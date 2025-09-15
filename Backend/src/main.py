@@ -6,7 +6,9 @@ from src.database import engine
 from src.models import ModeloBase
 
 # importamos los routers desde nuestros modulos
-from src.encuesta.router import router as encuesta_router #Importo la ruta de encuesta
+from src.personas.router import router as personas_router
+from src.mascotas.router import router as mascotas_router
+from src.productos.router import router as productos_router
 from fastapi.middleware.cors import CORSMiddleware
 
 load_dotenv()
@@ -37,4 +39,6 @@ app.add_middleware(
 
 
 # asociamos los routers a nuestra app
-app.include_router(encuesta_router)
+app.include_router(personas_router)
+app.include_router(mascotas_router)
+app.include_router(productos_router)
