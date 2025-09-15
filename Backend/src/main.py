@@ -9,6 +9,7 @@ from src.models import ModeloBase
 from src.personas.router import router as personas_router
 from src.mascotas.router import router as mascotas_router
 from src.productos.router import router as productos_router
+from src.estudiantes.router import router as estudiantes_router
 from fastapi.middleware.cors import CORSMiddleware
 
 load_dotenv()
@@ -42,3 +43,4 @@ app.add_middleware(
 app.include_router(personas_router)
 app.include_router(mascotas_router)
 app.include_router(productos_router)
+app.include_router(estudiantes_router)
