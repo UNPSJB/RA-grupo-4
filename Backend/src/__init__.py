@@ -1,3 +1,3 @@
-from src.mascotas.schemas import Mascota
-from src.personas.schemas import Persona
-from src.productos.schemas import Producto
+# from personas.schemas import Persona
+# from productos.schemas import Producto
+# from encuesta.schemas import Encuesta
