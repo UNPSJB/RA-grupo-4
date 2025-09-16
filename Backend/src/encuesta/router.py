@@ -1,0 +1,42 @@
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.orm import Session
+from src.database import get_db
+from src.encuesta import schemas, services
+
+router = APIRouter(prefix="/encuestas", tags=["encuestas"])
+
+
+@router.post("/", response_model=schemas.Encuesta)
+def create_encuesta(encuesta: schemas.EncuestaCreate, db: Session = Depends(get_db)):
+    return services.crear_encuesta(db, encuesta)
+
+
+@router.get("/", response_model=list[schemas.Encuesta])
+def read_encuestas(db: Session = Depends(get_db)):
+    return services.listar_encuestas(db)
+
+
+@router.get("/{id_encuesta}", response_model=schemas.Encuesta)
+def read_encuesta(id_encuesta: int, db: Session = Depends(get_db)):
+    encuesta = services.leer_encuesta(db, id_encuesta)
+    if not encuesta:
+        raise HTTPException(status_code=404, detail="Encuesta no encontrada")
+    return encuesta
+
+
+@router.put("/{id_encuesta}", response_model=schemas.Encuesta)
+def update_encuesta(
+    id_encuesta: int, encuesta: schemas.EncuestaUpdate, db: Session = Depends(get_db)
+):
+    encuesta_actualizada = services.modificar_encuesta(db, id_encuesta, encuesta)
+    if not encuesta_actualizada:
+        raise HTTPException(status_code=404, detail="Encuesta no encontrada")
+    return encuesta_actualizada
+
+
+@router.delete("/{id_encuesta}", response_model=schemas.EncuestaDelete)
+def delete_encuesta(id_encuesta: int, db: Session = Depends(get_db)):
+    encuesta_eliminada = services.eliminar_encuesta(db, id_encuesta)
+    if not encuesta_eliminada:
+        raise HTTPException(status_code=404, detail="Encuesta no encontrada")
+    return encuesta_eliminada
