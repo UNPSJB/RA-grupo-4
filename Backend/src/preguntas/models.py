@@ -20,6 +20,7 @@ class Pregunta(ModeloBase):
     opciones_respuestas: Mapped[List["src.respuestas.models.OpcionRespuesta"]] = relationship(
                 "src.respuestas.models.OpcionRespuesta", back_populates="pregunta", cascade="all, delete-orphan")
     
-    encuesta_id: Mapped[int] = mapped_column(ForeignKey("encuestas.id"))
-    encuesta: Mapped["src.encuestas.models.Encuesta"] = relationship ("src.encuestas.models.Encuesta", ForeignKey)
+    #NO ENCUENTRA LA TABLA ENCUESTA PARA REALIZAR LA FOREIGNKEY
+    encuesta_id: Mapped[int] = mapped_column(ForeignKey("encuesta.id_encuesta"))
+    encuesta: Mapped["src.encuesta.models.Encuesta"] = relationship ("src.encuesta.models.Encuesta", back_populates="preguntas")
 

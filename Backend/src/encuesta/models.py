@@ -10,5 +10,5 @@ class Encuesta(ModeloBase):
     #Tambien se podria agregar una descripcion de la encuesta
 
     preguntas: Mapped[list["src.preguntas.models.Pregunta"]] = relationship(
-        "src.preguntas.models.Pregunta", back_populates="encuesta", cascade="all, delete-orphan"
-    )
+         "src.preguntas.models.Pregunta", back_populates="encuesta", cascade="all, delete-orphan"
+     )

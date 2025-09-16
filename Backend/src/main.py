@@ -11,6 +11,7 @@ from src.mascotas.router import router as mascotas_router
 from src.productos.router import router as productos_router
 from src.preguntas.router import router as preguntas_router
 from src.respuestas.router import router as respuestas_router
+from src.encuesta.router import router as encuesta_router
 from fastapi.middleware.cors import CORSMiddleware
 
 load_dotenv()
@@ -43,6 +44,7 @@ app.add_middleware(
 # asociamos los routers a nuestra app
 app.include_router(preguntas_router)
 app.include_router(respuestas_router)
+app.include_router(encuesta_router)
 
 app.include_router(personas_router)
 app.include_router(mascotas_router)
