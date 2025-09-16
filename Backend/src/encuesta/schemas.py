@@ -31,10 +31,3 @@ class EncuestaDelete(BaseModel):
     id_encuesta: int
     nombre: str
 
-
-# Schema para Pregunta
-class Pregunta(BaseModel):
-    id: int
-    texto: str
-
-    model_config = {"from_attributes": True}

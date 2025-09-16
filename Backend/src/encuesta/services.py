@@ -3,6 +3,9 @@ from sqlalchemy import delete, select, update
 from sqlalchemy.orm import Session
 from src.encuesta.models import Encuesta
 from src.encuesta import schemas, exceptions
+from src.preguntas.schemas import PreguntaCreate, Pregunta as PreguntaSchema 
+from src.respuestas.schemas import OpcionRespuesta  
+from src.preguntas.models import Pregunta, TipoPregunta 
 
 #Crear Encuesta
 def crear_encuesta(db: Session, encuesta: schemas.EncuestaCreate) -> Encuesta:
@@ -47,3 +50,30 @@ def eliminar_encuesta(db: Session, id_encuesta: int) -> schemas.EncuestaDelete:
     db.execute(delete(Encuesta).where(Encuesta.id_encuesta == id_encuesta))
     db.commit()
     return db_encuesta
+
+
+def agregar_pregunta_a_encuesta(db: Session, id_encuesta: int, pregunta: PreguntaCreate ) -> PreguntaSchema:
+    
+    db_encuesta = leer_encuesta(db, id_encuesta)
+    
+    pregunta_nueva = Pregunta(
+        enunciado=pregunta.enunciado,
+        obligatoria=pregunta.obligatoria,
+        tipo=pregunta.tipo,
+        encuesta_id=db_encuesta.id_encuesta
+    )
+    db.add(pregunta_nueva)
+    db.commit()
+    db.refresh(pregunta_nueva)
+
+    if pregunta.tipo == TipoPregunta.CERRADA and pregunta.opciones_respuestas:
+        for opcion in pregunta.opciones_respuestas:
+            _opcion = OpcionRespuesta(
+                descripcion=opcion.descripcion,
+                pregunta_id= pregunta_nueva
+            )
+            db.add(_opcion)
+        db.commit()
+        db.refresh(pregunta_nueva)
+
+    return pregunta_nueva
