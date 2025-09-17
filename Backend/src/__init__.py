@@ -3,3 +3,4 @@ from src.personas.schemas import Persona
 from src.productos.schemas import Producto
 from src.preguntas.schemas import Pregunta
 from src.respuestas.schemas import OpcionRespuesta
+from src.encuesta.schemas import Encuesta

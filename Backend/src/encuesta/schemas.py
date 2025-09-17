@@ -10,13 +10,13 @@ class EncuestaBase(BaseModel):
 # Crear Encuesta
 class EncuestaCreate(EncuestaBase):
     preguntas: List[Pregunta] #= Field(default_factory=list)
-   
+
 
 
 # Actualizar Encuesta
 class EncuestaUpdate(EncuestaBase):
     preguntas: Optional[List[Pregunta]] #= None
- 
+
 
 # Leer Encuesta (respuesta completa)
 class Encuesta(EncuestaBase):

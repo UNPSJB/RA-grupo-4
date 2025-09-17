@@ -5,6 +5,7 @@ from fastapi import FastAPI
 from src.database import engine
 from src.models import ModeloBase
 
+
 # importamos los routers desde nuestros modulos
 from src.personas.router import router as personas_router
 from src.mascotas.router import router as mascotas_router

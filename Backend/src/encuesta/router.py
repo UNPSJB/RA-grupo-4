@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from src.database import get_db
 from src.encuesta import schemas, services
+from src.preguntas.schemas import Pregunta as PreguntaSchema, PreguntaCreate as PreguntaCreateSchema
 
 router = APIRouter(prefix="/encuestas", tags=["encuestas"])
 
@@ -40,3 +41,9 @@ def delete_encuesta(id_encuesta: int, db: Session = Depends(get_db)):
     if not encuesta_eliminada:
         raise HTTPException(status_code=404, detail="Encuesta no encontrada")
     return encuesta_eliminada
+
+
+
+@router.post("/{id_encuesta}/preguntas", response_model=PreguntaSchema)
+def agregar_pregunta_a_encuesta(id_encuesta: int, pregunta: PreguntaCreateSchema, db: Session = Depends(get_db)):
+    return services.agregar_pregunta_a_encuesta(db, id_encuesta, pregunta)

@@ -9,6 +9,7 @@ class Encuesta(ModeloBase):
     nombre: Mapped[str] = mapped_column(String, index=True)
     #Tambien se podria agregar una descripcion de la encuesta
 
-    preguntas: Mapped[list["src.preguntas.models.Pregunta"]] = relationship(
-         "src.preguntas.models.Pregunta", back_populates="encuesta", cascade="all, delete-orphan"
-     )
+    # preguntas: Mapped[list["src.preguntas.models.Pregunta"]] = relationship(
+    #  "src.preguntas.models.Pregunta", back_populates="encuesta", cascade="all, delete-orphan")
+preguntas: Mapped[list["Pregunta"]] = relationship (
+    "Pregunta", back_populates="encuesta", cascade="all, delete-orphan")
