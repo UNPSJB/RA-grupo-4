@@ -21,7 +21,8 @@ class EncuestaUpdate(EncuestaBase):
 # Leer Encuesta (respuesta completa)
 class Encuesta(EncuestaBase):
     id_encuesta: int
-    preguntas: List["Pregunta"]
+    nombre: str
+    #preguntas: List["Pregunta"]
 
     model_config = {"from_attributes": True}
 

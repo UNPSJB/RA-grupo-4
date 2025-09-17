@@ -3,12 +3,13 @@ from sqlalchemy import delete, select, update
 from sqlalchemy.orm import Session
 from src.estudiantes.models import Estudiante
 from src.estudiantes import schemas, exceptions
+from src.encuesta import schemas as encuesta_schemas
 
 # operaciones CRUD para Estudiantes
 
-def listar_encuestas(db: Session, estudiante_id: int) -> schemas.Estudiante:
-    db_estudiante = db.scalar(select(Estudiante).where(Estudiante.id == estudiante_id))
-    if db_estudiante is None:
+def listar_encuestas(db: Session, estudiante_id: int) -> List[encuesta_schemas.Encuesta]:
+    alumno = db.get(Estudiante, estudiante_id)
+    if alumno is None:
         raise exceptions.UsuarioNoEncontrado()
-    return db_estudiante.encuestas
+    return alumno.encuestas
 
