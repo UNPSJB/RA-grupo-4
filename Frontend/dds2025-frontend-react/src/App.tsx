@@ -1,35 +1,76 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useEffect, useState } from 'react';
+import './App.css';
 
-function App() {
-  const [count, setCount] = useState(0)
-
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+interface Survey {
+  id_encuesta: string;
+  nombre: string;
 }
 
-export default App
+function App() {
+  const [surveys, setSurveys] = useState<Survey[] | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  //  Estudiante hardcodeado
+  const studentId = 1;
+
+  const fetchSurveys = async () => {
+    setLoading(true);
+    setError(null);
+    setSurveys(null);
+
+    try {
+      const response = await fetch(`http://127.0.0.1:8000/estudiantes/${studentId}/encuestas`);
+
+      if (response.status === 404) {
+        setError('El estudiante no existe.');
+        setSurveys(null);
+      } else if (!response.ok) {
+        throw new Error('Error al obtener los datos de la API.');
+      } else {
+        const data: Survey[] = await response.json();
+        setSurveys(data);
+      }
+    } catch (err) {
+      console.error(err);
+      setError('Ocurrió un error al conectar con el servidor.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchSurveys();
+  }, []);
+
+  return (
+    <div className="container">
+      <h1>Encuestas del Estudiante {studentId}</h1>
+
+      {loading && <p>Cargando encuestas...</p>}
+      {error && <p className="error-message">{error}</p>}
+      
+      {surveys && (
+        <div className="results">
+          {surveys.length > 0 ? (
+            <div>
+              <h2>Encuestas Respondidas</h2>
+              <ul>
+                {surveys.map((survey, index) => (
+                  <li key={index}>
+                    <strong>ID de encuesta:</strong> {survey.id_encuesta} <br />
+                    <strong>Nombre:</strong> {survey.nombre}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : (
+            <p>El estudiante no tiene encuestas respondidas.</p>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default App;
