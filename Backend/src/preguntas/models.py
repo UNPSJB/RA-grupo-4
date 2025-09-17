@@ -17,12 +17,10 @@ class Pregunta(ModeloBase):
     obligatoria: Mapped[bool] = mapped_column(Boolean)
     tipo: Mapped[TipoPregunta] = mapped_column(String)
 
-    # opciones_respuestas: Mapped[List["src.respuestas.models.OpcionRespuesta"]] = relationship(
-    #             "src.respuestas.models.OpcionRespuesta", back_populates="pregunta", cascade="all, delete-orphan")
-    opciones_respuestas: Mapped[List["OpcionRespuesta"]] = relationship(
-                "OpcionRespuesta", back_populates="pregunta", cascade="all, delete-orphan")
-
+    opciones_respuestas: Mapped[List["src.respuestas.models.OpcionRespuesta"]] = relationship(
+                "src.respuestas.models.OpcionRespuesta", back_populates="pregunta"#, cascade="all, delete-orphan"
+                )
+    
     encuesta_id: Mapped[int] = mapped_column(ForeignKey("encuesta.id_encuesta"))
-    #encuesta: Mapped["src.encuesta.models.Encuesta"] = relationship ("src.encuesta.models.Encuesta", back_populates="preguntas")
-    encuesta: Mapped["Encuesta"] = relationship ("Encuesta", back_populates="preguntas")
-
+    encuesta: Mapped["src.encuesta.models.Encuesta"] = relationship ("src.encuesta.models.Encuesta", back_populates="preguntas")
+    

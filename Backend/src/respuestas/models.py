@@ -8,11 +8,9 @@ class OpcionRespuesta(ModeloBase):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     descripcion: Mapped[str] = mapped_column(String, index=True)    #texto de la respuesta  // si es null seria pregunta abierta?
+    
     pregunta_id: Mapped[int] = mapped_column(ForeignKey("preguntas.id"))
+    pregunta: Mapped["src.preguntas.models.Pregunta"] = relationship ("Pregunta", back_populates="opciones_respuestas")
+    
 
-#    pregunta: Mapped["src.preguntas.models.Pregunta"] = relationship ("Pregunta", back_populates="opciones_respuestas")
-    pregunta: Mapped["Pregunta"] = relationship ("Pregunta", back_populates="opciones_respuestas")
-    @property
-    def pregunta_enunciado(self):
-        return self.pregunta.enunciado
     
