@@ -1,169 +1,131 @@
-import { useEffect, useState } from "react";
 
-interface OpcionRespuesta {
-  id?: number;
+import React, { useState } from "react";
+
+interface Opcion {
   descripcion: string;
 }
 
-interface Pregunta {
-  id?: number;
+interface PreguntaCreate {
   enunciado: string;
   tipo: "ABIERTA" | "CERRADA";
   obligatoria: boolean;
-  opciones_respuestas?: OpcionRespuesta[];
+  opciones_respuestas?: Opcion[];
 }
 
-interface AgregarPreguntaProps {
-  encuestaId: number;
+interface AgregarPreguntaAEncuestaProps {
+  idEncuesta: number;
 }
 
-const AgregarPregunta: React.FC<AgregarPreguntaProps> = ({ encuestaId }) => {
-  const [preguntas, setPreguntas] = useState<Pregunta[]>([]);
+const AgregarPreguntaAEncuesta: React.FC<AgregarPreguntaAEncuestaProps> = ({ idEncuesta }) => {
   const [enunciado, setEnunciado] = useState("");
   const [tipo, setTipo] = useState<"ABIERTA" | "CERRADA">("ABIERTA");
   const [obligatoria, setObligatoria] = useState(false);
-  const [opciones, setOpciones] = useState<OpcionRespuesta[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [opciones, setOpciones] = useState<string[]>([""]);
+  const [mensaje, setMensaje] = useState("");
 
-  // Cargar preguntas existentes
-  useEffect(() => {
-    async function fetchPreguntas() {
-      try {
-        const res = await fetch(`http://localhost:8000/encuestas/${encuestaId}`);
-        const data = await res.json();
-        setPreguntas(data.preguntas || []);
-      } catch (err) {
-        console.error("Error cargando preguntas:", err);
-      }
-    }
-    fetchPreguntas();
-  }, [encuestaId]);
-
-  // Agregar una opción temporal
-  const addOpcion = () => {
-    setOpciones([...opciones, { descripcion: "" }]);
+  const handleOpcionChange = (index: number, valor: string) => {
+    const nuevasOpciones = [...opciones];
+    nuevasOpciones[index] = valor;
+    setOpciones(nuevasOpciones);
   };
 
-  // Actualizar texto de opción
-  const updateOpcion = (index: number, value: string) => {
-    const newOpciones = [...opciones];
-    newOpciones[index].descripcion = value;
-    setOpciones(newOpciones);
-  };
+  const agregarOpcion = () => setOpciones([...opciones, ""]);
+  const quitarOpcion = (index: number) =>
+    setOpciones(opciones.filter((_, i) => i !== index));
 
-  // Eliminar opción
-  const removeOpcion = (index: number) => {
-    const newOpciones = opciones.filter((_, i) => i !== index);
-    setOpciones(newOpciones);
-  };
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
-  // Agregar pregunta a la encuesta
-  const handleAgregarPregunta = async () => {
-    if (!enunciado.trim()) return;
-    if (tipo === "CERRADA" && opciones.length === 0) {
-      alert("Agregá al menos una opción para preguntas cerradas");
-      return;
-    }
+    const pregunta: PreguntaCreate = {
+      enunciado,
+      tipo,
+      obligatoria,
+      opciones_respuestas:
+        tipo === "CERRADA"
+          ? opciones.filter((o) => o.trim() !== "").map((o) => ({ descripcion: o }))
+          : [],
+    };
 
-    setLoading(true);
     try {
-      const nuevaPregunta: Pregunta = {
-        enunciado,
-        tipo,
-        obligatoria,
-        opciones_respuestas: tipo === "CERRADA" ? opciones : [],
-      };
-
       const res = await fetch(
-        `http://localhost:8000/encuestas/${encuestaId}/preguntas`,
+        `http://localhost:8000/encuestas/${idEncuesta}/preguntas`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(nuevaPregunta),
+          body: JSON.stringify(pregunta),
         }
       );
 
-      if (!res.ok) throw new Error("Error al crear pregunta");
+      if (!res.ok) {
+        const errorData = await res.json();
+        setMensaje(`Error: ${JSON.stringify(errorData.detail)}`);
+        return;
+      }
 
-      const data: Pregunta = await res.json();
-      setPreguntas([...preguntas, data]);
-
-      // Reset form
+      setMensaje("Pregunta agregada correctamente");
       setEnunciado("");
       setTipo("ABIERTA");
       setObligatoria(false);
-      setOpciones([]);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
+      setOpciones([""]);
+    } catch (error) {
+      setMensaje(`Error: ${error}`);
     }
   };
 
   return (
-    <div>
-      <h2>Agregar Pregunta</h2>
-
-      <input
-        type="text"
-        placeholder="Enunciado de la pregunta"
-        value={enunciado}
-        onChange={(e) => setEnunciado(e.target.value)}
-      />
-
-      <select
-        value={tipo}
-        onChange={(e) => setTipo(e.target.value as "ABIERTA" | "CERRADA")}
-      >
-        <option value="ABIERTA">Abierta</option>
-        <option value="CERRADA">Cerrada</option>
-      </select>
-
-      <label>
-        Obligatoria:
-        <input
-          type="checkbox"
-          checked={obligatoria}
-          onChange={(e) => setObligatoria(e.target.checked)}
-        />
-      </label>
-
-      {tipo === "CERRADA" && (
+    <div className="agregar-pregunta">
+      <h2>Agregar Pregunta a Encuesta {idEncuesta}</h2>
+      {mensaje && <p>{mensaje}</p>}
+      <form onSubmit={handleSubmit}>
         <div>
-          <h4>Opciones de respuesta</h4>
-          {opciones.map((opcion, i) => (
-            <div key={i}>
-              <input
-                type="text"
-                value={opcion.descripcion}
-                onChange={(e) => updateOpcion(i, e.target.value)}
-                placeholder={`Opción ${i + 1}`}
-              />
-              <button type="button" onClick={() => removeOpcion(i)}>
-                Eliminar
-              </button>
-            </div>
-          ))}
-          <button type="button" onClick={addOpcion}>
-            Agregar opción
-          </button>
+          <label>Enunciado:</label>
+          <input
+            type="text"
+            value={enunciado}
+            onChange={(e) => setEnunciado(e.target.value)}
+            required
+          />
         </div>
-      )}
-
-      <button onClick={handleAgregarPregunta} disabled={loading}>
-        {loading ? "Guardando..." : "Agregar Pregunta"}
-      </button>
-
-      <h3>Preguntas existentes</h3>
-      <ul>
-        {preguntas.map((p) => (
-          <li key={p.id}>
-            {p.enunciado} ({p.tipo}) {p.obligatoria ? "✅" : "❌"}
-          </li>
-        ))}
-      </ul>
+        <div>
+          <label>Tipo:</label>
+          <select value={tipo} onChange={(e) => setTipo(e.target.value as "ABIERTA" | "CERRADA")}>
+            <option value="ABIERTA">Abierta</option>
+            <option value="CERRADA">Cerrada</option>
+          </select>
+        </div>
+        <div>
+          <label>Obligatoria:</label>
+          <input
+            type="checkbox"
+            checked={obligatoria}
+            onChange={(e) => setObligatoria(e.target.checked)}
+          />
+        </div>
+        {tipo === "CERRADA" && (
+          <div>
+            <label>Opciones:</label>
+            {opciones.map((opcion, index) => (
+              <div key={index}>
+                <input
+                  type="text"
+                  value={opcion}
+                  onChange={(e) => handleOpcionChange(index, e.target.value)}
+                  required
+                />
+                <button type="button" onClick={() => quitarOpcion(index)}>
+                  Quitar
+                </button>
+              </div>
+            ))}
+            <button type="button" onClick={agregarOpcion}>
+              Agregar Opción
+            </button>
+          </div>
+        )}
+        <button type="submit">Agregar Pregunta</button>
+      </form>
     </div>
   );
 };
 
-export default AgregarPregunta;
+export default AgregarPreguntaAEncuesta;
