@@ -10,6 +10,7 @@ from src.models import ModeloBase
 from src.personas.router import router as personas_router
 from src.mascotas.router import router as mascotas_router
 from src.productos.router import router as productos_router
+
 from src.estudiantes.router import router as estudiantes_router
 from src.encuesta.router import router as encuesta_router
 from src.preguntas.router import router as preguntas_router
@@ -31,6 +32,11 @@ async def db_creation_lifespan(app: FastAPI):
 
 app = FastAPI(root_path=ROOT_PATH, lifespan=db_creation_lifespan)
 
+import logging
+
+logging.basicConfig(level=logging.DEBUG)
+
+
 origins = [
     "http://localhost:5173", # para recibir requests desde app React (puerto: 5173)
 ]
@@ -48,9 +54,8 @@ app.add_middleware(
 app.include_router(preguntas_router)
 app.include_router(respuestas_router)
 app.include_router(encuesta_router)
+app.include_router(estudiantes_router)
 
 app.include_router(personas_router)
 app.include_router(mascotas_router)
 app.include_router(productos_router)
-app.include_router(estudiantes_router)
-app.include_router(encuesta_router)

@@ -10,7 +10,7 @@ class Encuesta(ModeloBase):
     nombre: Mapped[str] = mapped_column(String, index=True)
     
     estudiante_id: Mapped[int] = mapped_column(
-        ForeignKey("estudiantes.id")
+        ForeignKey("estudiantes.id"), nullable=True     # incorporamos el null para permitir encuestas sin estudiantes
     )  # Foreign key a Estudiante
     estudiante: Mapped["src.estudiantes.models.Estudiante"] = relationship(
         "src.estudiantes.models.Estudiante", back_populates="encuestas"

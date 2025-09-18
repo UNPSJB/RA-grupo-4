@@ -9,20 +9,19 @@ class EncuestaBase(BaseModel):
 
 # Crear Encuesta
 class EncuestaCreate(EncuestaBase):
-    preguntas: List[Pregunta] #= Field(default_factory=list)
+    preguntas: Optional[List[Pregunta]]  = []
 
 
 
 # Actualizar Encuesta
 class EncuestaUpdate(EncuestaBase):
-    preguntas: Optional[List[Pregunta]] #= None
+    preguntas: Optional[List[Pregunta]]  = []
 
 
 # Leer Encuesta (respuesta completa)
 class Encuesta(EncuestaBase):
     id_encuesta: int
-    nombre: str
-    preguntas: Optional[List[Pregunta]]  = []
+    preguntas: List[Pregunta] = []
 
     model_config = {"from_attributes": True}
 
@@ -30,5 +29,5 @@ class Encuesta(EncuestaBase):
 # Eliminar Encuesta
 class EncuestaDelete(BaseModel):
     id_encuesta: int
-    nombre: str
+    
 
