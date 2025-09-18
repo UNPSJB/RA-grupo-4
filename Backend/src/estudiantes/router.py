@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from src.database import get_db
 from src.estudiantes import schemas, services
+from src.encuesta import schemas, services
 
 router = APIRouter(prefix="/estudiantes", tags=["estudiantes"])
 

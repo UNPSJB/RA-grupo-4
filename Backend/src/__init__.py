@@ -2,3 +2,4 @@ from src.mascotas.schemas import Mascota
 from src.personas.schemas import Persona
 from src.productos.schemas import Producto
 from src.encuesta.schemas import Encuesta
+from src.estudiantes.schemas import Estudiante

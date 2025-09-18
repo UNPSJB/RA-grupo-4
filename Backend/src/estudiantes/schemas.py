@@ -1,6 +1,8 @@
 from pydantic import BaseModel, field_validator
 from src.productos.models import TipoMasa
 from src.productos import exceptions
+from src.encuesta.models import Encuesta
+
 # Los siguientes schemas contienen atributos sin muchas restricciones de tipo.
 # Podemos crear atributos con ciertas reglas mediante el uso de un "Field" adecuado.
 # https://docs.pydantic.dev/latest/concepts/fields/
