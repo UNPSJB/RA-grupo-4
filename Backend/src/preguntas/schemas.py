@@ -14,7 +14,7 @@ class PreguntaBase(BaseModel):
 class PreguntaCreate(PreguntaBase):
     tipo: TipoPregunta
     obligatoria: bool
-    opciones_respuestas: Optional[List[OpcionRespuestaCreate]]
+    opciones_respuestas: Optional[List[OpcionRespuestaCreate]] = []
 
 
 class PreguntaUpdate(PreguntaBase):
@@ -22,16 +22,14 @@ class PreguntaUpdate(PreguntaBase):
 
 class PreguntaDelete(BaseModel):
     id: int
-    opciones_respuestas: Optional[List[OpcionRespuesta]]
-
+    opciones_respuestas: Optional[List[OpcionRespuestaDelete]] = []
 
 
 class Pregunta(PreguntaBase):
     id: int
     tipo: TipoPregunta
     obligatoria: bool
-    opciones_respuestas: Optional[List[OpcionRespuesta]]
-
+    opciones_respuestas: Optional[List[OpcionRespuesta]] = []
     # from_atributes=True permite que Pydantic trabaje con modelos SQLAlchemy
     # más info.: https://docs.pydantic.dev/latest/api/config/#pydantic.config.ConfigDict.from_attributes
     model_config = {"from_attributes": True}

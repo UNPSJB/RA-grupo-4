@@ -5,8 +5,8 @@ from src.models import ModeloBase
 from enum import auto, StrEnum
 
 class TipoPregunta(StrEnum):
-    ABIERTA = auto()
-    CERRADA = auto()
+    ABIERTA = "ABIERTA"
+    CERRADA = "CERRADA"
 
 
 class Pregunta(ModeloBase):
@@ -18,7 +18,7 @@ class Pregunta(ModeloBase):
     tipo: Mapped[TipoPregunta] = mapped_column(String)
 
     opciones_respuestas: Mapped[List["src.respuestas.models.OpcionRespuesta"]] = relationship(
-                "src.respuestas.models.OpcionRespuesta", back_populates="pregunta"#, cascade="all, delete-orphan"
+                "src.respuestas.models.OpcionRespuesta", back_populates="pregunta", cascade="all, delete-orphan"
                 )
     
     encuesta_id: Mapped[int] = mapped_column(ForeignKey("encuesta.id_encuesta"))

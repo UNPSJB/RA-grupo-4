@@ -12,5 +12,3 @@ class OpcionRespuesta(ModeloBase):
     pregunta_id: Mapped[int] = mapped_column(ForeignKey("preguntas.id"))
     pregunta: Mapped["src.preguntas.models.Pregunta"] = relationship ("Pregunta", back_populates="opciones_respuestas")
     
-
-    

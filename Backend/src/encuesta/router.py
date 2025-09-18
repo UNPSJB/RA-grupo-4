@@ -45,5 +45,5 @@ def delete_encuesta(id_encuesta: int, db: Session = Depends(get_db)):
 
 
 @router.post("/{id_encuesta}/preguntas", response_model=PreguntaSchema)
-def agregar_pregunta_a_encuesta(id_encuesta: int, pregunta: PreguntaCreateSchema, db: Session = Depends(get_db)):
+def agregar_pregunta_encuesta(id_encuesta: int, pregunta: PreguntaCreateSchema, db: Session = Depends(get_db)):
     return services.agregar_pregunta_a_encuesta(db, id_encuesta, pregunta)

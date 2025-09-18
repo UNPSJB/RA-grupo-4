@@ -9,8 +9,7 @@ class OpcionRespuestaBase(BaseModel):
     descripcion: str
 
 class OpcionRespuestaCreate(OpcionRespuestaBase):
-    pregunta_id: int
-
+    pass
 class OpcionRespuestaUpdate(OpcionRespuestaBase):
     pass
 
@@ -21,7 +20,6 @@ class OpcionRespuestaDelete(BaseModel):
 class OpcionRespuesta(OpcionRespuestaBase):
     id: int
     pregunta_id: int
-    pregunta_enunciado: str
 
     # from_atributes=True permite que Pydantic trabaje con modelos SQLAlchemy
     # más info.: https://docs.pydantic.dev/latest/api/config/#pydantic.config.ConfigDict.from_attributes
