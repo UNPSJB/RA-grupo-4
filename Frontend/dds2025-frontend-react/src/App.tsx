@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import './App.css';
 
 interface Survey {
@@ -10,14 +10,16 @@ function App() {
   const [surveys, setSurveys] = useState<Survey[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [fetched, setFetched] = useState(false); 
 
-  //  Estudiante hardcodeado
+  // Estudiante hardcodeado
   const studentId = 1;
 
   const fetchSurveys = async () => {
     setLoading(true);
     setError(null);
     setSurveys(null);
+    setFetched(true);
 
     try {
       const response = await fetch(`http://127.0.0.1:8000/estudiantes/${studentId}/encuestas`);
@@ -39,13 +41,16 @@ function App() {
     }
   };
 
-  useEffect(() => {
-    fetchSurveys();
-  }, []);
-
   return (
     <div className="container">
-      <h1>Encuestas del Estudiante {studentId}</h1>
+      <h1>Historial de Encuestas de Estudiante {studentId}</h1>
+
+      {/* Botón para cargar las encuestas */}
+      {!fetched && (
+        <button onClick={fetchSurveys}>
+          Listar Encuestas
+        </button>
+      )}
 
       {loading && <p>Cargando encuestas...</p>}
       {error && <p className="error-message">{error}</p>}
