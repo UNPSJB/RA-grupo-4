@@ -1,4 +1,0 @@
-
-En powerShell ejecutar
-ubicado en el directorio de usuario
-.\Envs\DesarrolloSoftware\Scripts\Activate.ps1
