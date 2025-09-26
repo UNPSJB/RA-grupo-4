@@ -21,6 +21,6 @@ class Pregunta(ModeloBase):
                 "src.respuestas.models.OpcionRespuesta", back_populates="pregunta", cascade="all, delete-orphan"
                 )
     
-    encuesta_id: Mapped[int] = mapped_column(ForeignKey("encuesta.id_encuesta"))
+    encuesta_id: Mapped[int] = mapped_column(ForeignKey("encuestas.id_encuesta"))
     encuesta: Mapped["src.encuesta.models.Encuesta"] = relationship ("src.encuesta.models.Encuesta", back_populates="preguntas")
     

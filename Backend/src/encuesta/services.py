@@ -11,7 +11,10 @@ from src.preguntas.models import Pregunta, TipoPregunta
 
 #Crear Encuesta
 def crear_encuesta(db: Session, encuesta: schemas.EncuestaCreate) -> Encuesta:
-    _encuesta = Encuesta(nombre=encuesta.nombre)
+    _encuesta = Encuesta(
+        nombre=encuesta.nombre,
+        disponible=encuesta.disponible  
+    )
     db.add(_encuesta)
     db.commit()
     db.refresh(_encuesta)
@@ -22,6 +25,11 @@ def crear_encuesta(db: Session, encuesta: schemas.EncuestaCreate) -> Encuesta:
 def listar_encuestas(db: Session) -> List[Encuesta]:
     return db.scalars(select(Encuesta)).all()
 
+# Listar solo encuestas disponibles
+def listar_encuestas_disponibles(db: Session) -> List[Encuesta]:
+    return db.scalars(
+        select(Encuesta).where(Encuesta.disponible == True)
+    ).all()
 
 #Leer una encuesta por ID
 def leer_encuesta(db: Session, id_encuesta: int) -> Encuesta:

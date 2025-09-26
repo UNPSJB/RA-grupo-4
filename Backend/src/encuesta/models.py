@@ -1,10 +1,10 @@
-from sqlalchemy import Integer, String, ForeignKey
+from sqlalchemy import Integer, String, Boolean, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from src.models import ModeloBase
 from typing import List
 
 class Encuesta(ModeloBase):
-    __tablename__ = "encuesta"
+    __tablename__ = "encuestas"
 
     id_encuesta: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     nombre: Mapped[str] = mapped_column(String, index=True)
@@ -19,7 +19,7 @@ class Encuesta(ModeloBase):
     @property
     def nombre_estudiante(self):
         return self.estudiante.nombre
-    #Tambien se podria agregar una descripcion de la encuesta
+    disponible: Mapped[bool] = mapped_column(Boolean, default=False)
 
     preguntas: Mapped[list["src.preguntas.models.Pregunta"]] = relationship (
         "src.preguntas.models.Pregunta", back_populates="encuesta", cascade="all, delete-orphan")
