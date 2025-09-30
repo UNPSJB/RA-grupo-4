@@ -1,5 +1,4 @@
 import { useState } from "react";
-import axios from "axios";
 
 function EncuestasDisponibles() {
   const [encuestas, setEncuestas] = useState<any[]>([]);
