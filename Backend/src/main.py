@@ -13,6 +13,8 @@ from src.encuesta.router import router as encuesta_router
 from src.preguntas.router import router as preguntas_router
 from src.respuestas.router import router as respuestas_router
 from src.materias.router import router as materias_router
+from src.carreras.router import router as carreras_router
+from src.docentes.router import router as docentes_router
 
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -53,9 +55,7 @@ app.include_router(preguntas_router)
 app.include_router(respuestas_router)
 app.include_router(encuesta_router)
 app.include_router(estudiantes_router)
-
-app.include_router(personas_router)
-app.include_router(mascotas_router)
-app.include_router(productos_router)
 app.include_router(encuesta_router)
 app.include_router(materias_router)
+app.include_router(docentes_router)
+app.include_router(carreras_router)
