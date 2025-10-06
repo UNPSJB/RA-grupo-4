@@ -21,12 +21,6 @@ def read_encuestas(db: Session = Depends(get_db)):
     return services.listar_encuestas(db)
 
 
-# @router.get("/{id_encuesta}", response_model=schemas.Encuesta)
-# def read_encuesta(id_encuesta: int, db: Session = Depends(get_db)):
-#     encuesta = services.leer_encuesta(db, id_encuesta)
-#     if not encuesta:
-#         raise HTTPException(status_code=404, detail="Encuesta no encontrada")
-#     return encuesta
 @router.get("/{id_encuesta}", response_model=schemas.Encuesta)
 def read_encuesta(id_encuesta: int, db: Session = Depends(get_db)):
     try:
@@ -39,7 +33,6 @@ def read_encuesta(id_encuesta: int, db: Session = Depends(get_db)):
         print("ERROR en read_encuesta")
         traceback.print_exc()  # esto te muestra el error real en consola
         raise HTTPException(status_code=500, detail=str(e))
-
 
 
 
