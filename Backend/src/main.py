@@ -11,6 +11,7 @@ from src.estudiantes.router import router as estudiantes_router
 from src.encuesta.router import router as encuesta_router
 from src.preguntas.router import router as preguntas_router
 from src.respuestas.router import router as respuestas_router
+from src.informesSinteticos.router import router as informesSinteticos_router
 
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -52,3 +53,4 @@ app.include_router(respuestas_router)
 app.include_router(encuesta_router)
 app.include_router(estudiantes_router)
 app.include_router(encuesta_router)
+app.include_router(informesSinteticos_router)
