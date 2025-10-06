@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import AgregarPreguntaAEncuesta from "./Componentes/AgregarPreguntaAEncuesta";
 import HistorialEncuestas from "./Componentes/HistorialEncuestasRealizadasEstudiante";
 import EncuestasDisponibles from "./Componentes/EncuestasList";
+import ListadoInformesACDep from "./Componentes/ListadoInformesACDep"; 
 
 function App() {
   const [idEncuestaSeleccionada, setIdEncuestaSeleccionada] = useState<number>(1);
@@ -21,8 +22,13 @@ function App() {
         <HistorialEncuestas studentId={idEstudiante} />
       </section>
 
+      <section style={{ marginBottom: "40px" }}>
+        <h2>3. Listado de Informes de Actividad Curricular del Departamento</h2>
+        <ListadoInformesACDep />
+      </section>
+
       <section>
-        <h2>3. Agregar Pregunta a Encuesta</h2>
+        <h2>4. Agregar Pregunta a Encuesta</h2>
         <AgregarPreguntaAEncuesta idEncuesta={idEncuestaSeleccionada} />
       </section>
     </div>
@@ -30,4 +36,3 @@ function App() {
 }
 
 export default App;
-

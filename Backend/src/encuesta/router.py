@@ -36,7 +36,7 @@ def read_encuesta(id_encuesta: int, db: Session = Depends(get_db)):
         return encuesta
     except Exception as e:
         import traceback
-        print("❌ ERROR en read_encuesta")
+        print("ERROR en read_encuesta")
         traceback.print_exc()  # esto te muestra el error real en consola
         raise HTTPException(status_code=500, detail=str(e))
 
