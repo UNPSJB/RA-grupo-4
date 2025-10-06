@@ -1,33 +1,38 @@
-import React, { useState } from "react";
-import AgregarPreguntaAEncuesta from "./Componentes/AgregarPreguntaAEncuesta";
-import HistorialEncuestas from "./Componentes/HistorialEncuestasRealizadasEstudiante";
-import EncuestasDisponibles from "./Componentes/EncuestasList";
+    import React, { useState } from "react";
+    import AgregarPreguntaAEncuesta from "./Componentes/AgregarPreguntaAEncuesta";
+    import HistorialEncuestas from "./Componentes/HistorialEncuestasRealizadasEstudiante";
+    import EncuestasDisponibles from "./Componentes/EncuestasList";
+    import ListarInformesSinteticos from "./Componentes/ListarInformesSinteticos";
+    function App() {
+      const [idEncuestaSeleccionada, setIdEncuestaSeleccionada] = useState<number>(1);
+      const [idEstudiante, setIdEstudiante] = useState<number>(1);
 
-function App() {
-  const [idEncuestaSeleccionada, setIdEncuestaSeleccionada] = useState<number>(1);
-  const [idEstudiante, setIdEstudiante] = useState<number>(1);
+      return (
+        <div style={{ padding: "20px", fontFamily: "Arial, sans-serif" }}>
+          <h1>Gestión de Encuestas</h1>
 
-  return (
-    <div style={{ padding: "20px", fontFamily: "Arial, sans-serif" }}>
-      <h1>Gestión de Encuestas</h1>
+          <section style={{ marginBottom: "40px" }}>
+            <h2>1. Encuestas Disponibles</h2>
+            <EncuestasDisponibles />
+          </section>
 
-      <section style={{ marginBottom: "40px" }}>
-        <h2>1. Encuestas Disponibles</h2>
-        <EncuestasDisponibles />
-      </section>
+          <section style={{ marginBottom: "40px" }}>
+            <h2>2. Historial de Encuestas del Estudiante</h2>
+            <HistorialEncuestas studentId={idEstudiante} />
+          </section>
 
-      <section style={{ marginBottom: "40px" }}>
-        <h2>2. Historial de Encuestas del Estudiante</h2>
-        <HistorialEncuestas studentId={idEstudiante} />
-      </section>
+          <section>
+            <h2>3. Agregar Pregunta a Encuesta</h2>
+            <AgregarPreguntaAEncuesta idEncuesta={idEncuestaSeleccionada} />
+          </section>
 
-      <section>
-        <h2>3. Agregar Pregunta a Encuesta</h2>
-        <AgregarPreguntaAEncuesta idEncuesta={idEncuestaSeleccionada} />
-      </section>
-    </div>
-  );
-}
+          <section>
+            <h2>Listado de informes sinteticos</h2>
+            <ListarInformesSinteticos />
+          </section>
+          
+        </div>
+      );
+    }
 
-export default App;
-
+    export default App;

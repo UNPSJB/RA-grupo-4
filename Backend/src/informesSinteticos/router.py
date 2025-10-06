@@ -9,7 +9,7 @@ router = APIRouter(prefix="/informesSinteticos", tags=["informesSinteticos"])
 
 # Rutas para Informes Sinteticos
 
-@router.get("/{informeSintetico_id}/informesSinteticos", response_model=List[schemas.InformeSintetico])
+@router.get("/", response_model=List[schemas.InformeSintetico])
 def leer_informesSinteticos(db: Session = Depends(get_db)):
     return services.listar_informesSinteticos(db)
 
