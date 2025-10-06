@@ -1,5 +1,5 @@
 from pydantic import BaseModel, field_validator
-from src.materias.models import TipoMasa
+from src.materias.models import Materias
 from src.materias import exceptions
 
 
