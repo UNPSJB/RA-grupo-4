@@ -2,7 +2,8 @@ import React, { useState } from "react";
 import AgregarPreguntaAEncuesta from "./Componentes/AgregarPreguntaAEncuesta";
 import HistorialEncuestas from "./Componentes/HistorialEncuestasRealizadasEstudiante";
 import EncuestasDisponibles from "./Componentes/EncuestasList";
-import ListadoInformesACDep from "./Componentes/ListadoInformesACDep"; 
+import ListadoInformesACDep from "./Componentes/ListadoInformesACDep";
+import SeleccionarEncuesta from "./Componentes/SeleccionarEncuestas";
 
 function App() {
   const [idEncuestaSeleccionada, setIdEncuestaSeleccionada] = useState<number>(1);
@@ -27,9 +28,14 @@ function App() {
         <ListadoInformesACDep />
       </section>
 
-      <section>
+      <section style={{ marginBottom: "40px" }}>
         <h2>4. Agregar Pregunta a Encuesta</h2>
         <AgregarPreguntaAEncuesta idEncuesta={idEncuestaSeleccionada} />
+      </section>
+
+      <section>
+        <h2>5. Seleccionar Encuesta para Responder</h2>
+        <SeleccionarEncuesta idEstudiante={idEstudiante} />
       </section>
     </div>
   );

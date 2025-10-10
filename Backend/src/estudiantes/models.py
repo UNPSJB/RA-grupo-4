@@ -11,8 +11,8 @@ class Estudiante(ModeloBase):
     usuario: Mapped[str] = mapped_column(String, unique=True, index=True, nullable=False)
     contraseña: Mapped[str] = mapped_column(String, nullable=False)
 
-    inscripciones: Mapped[List["Inscripcion"]] = relationship(
-        "Inscripcion", 
+    inscripciones: Mapped[Optional[List["Inscripciones"]]] = relationship(
+        "Inscripciones", 
         back_populates="estudiante"
     )
     

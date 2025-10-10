@@ -16,8 +16,8 @@ class Materias(ModeloBase):
         "InformesAC",
         back_populates="materia"
     )
-    inscripciones: Mapped[List["Inscripcion"]] = relationship(
-        "Inscripcion", 
+    inscripciones: Mapped[List["Inscripciones"]] = relationship(
+        "Inscripciones", 
         back_populates="materia"
     )
     

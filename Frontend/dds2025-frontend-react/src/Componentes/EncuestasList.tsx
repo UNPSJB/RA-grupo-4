@@ -7,10 +7,16 @@ function EncuestasDisponibles() {
   const cargarEncuestasDisponibles = async () => {
     try {
       const url = "http://localhost:8000/encuestas";
-      const res = await axios.get(url);
-      console.log("Datos recibidos:", res.data);
+      const res = await fetch(url);
 
-      const disponibles = res.data.filter(
+      if (!res.ok) {
+        throw new Error(`Error HTTP: ${res.status}`);
+      }
+
+      const data = await res.json();
+      console.log("Datos recibidos:", data);
+
+      const disponibles = data.filter(
         (e: any) => e.disponible === true || e.disponible === 1
       );
 
@@ -77,3 +83,4 @@ function EncuestasDisponibles() {
 }
 
 export default EncuestasDisponibles;
+

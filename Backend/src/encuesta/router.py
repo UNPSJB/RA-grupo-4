@@ -73,3 +73,19 @@ def seleccionar_encuestas_disponibles(
     Obtiene las encuestas habilitadas para un estudiante basado en sus inscripciones a materias.
     """
     return services.get_encuestas_disponibles_por_estudiante(db, estudiante_id)
+
+@router.get("/estudiantes/{id_estudiante}", tags=["encuestas"])
+def obtener_encuestas_disponibles(id_estudiante: int):
+    """
+    Endpoint de prueba para devolver encuestas disponibles a un estudiante.
+    Luego se reemplazará con la lógica real que use Inscripciones y Materias.
+    """
+    encuestas = [
+        {"id": 1, "nombre": "Encuesta de Programación I", "materia": "Programación I", "habilitada": True},
+        {"id": 2, "nombre": "Encuesta de Matemática I", "materia": "Matemática I", "habilitada": False},
+        {"id": 3, "nombre": "Encuesta de Base de Datos", "materia": "Base de Datos", "habilitada": True},
+    ]
+
+    # Solo devuelve las encuestas habilitadas
+    disponibles = [e for e in encuestas if e["habilitada"]]
+    return disponibles

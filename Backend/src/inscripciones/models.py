@@ -18,8 +18,8 @@ class Inscripciones(ModeloBase):
     
     fecha_inscripcion: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
-    estudiante: Mapped["Estudiante"] = relationship(back_populates="inscripciones")
-    materia: Mapped["Materias"] = relationship(back_populates="inscripciones")
+    estudiante: Mapped["Estudiante"] = relationship("Estudiante", back_populates="inscripciones")
+    materia: Mapped["Materias"] = relationship("Materias",back_populates="inscripciones")
 
     def __repr__(self):
         return f"<Inscripcion EstudianteID={self.estudiante_id}, MateriaID={self.materia_id}>"
