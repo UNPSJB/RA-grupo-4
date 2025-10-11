@@ -6,7 +6,10 @@ from src.encuesta import schemas, exceptions
 from src.preguntas.schemas import PreguntaCreate, Pregunta as PreguntaSchema 
 from src.respuestas.models import  OpcionRespuesta 
 from src.preguntas.models import Pregunta, TipoPregunta
-
+from typing import Dict, Any
+from sqlalchemy import distinct
+from src.inscripciones.models import Inscripciones 
+from src.materias.models import Materias
 
 
 #Crear Encuesta
@@ -62,33 +65,6 @@ def eliminar_encuesta(db: Session, id_encuesta: int) -> schemas.EncuestaDelete:
     return db_encuesta
 
 
-# def agregar_pregunta_a_encuesta(db: Session, id_encuesta: int, pregunta: PreguntaCreate ) -> PreguntaSchema:
-    
-#     db_encuesta = leer_encuesta(db, id_encuesta)
-    
-#     pregunta_nueva = Pregunta(
-#         enunciado=pregunta.enunciado,
-#         obligatoria=pregunta.obligatoria,
-#         tipo=pregunta.tipo,
-#         encuesta_id=db_encuesta.id_encuesta
-#     )
-#     db.add(pregunta_nueva)
-#     db.commit()
-#     db.refresh(pregunta_nueva)
-
-#     if pregunta.tipo == TipoPregunta.CERRADA and pregunta.opciones_respuestas:
-#         for opcion in pregunta.opciones_respuestas:
-#             _opcion = OpcionRespuesta(
-#                 descripcion=opcion.descripcion,
-#                 pregunta_id= pregunta_nueva.id
-#             )
-#             db.add(_opcion)
-#         db.commit()
-#         db.refresh(pregunta_nueva)
-
-#     return pregunta_nueva
-
-
 def agregar_pregunta_a_encuesta(db: Session, id_encuesta: int, pregunta: PreguntaCreate) -> PreguntaSchema:
     
     # Obtener encuesta
@@ -123,3 +99,34 @@ def agregar_pregunta_a_encuesta(db: Session, id_encuesta: int, pregunta: Pregunt
         db.refresh(pregunta_nueva)
     
     return pregunta_nueva
+
+#encuestas disponibles para un estudiante 
+def get_encuestas_disponibles_por_estudiante(db: Session, estudiante_id: int) -> List[Dict[str, Any]]:
+    """
+    Criterio: El estudiante debe estar inscrito en la materia asociada a la encuesta.
+    """
+    
+    query = (
+        db.query(
+            Encuesta,
+            Materias.nombre.label("materia_nombre")
+        )
+        .join(Materias, Encuesta.materia_id == Materias.id_materia)
+        .join(Inscripciones, Inscripciones.materia_id == Materias.id_materia)
+        .filter(Inscripciones.estudiante_id == estudiante_id)
+        .filter(Encuesta.disponible == True)
+        .distinct(Encuesta.id_encuesta) 
+        .all()
+    )
+
+    resultados = []
+    for encuesta_obj, materia_nombre in query:
+        resultados.append({
+            "id_encuesta": encuesta_obj.id_encuesta,
+            "nombre": encuesta_obj.nombre,
+            "disponible": encuesta_obj.disponible,
+            "materia_id": encuesta_obj.materia_id,
+            "materia_nombre": materia_nombre,
+        })
+        
+    return resultados

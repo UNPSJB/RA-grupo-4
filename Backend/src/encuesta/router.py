@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from src.database import get_db
 from src.encuesta import schemas, services
 from src.preguntas.schemas import Pregunta as PreguntaSchema, PreguntaCreate as PreguntaCreateSchema
+from typing import List
 
 router = APIRouter(prefix="/encuestas", tags=["encuestas"])
 
@@ -21,12 +22,6 @@ def read_encuestas(db: Session = Depends(get_db)):
     return services.listar_encuestas(db)
 
 
-# @router.get("/{id_encuesta}", response_model=schemas.Encuesta)
-# def read_encuesta(id_encuesta: int, db: Session = Depends(get_db)):
-#     encuesta = services.leer_encuesta(db, id_encuesta)
-#     if not encuesta:
-#         raise HTTPException(status_code=404, detail="Encuesta no encontrada")
-#     return encuesta
 @router.get("/{id_encuesta}", response_model=schemas.Encuesta)
 def read_encuesta(id_encuesta: int, db: Session = Depends(get_db)):
     try:
@@ -36,10 +31,9 @@ def read_encuesta(id_encuesta: int, db: Session = Depends(get_db)):
         return encuesta
     except Exception as e:
         import traceback
-        print("❌ ERROR en read_encuesta")
-        traceback.print_exc()  # esto te muestra el error real en consola
+        print("ERROR en read_encuesta")
+        traceback.print_exc()  
         raise HTTPException(status_code=500, detail=str(e))
-
 
 
 
@@ -65,3 +59,33 @@ def delete_encuesta(id_encuesta: int, db: Session = Depends(get_db)):
 @router.post("/{id_encuesta}/preguntas", response_model=PreguntaSchema)
 def agregar_pregunta_encuesta(id_encuesta: int, pregunta: PreguntaCreateSchema, db: Session = Depends(get_db)):
     return services.agregar_pregunta_a_encuesta(db, id_encuesta, pregunta)
+
+@router.get(
+    "/estudiantes/{estudiante_id}/encuestas_habilitadas",
+    response_model=List[schemas.EncuestaDisponible],
+    tags=["estudiantes"] 
+)
+def seleccionar_encuestas_disponibles(
+    estudiante_id: int,
+    db: Session = Depends(get_db)
+):
+    """
+    Obtiene las encuestas habilitadas para un estudiante basado en sus inscripciones a materias.
+    """
+    return services.get_encuestas_disponibles_por_estudiante(db, estudiante_id)
+
+@router.get("/estudiantes/{id_estudiante}", tags=["encuestas"])
+def obtener_encuestas_disponibles(id_estudiante: int):
+    """
+    Endpoint de prueba para devolver encuestas disponibles a un estudiante.
+    Luego se reemplazará con la lógica real que use Inscripciones y Materias.
+    """
+    encuestas = [
+        {"id": 1, "nombre": "Encuesta de Programación I", "materia": "Programación I", "habilitada": True},
+        {"id": 2, "nombre": "Encuesta de Matemática I", "materia": "Matemática I", "habilitada": False},
+        {"id": 3, "nombre": "Encuesta de Base de Datos", "materia": "Base de Datos", "habilitada": True},
+    ]
+
+    # Solo devuelve las encuestas habilitadas
+    disponibles = [e for e in encuestas if e["habilitada"]]
+    return disponibles
