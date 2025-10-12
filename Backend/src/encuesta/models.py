@@ -10,12 +10,12 @@ class Encuesta(ModeloBase):
     nombre: Mapped[str] = mapped_column(String, index=True)
     
     
-    materia_id: Mapped[int] = mapped_column(
-        ForeignKey("materias.id_materia"), nullable=False 
-    ) 
-    materia: Mapped["src.materias.models.Materias"] = relationship(
-        "src.materias.models.Materias", back_populates="encuestas"
+    # materias que usan esta encuesta
+    materias: Mapped[List["src.materias.models.Materias"]] = relationship(
+        "src.materias.models.Materias",
+        back_populates="encuesta"
     )
+
 
     estudiante_id: Mapped[Optional[int]] = mapped_column(
         ForeignKey("estudiantes.id"), nullable=True 

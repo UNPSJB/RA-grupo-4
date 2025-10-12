@@ -5,6 +5,7 @@ import EncuestasDisponibles from "./Componentes/EncuestasList";
 import ListadoInformesACDep from "./Componentes/ListadoInformesACDep";
 import SeleccionarEncuesta from "./Componentes/SeleccionarEncuestas";
 import ListarInformesSinteticos from "./Componentes/ListarInformesSinteticos";
+import MostrarEncuesta from "./Componentes/MostrarEncuesta";
 
 function App() {
   const [idEncuestaSeleccionada, setIdEncuestaSeleccionada] = useState<number>(1);
@@ -39,10 +40,19 @@ function App() {
             <ListarInformesSinteticos />
           </section>
           
+          <section>
+            <h2>Ver Preguntas de Encuesta</h2>
+            <MostrarEncuesta
+              estudianteId={idEstudiante}
+              encuestaId={idEncuestaSeleccionada}
+            />
+          </section>
+
     
       <section>
         <h2>5. Seleccionar Encuesta para Responder</h2>
-        <SeleccionarEncuesta idEstudiante={idEstudiante} />
+        {/* <SeleccionarEncuesta idEstudiante={idEstudiante} /> esta hardcoreado, no se le pasa el prop */}
+        <SeleccionarEncuesta />
       </section>
     </div>
       );
