@@ -3,6 +3,7 @@ import AgregarPreguntaAEncuesta from "./Componentes/AgregarPreguntaAEncuesta";
 import HistorialEncuestas from "./Componentes/HistorialEncuestasRealizadasEstudiante";
 import EncuestasDisponibles from "./Componentes/EncuestasList";
 import ListadoInformesACDep from "./Componentes/ListadoInformesACDep";
+import ListadoInformesACDoc from "./Componentes/ListadoInformesACDoc";
 import SeleccionarEncuesta from "./Componentes/SeleccionarEncuestas";
 
 function App() {
@@ -11,7 +12,7 @@ function App() {
 
   return (
     <div style={{ padding: "20px", fontFamily: "Arial, sans-serif" }}>
-      <h1>Gestión de Encuestas</h1>
+      <h1>Gestión de Encuestas e Informes</h1>
 
       <section style={{ marginBottom: "40px" }}>
         <h2>1. Encuestas Disponibles</h2>
@@ -29,12 +30,17 @@ function App() {
       </section>
 
       <section style={{ marginBottom: "40px" }}>
-        <h2>4. Agregar Pregunta a Encuesta</h2>
+        <h2>4. Listado de Informes de Actividad Curricular del Docente</h2>
+        <ListadoInformesACDoc />
+      </section>
+
+      <section style={{ marginBottom: "40px" }}>
+        <h2>5. Agregar Pregunta a Encuesta</h2>
         <AgregarPreguntaAEncuesta idEncuesta={idEncuestaSeleccionada} />
       </section>
 
       <section>
-        <h2>5. Seleccionar Encuesta para Responder</h2>
+        <h2>6. Seleccionar Encuesta para Responder</h2>
         <SeleccionarEncuesta idEstudiante={idEstudiante} />
       </section>
     </div>
