@@ -3,7 +3,7 @@ import AgregarPreguntaAEncuesta from "./Componentes/AgregarPreguntaAEncuesta";
 import HistorialEncuestas from "./Componentes/HistorialEncuestasRealizadasEstudiante";
 import EncuestasDisponibles from "./Componentes/EncuestasList";
 import ListadoInformesACDep from "./Componentes/ListadoInformesACDep"; 
-
+import FiltrarInformesAC from "./Componentes/FiltradoInformeACDep";
 function App() {
   const [idEncuestaSeleccionada, setIdEncuestaSeleccionada] = useState<number>(1);
   const [idEstudiante, setIdEstudiante] = useState<number>(1);
@@ -27,8 +27,14 @@ function App() {
         <ListadoInformesACDep />
       </section>
 
+      <section style={{ marginBottom: "40px" }}>
+        <h2>4. Filtrar Informes de Actividad Curricular</h2>
+        <FiltrarInformesAC />
+      </section>
+
+
       <section>
-        <h2>4. Agregar Pregunta a Encuesta</h2>
+        <h2>5. Agregar Pregunta a Encuesta</h2>
         <AgregarPreguntaAEncuesta idEncuesta={idEncuestaSeleccionada} />
       </section>
     </div>
