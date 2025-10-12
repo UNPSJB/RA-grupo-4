@@ -1,23 +1,23 @@
 from pydantic import BaseModel, Field
 from typing import List, Optional
 from src.preguntas.schemas import Pregunta
-# Base común para Encuesta
+
+
 class EncuestaBase(BaseModel):
-    nombre: str #= Field(..., min_length=1, max_length=100)
+    nombre: str 
     disponible: bool = Field(default=False)
 
 # Crear Encuesta
 class EncuestaCreate(EncuestaBase):
-    preguntas: Optional[List[Pregunta]]  = []
-
+    preguntas: Optional[List[Pregunta]] = []
 
 
 # Actualizar Encuesta
 class EncuestaUpdate(EncuestaBase):
-    preguntas: Optional[List[Pregunta]]  = []
+    preguntas: Optional[List[Pregunta]] = []
 
 
-# Leer Encuesta (respuesta completa)
+# Leer Encuesta 
 class Encuesta(EncuestaBase):
     id_encuesta: int
     preguntas: List[Pregunta] = []
@@ -29,3 +29,12 @@ class EncuestaDelete(BaseModel):
     id_encuesta: int
     nombre: str
     disponible: bool
+
+class EncuestaDisponible(BaseModel):
+    id_encuesta: int
+    nombre: str
+    disponible: bool
+    materia_id: int
+    materia_nombre: str 
+
+    model_config = {"from_attributes": True}

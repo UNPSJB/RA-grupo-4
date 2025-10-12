@@ -1,6 +1,7 @@
+from typing import List
 from sqlalchemy.orm import Session
 from src.informesAC.models import InformesAC
-from typing import List
+from src.informesAC import exceptions
 
 def listar_todos_los_informes(db: Session) -> List[InformesAC]:
     return db.query(InformesAC).all()

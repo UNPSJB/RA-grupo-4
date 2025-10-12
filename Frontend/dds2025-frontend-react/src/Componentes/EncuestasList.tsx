@@ -7,11 +7,11 @@ function EncuestasDisponibles() {
 
   const cargarEncuestasDisponibles = async () => {
     try {
-      setError(null);
-      const res = await fetch("http://localhost:8000/encuestas");
+      const url = "http://localhost:8000/encuestas";
+      const res = await fetch(url);
 
       if (!res.ok) {
-        throw new Error("Error al obtener encuestas");
+        throw new Error(`Error HTTP: ${res.status}`);
       }
 
       const data = await res.json();
@@ -86,3 +86,4 @@ function EncuestasDisponibles() {
 }
 
 export default EncuestasDisponibles;
+

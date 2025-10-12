@@ -16,3 +16,13 @@ class Materias(ModeloBase):
         "InformesAC",
         back_populates="materia"
     )
+    inscripciones: Mapped[List["Inscripciones"]] = relationship(
+        "Inscripciones", 
+        back_populates="materia"
+    )
+    
+    encuestas: Mapped[List["src.encuesta.models.Encuesta"]] = relationship(
+        "src.encuesta.models.Encuesta", 
+        back_populates="materia"
+    )
+    
