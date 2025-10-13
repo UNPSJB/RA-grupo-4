@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-const API_BASE = "http://localhost:8000"; 
+const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
 const FiltradoInformeACDep = () => {
   const [docentes, setDocentes] = useState([]);
@@ -24,15 +24,16 @@ const FiltradoInformeACDep = () => {
           fetch(`${API_BASE}/carreras/todos`),
         ]);
 
-        const docentesData = await docRes.json();
-        const materiasData = await matRes.json();
-        const carrerasData = await carRes.json();
+        if (!docRes.ok || !matRes.ok || !carRes.ok) {
+          throw new Error("Error al obtener las listas.");
+        }
 
-        setDocentes(docentesData);
-        setMaterias(materiasData);
-        setCarreras(carrerasData);
+        setDocentes(await docRes.json());
+        setMaterias(await matRes.json());
+        setCarreras(await carRes.json());
       } catch (err) {
-        console.error("Error cargando listas:", err);
+        console.error(" Error cargando listados:", err);
+        alert("No se pudieron cargar los listados.");
       }
     };
 
@@ -40,11 +41,9 @@ const FiltradoInformeACDep = () => {
   }, []);
 
   const handleChange = (e) => {
-    setFiltros({
-      ...filtros,
-      [e.target.name]: e.target.value,
-    });
+    setFiltros({ ...filtros, [e.target.name]: e.target.value });
   };
+
   const filtrarInformes = async () => {
     try {
       const params = new URLSearchParams();
@@ -53,18 +52,17 @@ const FiltradoInformeACDep = () => {
         if (value) params.append(key, value);
       });
 
-      const response = await fetch(
-        `${API_BASE}/informesAC/filtradoInformesAc?${params.toString()}`
-      );
+      const url = `${API_BASE}/informesAC/filtradoInformesAc?${params.toString()}`;
+      console.log("Solicitando:", url);
 
-      if (!response.ok) {
-        throw new Error("Error al obtener los informes");
-      }
+      const response = await fetch(url);
+      if (!response.ok) throw new Error("Error al obtener los informes");
 
       const data = await response.json();
       setInformes(data);
     } catch (err) {
       console.error("Error filtrando informes:", err);
+      alert("Error al conectar con el servidor.");
     }
   };
 
@@ -75,13 +73,7 @@ const FiltradoInformeACDep = () => {
       </h2>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-        {/* Docente */}
-        <select
-          name="id_docente"
-          value={filtros.id_docente}
-          onChange={handleChange}
-          className="border p-2 rounded-lg"
-        >
+        <select name="id_docente" value={filtros.id_docente} onChange={handleChange} className="border p-2 rounded-lg">
           <option value="">Docente</option>
           {docentes.map((d) => (
             <option key={d.id_docente} value={d.id_docente}>
@@ -90,13 +82,7 @@ const FiltradoInformeACDep = () => {
           ))}
         </select>
 
-        {/* Materia */}
-        <select
-          name="id_materia"
-          value={filtros.id_materia}
-          onChange={handleChange}
-          className="border p-2 rounded-lg"
-        >
+        <select name="id_materia" value={filtros.id_materia} onChange={handleChange} className="border p-2 rounded-lg">
           <option value="">Materia</option>
           {materias.map((m) => (
             <option key={m.id_materia} value={m.id_materia}>
@@ -105,13 +91,7 @@ const FiltradoInformeACDep = () => {
           ))}
         </select>
 
-        {/* Carrera */}
-        <select
-          name="id_carrera"
-          value={filtros.id_carrera}
-          onChange={handleChange}
-          className="border p-2 rounded-lg"
-        >
+        <select name="id_carrera" value={filtros.id_carrera} onChange={handleChange} className="border p-2 rounded-lg">
           <option value="">Carrera</option>
           {carreras.map((c) => (
             <option key={c.id_carrera} value={c.id_carrera}>
@@ -120,7 +100,6 @@ const FiltradoInformeACDep = () => {
           ))}
         </select>
 
-        {/* Año */}
         <input
           type="number"
           name="anio"
@@ -138,7 +117,6 @@ const FiltradoInformeACDep = () => {
         Filtrar
       </button>
 
-      {/* Resultados */}
       <div className="mt-6">
         {informes.length > 0 ? (
           <table className="w-full text-left border-collapse">

@@ -89,3 +89,18 @@ def obtener_encuestas_disponibles(id_estudiante: int):
     # Solo devuelve las encuestas habilitadas
     disponibles = [e for e in encuestas if e["habilitada"]]
     return disponibles
+
+
+
+@router.get("/admin/debug-listado", tags=["debug"])
+def debug_encuestas_admin(db: Session = Depends(get_db)):
+    encuestas = services.listar_encuestas(db)
+    return [
+        {
+            "id_encuesta": e.id_encuesta,
+            "nombre": e.nombre,
+            "disponible": e.disponible,
+            "tipo_disponible": type(e.disponible).__name__
+        }
+        for e in encuestas
+    ]

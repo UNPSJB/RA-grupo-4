@@ -2,8 +2,9 @@ import os
 from contextlib import asynccontextmanager
 from dotenv import load_dotenv
 from fastapi import FastAPI
-from src.database import engine
+from fastapi.middleware.cors import CORSMiddleware
 
+from src.database import engine
 from src.models import ModeloBase
 
 from src.estudiantes import models as estudiantes_models
@@ -24,25 +25,21 @@ from src.carreras.router import router as carreras_router
 from src.docentes.router import router as docentes_router
 from src.inscripciones.router import router as inscripciones_router
 
-from fastapi.middleware.cors import CORSMiddleware
-
 load_dotenv()
 
 ENV = os.getenv("ENV")
 ROOT_PATH = os.getenv(f"ROOT_PATH_{ENV.upper()}")
-
 
 @asynccontextmanager
 async def db_creation_lifespan(app: FastAPI):
     ModeloBase.metadata.create_all(bind=engine)
     yield
 
-
 app = FastAPI(root_path=ROOT_PATH, lifespan=db_creation_lifespan)
 
-
 origins = [
-    "http://localhost:5173", 
+    "http://localhost:5173",
+    "http://127.0.0.1:5173"
 ]
 
 app.add_middleware(
@@ -51,8 +48,7 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
- )
-
+)
 
 app.include_router(preguntas_router)
 app.include_router(respuestas_router)

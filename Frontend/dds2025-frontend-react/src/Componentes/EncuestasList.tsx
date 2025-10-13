@@ -1,5 +1,7 @@
 import { useState } from "react";
 
+const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:8000";
+
 function EncuestasDisponibles() {
   const [encuestas, setEncuestas] = useState<any[]>([]);
   const [mostrarListado, setMostrarListado] = useState(false);
@@ -7,7 +9,9 @@ function EncuestasDisponibles() {
 
   const cargarEncuestasDisponibles = async () => {
     try {
-      const url = "http://localhost:8000/encuestas";
+      const url = `${API_BASE}/encuestas/`;
+      console.log("Solicitando:", url);
+
       const res = await fetch(url);
 
       if (!res.ok) {
@@ -23,9 +27,10 @@ function EncuestasDisponibles() {
 
       setEncuestas(disponibles);
       setMostrarListado(true);
+      setError(null);
     } catch (err) {
       console.error("Error al obtener encuestas:", err);
-      setError("No se pudo cargar la lista de encuestas.");
+      setError("No se pudo conectar con el servidor.");
       setEncuestas([]);
       setMostrarListado(true);
     }
@@ -43,7 +48,7 @@ function EncuestasDisponibles() {
 
   return (
     <div style={{ padding: "20px" }}>
-      <h2>Encuestas disponibles</h2>
+      <h2> Encuestas disponibles</h2>
 
       <div style={{ marginBottom: "20px" }}>
         <button style={estiloBotonAzul} onClick={cargarEncuestasDisponibles}>
@@ -64,7 +69,7 @@ function EncuestasDisponibles() {
               style={{ borderCollapse: "collapse", width: "100%" }}
             >
               <thead>
-                <tr>
+                <tr style={{ backgroundColor: "#f2f2f2" }}>
                   <th>ID</th>
                   <th>Nombre</th>
                 </tr>
@@ -86,4 +91,3 @@ function EncuestasDisponibles() {
 }
 
 export default EncuestasDisponibles;
-

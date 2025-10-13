@@ -9,9 +9,10 @@ router = APIRouter(prefix="/materias", tags=["Materias"])
 
 @router.get("/", response_model=List[schemas.Materia])
 def leer_materias(db: Session = Depends(get_db)):
-    """
-    Lista todas las materias existentes en la base de datos.
-    """
     return services.get_materias(db)
+
+@router.get("/todos")
+def listar_materias(db: Session = Depends(get_db)):
+    return db.query(models.Materias).all()
 
 
