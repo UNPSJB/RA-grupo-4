@@ -36,7 +36,7 @@ const ListadoInformesACDoc: React.FC = () => {
 
   return (
     <div style={{ color: "#fff" }}>
-      <h3 style={{ marginBottom: "15px" }}>
+      <h3 style={{ marginBottom: "15px", color: "#0d0d0eff" }}>
         Informes de Actividad Curricular del Docente
       </h3>
 
