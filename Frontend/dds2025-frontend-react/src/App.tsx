@@ -6,10 +6,12 @@ import ListadoInformesACDep from "./Componentes/ListadoInformesACDep";
 import SeleccionarEncuesta from "./Componentes/SeleccionarEncuestas";
 import ListarInformesSinteticos from "./Componentes/ListarInformesSinteticos";
 import MostrarEncuesta from "./Componentes/MostrarEncuesta";
+import ResponderEncuesta from "./Componentes/ResponderEncuesta";
 
 function App() {
   const [idEncuestaSeleccionada, setIdEncuestaSeleccionada] = useState<number>(1);
   const [idEstudiante, setIdEstudiante] = useState<number>(1);
+  const [idInscripcion, setIdInscripcion] = useState<number>(1);
 
       return (
         <div style={{ padding: "20px", fontFamily: "Arial, sans-serif" }}>
@@ -48,7 +50,15 @@ function App() {
             />
           </section>
 
-    
+          <section>
+            <h2>Responder preguntas de Encuesta</h2>
+            <ResponderEncuesta
+              estudianteId={idEstudiante}
+              inscripcionId={idInscripcion}
+              encuestaId={idEncuestaSeleccionada}
+            />
+          </section>
+
       <section>
         <h2>5. Seleccionar Encuesta para Responder</h2>
         {/* <SeleccionarEncuesta idEstudiante={idEstudiante} /> esta hardcoreado, no se le pasa el prop */}

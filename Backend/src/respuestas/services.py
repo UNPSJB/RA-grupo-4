@@ -2,7 +2,7 @@ from typing import List
 from sqlalchemy import delete, select, update
 from sqlalchemy.orm import Session
 from src.respuestas.models import OpcionRespuesta
-from src.respuestas import schemas, exceptions
+from src.respuestas import models, schemas, exceptions
 
 # operaciones CRUD para Respuestas
 
@@ -44,3 +44,30 @@ def eliminar_opcionRespuesta(db: Session, opcionRespuesta_id: int) -> schemas.Op
     db.execute(delete(OpcionRespuesta).where(OpcionRespuesta.id == opcionRespuesta_id))
     db.commit()
     return db_opcionRespuesta
+
+
+
+
+
+#servicios de Respuesta
+
+def crear_respuestas(db: Session, respuestas_recibidas: list[schemas.RespuestaCreate]) -> list[models.Respuesta]:
+    
+    respuestas = []
+
+    for r in respuestas_recibidas:
+        respuesta = models.Respuesta(
+            pregunta_id=r.pregunta_id,
+            inscripcion_id=r.inscripcion_id,
+            opcion_respuesta_id=r.opcion_respuesta_id,
+            respuesta_abierta=r.respuesta_abierta,
+        )
+        respuestas.append(respuesta)
+        db.add(respuesta)
+
+    db.commit()
+    for r in respuestas:
+        db.refresh(r)
+
+    return respuestas
+

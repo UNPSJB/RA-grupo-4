@@ -80,7 +80,7 @@ const MostrarEncuesta: React.FC<MostrarEncuestaProps> = ({
 
                     {pregunta.tipo === "ABIERTA" && (
                         <p style={{ fontStyle: "italic", color: "#555" }}>
-                            Respuesta abierta
+                            Escribe tu respuesta
                         </p>
                     )}
                 </div>
