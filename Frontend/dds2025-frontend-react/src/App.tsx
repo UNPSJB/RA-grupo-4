@@ -10,8 +10,8 @@ import EncuestasList from "./Componentes/EncuestasList";
 import AgregarPreguntaAEncuesta from "./Componentes/AgregarPreguntaAEncuesta";
 import HistorialEncuestas from "./Componentes/HistorialEncuestasRealizadasEstudiante";
 import EncuestasDisponibles from "./Componentes/EncuestasList";
-import ListadoInformesACDep from "./Componentes/ListadoInformesACDep";
 import SeleccionarEncuesta from "./Componentes/SeleccionarEncuestas";
+
 import ListarInformesSinteticos from "./Componentes/ListarInformesSinteticos";
 import MostrarEncuesta from "./Componentes/MostrarEncuesta";
 import ResponderEncuesta from "./Componentes/ResponderEncuesta";
@@ -38,6 +38,10 @@ function App() {
                 <Link to="/home/historial">Historial</Link>
                 <Link to="/home/informes-dep">Informes Dept.</Link>
                 <Link to="/home/informes-doc">Informes Docente</Link>
+
+                <Link to="/home/informes-sinteticos">Informes Sintéticos</Link>
+                <Link to="/home/mostrar-encuesta/1">Mostrar Preguntas Encuesta</Link>
+                <Link to="/home/responder-encuesta/1">Responder Encuesta</Link>
               </div>
               <div className="navbar-right">
                 <Link to="/">Cerrar sesión</Link>
@@ -67,6 +71,21 @@ function App() {
                 <Route
                   path="informes-doc"
                   element={<ListadoInformesACDoc />}
+                />
+
+
+                <Route 
+                  path="mostrar-encuesta/:encuestaId" 
+                  element={<MostrarEncuesta estudianteId={1} encuestaId={1} />} 
+                />
+                {/* En MostrarEncuesta, se puede usar useParams() para capturar encuestaId dinámicamente */}
+                <Route
+                  path="responder-encuesta/:inscripcionId"
+                  element={<ResponderEncuesta estudianteId={1} inscripcionId={1} encuestaId={1} />}
+                />
+                <Route
+                  path="informes-sinteticos"
+                  element={<ListarInformesSinteticos />}
                 />
               </Routes>
             </div>
