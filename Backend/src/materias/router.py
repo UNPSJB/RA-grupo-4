@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from src.database import get_db 
-from . import schemas, services 
+from . import schemas, services, models
 from typing import List
 
 router = APIRouter(prefix="/materias", tags=["Materias"])
@@ -11,7 +11,7 @@ router = APIRouter(prefix="/materias", tags=["Materias"])
 def leer_materias(db: Session = Depends(get_db)):
     return services.get_materias(db)
 
-@router.get("/todos")
+@router.get("/listar")
 def listar_materias(db: Session = Depends(get_db)):
     return db.query(models.Materias).all()
 

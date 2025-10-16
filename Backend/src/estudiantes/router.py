@@ -7,8 +7,6 @@ from typing import List
 
 router = APIRouter(prefix="/estudiantes", tags=["estudiantes"])
 
-# Rutas para Estudiantes
-
 @router.get("/{estudiante_id}/encuestas", response_model=List[Encuesta])
 def leer_encuestas_estudiante(estudiante_id: int, db: Session = Depends(get_db)):
     return services.listar_encuestas(db, estudiante_id)

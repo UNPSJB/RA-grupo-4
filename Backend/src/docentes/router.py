@@ -7,6 +7,6 @@ from typing import List
 
 router = APIRouter(prefix="/docentes", tags=["Docentes"])
 
-@router.get("/todos")
+@router.get("/listar", response_model=List[schemas.Docente])
 def listar_docentes(db: Session = Depends(get_db)):
-    return db.query(models.Docentes).all()
+    return services.get_all_docentes(db=db)

@@ -6,7 +6,6 @@ class InformesAC(ModeloBase):
     __tablename__ = "informesAC"
 
     id_informesAC: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
-    anio: Mapped[Date] = mapped_column(Date, index=True)
 
     id_materia: Mapped[int] = mapped_column(ForeignKey("materias.id_materia"), nullable=False)
     materia: Mapped["Materias"] = relationship("Materias", back_populates="informesAC")

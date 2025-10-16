@@ -7,14 +7,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from src.database import engine
 from src.models import ModeloBase
 
-from src.estudiantes import models as estudiantes_models
-from src.encuesta import models as encuesta_models
-from src.preguntas import models as preguntas_models
-from src.respuestas import models as respuestas_models
-from src.materias import models as materias_models
-from src.inscripciones import models as inscripciones_models 
-
-# importamos los routers desde nuestros modulos
 from src.informesAC.router import router as informesAC_router
 from src.estudiantes.router import router as estudiantes_router
 from src.encuesta.router import router as encuesta_router
@@ -44,7 +36,7 @@ origins = [
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

@@ -1,15 +1,16 @@
 from pydantic import BaseModel
-from typing import List
 
-
-class DocentesBase(BaseModel):
+class DocenteBase(BaseModel):
+    nroLegajo: int
     nombre: str
 
-class DocentesCreate(DocentesBase):
+class DocenteCreate(DocenteBase):
     pass
 
-class DocentesUpdate(DocentesBase):
-    pass
 
-class Docentes(DocentesBase):
-    pass
+class Docente(DocenteBase):
+    id_docente: int
+
+
+    class Config:
+        from_attributes = True

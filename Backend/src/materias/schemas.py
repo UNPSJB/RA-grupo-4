@@ -1,21 +1,17 @@
-from pydantic import BaseModel, field_validator
-from src.materias.models import Materias
-from src.materias import exceptions
-
+from pydantic import BaseModel
+from datetime import date
 
 class MateriaBase(BaseModel):
     nombre: str
     id_materia: int
 
-
 class MateriaCreate(MateriaBase):
-    pass
-
+    anio:int
 
 class MateriaUpdate(MateriaBase):
-    pass
-
+    anio: int  
 
 class Materia(MateriaBase):
-    id_materia: int
+    anio: int  
     model_config = {"from_attributes": True}
+

@@ -1,89 +1,79 @@
-import { useState } from "react";
+import React, { useState } from 'react';
+
+interface Docente {
+  id_docente: number;
+  nombre: string;
+}
+
+interface Materia {
+  id_materia: number;
+  nombre: string;
+  anio: string; 
+}
 
 interface InformeAC {
   id_informesAC: number;
-  anio: string;
+  materia: Materia;
+  docente: Docente;
 }
 
-const ListadoInformesACDep = () => {
+const ListadoInformesACDep: React.FC = () => {
   const [informes, setInformes] = useState<InformeAC[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [mostrarListado, setMostrarListado] = useState(false);
+  const [mostrarTabla, setMostrarTabla] = useState(false);
 
   const cargarInformes = async () => {
     setLoading(true);
     setError(null);
-    setMostrarListado(true);
+    setMostrarTabla(false); 
 
     try {
-      const res = await fetch("http://localhost:8000/informesAC");
-
+      const res = await fetch('http://localhost:8000/informesAC/listar');
       if (!res.ok) {
-        throw new Error("Error al obtener informes");
+        throw new Error(`Error: ${res.status} - ${res.statusText}`);
       }
-
-      const data = await res.json();
+      const data: InformeAC[] = await res.json();
       setInformes(data);
-    } catch (err) {
-      console.error("Error de conexión:", err);
-      setError("No se pudo conectar con la base de datos.");
-      setInformes([]);
+      setMostrarTabla(true);
+    } catch (err: any) {
+      setError(err.message);
     } finally {
       setLoading(false);
     }
   };
 
-  const estiloBoton = {
-    backgroundColor: "#28a745",
-    color: "white",
-    padding: "10px 16px",
-    border: "none",
-    borderRadius: "6px",
-    fontSize: "16px",
-    cursor: "pointer",
-    marginBottom: "20px",
-  };
-
   return (
-    <div style={{ padding: "20px" }}>
-      <h3>Listado de Informes de Actividad Curricular</h3>
-
-      <button style={estiloBoton} onClick={cargarInformes}>
-        Cargar informes
+    <div>
+      <h2>Listado de InformesAC</h2>
+      <button onClick={cargarInformes} disabled={loading}>
+        {loading ? 'Cargando...' : 'Cargar Informes'}
       </button>
 
-      {mostrarListado && (
-        <>
-          {loading ? (
-            <p>Cargando informes...</p>
-          ) : error ? (
-            <p style={{ color: "red" }}>{error}</p>
-          ) : informes.length === 0 ? (
-            <p>No hay informes disponibles.</p>
-          ) : (
-            <table
-              border={1}
-              cellPadding={8}
-              style={{ borderCollapse: "collapse", width: "100%" }}
-            >
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Año</th>
-                </tr>
-              </thead>
-              <tbody>
-                {informes.map((informe) => (
-                  <tr key={informe.id_informesAC}>
-                    <td>{informe.id_informesAC}</td>
-                    <td>{new Date(informe.anio).getFullYear()}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-        </>
+      {loading && <p>Cargando informes...</p>}
+      {error && <p style={{ color: 'red' }}>Error: {error}</p>}
+
+      {mostrarTabla && (
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Año</th>
+              <th>Materia</th>
+              <th>Docente</th>
+            </tr>
+          </thead>
+          <tbody>
+            {informes.map((informe) => (
+              <tr key={informe.id_informesAC}>
+                <td>{informe.id_informesAC}</td>
+                <td>{informe.materia?.anio ?? 'N/A'}</td>
+                <td>{informe.materia?.nombre ?? 'Sin materia'}</td>
+                <td>{informe.docente?.nombre ?? 'Sin docente'}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       )}
     </div>
   );
