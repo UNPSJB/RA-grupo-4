@@ -22,8 +22,13 @@ class Materias(ModeloBase):
         back_populates="materia"
     )
     
-    encuestas: Mapped[List["src.encuesta.models.Encuesta"]] = relationship(
-        "src.encuesta.models.Encuesta", 
-        back_populates="materia"
+
+    # encuesta que usa la materia
+    encuesta_id: Mapped[int] = mapped_column(
+        ForeignKey("encuestas.id_encuesta"),
+        nullable=False
     )
-    
+    encuesta: Mapped["src.encuesta.models.Encuesta"] = relationship(
+        "src.encuesta.models.Encuesta",
+        back_populates="materias"
+    )

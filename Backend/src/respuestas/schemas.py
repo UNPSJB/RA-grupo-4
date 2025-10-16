@@ -24,3 +24,27 @@ class OpcionRespuesta(OpcionRespuestaBase):
     # from_atributes=True permite que Pydantic trabaje con modelos SQLAlchemy
     # más info.: https://docs.pydantic.dev/latest/api/config/#pydantic.config.ConfigDict.from_attributes
     model_config = {"from_attributes": True}
+
+
+
+
+class RespuestaBase(BaseModel):
+    pregunta_id: int
+    inscripcion_id: int
+    opcion_respuesta_id: Optional[int] = None
+    respuesta_abierta: Optional[str] = None
+
+class RespuestaCreate(RespuestaBase):
+    pass
+
+class RespuestaUpdate(BaseModel):
+    opcion_respuesta_id: Optional[int] = None
+    respuesta_abierta: Optional[str] = None
+
+class RespuestaDelete(BaseModel):
+    pass
+
+class Respuesta(RespuestaBase):
+    id: int
+    
+    model_config = {"from_attributes": True}

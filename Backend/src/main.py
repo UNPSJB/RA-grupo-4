@@ -16,6 +16,10 @@ from src.materias.router import router as materias_router
 from src.carreras.router import router as carreras_router
 from src.docentes.router import router as docentes_router
 from src.inscripciones.router import router as inscripciones_router
+from src.informesSinteticos.router import router as informesSinteticos_router
+from src.departamentos.router import router as departamentos_router
+
+from fastapi.middleware.cors import CORSMiddleware
 
 load_dotenv()
 
@@ -51,3 +55,5 @@ app.include_router(docentes_router)
 app.include_router(carreras_router)
 app.include_router(inscripciones_router)
 app.include_router(informesAC_router)
+app.include_router(informesSinteticos_router)
+app.include_router(departamentos_router)
