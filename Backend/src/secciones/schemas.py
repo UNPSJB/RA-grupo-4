@@ -7,6 +7,7 @@ from src.preguntas.schemas import Pregunta
 
 
 class SeccionBase(BaseModel):
+    sigla: str
     enunciado: str
 
 

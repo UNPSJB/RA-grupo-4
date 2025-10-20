@@ -9,7 +9,8 @@ class Seccion(ModeloBase):
     __tablename__ = "secciones"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
-    enunciado: Mapped[str] = mapped_column(String, index=True)
+    sigla: Mapped[str] = mapped_column(String, index=True)
+    descripcion: Mapped[str] = mapped_column(String)
     
     encuesta_id: Mapped[int] = mapped_column(ForeignKey("encuestas.id_encuesta"))
     encuesta: Mapped["src.encuesta.models.Encuesta"] = relationship ("src.encuesta.models.Encuesta", back_populates="secciones")
