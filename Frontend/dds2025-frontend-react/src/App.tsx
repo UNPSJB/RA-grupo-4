@@ -3,15 +3,11 @@ import "./App.css";
 
 import LoginPage from "./Componentes/LoginPage";
 import SeleccionarEncuestas from "./Componentes/SeleccionarEncuestas";
-import ListadoInformesACDep from "./Componentes/ListadoInformesACDep";
 import ListadoInformesACDoc from "./Componentes/ListadoInformesACDoc";
 import HistorialEncuestasRealizadasEstudiante from "./Componentes/HistorialEncuestasRealizadasEstudiante";
 import EncuestasList from "./Componentes/EncuestasList";
 import AgregarPreguntaAEncuesta from "./Componentes/AgregarPreguntaAEncuesta";
-import HistorialEncuestas from "./Componentes/HistorialEncuestasRealizadasEstudiante";
-import EncuestasDisponibles from "./Componentes/EncuestasList";
 import ListadoInformesACDep from "./Componentes/ListadoInformesACDep";
-import SeleccionarEncuesta from "./Componentes/SeleccionarEncuestas";
 import ListarInformesSinteticos from "./Componentes/ListarInformesSinteticos";
 import MostrarEncuesta from "./Componentes/MostrarEncuesta";
 import ResponderEncuesta from "./Componentes/ResponderEncuesta";
@@ -54,14 +50,14 @@ function App() {
                 <Route path="encuestas" element={<EncuestasList />} />
                 <Route
                   path="agregar-pregunta"
-                  element={<AgregarPreguntaAEncuesta idEncuesta={1}/>}
+                  element={<AgregarPreguntaAEncuesta idEncuesta={1} />}
                 />
                 <Route
                   path="historial"
                   element={<HistorialEncuestasRealizadasEstudiante studentId={1} />}
                 />
                 <Route
-                  path="informes-dep"
+                  path="Informes-dep"
                   element={<ListadoInformesACDep />}
                 />
                 <Route
