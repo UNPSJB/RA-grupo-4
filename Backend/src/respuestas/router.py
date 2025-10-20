@@ -2,11 +2,12 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from src.database import get_db
 from src.respuestas import schemas, services
+from typing import List
 
 router = APIRouter(prefix="/opcionRespuestas", tags=["opcionesRespuestas"])
+router_respuestas = APIRouter(prefix="/respuestas", tags=["Respuestas"])
 
 # Rutas para Respuestas
-
 
 @router.post("/", response_model=schemas.OpcionRespuesta)
 def create_opcionRespuesta(opcionRespuesta: schemas.OpcionRespuestaCreate, db: Session = Depends(get_db)):
@@ -34,3 +35,13 @@ def update_opcionRespuesta(
 def delete_opcionRespuesta(opcionRespuesta_id: int, db: Session = Depends(get_db)):
     return services.eliminar_opcionRespuesta(db, opcionRespuesta_id)
 
+
+@router_respuestas.post("/", response_model=List[schemas.Respuesta])
+def create_respuestas(respuestas: List[schemas.RespuestaCreate], db: Session = Depends(get_db)):
+    """
+    Recibe una lista de respuestas de un estudiante y las guarda.
+    
+    Esta es la función que disparará la lógica para marcar
+    la encuesta como "procesada".
+    """
+    return services.crear_respuestas(db=db, respuestas_recibidas=respuestas)

@@ -18,7 +18,8 @@ from src.informesAC.router import router as informesAC_router
 from src.estudiantes.router import router as estudiantes_router
 from src.encuesta.router import router as encuesta_router
 from src.preguntas.router import router as preguntas_router
-from src.respuestas.router import router as respuestas_router
+from src.respuestas.router import router as opcion_respuestas_router
+from src.respuestas.router import router_respuestas
 from src.materias.router import router as materias_router
 from src.carreras.router import router as carreras_router
 from src.docentes.router import router as docentes_router
@@ -53,11 +54,12 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
- )
+)
 
 
 app.include_router(preguntas_router)
-app.include_router(respuestas_router)
+app.include_router(opcion_respuestas_router)
+app.include_router(router_respuestas)
 app.include_router(encuesta_router)
 app.include_router(estudiantes_router)
 app.include_router(materias_router)
