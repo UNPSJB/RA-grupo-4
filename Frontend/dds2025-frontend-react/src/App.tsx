@@ -2,8 +2,12 @@ import { Routes, Route, Link, Navigate } from "react-router-dom";
 import "./App.css";
 
 import LoginPage from "./Componentes/LoginPage";
+// import HistorialEncuestasRealizadasEstudiante from "./Componentes/HistorialEncuestasRealizadasEstudiante";
+// import EncuestasList from "./Componentes/EncuestasList";
+// import AgregarPreguntaAEncuesta from "./Componentes/AgregarPreguntaAEncuesta";
 import SeleccionarEncuestas from "./Componentes/SeleccionarEncuestas";
 import ListadoInformesACDoc from "./Componentes/ListadoInformesACDoc";
+
 import HistorialEncuestasRealizadasEstudiante from "./Componentes/HistorialEncuestasRealizadasEstudiante";
 import EncuestasList from "./Componentes/EncuestasList";
 import AgregarPreguntaAEncuesta from "./Componentes/AgregarPreguntaAEncuesta";
@@ -29,11 +33,15 @@ function App() {
               </div>
               <div className="navbar-links">
                 <Link to="/home/seleccionar">Seleccionar Encuestas</Link>
-                <Link to="/home/encuestas">Encuestas</Link>
+                {/* <Link to="/home/encuestas">Encuestas</Link>
                 <Link to="/home/agregar-pregunta">Agregar Pregunta</Link>
-                <Link to="/home/historial">Historial</Link>
+                <Link to="/home/historial">Historial</Link> */}
                 <Link to="/home/informes-dep">Informes Dept.</Link>
                 <Link to="/home/informes-doc">Informes Docente</Link>
+
+                <Link to="/home/informes-sinteticos">Informes Sintéticos</Link>
+                <Link to="/home/mostrar-encuesta/1">Mostrar Preguntas Encuesta</Link>
+                <Link to="/home/responder-encuesta/1">Responder Encuesta</Link>
               </div>
               <div className="navbar-right">
                 <Link to="/">Cerrar sesión</Link>
@@ -47,7 +55,7 @@ function App() {
                   element={<Navigate to="/home/seleccionar" replace />}
                 />
                 <Route path="seleccionar" element={<SeleccionarEncuestas />} />
-                <Route path="encuestas" element={<EncuestasList />} />
+                {/* <Route path="encuestas" element={<EncuestasList />} />
                 <Route
                   path="agregar-pregunta"
                   element={<AgregarPreguntaAEncuesta idEncuesta={1} />}
@@ -55,7 +63,7 @@ function App() {
                 <Route
                   path="historial"
                   element={<HistorialEncuestasRealizadasEstudiante studentId={1} />}
-                />
+                /> */}
                 <Route
                   path="Informes-dep"
                   element={<ListadoInformesACDep />}
@@ -63,6 +71,19 @@ function App() {
                 <Route
                   path="informes-doc"
                   element={<ListadoInformesACDoc />}
+                />
+                <Route 
+                  path="mostrar-encuesta/:encuestaId" 
+                  element={<MostrarEncuesta estudianteId={1} encuestaId={1} />} 
+                />
+                {/* En MostrarEncuesta, se puede usar useParams() para capturar encuestaId dinámicamente segun la url */}
+                <Route
+                  path="responder-encuesta/:inscripcionId"
+                  element={<ResponderEncuesta estudianteId={1} inscripcionId={1} encuestaId={1} />}
+                />
+                <Route
+                  path="informes-sinteticos"
+                  element={<ListarInformesSinteticos />}
                 />
               </Routes>
             </div>

@@ -15,40 +15,12 @@ def listar_encuestas(db: Session, estudiante_id: int) -> List[encuesta_schemas.E
     return alumno.encuestas
 
 
-# def obtener_preguntas_de_encuesta_estudiante(db: Session, id_estudiante: int, id_encuesta: int):
-#     """Obtiene las preguntas y opciones de una encuesta accesible por el estudiante."""
-    
-#     estudiante = (
-#         db.query(Estudiante)
-#         .options(
-#             joinedload(Estudiante.inscripciones)
-#             .joinedload("materia")
-#             .joinedload("encuesta")
-#             .joinedload("preguntas")
-#             .joinedload("opciones_respuestas")
-#         )
-#         .filter(Estudiante.id == id_estudiante)
-#         .first()
-#     )
-
-#     if not estudiante:
-#         raise exceptions.UsuarioNoEncontrado()
-
-#     # Buscar la encuesta solicitada entre las materias inscritas del estudiante
-#     for inscripcion in estudiante.inscripciones:
-#         materia = inscripcion.materia
-#         encuesta = materia.encuesta
-#         if encuesta and encuesta.id_encuesta == id_encuesta:
-#             return encuesta
-            
-#     raise EncuestaNoEncontrada()
-
-
 
 
 from src.inscripciones.models import Inscripciones
 from src.materias.models import Materias
 from src.preguntas.models import Pregunta
+from src.secciones.models import Seccion
 
 def obtener_preguntas_de_encuesta_estudiante(db: Session, id_estudiante: int, id_encuesta: int):
     estudiante = (
@@ -57,7 +29,8 @@ def obtener_preguntas_de_encuesta_estudiante(db: Session, id_estudiante: int, id
             joinedload(Estudiante.inscripciones)
             .joinedload(Inscripciones.materia)
             .joinedload(Materias.encuesta)
-            .joinedload(Encuesta.preguntas)
+            .joinedload(Encuesta.secciones)
+            .joinedload(Seccion.preguntas)
             .joinedload(Pregunta.opciones_respuestas)
         )
         .filter(Estudiante.id == id_estudiante)
@@ -71,6 +44,9 @@ def obtener_preguntas_de_encuesta_estudiante(db: Session, id_estudiante: int, id
         materia = inscripcion.materia
         encuesta = materia.encuesta
         if encuesta and encuesta.id_encuesta == id_encuesta:
+            encuesta.secciones.sort(key=lambda s: s.id)
+            for seccion in encuesta.secciones:
+                seccion.preguntas.sort(key=lambda p: p.id)
             return encuesta
 
     raise EncuestaNoEncontrada()

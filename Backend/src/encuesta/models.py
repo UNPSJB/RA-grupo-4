@@ -11,7 +11,7 @@ class Encuesta(ModeloBase):
     
     
     # materias que usan esta encuesta
-    materias: Mapped[List["src.materias.models.Materias"]] = relationship(
+    materias: Mapped[Optional[List["src.materias.models.Materias"]]] = relationship(
         "src.materias.models.Materias",
         back_populates="encuesta"
     )
@@ -26,6 +26,7 @@ class Encuesta(ModeloBase):
 
     disponible: Mapped[bool] = mapped_column(Boolean, default=False)
 
-    preguntas: Mapped[list["src.preguntas.models.Pregunta"]] = relationship (
-        "src.preguntas.models.Pregunta", back_populates="encuesta", cascade="all, delete-orphan")
 
+    secciones: Mapped[list["src.secciones.models.Seccion"]] = relationship (
+        "src.secciones.models.Seccion", back_populates="encuesta", cascade="all, delete-orphan")
+    

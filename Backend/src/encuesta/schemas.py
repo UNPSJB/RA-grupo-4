@@ -1,6 +1,8 @@
+from __future__ import annotations
 from pydantic import BaseModel, Field
 from typing import List, Optional
-from src.preguntas.schemas import Pregunta
+from src.secciones.schemas import Seccion
+
 
 
 class EncuestaBase(BaseModel):
@@ -9,18 +11,18 @@ class EncuestaBase(BaseModel):
 
 # Crear Encuesta
 class EncuestaCreate(EncuestaBase):
-    preguntas: Optional[List[Pregunta]] = []
+    secciones: Optional[List[Seccion]] = []
 
 
 # Actualizar Encuesta
 class EncuestaUpdate(EncuestaBase):
-    preguntas: Optional[List[Pregunta]] = []
+    secciones: Optional[List[Seccion]] = []
 
 
 # Leer Encuesta 
 class Encuesta(EncuestaBase):
     id_encuesta: int
-    preguntas: List[Pregunta] = []
+    secciones: List[Seccion] = []
 
     model_config = {"from_attributes": True}
 
@@ -38,3 +40,8 @@ class EncuestaDisponible(BaseModel):
     materia_nombre: str 
 
     model_config = {"from_attributes": True}
+
+
+EncuestaCreate.model_rebuild()
+EncuestaUpdate.model_rebuild()
+Encuesta.model_rebuild()

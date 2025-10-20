@@ -18,6 +18,7 @@ from src.docentes.router import router as docentes_router
 from src.inscripciones.router import router as inscripciones_router
 from src.informesSinteticos.router import router as informesSinteticos_router
 from src.departamentos.router import router as departamentos_router
+from src.secciones.router import router as secciones_router
 
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -57,3 +58,4 @@ app.include_router(inscripciones_router)
 app.include_router(informesAC_router)
 app.include_router(informesSinteticos_router)
 app.include_router(departamentos_router)
+app.include_router(secciones_router)

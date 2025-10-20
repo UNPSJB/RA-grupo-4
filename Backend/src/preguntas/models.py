@@ -1,3 +1,4 @@
+from __future__ import annotations
 from typing import List
 from sqlalchemy import Integer, String, ForeignKey, Boolean
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -21,6 +22,6 @@ class Pregunta(ModeloBase):
                 "src.respuestas.models.OpcionRespuesta", back_populates="pregunta", cascade="all, delete-orphan"
                 )
     
-    encuesta_id: Mapped[int] = mapped_column(ForeignKey("encuestas.id_encuesta"))
-    encuesta: Mapped["src.encuesta.models.Encuesta"] = relationship ("src.encuesta.models.Encuesta", back_populates="preguntas")
+    seccion_id: Mapped[int] = mapped_column(ForeignKey("secciones.id"))
+    seccion: Mapped["src.secciones.models.Seccion"] = relationship ("src.secciones.models.Seccion", back_populates="preguntas")
     
