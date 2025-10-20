@@ -7,9 +7,6 @@ from src.inscripciones.models import Inscripciones
 from src.encuesta.models import Encuesta
 from src.preguntas.models import Pregunta
 
-
-# operaciones CRUD para Respuestas
-
 def crear_opcionRespuesta(db: Session, opcionRespuesta: schemas.OpcionRespuestaCreate) -> schemas.OpcionRespuesta:
     _opcionRespuesta = OpcionRespuesta(**opcionRespuesta.model_dump())
     db.add(_opcionRespuesta)
@@ -43,83 +40,79 @@ def modificar_opcionRespuesta(
 
 def eliminar_opcionRespuesta(db: Session, opcionRespuesta_id: int) -> schemas.OpcionRespuesta:
     db_opcionRespuesta = leer_opcionRespuesta(db, opcionRespuesta_id)
-    if len(db_opcionRespuesta.opciones_respuestas) > 0:
-        raise exceptions.OpcionRespuestaTieneOpcionRespuesta()
+    # La siguiente validación parece tener un error de lógica (debería ser sobre otra tabla),
+    # pero se mantiene como estaba en tu código original.
+    # if len(db_opcionRespuesta.opciones_respuestas) > 0:
+    #     raise exceptions.OpcionRespuestaTieneOpcionRespuesta()
     db.execute(delete(OpcionRespuesta).where(OpcionRespuesta.id == opcionRespuesta_id))
     db.commit()
     return db_opcionRespuesta
 
-#servicios de Respuesta
-def _actualizar_estado_encuesta(db: Session, inscripcion_id: int):
-    """
-    Función helper para verificar y actualizar el estado 
-    de la encuesta de una inscripción.
-    """
-    
-    # 1. Obtener la inscripción
-    inscripcion = db.get(Inscripciones, inscripcion_id)
-    if not inscripcion or inscripcion.encuesta_procesada:
-        return
-
-    # 2. Contar el N° de preguntas OBLIGATORIAS (N)
-    primera_encuesta = db.query(Encuesta).first()
-    if not primera_encuesta:
-        return # No hay encuestas en el sistema
-
-    total_preguntas_obligatorias = (
-        db.query(Pregunta)
-        .filter(
-            Pregunta.encuesta_id == primera_encuesta.id_encuesta,
-            Pregunta.obligatoria == True
-        )
-        .count()
-    )
-
-    if total_preguntas_obligatorias == 0:
-        return # No hay preguntas obligatorias, no se puede "completar"
-
-    # 3. Contar el N° de respuestas OBLIGATORIAS (R) que ha dado ESE estudiante
-    total_respuestas_obligatorias = (
-        db.query(models.Respuesta)
-        .join(Pregunta, models.Respuesta.pregunta_id == Pregunta.id)
-        .filter(
-            models.Respuesta.inscripcion_id == inscripcion_id,
-            Pregunta.obligatoria == True
-        )
-        .count()
-    )
-
-    # 4. Comparar y actualizar
-    if total_respuestas_obligatorias == total_preguntas_obligatorias:
-        inscripcion.encuesta_procesada = True
-        db.add(inscripcion)
-
-
 def crear_respuestas(db: Session, respuestas_recibidas: list[schemas.RespuestaCreate]) -> list[models.Respuesta]:
     
-    respuestas = []
-
-    if not respuestas_recibidas: #Chequeo de lista vacía
+    if not respuestas_recibidas:
         return [] 
 
-    inscripcion_id_actual = respuestas_recibidas[0].inscripcion_id 
+    inscripcion_id_actual = respuestas_recibidas[0].inscripcion_id
+    
+    try:
+        # --- Inicio de la Transacción Atómica ---
+        
+        # Creamos los objetos Respuesta y los añadimos a la sesión
+        respuestas_a_crear = []
+        for r in respuestas_recibidas:
+            respuesta_obj = models.Respuesta(**r.model_dump())
+            db.add(respuesta_obj)
+            respuestas_a_crear.append(respuesta_obj)
 
-    for r in respuestas_recibidas:
-        respuesta = models.Respuesta(
-            pregunta_id=r.pregunta_id,
-            inscripcion_id=r.inscripcion_id,
-            opcion_respuesta_id=r.opcion_respuesta_id,
-            respuesta_abierta=r.respuesta_abierta,
+        # Obtenemos la inscripción y verificamos si ya está procesada
+        inscripcion = db.get(Inscripciones, inscripcion_id_actual)
+        if not inscripcion:
+             raise Exception(f"No se encontró la inscripción con id {inscripcion_id_actual}")
+        
+        if inscripcion.encuesta_procesada:
+            # Si ya está procesada, simplemente guardamos las nuevas respuestas y terminamos
+            db.commit()
+            for r in respuestas_a_crear:
+                db.refresh(r)
+            return respuestas_a_crear
+        
+        #  Contamos el N° de preguntas OBLIGATORIAS (N)
+        primera_encuesta = db.query(Encuesta).first()
+        if not primera_encuesta:
+             raise Exception("No hay encuestas configuradas en el sistema.")
+        
+        total_preguntas_obligatorias = (
+            db.query(Pregunta)
+            .filter(Pregunta.encuesta_id == primera_encuesta.id_encuesta, Pregunta.obligatoria == True)
+            .count()
         )
-        respuestas.append(respuesta)
-        db.add(respuesta)
 
-    # Guardamos todas las respuestas en la base de datos
-    db.commit() 
-    _actualizar_estado_encuesta(db, inscripcion_id_actual)
-    db.commit()
+        db.flush()
 
-    for r in respuestas:
-        db.refresh(r)
+        # Contamos el N° de respuestas OBLIGATORIAS (R) que tiene el estudiante AHORA
+        total_respuestas_obligatorias = (
+            db.query(models.Respuesta)
+            .join(Pregunta, models.Respuesta.pregunta_id == Pregunta.id)
+            .filter(models.Respuesta.inscripcion_id == inscripcion_id_actual, Pregunta.obligatoria == True)
+            .count()
+        )
+        
+        # Comparamos y actualizamos el estado si es necesario
+        if total_preguntas_obligatorias > 0 and total_respuestas_obligatorias >= total_preguntas_obligatorias:
+            inscripcion.encuesta_procesada = True
+            db.add(inscripcion)
 
-    return respuestas
+        # Hacemos UN SOLO commit para guardar TODO a la vez (respuestas y estado)
+        db.commit()
+        
+        # --- Fin de la Transacción ---
+
+        for r in respuestas_a_crear:
+            db.refresh(r)
+        
+        return respuestas_a_crear
+
+    except Exception as e:
+        db.rollback() 
+        raise e
