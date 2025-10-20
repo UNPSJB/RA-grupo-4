@@ -6,6 +6,9 @@ from src.encuesta import schemas, exceptions
 from src.preguntas.schemas import PreguntaCreate, Pregunta as PreguntaSchema 
 from src.respuestas.models import  OpcionRespuesta 
 from src.preguntas.models import Pregunta, TipoPregunta
+from src.secciones.models import Seccion
+from src.secciones.schemas import Seccion as SchemaSeccion
+from src.secciones.services import agregar_pregunta_a_seccion
 from typing import Dict, Any
 from sqlalchemy import distinct
 from src.inscripciones.models import Inscripciones 
@@ -65,40 +68,33 @@ def eliminar_encuesta(db: Session, id_encuesta: int) -> schemas.EncuestaDelete:
     return db_encuesta
 
 
-def agregar_pregunta_a_encuesta(db: Session, id_encuesta: int, pregunta: PreguntaCreate) -> PreguntaSchema:
-    
-    # Obtener encuesta
-    db_encuesta = leer_encuesta(db, id_encuesta)
-    
-    # Crear la pregunta primero
-    pregunta_nueva = Pregunta(
-        enunciado=pregunta.enunciado,
-        obligatoria=pregunta.obligatoria,
-        tipo=pregunta.tipo,
+
+
+
+def agregar_seccion_a_encuesta(db: Session, id_encuesta: int, seccion: SchemaSeccion) -> SchemaSeccion:
+
+    db_encuesta = db.scalar(select(Encuesta).where(Encuesta.id_encuesta == id_encuesta))
+    if db_encuesta is None:
+        raise exceptions.EncuestaNoEncontrada()
+
+    seccion_nueva = Seccion(
+        enunciado=seccion.enunciado,
         encuesta_id=db_encuesta.id_encuesta
     )
-    
-    db.add(pregunta_nueva)
+    db.add(seccion_nueva)
     db.commit()
-    db.refresh(pregunta_nueva)  # ahora pregunta_nueva.id existe
+    db.refresh(seccion_nueva)
 
-    # Crear opciones si es pregunta cerrada
-    if pregunta.tipo == TipoPregunta.CERRADA and pregunta.opciones_respuestas:
-        opciones_creadas = []
-        for opcion in pregunta.opciones_respuestas:
-            _opcion = OpcionRespuesta(
-                descripcion=opcion.descripcion,
-                pregunta_id=pregunta_nueva.id
-            )
-            db.add(_opcion)
-            opciones_creadas.append(_opcion)
-        db.commit()
-        
-        # Asociar las opciones a la pregunta para la serialización
-        pregunta_nueva.opciones_respuestas = opciones_creadas
-        db.refresh(pregunta_nueva)
-    
-    return pregunta_nueva
+    if seccion.preguntas:
+        for pregunta in seccion.preguntas:
+            agregar_pregunta_a_seccion(db, seccion_nueva.id, pregunta)
+
+
+    db.refresh(seccion_nueva)
+    return seccion_nueva
+
+
+
 
 #encuestas disponibles para un estudiante 
 def get_encuestas_disponibles_por_estudiante(db: Session, estudiante_id: int) -> List[Dict[str, Any]]:

@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from src.database import get_db
 from src.encuesta import schemas, services
 from src.preguntas.schemas import Pregunta as PreguntaSchema, PreguntaCreate as PreguntaCreateSchema
+from src.secciones.schemas import Seccion as SchemaSeccion
 from typing import List
 
 router = APIRouter(prefix="/encuestas", tags=["encuestas"])
@@ -56,9 +57,10 @@ def delete_encuesta(id_encuesta: int, db: Session = Depends(get_db)):
 
 
 
-@router.post("/{id_encuesta}/preguntas", response_model=PreguntaSchema)
-def agregar_pregunta_encuesta(id_encuesta: int, pregunta: PreguntaCreateSchema, db: Session = Depends(get_db)):
-    return services.agregar_pregunta_a_encuesta(db, id_encuesta, pregunta)
+@router.post("/{id_encuesta}/secciones", response_model=SchemaSeccion)
+def agrega_seccion_a_encuesta(id_encuesta: int, seccion: SchemaSeccion, db: Session = Depends(get_db)):
+    return services.agregar_seccion_a_encuesta(db, id_encuesta, seccion)
+
 
 @router.get(
     "/estudiantes/{estudiante_id}/encuestas_habilitadas",
