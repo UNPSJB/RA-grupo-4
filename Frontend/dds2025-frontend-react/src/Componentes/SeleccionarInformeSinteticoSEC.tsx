@@ -6,7 +6,6 @@ interface InformeSintetico {
   descripcion: string;
 }
 
-
 const SeleccionarInformeSinteticoSEC: React.FC = () => {
   const [informes, setInformes] = useState<InformeSintetico[]>([]);
   const [cargando, setCargando] = useState<boolean>(true);
@@ -23,6 +22,7 @@ const SeleccionarInformeSinteticoSEC: React.FC = () => {
         if (!response.ok) throw new Error("Error al obtener los informes sintéticos");
         const data: InformeSintetico[] = await response.json();
         setInformes(data);
+        
       } catch (err: any) {
         setError(err.message || "Error desconocido");
       } finally {
@@ -32,12 +32,12 @@ const SeleccionarInformeSinteticoSEC: React.FC = () => {
     fetchInformesSinteticos();
   }, []);
 
-  if (cargando) return <p style={{ color: "#ccc" }}>Cargando informes...</p>;
+  if (cargando) return <p style={{ color: "#333" }}>Cargando informes...</p>;
   if (error) return <p style={{ color: "red" }}>Error: {error}</p>;
 
   return (
-    <div style={{ color: "#fff" }}>
-      <h3 style={{ marginBottom: "15px", color: "#0d0d0eff" }}>
+    <div className="content-card">
+      <h3 className="content-title">
         Seleccionar Informe Sintético
       </h3>
 
@@ -48,20 +48,19 @@ const SeleccionarInformeSinteticoSEC: React.FC = () => {
           style={{
             width: "100%",
             borderCollapse: "collapse",
-            backgroundColor: "#222",
             borderRadius: "6px",
             overflow: "hidden",
           }}
         >
           <thead>
             <tr style={{ backgroundColor: "#444", color: "#fff" }}>
-              <th style={{ border: "1px solid #555", padding: "10px", textAlign: "left" }}>
+              <th style={{ border: "1px solid #555", padding: "12px", textAlign: "left" }}>
                 ID
               </th>
-              <th style={{ border: "1px solid #555", padding: "10px", textAlign: "left" }}>
+              <th style={{ border: "1px solid #555", padding: "12px", textAlign: "left" }}>
                 Descripción
               </th>
-              <th style={{ border: "1px solid #555", padding: "10px", textAlign: "left" }}>
+              <th style={{ border: "1px solid #555", padding: "12px", textAlign: "left" }}>
                 Acciones
               </th>
             </tr>
@@ -74,14 +73,16 @@ const SeleccionarInformeSinteticoSEC: React.FC = () => {
                   backgroundColor: index % 2 === 0 ? "#2b2b2b" : "#1e1e1e",
                 }}
               >
-                <td style={{ border: "1px solid #444", padding: "10px" }}>
+                <td style={{ border: "1px solid #444", padding: "12px" }}>
                   {inf.id}
                 </td>
-                <td style={{ border: "1px solid #444", padding: "10px" }}>
+                <td style={{ border: "1px solid #444", padding: "12px" }}>
                   {inf.descripcion}
                 </td>
-                <td style={{ border: "1px solid #444", padding: "10px" }}>
-                  <Link to={`/home/informe-sintetico/ver/${inf.id}`}>Seleccionar</Link>
+                <td style={{ border: "1px solid #444", padding: "12px" }}>
+                  <Link to={`/home/informe-sintetico/ver/${inf.id}`} className="styled-button">
+                    Seleccionar
+                  </Link>
                 </td>
               </tr>
             ))}

@@ -19,17 +19,14 @@ const PaginaEstadisticasDoc: React.FC = () => {
       setCargando(true);
       setError(null);
       
-      // --- INICIO DE LA MODIFICACIÓN (Cache-Busting) ---
       // Añadimos un parámetro único a la URL para forzar que no se use caché
       const uniqueUrl = `http://localhost:8000/materias/${materiaId}/estadisticas?timestamp=${new Date().getTime()}`;
 
       const response = await fetch(uniqueUrl, { cache: 'no-cache' });
-      // --- FIN DE LA MODIFICACIÓN ---
 
       if (!response.ok) throw new Error("Error al obtener estadísticas");
       const data: EstadisticasMateria = await response.json();
       
-      // <-- AÑADIDO: Debugging para ver qué datos llegan
       console.log("Datos recibidos del backend:", data); 
       
       setEstadisticas(data);
@@ -44,24 +41,24 @@ const PaginaEstadisticasDoc: React.FC = () => {
     fetchEstadisticas();
   }, [fetchEstadisticas]);
 
-  if (cargando) return <p style={{ color: "#ccc" }}>Cargando estadísticas...</p>;
+  if (cargando) return <p style={{ color: "#333" }}>Cargando estadísticas...</p>;
   if (error) return <p style={{ color: "red" }}>Error: {error}</p>;
   if (!estadisticas) return <p>No se encontraron estadísticas.</p>;
 
   return (
-    <div style={{ color: "#fff" }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <h3 style={{ marginBottom: "15px", color: "#0d0d0eff" }}>
+    <div className="content-card">
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid #444", paddingBottom: "15px", marginBottom: "20px" }}>
+        <h3 className="content-title" style={{ border: "none", margin: 0, padding: 0 }}>
           Estadísticas de la Materia (ID: {materiaId})
         </h3>
         <button 
           onClick={fetchEstadisticas}
-          style={{ padding: '8px 12px', cursor: 'pointer' }}
+          className="styled-button"
         >
           Refrescar
         </button>
       </div>
-      <div style={{ backgroundColor: "#222", padding: "20px", borderRadius: "6px" }}>
+      <div>
         <p style={{ fontSize: "1.2rem", margin: "10px 0" }}>
           <strong>Total de Inscriptos:</strong> {estadisticas.total_inscriptos}
         </p>
