@@ -8,7 +8,7 @@ import LoginPage from "./Componentes/LoginPage";
 import SeleccionarEncuestas from "./Componentes/SeleccionarEncuestas";
 import ListadoInformesACDep from "./Componentes/ListadoInformesACDep";
 import ListadoInformesACDoc from "./Componentes/ListadoInformesACDoc";
-import ListarInformesSinteticos from "./Componentes/ListarInformesSinteticos";
+import SeleccionarInformeSinteticoSEC from "./Componentes/SeleccionarInformeSinteticoSEC";
 import MostrarEncuesta from "./Componentes/MostrarEncuesta";
 import ResponderEncuesta from "./Componentes/ResponderEncuesta";
 import PaginaEstadisticasDoc from "./Componentes/PaginaEstadisticasDoc";
@@ -36,7 +36,6 @@ function App() {
                  <Link to="/home/historial">Historial</Link> */}
                 <Link to="/home/informes-dep">Informes Dept.</Link>
                 <Link to="/home/informes-doc">Informes Docente</Link>
-
                 <Link to="/home/informes-sinteticos">Informes Sintéticos</Link>
                 <Link to="/home/mostrar-encuesta/1">Mostrar Preguntas Encuesta</Link>
                 <Link to="/home/responder-encuesta/1">Responder Encuesta</Link>
@@ -75,21 +74,20 @@ function App() {
                   path="mostrar-encuesta/:encuestaId" 
                   element={<MostrarEncuesta estudianteId={1} encuestaId={1} />} 
                 />
-               
+                
                 <Route
                   path="responder-encuesta/:inscripcionId"
                   element={<ResponderEncuesta estudianteId={1} inscripcionId={1} encuestaId={1} />}
                 />
                 <Route
-                  path="informes-sinteticos"
-                  element={<ListarInformesSinteticos />}
-                />
-
-                <Route
                   path="estadisticas/:materiaId"
                   element={<PaginaEstadisticasDoc />}
                 />
 
+                <Route
+                  path="informes-sinteticos"
+                  element={<SeleccionarInformeSinteticoSEC />}
+                />
               </Routes>
             </div>
 
