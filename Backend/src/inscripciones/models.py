@@ -21,8 +21,8 @@ class Inscripciones(ModeloBase):
     estudiante: Mapped["Estudiante"] = relationship("Estudiante", back_populates="inscripciones")
     materia: Mapped["Materias"] = relationship("Materias",back_populates="inscripciones")
 
-    # respuestas: Mapped[List["src.respuestas.models.Respuesta"]] = relationship(
-    # "src.respuestas.models.Respuesta", back_populates="inscripcion", cascade="all, delete-orphan")
+    respuestas: Mapped[List["src.respuestas.models.Respuesta"]] = relationship(
+    "src.respuestas.models.Respuesta", back_populates="inscripcion", cascade="all, delete-orphan")
 
 
     def __repr__(self):
