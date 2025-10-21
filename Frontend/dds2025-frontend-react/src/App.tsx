@@ -16,6 +16,8 @@ import ListarInformesSinteticos from "./Componentes/ListarInformesSinteticos";
 import MostrarEncuesta from "./Componentes/MostrarEncuesta";
 import ResponderEncuesta from "./Componentes/ResponderEncuesta";
 
+import { ResumenSeccionesWrapper } from "./Componentes/ConsignarResumenValoresEncuestaSINRECHARTS";
+
 function App() {
   return (
     <Routes>
@@ -42,6 +44,7 @@ function App() {
                 <Link to="/home/informes-sinteticos">Informes Sintéticos</Link>
                 <Link to="/home/mostrar-encuesta/1">Mostrar Preguntas Encuesta</Link>
                 <Link to="/home/responder-encuesta/1">Responder Encuesta</Link>
+                <Link to="/home/informe/1">Informe 1</Link>
               </div>
               <div className="navbar-right">
                 <Link to="/">Cerrar sesión</Link>
@@ -85,6 +88,9 @@ function App() {
                   path="informes-sinteticos"
                   element={<ListarInformesSinteticos />}
                 />
+                <Route 
+                  path="informe/:idInforme" 
+                  element={<ResumenSeccionesWrapper />} />
               </Routes>
             </div>
 
