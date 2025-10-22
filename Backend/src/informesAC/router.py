@@ -36,13 +36,13 @@ def listar_informes_por_docente(id_docente: int, db: Session = Depends(get_db)):
     return service.obtener_informes_por_docente(id_docente)
 
 
-@router.put("/informesAC/{id_informe}/opinion", response_model=schemas.InformeAC)
+@router.put("/{id_informe}/opinion", response_model=schemas.InformeAC)
 def actualizar_opinion(id_informe: int, opinion: str, db: Session = Depends(get_db)):
     informe_actualizado = services.actualizar_opinion_informe(db, id_informe, opinion)
     return schemas.InformeAC.from_orm(informe_actualizado)
 
 
-@router.get("/informesAC/{id_informe}", response_model=schemas.InformeAC)
+@router.get("/{id_informe}", response_model=schemas.InformeAC)
 def obtener_informeAC(id_informe: int, db: Session = Depends(get_db)):
     
     informe = services.read_informeAC(db, id_informe) 

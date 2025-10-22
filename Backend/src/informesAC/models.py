@@ -20,6 +20,7 @@ class InformesAC(ModeloBase):
     opinionSobreResumen: Mapped[str] = mapped_column(String, nullable=True) # Comentario del docente sobre los valores estadísticos
 
     _resumenSecciones: Mapped[str] = mapped_column("resumenSecciones", Text, nullable=True) # JSON con los porcentajes por sección
+    @property
     def resumenSecciones(self) -> Dict[str, Any]:
         if self._resumenSecciones:
             return json.loads(self._resumenSecciones)

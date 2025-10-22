@@ -38,7 +38,7 @@ export const ResumenSeccionesSinRecharts: React.FC<Props> = ({ idInforme }) => {
     const [comentario, setComentario] = useState<string>("");
 
     useEffect(() => {
-        fetch(`/api/informesAC/${idInforme}`)
+        fetch(`http://localhost:8000/informesAC/${idInforme}`)
             .then(res => res.json())
             .then(data => {
                 setInforme(data);
@@ -48,7 +48,7 @@ export const ResumenSeccionesSinRecharts: React.FC<Props> = ({ idInforme }) => {
 
     const guardarComentario = async () => {
         if (!informe) return;
-        await fetch(`/api/informesAC/${idInforme}/opinion`, {
+        await fetch(`http://localhost:8000/informesAC/${idInforme}/opinion`, {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ opinion: comentario }),

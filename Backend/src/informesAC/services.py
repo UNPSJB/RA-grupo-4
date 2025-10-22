@@ -68,11 +68,6 @@ def actualizar_opinion_informe(db: Session, id_informe: int, opinion: str):
 
 
 
-from sqlalchemy.orm import Session, joinedload
-from collections import defaultdict
-from fastapi import HTTPException
-from src.models import InformesAC, Materias, Inscripciones, Encuesta, Seccion, Pregunta, Respuesta
-
 
 def read_informeAC(db: Session, id_informe: int) -> InformesAC:
     informe = (
@@ -86,8 +81,7 @@ def read_informeAC(db: Session, id_informe: int) -> InformesAC:
     )
 
     if not informe:
-        raise HTTPException(status_code=404, detail="Informe no encontrado")
-
+        raise exceptions.InformesNoEncontrados
     return informe
 
 
@@ -144,7 +138,7 @@ def cargar_resumen_secciones_informe(informe: InformesAC, db: Session):
 
         resumen_general.append({
             "id": seccion.id,
-            "nombre": seccion.nombre,
+            "nombre": seccion.descripcion,
             "porcentajes_opciones": porcentajes
         })
 
