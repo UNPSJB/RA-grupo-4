@@ -13,6 +13,9 @@ class Materias(ModeloBase):
     id_carrera: Mapped[int] = mapped_column(ForeignKey("carreras.id_carrera"), nullable=False)
     carrera: Mapped["Carreras"] = relationship("Carreras", back_populates="materias")
 
+    id_docente: Mapped[int] = mapped_column(ForeignKey("docentes.id_docente"), nullable=False)
+    docente: Mapped["Docentes"] = relationship("Docentes", back_populates="Materias")
+
     informesAC: Mapped[List["InformesAC"]] = relationship(
         "InformesAC",
         back_populates="materia"
@@ -21,7 +24,7 @@ class Materias(ModeloBase):
         "Inscripciones", 
         back_populates="materia"
     )
-    
+    #debo saber el tamño de esa lista
 
     # encuesta que usa la materia
     encuesta_id: Mapped[int] = mapped_column(

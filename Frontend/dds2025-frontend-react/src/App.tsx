@@ -7,10 +7,10 @@ import LoginPage from "./Componentes/LoginPage";
 // import AgregarPreguntaAEncuesta from "./Componentes/AgregarPreguntaAEncuesta";
 import SeleccionarEncuestas from "./Componentes/SeleccionarEncuestas";
 import ListadoInformesACDoc from "./Componentes/ListadoInformesACDoc";
-
-import HistorialEncuestasRealizadasEstudiante from "./Componentes/HistorialEncuestasRealizadasEstudiante";
-import EncuestasList from "./Componentes/EncuestasList";
-import AgregarPreguntaAEncuesta from "./Componentes/AgregarPreguntaAEncuesta";
+import CompletarDatosGeneralesDoc from "./Componentes/CompletarDatosGeneralesDoc";
+// import HistorialEncuestasRealizadasEstudiante from "./Componentes/HistorialEncuestasRealizadasEstudiante";
+// import EncuestasList from "./Componentes/EncuestasList";
+// import AgregarPreguntaAEncuesta from "./Componentes/AgregarPreguntaAEncuesta";
 import ListadoInformesACDep from "./Componentes/ListadoInformesACDep";
 import ListarInformesSinteticos from "./Componentes/ListarInformesSinteticos";
 import MostrarEncuesta from "./Componentes/MostrarEncuesta";
@@ -42,6 +42,7 @@ function App() {
                 <Link to="/home/informes-sinteticos">Informes Sintéticos</Link>
                 <Link to="/home/mostrar-encuesta/1">Mostrar Preguntas Encuesta</Link>
                 <Link to="/home/responder-encuesta/1">Responder Encuesta</Link>
+                <Link to="/home/informes/crear/3">Crear Informe Curricular</Link>
               </div>
               <div className="navbar-right">
                 <Link to="/">Cerrar sesión</Link>
@@ -84,6 +85,10 @@ function App() {
                 <Route
                   path="informes-sinteticos"
                   element={<ListarInformesSinteticos />}
+                />
+                <Route 
+                  path="/informes/crear/:id_materia" 
+                  element={<CompletarDatosGeneralesDoc />} 
                 />
               </Routes>
             </div>

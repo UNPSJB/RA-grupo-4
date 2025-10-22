@@ -10,7 +10,11 @@ class Docentes(ModeloBase):
     nombre: Mapped[str] = mapped_column(String, unique=True, index=True)
     nroLegajo: Mapped[int] = mapped_column(Integer, index=True)
 
+    Materias: Mapped[List["Materias"]] = relationship(
+        "Materias",
+        back_populates="docente"
+    )
     informesAC: Mapped[List["InformesAC"]] = relationship(
-        "InformesAC",
+        "InformesAC", 
         back_populates="docente"
     )

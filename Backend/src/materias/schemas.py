@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from datetime import date
+
 
 class MateriaBase(BaseModel):
     nombre: str
@@ -15,3 +15,17 @@ class Materia(MateriaBase):
     anio: int  
     model_config = {"from_attributes": True}
 
+class MateriaOut(BaseModel):
+    id_materia: int
+    nombre: str
+    anio: int
+
+    class Config:
+     
+        orm_mode = True
+class MateriaAutocompletar(BaseModel):
+    id_materia: int
+    nombre: str
+    anio: int
+    id_docente: int
+    cantidad_inscripciones: int

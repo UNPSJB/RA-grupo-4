@@ -11,8 +11,6 @@ router = APIRouter(prefix="/materias", tags=["Materias"])
 def leer_materias(db: Session = Depends(get_db)):
     return services.get_materias(db)
 
-@router.get("/listar")
+@router.get("/listar", response_model=List[schemas.MateriaAutocompletar]) 
 def listar_materias(db: Session = Depends(get_db)):
-    return db.query(models.Materias).all()
-
-
+    return services.get_materias_para_autocompletar(db) 
