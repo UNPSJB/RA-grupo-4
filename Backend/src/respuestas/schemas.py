@@ -26,8 +26,6 @@ class OpcionRespuesta(OpcionRespuestaBase):
     model_config = {"from_attributes": True}
 
 
-
-
 class RespuestaBase(BaseModel):
     pregunta_id: int
     inscripcion_id: int

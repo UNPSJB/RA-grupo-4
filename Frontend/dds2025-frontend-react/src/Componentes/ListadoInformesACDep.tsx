@@ -115,11 +115,11 @@ const ListadoInformesACDep: React.FC = () => {
 
       {/* La tabla solo se muestra si mostrarTabla es true (es decir, si hay datos) */}
       {mostrarTabla && (
-        <table>
+        <table style={{ width: "100%", borderCollapse: "collapse", borderRadius: "6px", overflow: "hidden" }}>
           <thead>
-            <tr>
-              <th>ID</th>
-              <th>Año</th>
+            <tr style={{ backgroundColor: "#444" }}>
+              <th style={{ border: "1px solid #555", padding: "12px", textAlign: "left" }}>ID</th>
+              <th style={{ border: "1px solid #555", padding: "12px", textAlign: "left" }}>Año</th>
               <th>Materia</th>
               <th>Docente</th>
             </tr>

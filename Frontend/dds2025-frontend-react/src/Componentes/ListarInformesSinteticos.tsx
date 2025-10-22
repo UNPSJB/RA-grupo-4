@@ -1,4 +1,3 @@
-// src/components/ListarInformesSinteticos.tsx
 import React, { useState, useEffect } from 'react';
 
 interface InformeSintetico {
@@ -11,7 +10,6 @@ const ListarInformesSinteticos: React.FC = () => {
   const [informes, setInformes] = useState<InformeSintetico[]>([]);
   const [error, setError] = useState<string | null>(null);
 
-  // Fetch de los informes sintéticos
   useEffect(() => {
     const fetchInformes = async () => {
       try {

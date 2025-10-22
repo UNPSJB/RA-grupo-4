@@ -1,34 +1,35 @@
 import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 
-interface InformeAC {
-  id_informesAC: number;
-  anio: string;
+interface InformeSintetico {
+  id: number;
+  descripcion: string;
 }
 
-const ListadoInformesACDoc: React.FC = () => {
-  const idDocenteActual = 1;
-  const [informes, setInformes] = useState<InformeAC[]>([]);
+const SeleccionarInformeSinteticoSEC: React.FC = () => {
+  const [informes, setInformes] = useState<InformeSintetico[]>([]);
   const [cargando, setCargando] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchInformes = async () => {
+    const fetchInformesSinteticos = async () => {
       try {
         setCargando(true);
         setError(null);
         const response = await fetch(
-          `http://localhost:8000/informesAC/docente/${idDocenteActual}`
+          `http://localhost:8000/informesSinteticos/`
         );
-        if (!response.ok) throw new Error("Error al obtener informes");
-        const data: InformeAC[] = await response.json();
+        if (!response.ok) throw new Error("Error al obtener los informes sintéticos");
+        const data: InformeSintetico[] = await response.json();
         setInformes(data);
+        
       } catch (err: any) {
         setError(err.message || "Error desconocido");
       } finally {
         setCargando(false);
       }
     };
-    fetchInformes();
+    fetchInformesSinteticos();
   }, []);
 
   if (cargando) return <p style={{ color: "#333" }}>Cargando informes...</p>;
@@ -37,11 +38,11 @@ const ListadoInformesACDoc: React.FC = () => {
   return (
     <div className="content-card">
       <h3 className="content-title">
-        Informes de Actividad Curricular del Docente
+        Seleccionar Informe Sintético
       </h3>
 
       {informes.length === 0 ? (
-        <p>No hay informes disponibles para este docente.</p>
+        <p>No hay informes sintéticos disponibles.</p>
       ) : (
         <table
           style={{
@@ -57,23 +58,31 @@ const ListadoInformesACDoc: React.FC = () => {
                 ID
               </th>
               <th style={{ border: "1px solid #555", padding: "12px", textAlign: "left" }}>
-                Año
+                Descripción
+              </th>
+              <th style={{ border: "1px solid #555", padding: "12px", textAlign: "left" }}>
+                Acciones
               </th>
             </tr>
           </thead>
           <tbody>
             {informes.map((inf, index) => (
               <tr
-                key={inf.id_informesAC}
+                key={inf.id}
                 style={{
                   backgroundColor: index % 2 === 0 ? "#2b2b2b" : "#1e1e1e",
                 }}
               >
                 <td style={{ border: "1px solid #444", padding: "12px" }}>
-                  {inf.id_informesAC}
+                  {inf.id}
                 </td>
                 <td style={{ border: "1px solid #444", padding: "12px" }}>
-                  {new Date(inf.anio).getFullYear()}
+                  {inf.descripcion}
+                </td>
+                <td style={{ border: "1px solid #444", padding: "12px" }}>
+                  <Link to={`/home/informe-sintetico/ver/${inf.id}`} className="styled-button">
+                    Seleccionar
+                  </Link>
                 </td>
               </tr>
             ))}
@@ -84,4 +93,4 @@ const ListadoInformesACDoc: React.FC = () => {
   );
 };
 
-export default ListadoInformesACDoc;
+export default SeleccionarInformeSinteticoSEC;
