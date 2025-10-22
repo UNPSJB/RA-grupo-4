@@ -22,7 +22,6 @@ class Materias(ModeloBase):
         back_populates="materia"
     )
     
-
     # encuesta que usa la materia
     encuesta_id: Mapped[int] = mapped_column(
         ForeignKey("encuestas.id_encuesta"),

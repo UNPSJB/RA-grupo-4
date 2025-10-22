@@ -28,6 +28,7 @@ const ListadoInformesACDep: React.FC = () => {
   const [mostrarTabla, setMostrarTabla] = useState(false);
   // <-- NUEVO: Estado para el mensaje de "no hay resultados"
   const [mensaje, setMensaje] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null); // Añadido manejo de errores
 
   const cargarInformes = async () => {
     setLoading(true);
@@ -44,19 +45,18 @@ const ListadoInformesACDep: React.FC = () => {
       // <-- MODIFICADO: Comprueba si hay datos
       if (data.length > 0) {
         setInformes(data);
-        setMostrarTabla(true);
-      } else {
-        // Si no hay datos, muestra el mensaje
-        setInformes([]);
-        setMensaje("No se encontraron informes de actividad curricular.");
-      }
+      })
+      .catch((err) => {
+        console.error(err);
+        setError(err.message); // Guardar error en el estado
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, []);
 
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+  if (loading) return <p style={{ color: "#333" }}>Cargando informes...</p>;
+  if (error) return <p style={{ color: "red" }}>Error: {error}</p>;
 
   const cargarInformesFiltrados = async (filtros: FiltrosData) => {
     setLoading(true);
@@ -99,39 +99,25 @@ const ListadoInformesACDep: React.FC = () => {
   }, []); 
 
   return (
-    <div>
-      <h2>Listado de InformesAC</h2>
-      
-      <FiltradoInformeACDep 
-        onAplicarFiltros={cargarInformesFiltrados}
-        onQuitarFiltros={cargarInformes} 
-      />
-
-      {loading && <p>Cargando informes...</p>}
-      {error && <p style={{ color: 'red' }}>Error: {error}</p>}
-      
-      {/* <-- NUEVO: Muestra el mensaje si no hay resultados --> */}
-      {mensaje && <p>{mensaje}</p>}
-
-      {/* La tabla solo se muestra si mostrarTabla es true (es decir, si hay datos) */}
-      {mostrarTabla && (
-        <table>
+    <div className="content-card">
+      <h3 className="content-title">Listado de Informes de Actividad Curricular</h3>
+      {informes.length === 0 ? (
+        <p>No hay informes disponibles.</p>
+      ) : (
+        <table style={{ width: "100%", borderCollapse: "collapse", borderRadius: "6px", overflow: "hidden" }}>
           <thead>
-            <tr>
-              <th>ID</th>
-              <th>Año</th>
+            <tr style={{ backgroundColor: "#444" }}>
+              <th style={{ border: "1px solid #555", padding: "12px", textAlign: "left" }}>ID</th>
+              <th style={{ border: "1px solid #555", padding: "12px", textAlign: "left" }}>Año</th>
               <th>Materia</th>
               <th>Docente</th>
             </tr>
           </thead>
           <tbody>
-            {informes.map((informe) => (
-              <tr key={informe.id_informesAC}>
-                <td>{informe.id_informesAC}</td>
-                <td>{informe.materia?.anio ?? 'N/A'}</td>
-                <td>{informe.docente?.nombre ?? 'Sin materia'}</td>
-
-                <td>{informe.docente?.nombre ?? 'Sin docente'}</td>
+            {informes.map((informe, index) => (
+              <tr key={informe.id_informesAC} style={{ backgroundColor: index % 2 === 0 ? "#2b2b2b" : "#1e1e1e" }}>
+                <td style={{ border: "1px solid #444", padding: "12px" }}>{informe.id_informesAC}</td>
+                <td style={{ border: "1px solid #444", padding: "12px" }}>{new Date(informe.anio).getFullYear()}</td>
               </tr>
             ))}
           </tbody>

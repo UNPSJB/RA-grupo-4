@@ -15,3 +15,13 @@ class Materia(MateriaBase):
     anio: int  
     model_config = {"from_attributes": True}
 
+
+class MateriaEstadisticas(BaseModel):
+    """
+    Esquema para devolver las estadísticas de participación
+    de una materia.
+    """
+    total_inscriptos: int
+    total_encuestas_procesadas: int
+
+    model_config = {"from_attributes": True}
