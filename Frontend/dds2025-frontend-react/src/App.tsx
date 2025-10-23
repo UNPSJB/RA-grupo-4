@@ -6,11 +6,7 @@ import LoginPage from "./Componentes/LoginPage";
 import SeleccionarEncuestas from "./Componentes/SeleccionarEncuestas";
 import ListadoInformesACDoc from "./Componentes/ListadoInformesACDoc";
 import SeleccionarInformeSinteticoSEC from "./Componentes/SeleccionarInformeSinteticoSEC";
-import HistorialEncuestasRealizadasEstudiante from "./Componentes/HistorialEncuestasRealizadasEstudiante";
-import EncuestasList from "./Componentes/EncuestasList";
-import AgregarPreguntaAEncuesta from "./Componentes/AgregarPreguntaAEncuesta";
 import ListadoInformesACDep from "./Componentes/ListadoInformesACDep";
-import ListarInformesSinteticos from "./Componentes/ListarInformesSinteticos";
 import MostrarEncuesta from "./Componentes/MostrarEncuesta";
 import ResponderEncuesta from "./Componentes/ResponderEncuesta";
 import PaginaEstadisticasDoc from "./Componentes/PaginaEstadisticasDoc";
@@ -19,7 +15,6 @@ import HomePage from "./Componentes/HomePage";
 import GenerarInformeACDoc from "./Componentes/GenerarInformeAC";
 
 
-// --- COMPONENTE REUTILIZABLE PARA EL MENÚ DESPLEGABLE ---
 const DropdownMenu: React.FC<{ title: string; children: React.ReactNode }> = ({ title, children }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -84,7 +79,6 @@ function App() {
                   <Link to="/home/informes-sinteticos">Informes Sintéticos</Link>
                 </DropdownMenu>
 
-                {/* --- MODIFICADO: 2. Añadir el Link --- */}
                 <DropdownMenu title="Funcionalidades Docente">
                   <Link to="/home/informes-doc">Listar Informes</Link>
                   <Link to="/home/generar-informe">Generar Informe AC</Link>
