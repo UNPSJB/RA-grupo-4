@@ -34,8 +34,12 @@ class InformesAC(ModeloBase):
     porcentaje_practicas: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
     justificacion_porcentaje: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
 
-    # --- AÑADIDO PARA HDU 3 ---
+    # --- AÑADIDO PARA HDU ConsignarContPlanificados ---
     porcentaje_contenido_abordado: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+
+    # --- AÑADIDO PARA HDU ConsignarValDesempeñoAuxiliares ---
+    valoracion_auxiliares: Mapped[Optional[List[dict]]] = mapped_column(JSON, nullable=True) # Guardará [{nombre_auxiliar: '', calificacion: '', justificacion: ''}, ...]
+    # --- FIN AÑADIDO ---
 
     #Agregado para HDU proceso de aprendizaje
     aspectos_positivos_enseñanza: Mapped[Optional[str]] = mapped_column(Text, nullable=True)

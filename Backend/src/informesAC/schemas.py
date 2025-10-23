@@ -1,22 +1,32 @@
-from pydantic import BaseModel, Field # <-- Añadir Field
-from typing import Optional, List # Importación de List
+from pydantic import BaseModel, Field, validator
+from typing import Optional, List, Literal # <-- Añadir Literal
+
+# --- Definición de la Calificación (para validación) ---
+CalificacionAuxiliar = Literal["E", "MB", "B", "R", "I"]
 
 class DocenteOut(BaseModel):
     id_docente: int
     nombre: str
-
     class Config:
-        orm_mode = True # Deprecated, usar model_config = {"from_attributes": True} en Pydantic V2
-        # model_config = {"from_attributes": True} # Forma correcta en Pydantic V2
+        orm_mode = True
 
 class MateriaOut(BaseModel):
     id_materia: int
     nombre: str
-    # anio: int # Comentado porque no está en el modelo Materias que enviaste
-
     class Config:
         orm_mode = True
-        # model_config = {"from_attributes": True}
+
+# --- AÑADIDO: Esquema para una valoración individual ---
+class ValoracionAuxiliarBase(BaseModel):
+    nombre_auxiliar: str = Field(..., min_length=1) # Campo obligatorio
+    calificacion: CalificacionAuxiliar # Usamos el tipo Literal para validar
+    justificacion: str = Field(..., min_length=1) # Campo obligatorio
+
+class ValoracionAuxiliar(ValoracionAuxiliarBase):
+    # Podríamos añadir un ID si se guardaran en tabla separada, pero como JSON no es necesario
+    pass
+# --- FIN AÑADIDO ---
+
 
 class InformeACCreate(BaseModel):
     #Hdu completar datos generales
@@ -27,18 +37,21 @@ class InformeACCreate(BaseModel):
     cantidad_alumnos_inscriptos: Optional[int] = None
     cantidad_comisiones_teoricas: Optional[int] = None
     cantidad_comisiones_practicas: Optional[int] = None
-    
+
     #Hdu completar necesidades
-    necesidades_equipamiento: Optional[List[str]] = None # Hacer opcional si puede no venir
-    necesidades_bibliografia: Optional[List[str]] = None # Hacer opcional si puede no venir
+    necesidades_equipamiento: Optional[List[str]] = None
+    necesidades_bibliografia: Optional[List[str]] = None
 
     #Hdu consignar porcentaje horas
-    porcentaje_teoricas: Optional[int] = Field(None, ge=0, le=100) # Validar 0-100
-    porcentaje_practicas: Optional[int] = Field(None, ge=0, le=100) # Validar 0-100
-    justificacion_porcentaje: Optional[str] = None 
-    
-    # --- AÑADIDO PARA HDU 3 ---
-    porcentaje_contenido_abordado: Optional[int] = Field(None, ge=0, le=100) # Validar 0-100
+    porcentaje_teoricas: Optional[int] = Field(None, ge=0, le=100)
+    porcentaje_practicas: Optional[int] = Field(None, ge=0, le=100)
+    justificacion_porcentaje: Optional[str] = None
+
+    # HDU 3
+    porcentaje_contenido_abordado: Optional[int] = Field(None, ge=0, le=100)
+
+    # --- AÑADIDO PARA HDU 4 ---
+    valoracion_auxiliares: Optional[List[ValoracionAuxiliarBase]] = None # Lista de valoraciones
     # --- FIN AÑADIDO ---
 
     #Hdu completar proceso de aprendizaje
@@ -60,7 +73,7 @@ class InformeAC(BaseModel):
 
     docente: DocenteOut
     materia: MateriaOut
-    
+
     necesidades_equipamiento: Optional[List[str]] = None
     necesidades_bibliografia: Optional[List[str]] = None
 
@@ -68,8 +81,11 @@ class InformeAC(BaseModel):
     porcentaje_practicas: Optional[int] = None
     justificacion_porcentaje: Optional[str] = None
 
-    # --- AÑADIDO PARA HDU 3 ---
-    porcentaje_contenido_abordado: Optional[int] = None
+    porcentaje_contenido_abordado: Optional[int] = None # HDU 3
+
+    # --- AÑADIDO PARA HDU 4 ---
+    valoracion_auxiliares: Optional[List[ValoracionAuxiliar]] = None # Lista de valoraciones
+    # --- FIN AÑADIDO ---
 
     aspectos_positivos_enseñanza: Optional[str] = None
     aspectos_positivos_aprendizaje: Optional[str] = None
@@ -80,4 +96,3 @@ class InformeAC(BaseModel):
 
     class Config:
         orm_mode = True
-        # model_config = {"from_attributes": True}
