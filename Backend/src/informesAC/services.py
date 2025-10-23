@@ -39,7 +39,13 @@ def create_informe_ac(db: Session, informe: schemas.InformeACCreate):
         
         # Datos de Necesidades (listas de strings)
         necesidades_equipamiento=informe.necesidades_equipamiento,
-        necesidades_bibliografia=informe.necesidades_bibliografia
+        necesidades_bibliografia=informe.necesidades_bibliografia,
+
+        #Datos porcentaje horas
+        porcentaje_teoricas = informe.porcentaje_teoricas,
+        porcentaje_practicas = informe.porcentaje_practicas,
+        justificacion_porcentaje = informe.justificacion_porcentaje
+        
     )
     db.add(db_informe)
     db.commit()

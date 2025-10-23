@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-
 import CompletarDatosGeneralesDoc from './CompletarDatosGeneralesDoc';
 import CompletarNecesidadesDoc from './CompletarNecesidadesDoc';
+import CompletarPorcentajesDoc from './CompletarPorcentajesDoc';
 
 const BASE_URL = 'http://localhost:8000';
 
-// --- (Estilos del contenedor) ---
 const pageStyle: React.CSSProperties = { backgroundColor: '#f4f7f6', padding: '30px', minHeight: '100vh', fontFamily: 'Arial, sans-serif' };
 const formContainerStyle: React.CSSProperties = { maxWidth: '850px', margin: '0 auto', padding: '30px', backgroundColor: '#ffffff', borderRadius: '8px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' };
 const headerStyle: React.CSSProperties = { textAlign: 'center', color: '#333', borderBottom: '2px solid #f0f0f0', paddingBottom: '15px', marginBottom: '30px' };
@@ -18,12 +17,10 @@ const submitButtonStyle: React.CSSProperties = { padding: '12px 25px', fontSize:
 const GenerarInformeACDoc: React.FC = () => {
   const navigate = useNavigate();
 
-  // Estado para los <select>
   const [materias, setMaterias] = useState<any[]>([]);
   const [docentes, setDocentes] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Estado para el formulario de Datos Generales
   const [formData, setFormData] = useState({
     sede: '',
     ciclo_lectivo: '',
@@ -31,19 +28,18 @@ const GenerarInformeACDoc: React.FC = () => {
     id_docente: '',
     cantidad_alumnos_inscriptos: '',
     cantidad_comisiones_teoricas: '',
-    cantidad_comisiones_practicas: ''
+    cantidad_comisiones_practicas: '',
+    porcentaje_teoricas: '',
+    porcentaje_practicas: '',
+    justificacion_porcentaje: '',
   });
 
-  // Estado para las listas de Necesidades
   const [equipamiento, setEquipamiento] = useState<string[]>([]);
   const [bibliografia, setBibliografia] = useState<string[]>([]);
 
-  // Estado para el resultado del submit
   const [error, setError] = useState<string | null>(null);
   const [informeGenerado, setInformeGenerado] = useState(null);
 
-
-  // Cargar datos para los <select>
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -52,11 +48,9 @@ const GenerarInformeACDoc: React.FC = () => {
         if (!materiasRes.ok) throw new Error('Fallo al cargar materias');
         const materiasData = await materiasRes.json();
         setMaterias(materiasData);
-
         if (!docentesRes.ok) throw new Error('Fallo al cargar docentes');
         const docentesData = await docentesRes.json();
         setDocentes(docentesData);
-
       } catch (err: any) {
         setError(err.message || 'Error cargando datos');
       } finally {
@@ -66,8 +60,7 @@ const GenerarInformeACDoc: React.FC = () => {
     fetchData();
   }, []);
 
-  // Función para el hijo 1 (Datos Generales)
-  const handleDatosGeneralesChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => {
       let newState: any = { ...prev, [name]: value };
@@ -88,7 +81,6 @@ const GenerarInformeACDoc: React.FC = () => {
     });
   };
 
-  // Función para el hijo 2 (Necesidades)
   const handleNecesidadesChange = (
     tipo: 'equipamiento' | 'bibliografia', 
     nuevaLista: string[]
@@ -100,7 +92,6 @@ const GenerarInformeACDoc: React.FC = () => {
     }
   };
 
-  // Función de guardado final
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
@@ -116,6 +107,9 @@ const GenerarInformeACDoc: React.FC = () => {
       cantidad_comisiones_practicas: Number(formData.cantidad_comisiones_practicas) || null,
       necesidades_equipamiento: equipamiento,
       necesidades_bibliografia: bibliografia,
+      porcentaje_teoricas: Number(formData.porcentaje_teoricas) || null,
+      porcentaje_practicas: Number(formData.porcentaje_practicas) || null,
+      justificacion_porcentaje: formData.justificacion_porcentaje || null,
     };
 
     console.log("Enviando payload al backend:", JSON.stringify(payload, null, 2));
@@ -133,9 +127,9 @@ const GenerarInformeACDoc: React.FC = () => {
       }
 
       const data = await res.json();
-      setInformeGenerado(data); // Guarda el resultado
+      setInformeGenerado(data);
       alert('¡Informe creado exitosamente!');
-      navigate(-1); // Opcional: vuelve a la página anterior
+      navigate(-1);
 
     } catch (err: any) {
       setError(err.message);
@@ -147,7 +141,6 @@ const GenerarInformeACDoc: React.FC = () => {
 
   if (loading) return <p style={{ textAlign: 'center', fontSize: '18px' }}>Cargando...</p>;
   
-
   if (informeGenerado) {
     return (
       <div style={pageStyle}>
@@ -160,32 +153,35 @@ const GenerarInformeACDoc: React.FC = () => {
     );
   }
 
-
   return (
     <div style={pageStyle}>
       <div style={formContainerStyle}>
         <form onSubmit={handleSubmit}>
           <h2 style={headerStyle}>Generar Informe de Actividad Curricular</h2>
           
-          {/* 1. Renderiza el Hijo 1 */}
           <CompletarDatosGeneralesDoc
             materias={materias}
             docentes={docentes}
             formData={formData}
-            handleChange={handleDatosGeneralesChange}
+            handleChange={handleFormChange}
             loading={loading}
           />
 
           <hr style={{borderColor: '#eee', margin: '30px 0'}} />
           
-          {/* 2. Renderiza el Hijo 2 */}
           <CompletarNecesidadesDoc
             equipamiento={equipamiento}
             bibliografia={bibliografia}
             onNecesidadesChange={handleNecesidadesChange}
           />
 
-          {/* 3. El botón de Submit está en el padre */}
+          <div style={{marginTop: '30px'}}>
+            <CompletarPorcentajesDoc
+              formData={formData}
+              handleChange={handleFormChange}
+            />
+          </div>
+
           <div style={buttonContainerStyle}>
             <button type="submit" style={submitButtonStyle} disabled={loading}>
               {loading ? 'Generando...' : 'Generar Informe'}

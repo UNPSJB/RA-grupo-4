@@ -17,6 +17,7 @@ class MateriaOut(BaseModel):
         orm_mode = True
 
 class InformeACCreate(BaseModel):
+    #Hdu completar datos generales
     id_docente: int
     id_materia: int
     sede: str
@@ -25,9 +26,14 @@ class InformeACCreate(BaseModel):
     cantidad_comisiones_teoricas: Optional[int] = None
     cantidad_comisiones_practicas: Optional[int] = None
     
+    #Hdu completar necesidades
     necesidades_equipamiento: List[str]
     necesidades_bibliografia: List[str]
 
+    #Hdu consignar porcentaje horas
+    porcentaje_teoricas: Optional[int] = None
+    porcentaje_practicas: Optional[int] = None
+    justificacion_porcentaje: Optional[str] = None
 
 
 
@@ -42,9 +48,13 @@ class InformeAC(BaseModel):
     docente: DocenteOut
     materia: MateriaOut
     
-    # Estos campos se poblarán desde el modelo
+
     necesidades_equipamiento: Optional[List[str]] = None
     necesidades_bibliografia: Optional[List[str]] = None
+
+    porcentaje_teoricas: Optional[int] = None
+    porcentaje_practicas: Optional[int] = None
+    justificacion_porcentaje: Optional[str] = None
 
     class Config:
         orm_mode = True

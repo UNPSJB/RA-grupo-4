@@ -14,8 +14,6 @@ class InformesAC(ModeloBase):
     id_docente: Mapped[int] = mapped_column(ForeignKey("docentes.id_docente"), nullable=False)
     docente: Mapped["Docentes"] = relationship("Docentes", back_populates="informesAC")
     
-    #Agregado para la HDU Completar datos generales
-    #Estos datos se autocompletan cuando corresponda
     sede: Mapped[str] = mapped_column(String(100))
     ciclo_lectivo: Mapped[int] = mapped_column(Integer)
     cantidad_alumnos_inscriptos: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
@@ -29,3 +27,8 @@ class InformesAC(ModeloBase):
     necesidades_bibliografia: Mapped[Optional[List[str]]] = mapped_column(
         JSON, nullable=True
     )
+
+    #Agregado para HDU Consignar porcentaje de horas
+    porcentaje_teoricas: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    porcentaje_practicas: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    justificacion_porcentaje: Mapped[Optional[String]] = mapped_column(String, nullable=True)    
