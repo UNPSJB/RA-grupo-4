@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import CompletarDatosGeneralesDoc from './CompletarDatosGeneralesDoc';
 import CompletarNecesidadesDoc from './CompletarNecesidadesDoc';
 import CompletarPorcentajesDoc from './CompletarPorcentajesDoc';
+import CompletarProcesoAprendizajeDoc from './CompletarProcesoAprendizajeDoc';
 
 const BASE_URL = 'http://localhost:8000';
 
@@ -32,6 +33,12 @@ const GenerarInformeACDoc: React.FC = () => {
     porcentaje_teoricas: '',
     porcentaje_practicas: '',
     justificacion_porcentaje: '',
+    aspectos_positivos_enseñanza: '',
+    aspectos_positivos_aprendizaje: '',
+    obstaculos_enseñanza: '',
+    obstaculos_aprendizaje: '',
+    estrategias_a_implementar: '',
+    resumen_reflexion: '',
   });
 
   const [equipamiento, setEquipamiento] = useState<string[]>([]);
@@ -110,6 +117,12 @@ const GenerarInformeACDoc: React.FC = () => {
       porcentaje_teoricas: Number(formData.porcentaje_teoricas) || null,
       porcentaje_practicas: Number(formData.porcentaje_practicas) || null,
       justificacion_porcentaje: formData.justificacion_porcentaje || null,
+      aspectos_positivos_enseñanza: formData.aspectos_positivos_enseñanza || null,
+      aspectos_positivos_aprendizaje: formData.aspectos_positivos_aprendizaje || null,
+      obstaculos_enseñanza: formData.obstaculos_enseñanza || null,
+      obstaculos_aprendizaje: formData.obstaculos_aprendizaje || null,
+      estrategias_a_implementar: formData.estrategias_a_implementar || null,
+      resumen_reflexion: formData.resumen_reflexion || null,
     };
 
     console.log("Enviando payload al backend:", JSON.stringify(payload, null, 2));
@@ -177,6 +190,13 @@ const GenerarInformeACDoc: React.FC = () => {
 
           <div style={{marginTop: '30px'}}>
             <CompletarPorcentajesDoc
+              formData={formData}
+              handleChange={handleFormChange}
+            />
+          </div>
+
+          <div style={{marginTop: '30px'}}>
+            <CompletarProcesoAprendizajeDoc
               formData={formData}
               handleChange={handleFormChange}
             />

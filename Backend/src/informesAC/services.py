@@ -44,7 +44,16 @@ def create_informe_ac(db: Session, informe: schemas.InformeACCreate):
         #Datos porcentaje horas
         porcentaje_teoricas = informe.porcentaje_teoricas,
         porcentaje_practicas = informe.porcentaje_practicas,
-        justificacion_porcentaje = informe.justificacion_porcentaje
+        justificacion_porcentaje = informe.justificacion_porcentaje,
+
+        #Proceso de aprendizaje
+        aspectos_positivos_enseñanza = informe.aspectos_positivos_enseñanza,
+        aspectos_positivos_aprendizaje = informe.aspectos_positivos_aprendizaje,
+        obstaculos_enseñanza = informe.obstaculos_enseñanza,
+        obstaculos_aprendizaje = informe.obstaculos_aprendizaje,
+        estrategias_a_implementar = informe.estrategias_a_implementar,
+        resumen_reflexion = informe.resumen_reflexion
+        
         
     )
     db.add(db_informe)

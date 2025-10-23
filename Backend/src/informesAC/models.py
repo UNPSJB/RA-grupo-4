@@ -1,7 +1,8 @@
-from sqlalchemy import Integer, String, ForeignKey, JSON
+from sqlalchemy import Integer, String, ForeignKey, JSON, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from src.models import ModeloBase
 from typing import Optional, List
+#Uso text porque es mucho mas dinamico para la hora de guardar cadenas largas
 
 class InformesAC(ModeloBase):
     __tablename__ = "informesAC"
@@ -31,4 +32,12 @@ class InformesAC(ModeloBase):
     #Agregado para HDU Consignar porcentaje de horas
     porcentaje_teoricas: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
     porcentaje_practicas: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
-    justificacion_porcentaje: Mapped[Optional[String]] = mapped_column(String, nullable=True)    
+    justificacion_porcentaje: Mapped[Optional[str]] = mapped_column(Text, nullable=True)   
+
+    #Agregado para HDU proceso de aprendizaje
+    aspectos_positivos_enseñanza: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    aspectos_positivos_aprendizaje: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    obstaculos_enseñanza: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    obstaculos_aprendizaje: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    estrategias_a_implementar: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    resumen_reflexion: Mapped[Optional[str]] = mapped_column(Text, nullable=True) 

@@ -33,7 +33,15 @@ class InformeACCreate(BaseModel):
     #Hdu consignar porcentaje horas
     porcentaje_teoricas: Optional[int] = None
     porcentaje_practicas: Optional[int] = None
-    justificacion_porcentaje: Optional[str] = None
+    justificacion_porcentaje: Optional[str] = None 
+    
+    #Hdu completar proceso de aprendizaje
+    aspectos_positivos_enseñanza: Optional[str] = None
+    aspectos_positivos_aprendizaje: Optional[str] = None
+    obstaculos_enseñanza: Optional[str] = None
+    obstaculos_aprendizaje: Optional[str] = None
+    estrategias_a_implementar: Optional[str] = None
+    resumen_reflexion: Optional[str] = None
 
 
 
@@ -55,6 +63,13 @@ class InformeAC(BaseModel):
     porcentaje_teoricas: Optional[int] = None
     porcentaje_practicas: Optional[int] = None
     justificacion_porcentaje: Optional[str] = None
+
+    aspectos_positivos_enseñanza: Optional[str] = None
+    aspectos_positivos_aprendizaje: Optional[str] = None
+    obstaculos_enseñanza: Optional[str] = None
+    obstaculos_aprendizaje: Optional[str] = None
+    estrategias_a_implementar: Optional[str] = None
+    resumen_reflexion: Optional[str] = None
 
     class Config:
         orm_mode = True
