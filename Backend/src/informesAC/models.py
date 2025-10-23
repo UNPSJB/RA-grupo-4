@@ -1,7 +1,7 @@
-from sqlalchemy import Integer, String, ForeignKey
+from sqlalchemy import Integer, String, ForeignKey, JSON
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from src.models import ModeloBase
-from typing import Optional
+from typing import Optional, List
 
 class InformesAC(ModeloBase):
     __tablename__ = "informesAC"
@@ -21,3 +21,11 @@ class InformesAC(ModeloBase):
     cantidad_alumnos_inscriptos: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
     cantidad_comisiones_teoricas: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
     cantidad_comisiones_practicas: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+
+    #Agregado para la HDU Completar campo de pedido de equipamiento y bibliografia
+    necesidades_equipamiento: Mapped[Optional[List[str]]] = mapped_column(
+        JSON, nullable=True
+    )
+    necesidades_bibliografia: Mapped[Optional[List[str]]] = mapped_column(
+        JSON, nullable=True
+    )
