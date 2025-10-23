@@ -58,6 +58,7 @@ def obtener_informeAC(id_informe: int, db: Session = Depends(get_db)):
         opinionSobreResumen= informe.opinionSobreResumen,
         resumenSecciones=[{
             "id": s["id"],
+            "sigla": s["sigla"],
             "nombre": s["nombre"],
             "porcentajes_opciones": s["porcentajes_opciones"]
         } for s in secciones]  

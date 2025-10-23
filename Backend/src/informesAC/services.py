@@ -1,5 +1,5 @@
 from typing import List
-from collections import defaultdict
+from collections import defaultdict, OrderedDict
 from sqlalchemy.orm import Session, joinedload
 from src.informesAC.models import InformesAC
 from src.informesAC import exceptions, models
@@ -130,14 +130,36 @@ def cargar_resumen_secciones_informe(informe: InformesAC, db: Session):
         if total_respuestas == 0:
             continue
 
+        # Orden deseado de opciones conocidas (de mejor a peor)
+        orden_preferido = [
+            "Malo, No Satisfactorio",
+            "Regular, Poco Satisfactorio.",
+            "Bueno, Satisfactorio.",
+            "Muy Bueno, Muy satisfactorio.",
+        ]
+
+        # Obtener todas las opciones posibles de la primera pregunta de la sección
+        opciones_texto = [o.descripcion.strip() for o in seccion.preguntas[0].opciones_respuestas]
+
+        # Construir lista ordenada:
+        # 1. Primero las que están en el orden preferido, en ese orden
+        # 2. Luego las que no están, en el orden original de la encuesta
+        opciones_ordenadas = [
+            opt for opt in orden_preferido if opt in opciones_texto
+        ] + [
+            opt for opt in opciones_texto if opt not in orden_preferido
+        ]
+
+        # Calcular porcentajes en ese orden
         porcentajes = {}
-        for opcion in seccion.preguntas[0].opciones_respuestas:
-            desc = opcion.descripcion.strip()
+        for desc in opciones_ordenadas:
             cantidad = conteo_por_desc.get(desc, 0)
             porcentajes[desc] = round((cantidad / total_respuestas) * 100, 2)
 
+
         resumen_general.append({
             "id": seccion.id,
+            "sigla": seccion.sigla,
             "nombre": seccion.descripcion,
             "porcentajes_opciones": porcentajes
         })

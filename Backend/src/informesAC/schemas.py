@@ -3,6 +3,7 @@ from datetime import date
 from typing import Dict, List, Optional
 class SeccionResumen(BaseModel):
     id: int
+    sigla: str
     nombre: str
     porcentajes_opciones: Dict[str, float]  # {"Muy de acuerdo": 42.0, ...}
 

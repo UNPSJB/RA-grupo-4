@@ -16,7 +16,7 @@ import ListarInformesSinteticos from "./Componentes/ListarInformesSinteticos";
 import MostrarEncuesta from "./Componentes/MostrarEncuesta";
 import ResponderEncuesta from "./Componentes/ResponderEncuesta";
 
-import { ResumenSeccionesWrapper } from "./Componentes/ConsignarResumenValoresEncuestaSINRECHARTS";
+import ResumenSeccionesWrapper from "./Componentes/ConsignarResumenValoresEncuesta";
 
 function App() {
   return (
