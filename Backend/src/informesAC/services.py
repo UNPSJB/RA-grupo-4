@@ -1,7 +1,8 @@
 from typing import List
 from sqlalchemy.orm import Session
 from src.informesAC.models import InformesAC
-from src.informesAC import schemas, models
+from src.informesAC import schemas, models, services
+
 
 def listar_todos_los_informes(db: Session):
     return db.query(models.InformesAC).all()

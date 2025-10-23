@@ -32,9 +32,17 @@ def filtrado_informes_ac(
 
 @router.get("/docente/{id_docente}", response_model=List[schemas.InformeAC])
 def listar_informes_por_docente(id_docente: int, db: Session = Depends(get_db)):
-    service = services.InformeACService(db)
-    return service.obtener_informes_por_docente(id_docente)
+    informes = services.filtrar_informes(
+        db=db, 
+        id_docente=id_docente, 
+        id_materia=None, 
+        id_carrera=None
+    )
+    
+    if not informes:
+        return [] 
 
+    return informes
 
 @router.post("/crear", response_model=schemas.InformeAC)
 def crear_nuevo_informe_ac(
