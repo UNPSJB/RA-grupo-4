@@ -244,7 +244,7 @@ const CompletarDatosGeneralesDoc = () => {
                     required 
                     disabled 
                   >
-                    <option value="">Seleccione un docente</option>
+                    <option value="">Docente</option>
                     {docentes.map(d => (
                       <option key={d.id_docente} value={d.id_docente}>{d.nombre}</option>
                     ))}
