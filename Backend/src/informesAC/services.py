@@ -10,18 +10,16 @@ def filtrar_informes(
     db: Session,
     id_docente: int | None = None,
     id_materia: int | None = None,
-    id_carrera: int | None = None
 ):
     query = db.query(InformesAC)
 
     if id_docente is not None:
+        # Usamos filter en lugar de where
         query = query.filter(InformesAC.id_docente == id_docente)
 
     if id_materia is not None:
+        # Usamos filter en lugar de where
         query = query.filter(InformesAC.id_materia == id_materia)
-        
-    if id_carrera is not None:
-        query = query.filter(InformesAC.id_carrera == id_carrera)
 
     return query.all()
 
@@ -36,7 +34,7 @@ def create_informe_ac(db: Session, informe: schemas.InformeACCreate):
         cantidad_alumnos_inscriptos=informe.cantidad_alumnos_inscriptos,
         cantidad_comisiones_teoricas=informe.cantidad_comisiones_teoricas,
         cantidad_comisiones_practicas=informe.cantidad_comisiones_practicas,
-        
+
         # Datos de Necesidades (listas de strings)
         necesidades_equipamiento=informe.necesidades_equipamiento,
         necesidades_bibliografia=informe.necesidades_bibliografia,
@@ -46,6 +44,9 @@ def create_informe_ac(db: Session, informe: schemas.InformeACCreate):
         porcentaje_practicas = informe.porcentaje_practicas,
         justificacion_porcentaje = informe.justificacion_porcentaje,
 
+        # --- AÑADIDO PARA HDU 3 ---
+        porcentaje_contenido_abordado = informe.porcentaje_contenido_abordado,
+
         #Proceso de aprendizaje
         aspectos_positivos_enseñanza = informe.aspectos_positivos_enseñanza,
         aspectos_positivos_aprendizaje = informe.aspectos_positivos_aprendizaje,
@@ -53,10 +54,9 @@ def create_informe_ac(db: Session, informe: schemas.InformeACCreate):
         obstaculos_aprendizaje = informe.obstaculos_aprendizaje,
         estrategias_a_implementar = informe.estrategias_a_implementar,
         resumen_reflexion = informe.resumen_reflexion
-        
-        
     )
     db.add(db_informe)
     db.commit()
     db.refresh(db_informe)
     return db_informe
+
