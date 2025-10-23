@@ -24,8 +24,7 @@ class Materias(ModeloBase):
         "Inscripciones", 
         back_populates="materia"
     )
-    #debo saber el tamño de esa lista
-
+    
     # encuesta que usa la materia
     encuesta_id: Mapped[int] = mapped_column(
         ForeignKey("encuestas.id_encuesta"),

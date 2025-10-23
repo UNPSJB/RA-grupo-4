@@ -60,7 +60,7 @@ const ListadoInformesACDoc: React.FC = () => {
     fetchInformes();
   }, [idDocenteActual]); 
 
-  if (cargando) return <p style={{ color: "#ccc" }}>Cargando informes...</p>;
+  if (cargando) return <p style={{ color: "#333" }}>Cargando informes...</p>;
   if (error) return <p style={{ color: "red" }}>Error: {error}</p>;
 
   return (
@@ -76,7 +76,6 @@ const ListadoInformesACDoc: React.FC = () => {
           style={{
             width: "100%",
             borderCollapse: "collapse",
-            backgroundColor: "#222",
             borderRadius: "6px",
             overflow: "hidden",
           }}

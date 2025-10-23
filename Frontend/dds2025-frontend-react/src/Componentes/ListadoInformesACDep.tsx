@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import FiltradoInformeACDep from './FiltradoInformeACDep';
+import FiltradoInformeACDep from './FiltradoInformeACDep'; 
 
-// ... (tus interfaces no cambian) ...
 interface Docente {
   id_docente: number;
   nombre: string;
@@ -24,45 +23,42 @@ interface FiltrosData {
 const ListadoInformesACDep: React.FC = () => {
   const [informes, setInformes] = useState<InformeAC[]>([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null); 
   const [mostrarTabla, setMostrarTabla] = useState(false);
-  // <-- NUEVO: Estado para el mensaje de "no hay resultados"
   const [mensaje, setMensaje] = useState<string | null>(null);
 
   const cargarInformes = async () => {
     setLoading(true);
     setError(null);
     setMostrarTabla(false); 
-    setMensaje(null); // <-- MODIFICADO: Limpia el mensaje en cada carga
-    try {
+    setMensaje(null);
+    
+    try { 
       const res = await fetch('http://localhost:8000/informesAC/listar');
       if (!res.ok) {
         throw new Error(`Error: ${res.status} - ${res.statusText}`);
       }
       const data: InformeAC[] = await res.json();
       
-      // <-- MODIFICADO: Comprueba si hay datos
       if (data.length > 0) {
         setInformes(data);
-        setMostrarTabla(true);
+        setMostrarTabla(true); 
       } else {
-        // Si no hay datos, muestra el mensaje
         setInformes([]);
-        setMensaje("No se encontraron informes de actividad curricular.");
+        setMensaje("No hay informes disponibles."); 
       }
-
-    } catch (err: any) {
+    } catch (err: any) { 
+      console.error(err);
       setError(err.message);
-    } finally {
+    } finally { 
       setLoading(false);
     }
-  };
-
+  }; 
   const cargarInformesFiltrados = async (filtros: FiltrosData) => {
     setLoading(true);
     setError(null);
     setMostrarTabla(false); 
-    setMensaje(null); // <-- MODIFICADO: Limpia el mensaje en cada carga
+    setMensaje(null);
     try {
       const url = new URL('http://localhost:8000/informesAC/listar');
       if (filtros.anio) {
@@ -77,12 +73,10 @@ const ListadoInformesACDep: React.FC = () => {
       }
       const data: InformeAC[] = await res.json();
       
-      // <-- MODIFICADO: Comprueba si hay datos
       if (data.length > 0) {
         setInformes(data);
         setMostrarTabla(true);
       } else {
-        // Si no hay datos, muestra el mensaje
         setInformes([]);
         setMensaje("No hay informes con los filtros seleccionados.");
       }
@@ -99,39 +93,35 @@ const ListadoInformesACDep: React.FC = () => {
   }, []); 
 
   return (
-    <div>
-      <h2>Listado de InformesAC</h2>
+    <div className="content-card">
+      <h3 className="content-title">Listado de Informes de Actividad Curricular</h3>
       
-      <FiltradoInformeACDep 
-        onAplicarFiltros={cargarInformesFiltrados}
-        onQuitarFiltros={cargarInformes} 
-      />
+      <FiltradoInformeACDep onFiltrar={cargarInformesFiltrados} />
 
-      {loading && <p>Cargando informes...</p>}
-      {error && <p style={{ color: 'red' }}>Error: {error}</p>}
-      
-      {/* <-- NUEVO: Muestra el mensaje si no hay resultados --> */}
-      {mensaje && <p>{mensaje}</p>}
+      {loading && <p style={{ color: "#333" }}>Cargando informes...</p>}
+      {error && <p style={{ color: "red" }}>Error: {error}</p>}
+      {!loading && mensaje && <p>{mensaje}</p>}
 
-      {/* La tabla solo se muestra si mostrarTabla es true (es decir, si hay datos) */}
-      {mostrarTabla && (
-        <table>
+
+      {!loading && !error && mostrarTabla && (
+        <table style={{ width: "100%", borderCollapse: "collapse", borderRadius: "6px", overflow: "hidden" }}>
           <thead>
-            <tr>
-              <th>ID</th>
-              <th>Año</th>
-              <th>Materia</th>
-              <th>Docente</th>
+            <tr style={{ backgroundColor: "#444", color: "white" }}>
+              <th style={{ border: "1px solid #555", padding: "12px", textAlign: "left" }}>ID</th>
+              <th style={{ border: "1px solid #555", padding: "12px", textAlign: "left" }}>Año</th>
+            
+              <th style={{ border: "1px solid #555", padding: "12px", textAlign: "left" }}>Materia</th>
+              <th style={{ border: "1px solid #555", padding: "12px", textAlign: "left" }}>Docente</th>
             </tr>
           </thead>
           <tbody>
-            {informes.map((informe) => (
-              <tr key={informe.id_informesAC}>
-                <td>{informe.id_informesAC}</td>
-                <td>{informe.materia?.anio ?? 'N/A'}</td>
-                <td>{informe.docente?.nombre ?? 'Sin materia'}</td>
-
-                <td>{informe.docente?.nombre ?? 'Sin docente'}</td>
+            {informes.map((informe, index) => (
+              <tr key={informe.id_informesAC} style={{ backgroundColor: index % 2 === 0 ? "#2b2b2b" : "#1e1e1e", color: "white" }}>
+                <td style={{ border: "1px solid #444", padding: "12px" }}>{informe.id_informesAC}</td>
+                <td style={{ border: "1px solid #444", padding: "12px" }}>{informe.materia.anio}</td>
+          
+                <td style={{ border: "1px solid #444", padding: "12px" }}>{informe.materia.nombre}</td>
+                <td style={{ border: "1px solid #444", padding: "12px" }}>{informe.docente.nombre}</td>
               </tr>
             ))}
           </tbody>

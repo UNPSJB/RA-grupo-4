@@ -29,3 +29,9 @@ class MateriaAutocompletar(BaseModel):
     anio: int
     id_docente: int
     cantidad_inscripciones: int
+class MateriaEstadisticas(BaseModel):
+
+    total_inscriptos: int
+    total_encuestas_procesadas: int
+
+    model_config = {"from_attributes": True}
