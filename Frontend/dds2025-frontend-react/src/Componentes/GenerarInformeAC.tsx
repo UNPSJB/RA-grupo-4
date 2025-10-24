@@ -201,8 +201,15 @@ const GenerarInformeACDoc: React.FC = () => {
       porcentaje_practicas: Number(formData.porcentaje_practicas) || null,
       justificacion_porcentaje: formData.justificacion_porcentaje || null,
       porcentaje_contenido_abordado: Number(formData.porcentaje_contenido_abordado) || null,
-      resumenSecciones: resumenSecciones,
+
+      resumenSecciones: resumenSecciones.map(s => ({
+        id: s.id,
+        sigla: s.sigla,
+        nombre: s.nombre,
+        porcentajes_opciones: s.porcentajes_opciones,
+      })),
       opinionSobreResumen: opinionSobreResumen,
+      
       aspectos_positivos_enseñanza: formData.aspectos_positivos_enseñanza || null,
       aspectos_positivos_aprendizaje: formData.aspectos_positivos_aprendizaje || null,
       obstaculos_enseñanza: formData.obstaculos_enseñanza || null,

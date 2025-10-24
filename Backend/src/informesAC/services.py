@@ -157,6 +157,11 @@ def create_informe_ac(db: Session, informe: schemas.InformeACCreate):
         # Usamos model_dump() (o .dict() si usas Pydantic V1)
         valoraciones_dict = [v.model_dump() for v in informe.valoracion_auxiliares]
 
+    resumen_dicts = None
+    if informe.resumenSecciones:
+        resumen_dicts = [s.model_dump() if hasattr(s, "model_dump") else s.dict() for s in informe.resumenSecciones]
+
+
     db_informe = models.InformesAC(
         # Datos Generales
         id_docente=informe.id_docente,
@@ -181,7 +186,7 @@ def create_informe_ac(db: Session, informe: schemas.InformeACCreate):
 
         # Resumen valores
         opinionSobreResumen=informe.opinionSobreResumen,
-        resumenSecciones=informe.resumenSecciones if informe.resumenSecciones else [],
+        resumenSecciones=resumen_dicts or [],
         # --- AÑADIDO PARA HDU 4 ---
         valoracion_auxiliares = valoraciones_dict, # Guardamos la lista de diccionarios
         # --- FIN AÑADIDO ---
