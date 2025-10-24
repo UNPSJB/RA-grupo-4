@@ -1,3 +1,11 @@
+/* --- AÑADIDO: Cursor de Gaviota --- */
+html, body {
+  /* --- CAMBIO: Nombre del archivo actualizado --- */
+  cursor: url('./assets/gaviotaPunteroRedimensionada.png'), auto; 
+}
+/* --- FIN AÑADIDO --- */
+
+
 /* --- ESTILOS GENERALES (Navbar, Footer, etc.) --- */
 .navbar {
   display: flex;
@@ -8,6 +16,8 @@
   height: 60px;
   color: white;
 }
+
+/* ... (El resto de tu archivo App.css sin cambios) ... */
 
 .navbar-left .site-name {
   font-weight: bold;
@@ -156,20 +166,18 @@
 }
 
 
-/* --- AÑADIDO: SISTEMA DE DISEÑO UNIFICADO --- */
+/* --- SISTEMA DE DISEÑO UNIFICADO --- */
 
-/* El recuadro oscuro principal para el contenido */
 .content-card {
-  background-color: #1e1e1e; /* Un negro suave */
-  color: #e1e1e1; /* Un blanco suave para el texto */
+  background-color: #1e1e1e;
+  color: #e1e1e1;
   padding: 25px 30px;
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-  max-width: 900px; /* Limita el ancho para mejor legibilidad */
-  margin: 0 auto; /* Centra el recuadro en la página */
+  max-width: 900px;
+  margin: 0 auto;
 }
 
-/* Título estandarizado para usar dentro de los recuadros */
 .content-title {
   font-size: 1.8rem;
   font-weight: 400;
@@ -180,7 +188,6 @@
   border-bottom: 1px solid #444;
 }
 
-/* Estilo para las listas (como la de Seleccionar Encuestas) */
 .styled-list {
   list-style: none;
   padding: 0;
@@ -197,7 +204,6 @@
   font-size: 1.1rem;
 }
 
-/* Botón estandarizado para usar dentro de los recuadros */
 .styled-button {
   background-color: #007bff;
   color: white;
@@ -209,8 +215,8 @@
   text-transform: uppercase;
   font-size: 0.9rem;
   transition: background-color 0.2s, transform 0.2s;
-  text-decoration: none; /* Para que funcione en <Link> */
-  display: inline-block; /* Para que funcione en <Link> */
+  text-decoration: none;
+  display: inline-block;
 }
 
 .styled-button:hover {
