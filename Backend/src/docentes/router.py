@@ -10,3 +10,4 @@ router = APIRouter(prefix="/docentes", tags=["Docentes"])
 @router.get("/listar", response_model=List[schemas.Docente])
 def listar_docentes(db: Session = Depends(get_db)):
     return services.get_all_docentes(db=db)
+

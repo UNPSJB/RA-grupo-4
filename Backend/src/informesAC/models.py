@@ -1,7 +1,8 @@
-from sqlalchemy import String, Integer, ForeignKey, Text
+from sqlalchemy import Integer, String, ForeignKey, JSON, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from typing import Dict, Any
 from src.models import ModeloBase
+from typing import Dict, Any, Optional, List
+#Uso text porque es mucho mas dinamico para la hora de guardar cadenas largas
 import json
 
 class InformesAC(ModeloBase):
@@ -14,6 +15,42 @@ class InformesAC(ModeloBase):
 
     id_docente: Mapped[int] = mapped_column(ForeignKey("docentes.id_docente"), nullable=False)
     docente: Mapped["Docentes"] = relationship("Docentes", back_populates="informesAC")
+
+    sede: Mapped[str] = mapped_column(String(100))
+    ciclo_lectivo: Mapped[int] = mapped_column(Integer)
+    cantidad_alumnos_inscriptos: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    cantidad_comisiones_teoricas: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    cantidad_comisiones_practicas: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+
+    #Agregado para la HDU Completar campo de pedido de equipamiento y bibliografia
+    necesidades_equipamiento: Mapped[Optional[List[str]]] = mapped_column(
+        JSON, nullable=True
+    )
+    necesidades_bibliografia: Mapped[Optional[List[str]]] = mapped_column(
+        JSON, nullable=True
+    )
+
+    #Agregado para HDU Consignar porcentaje de horas
+    porcentaje_teoricas: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    porcentaje_practicas: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    justificacion_porcentaje: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+
+    #Agregado para la HDU contenido abordado
+    porcentaje_contenido_abordado: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+
+    #Agregado para la HDU Consignar Valores Desempeño Auxiliares
+    valoracion_auxiliares: Mapped[Optional[List[dict]]] = mapped_column(JSON, nullable=True) 
+
+    #Agregado para HDU proceso de aprendizaje
+    aspectos_positivos_enseñanza: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    aspectos_positivos_aprendizaje: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    obstaculos_enseñanza: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    obstaculos_aprendizaje: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    estrategias_a_implementar: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    resumen_reflexion: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+
+    #Agregado para HDU consignar Actividades
+    actividades: Mapped[List["Actividades"]] = relationship("Actividades", back_populates="informeAC", cascade="all, delete-orphan")
 
 
     #consignar valores de encuesta

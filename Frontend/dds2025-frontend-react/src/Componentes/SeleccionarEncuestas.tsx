@@ -1,17 +1,17 @@
 import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 
 interface Encuesta {
-  id: number;
+  id: number; 
   nombre: string;
   materia: string;
   habilitada: boolean;
 }
 
-const SeleccionarEncuesta: React.FC = () => {
+const SeleccionarEncuestas: React.FC = () => {
   const [encuestas, setEncuestas] = useState<Encuesta[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [seleccionada, setSeleccionada] = useState<Encuesta | null>(null);
 
   // Simulamos un alumno logeado
   const idAlumno = 1;
@@ -29,46 +29,31 @@ const SeleccionarEncuesta: React.FC = () => {
         setLoading(false);
       }
     };
-
     obtenerEncuestas();
   }, []);
 
-  const manejarSeleccion = (encuesta: Encuesta) => {
-    setSeleccionada(encuesta);
-  };
-
-  if (loading) return <p>Cargando encuestas...</p>;
-  if (error) return <p>Error: {error}</p>;
+  if (loading) return <p style={{ color: "#333" }}>Cargando encuestas...</p>;
+  if (error) return <p style={{ color: "red" }}>Error: {error}</p>;
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h2>Encuestas disponibles</h2>
+    <div className="content-card">
+      <h3 className="content-title">Encuestas Disponibles</h3>
       {encuestas.length === 0 ? (
         <p>No hay encuestas disponibles para ti.</p>
       ) : (
-        <ul>
+        <ul className="styled-list">
           {encuestas.map((encuesta) => (
-            <li key={encuesta.id} style={{ margin: "8px 0" }}>
-              <strong>{encuesta.nombre}</strong> - {encuesta.materia}
-              <button
-                style={{ marginLeft: "10px" }}
-                onClick={() => manejarSeleccion(encuesta)}
-              >
+            <li key={encuesta.id}>
+              <span><strong>{encuesta.nombre}</strong> - {encuesta.materia}</span>
+              <Link to={`/home/responder-encuesta/${encuesta.id}`} className="styled-button">
                 Seleccionar
-              </button>
+              </Link>
             </li>
           ))}
         </ul>
-      )}
-
-      {seleccionada && (
-        <div style={{ marginTop: "20px", borderTop: "1px solid #ccc", paddingTop: "10px" }}>
-          <h3>Encuesta seleccionada:</h3>
-          <p><strong>{seleccionada.nombre}</strong> - {seleccionada.materia}</p>
-        </div>
       )}
     </div>
   );
 };
 
-export default SeleccionarEncuesta;
+export default SeleccionarEncuestas;
