@@ -34,7 +34,7 @@ class InformesAC(ModeloBase):
     porcentaje_practicas: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
     justificacion_porcentaje: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
 
-    # --- AÑADIDO PARA HDU 3 ---
+    #Agregado para la HDU contenido abordado
     porcentaje_contenido_abordado: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
 
     #Agregado para HDU proceso de aprendizaje
@@ -44,3 +44,6 @@ class InformesAC(ModeloBase):
     obstaculos_aprendizaje: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     estrategias_a_implementar: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     resumen_reflexion: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+
+    #Agregado para HDU consignar Actividades
+    actividades: Mapped[List["Actividades"]] = relationship("Actividades", back_populates="informeAC", cascade="all, delete-orphan")

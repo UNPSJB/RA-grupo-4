@@ -1,18 +1,17 @@
-from pydantic import BaseModel, Field # <-- Añadir Field
-from typing import Optional, List # Importación de List
+from pydantic import BaseModel, Field 
+from typing import Optional, List
+from src.actividades.schemas import ActividadOut
 
 class DocenteOut(BaseModel):
     id_docente: int
     nombre: str
 
     class Config:
-        orm_mode = True # Deprecated, usar model_config = {"from_attributes": True} en Pydantic V2
-        # model_config = {"from_attributes": True} # Forma correcta en Pydantic V2
-
+        orm_mode = True 
 class MateriaOut(BaseModel):
     id_materia: int
     nombre: str
-    # anio: int # Comentado porque no está en el modelo Materias que enviaste
+    anio: int 
 
     class Config:
         orm_mode = True
@@ -37,9 +36,8 @@ class InformeACCreate(BaseModel):
     porcentaje_practicas: Optional[int] = Field(None, ge=0, le=100) # Validar 0-100
     justificacion_porcentaje: Optional[str] = None 
     
-    # --- AÑADIDO PARA HDU 3 ---
+    #Hdu consignar porcentaje abordado
     porcentaje_contenido_abordado: Optional[int] = Field(None, ge=0, le=100) # Validar 0-100
-    # --- FIN AÑADIDO ---
 
     #Hdu completar proceso de aprendizaje
     aspectos_positivos_enseñanza: Optional[str] = None
@@ -48,6 +46,9 @@ class InformeACCreate(BaseModel):
     obstaculos_aprendizaje: Optional[str] = None
     estrategias_a_implementar: Optional[str] = None
     resumen_reflexion: Optional[str] = None
+
+    #Hdu consignar actividades
+    actividades: List[ActividadOut] = []
 
 
 class InformeAC(BaseModel):
@@ -77,6 +78,9 @@ class InformeAC(BaseModel):
     obstaculos_aprendizaje: Optional[str] = None
     estrategias_a_implementar: Optional[str] = None
     resumen_reflexion: Optional[str] = None
+
+    #Hdu consignar actividades
+    actividades: List[ActividadOut] = []
 
     class Config:
         orm_mode = True

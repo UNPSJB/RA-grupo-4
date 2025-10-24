@@ -6,6 +6,7 @@ import CompletarNecesidadesDoc from './CompletarNecesidadesDoc';
 import CompletarPorcentajesDoc from './CompletarPorcentajesDoc';
 import CompletarContenidoAbordadoDoc from './CompletarContenidoAbordadoDoc';
 import CompletarProcesoAprendizajeDoc from './CompletarProcesoAprendizajeDoc';
+import ConsignarActividadesDoc from './ConsignarActividadesDoc';
 
 const BASE_URL = 'http://localhost:8000';
 
@@ -16,6 +17,7 @@ const headerStyle: React.CSSProperties = { textAlign: 'center', color: '#333', b
 const buttonContainerStyle: React.CSSProperties = { textAlign: 'center', marginTop: '30px' };
 const submitButtonStyle: React.CSSProperties = { padding: '12px 25px', fontSize: '16px', fontWeight: 'bold', color: '#ffffff', backgroundColor: '#007bff', border: 'none', borderRadius: '5px', cursor: 'pointer', transition: 'background-color 0.2s, transform 0.1s' };
 
+// --- INTERFACES ---
 interface MateriaParaAutocompletar {
   id_materia: number;
   nombre: string;
@@ -27,6 +29,16 @@ interface MateriaParaAutocompletar {
 interface Docente {
     id_docente: number;
     nombre: string;
+}
+
+// Interface para la fila de actividad (basada en ConsignarActividadesDoc)
+interface Actividad {
+  integranteCatedra: string;
+  capacitacion: string;
+  investigacion: string;
+  extension: string;
+  gestion: string;
+  observacionComentarios: string;
 }
 
 
@@ -57,8 +69,10 @@ const GenerarInformeACDoc: React.FC = () => {
     resumen_reflexion: '',
   });
 
+  // Estados para los componentes hijos que manejan listas
   const [equipamiento, setEquipamiento] = useState<string[]>([]);
   const [bibliografia, setBibliografia] = useState<string[]>([]);
+  const [actividades, setActividades] = useState<Actividad[]>([]);
 
   const [error, setError] = useState<string | null>(null);
   const [informeGenerado, setInformeGenerado] = useState(null);
@@ -70,7 +84,6 @@ const GenerarInformeACDoc: React.FC = () => {
         setLoading(true); 
         setError(null);   
 
-        // --- Verificamos las URLs ---
         const materiasRes = await fetch(`${BASE_URL}/materias/listar`);
         const docentesRes = await fetch(`${BASE_URL}/docentes/listar`);
 
@@ -116,6 +129,11 @@ const GenerarInformeACDoc: React.FC = () => {
     }
   };
 
+  // Handler para la lista de actividades
+  const handleActividadesChange = (nuevaLista: Actividad[]) => {
+    setActividades(nuevaLista);
+  };
+
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -142,6 +160,7 @@ const GenerarInformeACDoc: React.FC = () => {
       resumen_reflexion: formData.resumen_reflexion || null,
       necesidades_equipamiento: equipamiento,
       necesidades_bibliografia: bibliografia,
+      actividades: actividades,
     };
 
     if (!payload.id_docente || !payload.id_materia) {
@@ -178,22 +197,22 @@ const GenerarInformeACDoc: React.FC = () => {
       return <p style={{ textAlign: 'center', fontSize: '18px', color: '#333' }}>Cargando datos iniciales...</p>;
   }
 
-   // Renderizado de error de carga inicial
+    // Renderizado de error de carga inicial
   if (error && materias.length === 0 && docentes.length === 0) {
       return <p style={{ color: 'red', textAlign: 'center' }}>Error cargando datos: {error}</p>;
   }
 
   // Renderizado de éxito 
   if (informeGenerado) {
-     return (
-       <div style={pageStyle}>
-         <div style={formContainerStyle}>
-           <h2>Informe Generado con Éxito</h2>
-           <p>El informe ha sido guardado correctamente.</p>
-           <button onClick={() => navigate(-1)} style={submitButtonStyle}>Volver</button>
-         </div>
-       </div>
-     );
+      return (
+        <div style={pageStyle}>
+          <div style={formContainerStyle}>
+            <h2>Informe Generado con Éxito</h2>
+            <p>El informe ha sido guardado correctamente.</p>
+            <button onClick={() => navigate(-1)} style={submitButtonStyle}>Volver</button>
+          </div>
+        </div>
+      );
   }
 
   return (
@@ -239,14 +258,19 @@ const GenerarInformeACDoc: React.FC = () => {
             />
           </div>
 
+          <hr style={{borderColor: '#eee', margin: '30px 0'}} />
+          
+          <ConsignarActividadesDoc
+            actividades={actividades}
+            onActividadesChange={handleActividadesChange}
+          />
+          
           <div style={buttonContainerStyle}>
-            {/* Deshabilitar botón durante la carga inicial Y el envío */}
             <button type="submit" style={submitButtonStyle} disabled={loading}>
               {loading ? 'Procesando...' : 'Generar Informe'}
             </button>
           </div>
 
-          {/* Mostrar error de envío */}
           {error && <p style={{color: 'red', textAlign: 'center', marginTop: '15px'}}>{error}</p>}
 
         </form>
