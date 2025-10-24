@@ -26,7 +26,7 @@ def filtrado_informes_ac(
         id_docente=id_docente,
         id_materia=id_materia,
     )
-  
+
     return informes
 
 @router.get("/docente/{id_docente}", response_model=List[schemas.InformeAC])
@@ -60,15 +60,17 @@ def actualizar_opinion(id_informe: int, opinion: str, db: Session = Depends(get_
     return schemas.InformeAC.from_orm(informe_actualizado)
 
 
-@router.get("/{id_informe}", response_model=schemas.InformeAC)
-def obtener_informeAC(id_informe: int, db: Session = Depends(get_db)):
+
+@router.get("/resumen/{id_informe}", response_model=List[schemas.SeccionResumen])
+def obtener_resumen_secciones_informeAC(id_informe: int, db: Session = Depends(get_db)):
     
     informe = services.read_informeAC(db, id_informe) 
 
     resumen_secciones = services.cargar_resumen_secciones_informe(informe, db)
 
-    secciones = resumen_secciones.get("secciones", [])
-
+    return resumen_secciones
+    secciones = resumen_secciones
+    
     return schemas.InformeAC(
         id_informesAC=informe.id_informesAC,
         docente=schemas.DocenteOut.from_orm(informe.docente),
@@ -81,3 +83,11 @@ def obtener_informeAC(id_informe: int, db: Session = Depends(get_db)):
             "porcentajes_opciones": s["porcentajes_opciones"]
         } for s in secciones]  
     )
+
+@router.get("/resumen/materia/{id_materia}", response_model=List[schemas.SeccionResumen])
+def obtener_resumen_secciones_por_materia_informeAC(id_materia: int, db: Session = Depends(get_db)):
+    # Creamos un "informe temporal" para calcular el resumen
+    from src.informesAC.models import InformesAC
+    informe_temp = InformesAC(id_materia=id_materia)
+    resumen = services.cargar_resumen_secciones_informe(informe_temp, db)
+    return resumen

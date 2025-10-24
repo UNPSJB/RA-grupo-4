@@ -16,5 +16,4 @@ class ActividadOut(ActividadBase):
     id_actividades: int
     id_informeAC: int  
 
-    class Config:
-        orm_mode = True 
+    model_config = {"from_attributes": True} 

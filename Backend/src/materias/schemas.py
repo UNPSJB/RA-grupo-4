@@ -20,9 +20,7 @@ class MateriaOut(BaseModel):
     nombre: str
     anio: int
 
-    class Config:
-     
-        orm_mode = True
+    model_config = {"from_attributes": True}
 class MateriaAutocompletar(BaseModel):
     id_materia: int
     nombre: str

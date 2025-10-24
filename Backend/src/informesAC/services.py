@@ -61,25 +61,9 @@ def actualizar_opinion_informe(db: Session, id_informe: int, opinion: str):
 
 
 
-def read_informeAC(db: Session, id_informe: int) -> InformesAC:
-    informe = (
-        db.query(InformesAC)
-        .options(
-            joinedload(InformesAC.materia),
-            joinedload(InformesAC.docente)
-        )
-        .filter(InformesAC.id_informesAC == id_informe)
-        .first()
-    )
-
-    if not informe:
-        raise exceptions.InformesNoEncontrados
-    return informe
-
-
 def cargar_resumen_secciones_informe(informe: InformesAC, db: Session):
     # Si ya tiene resumen, lo devuelve directamente
-    if informe.resumenSecciones and informe.resumenSecciones.get("secciones"):
+    if informe.resumenSecciones:
         return informe.resumenSecciones
 
     # Traer materia con encuesta y secciones
@@ -157,10 +141,10 @@ def cargar_resumen_secciones_informe(informe: InformesAC, db: Session):
         })
 
     # Guardar resumen en informe
-    informe.resumenSecciones = {"secciones": resumen_general}
-    db.add(informe)
-    db.commit()
-    db.refresh(informe)
+    informe.resumenSecciones = resumen_general
+    # db.add(informe)
+    # db.commit()
+    # db.refresh(informe)
 
     return informe.resumenSecciones
 
@@ -195,6 +179,9 @@ def create_informe_ac(db: Session, informe: schemas.InformeACCreate):
         # HDU 3
         porcentaje_contenido_abordado = informe.porcentaje_contenido_abordado,
 
+        # Resumen valores
+        opinionSobreResumen=informe.opinionSobreResumen,
+        resumenSecciones=informe.resumenSecciones if informe.resumenSecciones else [],
         # --- AÑADIDO PARA HDU 4 ---
         valoracion_auxiliares = valoraciones_dict, # Guardamos la lista de diccionarios
         # --- FIN AÑADIDO ---

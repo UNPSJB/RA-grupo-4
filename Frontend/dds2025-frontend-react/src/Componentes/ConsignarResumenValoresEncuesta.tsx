@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
 import {
     BarChart,
     Bar,
@@ -11,81 +10,64 @@ import {
 } from "recharts";
 
 // --- Tipos ---
-interface SeccionResumen {
+export interface SeccionResumen {
     id: number;
     sigla: string;
     nombre: string;
     porcentajes_opciones: Record<string, number>;
 }
 
-interface InformeAC {
-    id_informesAC: number;
-    resumenSecciones: SeccionResumen[];
-    opinionSobreResumen?: string;
-}
-
 interface Props {
-    idInforme: number;
+    idInforme?: number;
+    idMateria: number;
+    handleChange?: (nuevoResumen: SeccionResumen[], nuevoComentario: string) => void;
 }
 
-// --- Componente principal ---
-const ResumenSecciones: React.FC<Props> = ({ idInforme }) => {
-    const [informe, setInforme] = useState<InformeAC | null>(null);
+const ResumenSecciones: React.FC<Props> = ({ idInforme, idMateria, handleChange }) => {
+    const [resumen, setResumen] = useState<SeccionResumen[]>([]);
     const [comentario, setComentario] = useState<string>("");
 
+    // --- Fetch de datos ---
     useEffect(() => {
-        fetch(`http://localhost:8000/informesAC/${idInforme}`)
-            .then(res => res.json())
-            .then(data => {
-                setInforme(data);
-                setComentario(data.opinionSobreResumen || "");
-            });
-    }, [idInforme]);
+        if (idInforme) {
+            fetch(`http://localhost:8000/informesAC/${idInforme}`)
+                .then(res => res.json())
+                .then((data: { resumenSecciones: SeccionResumen[]; opinionSobreResumen?: string }) => {
+                    setResumen(data.resumenSecciones || []);
+                    setComentario(data.opinionSobreResumen || "");
+                });
+        } else if (idMateria) {
+            fetch(`http://localhost:8000/informesAC/resumen/materia/${idMateria}`)
+                .then(res => res.json())
+                .then((data: SeccionResumen[]) => setResumen(data || []));
+        }
+    }, [idInforme, idMateria]);
 
-    const guardarComentario = async () => {
-        if (!informe) return;
+    // --- Manejo local de cambios en el comentario ---
+        const handleComentarioLocalChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+            const nuevoComentario = e.target.value;
+            setComentario(nuevoComentario);
 
-        await fetch(`http://localhost:8000/informesAC/${idInforme}/opinion`, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ opinion: comentario }),
-        });
+            // Notificar al componente padre
+            handleChange?.(resumen, nuevoComentario);
+        };
 
-        setInforme({ ...informe, opinionSobreResumen: comentario });
-    };
 
-    if (!informe) return <div>Cargando informe...</div>;
+    if (!resumen || resumen.length === 0) return <div>Cargando resumen...</div>;
 
     // Filtrar solo las secciones deseadas
-    const seccionesFiltradas = informe.resumenSecciones.filter(s =>
+    const seccionesFiltradas = resumen.filter(s =>
         ["B", "C", "D", "E-Teoria", "E-Practica"].includes(s.sigla)
     );
 
     return (
         <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
-            {/* Título principal */}
-            <h2
-                style={{
-                    textAlign: "center",
-                    fontSize: "1.4rem",
-                    fontWeight: "700",
-                    marginBottom: "0.5rem",
-                }}
-            >
+            <h2 style={{ textAlign: "center", fontSize: "1.4rem", fontWeight: "700", marginBottom: "0.5rem" }}>
                 Resumen valores de encuesta
             </h2>
 
-            {/* Contenedor de secciones */}
-            <div
-                style={{
-                    display: "flex",
-                    flexWrap: "wrap",
-                    justifyContent: "center",
-                    gap: "0.6rem",
-                }}
-            >
+            <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "0.6rem" }}>
                 {seccionesFiltradas.map((seccion, index) => {
-                    // Determinar si está en la última fila incompleta
                     const itemsRestantes = seccionesFiltradas.length - index;
                     const isUltimos =
                         seccionesFiltradas.length % 3 !== 0 &&
@@ -108,25 +90,16 @@ const ResumenSecciones: React.FC<Props> = ({ idInforme }) => {
                                 backgroundColor: "#fff",
                             }}
                         >
-                            <h3
-                                style={{
-                                    fontWeight: "600",
-                                    fontSize: "1rem",
-                                    marginBottom: "0.3rem",
-                                    textAlign: "center",
-                                }}
-                            >
+                            <h3 style={{ fontWeight: "600", fontSize: "1rem", marginBottom: "0.3rem", textAlign: "center" }}>
                                 {seccion.nombre}
                             </h3>
 
                             <ResponsiveContainer width="100%" height={250}>
                                 <BarChart
-                                    data={Object.entries(seccion.porcentajes_opciones).map(
-                                        ([opcion, porcentaje]) => ({
-                                            opcion,
-                                            porcentaje,
-                                        })
-                                    )}
+                                    data={Object.entries(seccion.porcentajes_opciones).map(([opcion, porcentaje]) => ({
+                                        opcion,
+                                        porcentaje,
+                                    }))}
                                     margin={{ top: 20, right: 10, left: 0, bottom: 70 }}
                                 >
                                     <XAxis
@@ -143,9 +116,7 @@ const ResumenSecciones: React.FC<Props> = ({ idInforme }) => {
                                         <LabelList
                                             dataKey="porcentaje"
                                             position="top"
-                                            formatter={(value: any) =>
-                                                typeof value === "number" ? `${value}%` : value
-                                            }
+                                            formatter={(value: any) => (typeof value === "number" ? `${value}%` : value)}
                                         />
                                     </Bar>
                                 </BarChart>
@@ -155,61 +126,19 @@ const ResumenSecciones: React.FC<Props> = ({ idInforme }) => {
                 })}
             </div>
 
-            {/* Comentario del docente */}
-            <div
-                style={{
-                    padding: "0.5rem",
-                    border: "1px solid #ccc",
-                    borderRadius: "6px",
-                    backgroundColor: "#fff",
-                }}
-            >
-                <h3
-                    style={{
-                        fontWeight: "600",
-                        fontSize: "1rem",
-                        marginBottom: "0.3rem",
-                    }}
-                >
+            <div style={{ padding: "0.5rem", border: "1px solid #ccc", borderRadius: "6px", backgroundColor: "#fff" }}>
+                <h3 style={{ fontWeight: "600", fontSize: "1rem", marginBottom: "0.3rem" }}>
                     Juicio de valor sobre los valores
                 </h3>
                 <textarea
-                    style={{
-                        width: "100%",
-                        border: "1px solid #ccc",
-                        padding: "0.3rem",
-                        borderRadius: "4px",
-                    }}
+                    style={{ width: "100%", border: "1px solid #ccc", padding: "0.3rem", borderRadius: "4px" }}
                     value={comentario}
-                    onChange={e => setComentario(e.target.value)}
+                    onChange={handleComentarioLocalChange}
                     rows={3}
                 />
-                <button
-                    style={{
-                        marginTop: "0.3rem",
-                        padding: "0.3rem 0.6rem",
-                        backgroundColor: "#4f46e5",
-                        color: "white",
-                        borderRadius: "4px",
-                        border: "none",
-                        cursor: "pointer",
-                    }}
-                    onClick={guardarComentario}
-                >
-                    Guardar Comentario
-                </button>
             </div>
         </div>
     );
 };
 
-// --- Wrapper ---
-const ResumenSeccionesWrapper: React.FC = () => {
-    const { idInforme } = useParams<{ idInforme: string }>();
-    if (!idInforme) return <div>ID de informe no proporcionado</div>;
-    const id = parseInt(idInforme, 10);
-    if (isNaN(id)) return <div>ID de informe inválido</div>;
-    return <ResumenSecciones idInforme={id} />;
-};
-
-export default ResumenSeccionesWrapper;
+export default ResumenSecciones;

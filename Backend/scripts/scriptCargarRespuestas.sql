@@ -10,8 +10,8 @@ DELETE FROM respuestas;
 -- =====================================================
 
 -- Crear inscripciones simuladas (del id 5 al 54)
-INSERT INTO inscripciones (id, estudiante_id, materia_id, fecha_inscripcion)
-SELECT id + 4, ((id - 1) % 4) + 1, 1, datetime('2025-08-01 10:00:00', '+' || id || ' minutes')
+INSERT INTO inscripciones (id, estudiante_id, materia_id, fecha_inscripcion, encuesta_procesada)
+SELECT id + 4, ((id - 1) % 4) + 1, 1, datetime('2025-08-01 10:00:00', '+' || id || ' minutes'), 1
 FROM (SELECT 1 AS id UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL
       SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL
       SELECT 9 UNION ALL SELECT 10 UNION ALL SELECT 11 UNION ALL SELECT 12 UNION ALL

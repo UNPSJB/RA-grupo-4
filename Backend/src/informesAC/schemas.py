@@ -43,45 +43,6 @@ class ValoracionAuxiliar(ValoracionAuxiliarBase):
     pass
 
 
-
-class InformeACCreate(BaseModel):
-    #Hdu completar datos generales
-    id_docente: int
-    id_materia: int
-    sede: str
-    ciclo_lectivo: int
-    cantidad_alumnos_inscriptos: Optional[int] = None
-    cantidad_comisiones_teoricas: Optional[int] = None
-    cantidad_comisiones_practicas: Optional[int] = None
-
-    #Hdu completar necesidades
-    necesidades_equipamiento: Optional[List[str]] = None
-    necesidades_bibliografia: Optional[List[str]] = None
-
-    #Hdu consignar porcentaje horas
-    porcentaje_teoricas: Optional[int] = Field(None, ge=0, le=100)
-    porcentaje_practicas: Optional[int] = Field(None, ge=0, le=100)
-    justificacion_porcentaje: Optional[str] = None
-
-    # HDU 3
-    porcentaje_contenido_abordado: Optional[int] = Field(None, ge=0, le=100)
-
-    # --- AÑADIDO PARA HDU 4 ---
-    valoracion_auxiliares: Optional[List[ValoracionAuxiliarBase]] = None 
-
-    #Hdu completar proceso de aprendizaje
-    aspectos_positivos_enseñanza: Optional[str] = None
-    aspectos_positivos_aprendizaje: Optional[str] = None
-    obstaculos_enseñanza: Optional[str] = None
-    obstaculos_aprendizaje: Optional[str] = None
-    estrategias_a_implementar: Optional[str] = None
-    resumen_reflexion: Optional[str] = None
-
-
-    #Hdu consignar actividades
-    actividades: List[ActividadBase] = []
-
-
 class ValoracionAuxiliarBase(BaseModel):
     nombre_auxiliar: str = Field(..., min_length=1) # Campo obligatorio
     calificacion: CalificacionAuxiliar # Usamos el tipo Literal para validar
@@ -115,6 +76,10 @@ class InformeACCreate(BaseModel):
     # HDU 3
     porcentaje_contenido_abordado: Optional[int] = Field(None, ge=0, le=100)
 
+    #Hdu Consignar Valores resumen encuesta 
+    opinionSobreResumen: Optional[str] = None
+    resumenSecciones: Optional[List[SeccionResumen]] = None
+    
     # --- AÑADIDO PARA HDU 4 ---
     valoracion_auxiliares: Optional[List[ValoracionAuxiliarBase]] = None 
 

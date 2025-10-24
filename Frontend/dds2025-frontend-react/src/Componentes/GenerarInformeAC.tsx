@@ -8,6 +8,7 @@ import CompletarContenidoAbordadoDoc from './CompletarContenidoAbordadoDoc';
 import CompletarProcesoAprendizajeDoc from './CompletarProcesoAprendizajeDoc';
 import ConsignarActividadesDoc from './ConsignarActividadesDoc';
 import CompletarValoracionAuxiliaresDoc, { ValoracionAuxiliarData } from './CompletarValoracionAuxiliaresDoc'; // Importación de la HDU 4
+import ResumenSecciones from './ConsignarResumenValoresEncuesta';
 
 
 const BASE_URL = 'http://localhost:8000';
@@ -33,6 +34,12 @@ interface Docente {
     nombre: string;
 }
 
+interface SeccionResumen {
+    id: number;
+    sigla: string;
+    nombre: string;
+    porcentajes_opciones: Record<string, number>;
+}
 // Interface para la fila de actividad (basada en ConsignarActividadesDoc)
 interface Actividad {
   integranteCatedra: string;
@@ -75,12 +82,16 @@ const GenerarInformeACDoc: React.FC = () => {
   const [equipamiento, setEquipamiento] = useState<string[]>([]);
   const [bibliografia, setBibliografia] = useState<string[]>([]);
   const [valoracionesAuxiliares, setValoracionesAuxiliares] = useState<ValoracionAuxiliarData[]>([
-       { nombre_auxiliar: '', calificacion: '', justificacion: '' }
+      { nombre_auxiliar: '', calificacion: '', justificacion: '' }
   ]);
   const [actividades, setActividades] = useState<Actividad[]>([]);
 
   const [error, setError] = useState<string | null>(null);
   const [informeGenerado, setInformeGenerado] = useState(null);
+  
+  const [resumenSecciones, setResumenSecciones] = useState<SeccionResumen[]>([]);
+  const [opinionSobreResumen, setOpinionSobreResumen] = useState<string>("");
+
 
   // useEffect para cargar datos (sin cambios)
   useEffect(() => {
@@ -135,6 +146,12 @@ const GenerarInformeACDoc: React.FC = () => {
     setActividades(nuevaLista);
   };
 
+  //Handle para resumen valores encuesta
+  const handleResumenChange = (nuevoResumen: SeccionResumen[], nuevoComentario: string) => {
+    setResumenSecciones(nuevoResumen);
+    setOpinionSobreResumen(nuevoComentario);
+  };
+  
   // handleValoracionesChange (sin cambios)
   const handleValoracionesChange = (nuevasValoraciones: ValoracionAuxiliarData[]) => {
       setValoracionesAuxiliares(nuevasValoraciones);
@@ -158,9 +175,9 @@ const GenerarInformeACDoc: React.FC = () => {
             return;
         }
         if (v.calificacion === '') {
-             setError(`Error en Fila ${i + 1} de Valoración: Debe seleccionar una calificación.`);
-             setLoading(false); // Detener carga si hay error
-             return;
+            setError(`Error en Fila ${i + 1} de Valoración: Debe seleccionar una calificación.`);
+            setLoading(false); // Detener carga si hay error
+            return;
         }
         if (!v.justificacion.trim()) {
             setError(`Error en Fila ${i + 1} de Valoración: El campo 'Justificación' es obligatorio.`);
@@ -184,6 +201,8 @@ const GenerarInformeACDoc: React.FC = () => {
       porcentaje_practicas: Number(formData.porcentaje_practicas) || null,
       justificacion_porcentaje: formData.justificacion_porcentaje || null,
       porcentaje_contenido_abordado: Number(formData.porcentaje_contenido_abordado) || null,
+      resumenSecciones: resumenSecciones,
+      opinionSobreResumen: opinionSobreResumen,
       aspectos_positivos_enseñanza: formData.aspectos_positivos_enseñanza || null,
       aspectos_positivos_aprendizaje: formData.aspectos_positivos_aprendizaje || null,
       obstaculos_enseñanza: formData.obstaculos_enseñanza || null,
@@ -284,6 +303,13 @@ const GenerarInformeACDoc: React.FC = () => {
               handleChange={handleFormChange}
             />
           </div>
+
+          <div style={{ marginTop: '30px' }}>
+            <ResumenSecciones
+              idMateria={Number(formData.id_materia)}
+              handleChange={handleResumenChange} 
+            />
+          </div>     
 
           <div style={{marginTop: '30px'}}>
             <CompletarProcesoAprendizajeDoc
