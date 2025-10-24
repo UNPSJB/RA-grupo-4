@@ -9,8 +9,14 @@ def get_materias(db: Session) -> List[models.Materias]:
     """
     return db.query(models.Materias).all()
 
+from sqlalchemy.orm import subqueryload # ¡Importa esto!
+
 def get_materias_para_autocompletar(db: Session) -> List[dict]:
-    materias_db = db.query(models.Materias).all()
+    materias_db = (
+        db.query(models.Materias)
+        .options(subqueryload(models.Materias.inscripciones)) 
+        .all()
+    )
     
     resultado = []
     for m in materias_db:

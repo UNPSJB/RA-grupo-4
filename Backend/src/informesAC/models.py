@@ -37,6 +37,9 @@ class InformesAC(ModeloBase):
     #Agregado para la HDU contenido abordado
     porcentaje_contenido_abordado: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
 
+    #Agregado para la HDU Consignar Valores Desempeño Auxiliares
+    valoracion_auxiliares: Mapped[Optional[List[dict]]] = mapped_column(JSON, nullable=True) 
+
     #Agregado para HDU proceso de aprendizaje
     aspectos_positivos_enseñanza: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     aspectos_positivos_aprendizaje: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
