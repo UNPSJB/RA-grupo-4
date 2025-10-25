@@ -4,11 +4,14 @@ from sqlalchemy.orm import Session, joinedload
 from src.informesAC.models import InformesAC
 from src.informesAC import exceptions, models, schemas
 from src.materias.models import Materias
+from src.materias import exceptions as exceptionsMaterias
 from src.inscripciones.models import Inscripciones
 from src.encuesta.models import Encuesta
 from src.secciones.models import Seccion
 from src.preguntas.models import Pregunta
 from src.respuestas.models import Respuesta
+
+
 
 def read_informeAC(db: Session, id_informe: int) -> InformesAC:
     informe = (
@@ -80,6 +83,7 @@ def cargar_resumen_secciones_informe(informe: InformesAC, db: Session):
     )
 
     if not materia:
+        raise exceptionsMaterias.MateriaNoEncontrada
         raise HTTPException(status_code=404, detail="Materia no encontrada")
 
     # Traer inscripciones con respuestas

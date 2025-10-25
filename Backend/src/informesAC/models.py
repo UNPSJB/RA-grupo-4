@@ -58,10 +58,31 @@ class InformesAC(ModeloBase):
     _resumenSecciones: Mapped[str] = mapped_column("resumenSecciones", Text, nullable=True) # JSON con los porcentajes por sección
     @property
     def resumenSecciones(self) -> List[Dict[str, Any]]:
-        if self._resumenSecciones:
-            return json.loads(self._resumenSecciones)
-        return []
-
+        if not self._resumenSecciones:
+            return []
+        try:
+            data = json.loads(self._resumenSecciones)
+            # Asegurar que siempre sea lista
+            if isinstance(data, dict):
+                return [data] if data else []
+            if isinstance(data, list):
+                return data
+            return []
+        except json.JSONDecodeError:
+            return []
     @resumenSecciones.setter
     def resumenSecciones(self, value: List[Dict[str, Any]]):
-        self._resumenSecciones = json.dumps(value)
+        if not value:
+            self._resumenSecciones = json.dumps([])
+        else:
+            self._resumenSecciones = json.dumps(value)
+
+    # @property
+    # def resumenSecciones(self) -> List[Dict[str, Any]]:
+    #     if self._resumenSecciones:
+    #         return json.loads(self._resumenSecciones)
+    #     return []
+
+    # @resumenSecciones.setter
+    # def resumenSecciones(self, value: List[Dict[str, Any]]):
+    #     self._resumenSecciones = json.dumps(value)

@@ -69,25 +69,12 @@ def obtener_resumen_secciones_informeAC(id_informe: int, db: Session = Depends(g
     resumen_secciones = services.cargar_resumen_secciones_informe(informe, db)
 
     return resumen_secciones
-    secciones = resumen_secciones
-    
-    return schemas.InformeAC(
-        id_informesAC=informe.id_informesAC,
-        docente=schemas.DocenteOut.from_orm(informe.docente),
-        materia=schemas.MateriaOut.from_orm(informe.materia), 
-        opinionSobreResumen= informe.opinionSobreResumen,
-        resumenSecciones=[{
-            "id": s["id"],
-            "sigla": s["sigla"],
-            "nombre": s["nombre"],
-            "porcentajes_opciones": s["porcentajes_opciones"]
-        } for s in secciones]  
-    )
+
 
 @router.get("/resumen/materia/{id_materia}", response_model=List[schemas.SeccionResumen])
 def obtener_resumen_secciones_por_materia_informeAC(id_materia: int, db: Session = Depends(get_db)):
     # Creamos un "informe temporal" para calcular el resumen
-    from src.informesAC.models import InformesAC
+
     informe_temp = InformesAC(id_materia=id_materia)
     resumen = services.cargar_resumen_secciones_informe(informe_temp, db)
     return resumen
