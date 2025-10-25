@@ -61,8 +61,8 @@ const ResumenSecciones: React.FC<Props> = ({ idInforme, idMateria, handleChange 
     );
 
     return (
-        <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
-            <h2 style={{ textAlign: "center", fontSize: "1.4rem", fontWeight: "700", marginBottom: "0.5rem" }}>
+        <div style={{ color: "black", display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+            <h2 style={{ fontSize: "1.4rem", fontWeight: "700", marginBottom: "0.5rem" }}>
                 Resumen valores de encuesta
             </h2>
 
@@ -91,7 +91,7 @@ const ResumenSecciones: React.FC<Props> = ({ idInforme, idMateria, handleChange 
                             }}
                         >
                             <h3 style={{ fontWeight: "600", fontSize: "1rem", marginBottom: "0.3rem", textAlign: "center" }}>
-                                {seccion.nombre}
+                                {seccion.sigla + " - " + seccion.nombre}
                             </h3>
 
                             <ResponsiveContainer width="100%" height={250}>
@@ -128,7 +128,7 @@ const ResumenSecciones: React.FC<Props> = ({ idInforme, idMateria, handleChange 
 
             <div style={{ padding: "0.5rem", border: "1px solid #ccc", borderRadius: "6px", backgroundColor: "#fff" }}>
                 <h3 style={{ fontWeight: "600", fontSize: "1rem", marginBottom: "0.3rem" }}>
-                    Juicio de valor sobre los valores
+                    Observaciones sobre valores de la encuesta:
                 </h3>
                 <textarea
                     style={{ width: "100%", border: "1px solid #ccc", padding: "0.3rem", borderRadius: "4px" }}
