@@ -1,4 +1,5 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field 
+from typing import List, Optional 
 
 
 class MateriaBase(BaseModel):
@@ -9,27 +10,38 @@ class MateriaCreate(MateriaBase):
     anio:int
 
 class MateriaUpdate(MateriaBase):
-    anio: int  
+    anio: int
 
 class Materia(MateriaBase):
-    anio: int  
+    anio: int
     model_config = {"from_attributes": True}
 
 class MateriaOut(BaseModel):
     id_materia: int
     nombre: str
     anio: int
-
     model_config = {"from_attributes": True}
+
 class MateriaAutocompletar(BaseModel):
     id_materia: int
     nombre: str
     anio: int
     id_docente: int
     cantidad_inscripciones: int
-class MateriaEstadisticas(BaseModel):
 
+
+class MateriaEstadisticas(BaseModel):
+    total_inscriptos: int
+    total_encuestas_procesadas: int
+    model_config = {"from_attributes": True}
+
+
+class MateriaEstadisticaItem(BaseModel):
+    id_materia: int
+    nombre_materia: str
     total_inscriptos: int
     total_encuestas_procesadas: int
 
-    model_config = {"from_attributes": True}
+class EstadisticasDocenteOut(BaseModel):
+    estadisticas: List[MateriaEstadisticaItem]
+

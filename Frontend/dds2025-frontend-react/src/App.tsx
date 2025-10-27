@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Routes, Route, Link, Navigate } from "react-router-dom";
 import "./App.css";
+
 import LoginPage from "./Componentes/LoginPage";
 import SeleccionarEncuestas from "./Componentes/SeleccionarEncuestas";
 import ListadoInformesACDoc from "./Componentes/ListadoInformesACDoc";
@@ -77,7 +78,7 @@ function App() {
                 <DropdownMenu title="Funcionalidades Docente">
                   <Link to="/home/informes-doc">Listar Informes</Link>
                   <Link to="/home/generar-informe">Generar Informe AC</Link>
-                  <Link to="/home/estadisticas/1">Estadísticas (Materia 1)</Link>
+                  <Link to="/home/estadisticas-docente">Ver Estadísticas Materias</Link>
                 </DropdownMenu>
 
                 <DropdownMenu title="Funcionalidades Departamento">
@@ -102,7 +103,7 @@ function App() {
                 <Route path="informes-doc" element={<ListadoInformesACDoc />} />
                 <Route path="responder-encuesta/:inscripcionId" element={<ResponderEncuesta />} />
                 <Route path="informes-sinteticos" element={<SeleccionarInformeSinteticoSEC />} />
-                <Route path="estadisticas/:materiaId" element={<PaginaEstadisticasDoc />} />
+                <Route path="estadisticas-docente" element={<PaginaEstadisticasDoc />} />
                 <Route path="generar-informe" element={<GenerarInformeACDoc />} />
 
               </Routes>

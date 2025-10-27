@@ -1,73 +1,91 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { useParams } from "react-router-dom";
 
-interface EstadisticasMateria {
+interface MateriaEstadisticaItem {
+  id_materia: number;
+  nombre_materia: string;
   total_inscriptos: number;
   total_encuestas_procesadas: number;
 }
 
-const PaginaEstadisticasDoc: React.FC = () => {
-  const { materiaId } = useParams<{ materiaId: string }>();
+const ID_DOCENTE_ACTUAL = 1;
 
-  const [estadisticas, setEstadisticas] = useState<EstadisticasMateria | null>(null);
+const PaginaEstadisticasDoc: React.FC = () => {
+  const [listaEstadisticas, setListaEstadisticas] = useState<MateriaEstadisticaItem[]>([]);
   const [cargando, setCargando] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchEstadisticas = useCallback(async () => {
-    if (!materiaId) return;
+  const fetchEstadisticasDocente = useCallback(async () => {
     try {
       setCargando(true);
       setError(null);
-      
-      // Añadimos un parámetro único a la URL para forzar que no se use caché
-      const uniqueUrl = `http://localhost:8000/materias/${materiaId}/estadisticas?timestamp=${new Date().getTime()}`;
-
-      const response = await fetch(uniqueUrl, { cache: 'no-cache' });
-
-      if (!response.ok) throw new Error("Error al obtener estadísticas");
-      const data: EstadisticasMateria = await response.json();
-      
-      console.log("Datos recibidos del backend:", data); 
-      
-      setEstadisticas(data);
+      const response = await fetch(
+        `http://localhost:8000/materias/docente/${ID_DOCENTE_ACTUAL}/estadisticas`,
+        { cache: 'no-cache' }
+      );
+      if (!response.ok) throw new Error("Error al obtener estadísticas del docente");
+      const data: { estadisticas: MateriaEstadisticaItem[] } = await response.json();
+      console.log("Datos recibidos del backend:", data);
+      setListaEstadisticas(data.estadisticas || []);
     } catch (err: any) {
       setError(err.message || "Error desconocido");
     } finally {
       setCargando(false);
     }
-  }, [materiaId]);
+  }, []);
 
   useEffect(() => {
-    fetchEstadisticas();
-  }, [fetchEstadisticas]);
+    fetchEstadisticasDocente();
+  }, [fetchEstadisticasDocente]);
 
   if (cargando) return <p style={{ color: "#333" }}>Cargando estadísticas...</p>;
   if (error) return <p style={{ color: "red" }}>Error: {error}</p>;
-  if (!estadisticas) return <p>No se encontraron estadísticas.</p>;
 
   return (
     <div className="content-card">
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid #444", paddingBottom: "15px", marginBottom: "20px" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid #444", paddingBottom: "15px", marginBottom: "25px" }}>
         <h3 className="content-title" style={{ border: "none", margin: 0, padding: 0 }}>
-          Estadísticas de la Materia (ID: {materiaId})
+          Estadísticas de Materias a Cargo
         </h3>
-        <button 
-          onClick={fetchEstadisticas}
+        <button
+          onClick={fetchEstadisticasDocente}
           className="styled-button"
         >
           Refrescar
         </button>
       </div>
-      <div>
-        <p style={{ fontSize: "1.2rem", margin: "10px 0" }}>
-          <strong>Total de Inscriptos:</strong> {estadisticas.total_inscriptos}
-        </p>
-        <p style={{ fontSize: "1.2rem", margin: "10px 0" }}>
-          <strong>Encuestas Procesadas:</strong> {estadisticas.total_encuestas_procesadas}
-        </p>
-      </div>
+
+      {listaEstadisticas.length === 0 ? (
+        <p>No se encontraron materias o estadísticas para este docente.</p>
+      ) : (
+        <div style={{ overflowX: 'auto' }}>
+            <table className="styled-table">
+            <thead>
+                <tr>
+                    {/* --- CAMBIO: Borde a la derecha para separación y padding --- */}
+                    <th style={{ borderRight: '1px solid #555', padding: '12px 18px' }}>ID Materia</th>
+                    <th style={{ borderRight: '1px solid #555', padding: '12px 18px' }}>Nombre Materia</th>
+                    <th style={{ borderRight: '1px solid #555', padding: '12px 18px', textAlign: 'center' }}>Total Inscriptos</th> {/* Centrado */}
+                    <th style={{ padding: '12px 18px', textAlign: 'center' }}>Encuestas Procesadas</th> {/* Centrado, sin borde derecho en la última */}
+                </tr>
+            </thead>
+            <tbody>
+                {listaEstadisticas.map((item, index) => (
+                <tr key={item.id_materia}>
+                    {/* --- CAMBIO: Borde a la derecha para separación, padding y tamaño de fuente --- */}
+                    <td style={{ borderRight: '1px solid #555', padding: '15px 18px', fontSize: '1.05rem' }}>{item.id_materia}</td>
+                    <td style={{ borderRight: '1px solid #555', padding: '15px 18px', fontSize: '1.05rem' }}>{item.nombre_materia}</td>
+                    <td style={{ borderRight: '1px solid #555', padding: '15px 18px', fontSize: '1.05rem', textAlign: 'center' }}>{item.total_inscriptos}</td>
+                    <td style={{ padding: '15px 18px', fontSize: '1.05rem', textAlign: 'center' }}>{item.total_encuestas_procesadas}</td>
+                    {/* --- FIN CAMBIO --- */}
+                </tr>
+                ))}
+            </tbody>
+            </table>
+        </div>
+      )}
     </div>
   );
 };
 
 export default PaginaEstadisticasDoc;
+
