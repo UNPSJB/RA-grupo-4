@@ -1,26 +1,25 @@
-from pydantic import BaseModel, field_validator
-# Los siguientes schemas contienen atributos sin muchas restricciones de tipo.
-# Podemos crear atributos con ciertas reglas mediante el uso de un "Field" adecuado.
-# https://docs.pydantic.dev/latest/concepts/fields/
+from pydantic import BaseModel
+from typing import List, Optional
+
+# --- Esquema para la respuesta de encuestas disponibles ---
+class EncuestaDisponibleOut(BaseModel):
+    inscripcion_id: int 
+    encuesta_id: int
+    nombre_encuesta: str
+    nombre_materia: str
+
+    class Config:
+        orm_mode = True 
+
 
 
 class EstudianteBase(BaseModel):
     nombre: str
-    usuario: str
-
-
-
-class EstudianteCreate(EstudianteBase):
-    pass
-
-
-class EstudianteUpdate(EstudianteBase):
-    pass
-
+    
 
 class Estudiante(EstudianteBase):
     id: int
+   
+    class Config:
+        orm_mode = True
 
-    # from_atributes=True permite que Pydantic trabaje con modelos SQLAlchemy
-    # más info.: https://docs.pydantic.dev/latest/api/config/#pydantic.config.ConfigDict.from_attributes
-    model_config = {"from_attributes": True}

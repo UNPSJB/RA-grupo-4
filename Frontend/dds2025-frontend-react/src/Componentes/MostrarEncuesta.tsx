@@ -1,211 +1,134 @@
 import React, { useEffect, useState } from "react";
+// --- AÑADIDO: Importar useParams ---
+import { useParams } from "react-router-dom";
 
+// Interfaces (Asegúrate de que coincidan con tu backend y ResponderEncuesta)
 interface OpcionRespuesta {
-    id: number;
-    descripcion: string;
+  id: number;
+  descripcion: string;
+  pregunta_id: number;
 }
-
 interface Pregunta {
-    id: number;
-    enunciado: string;
-    tipo: "ABIERTA" | "CERRADA";
-    obligatoria: boolean;
-    opciones_respuestas?: OpcionRespuesta[];
+  id: number;
+  enunciado: string;
+  tipo: "ABIERTA" | "CERRADA";
+  obligatoria: boolean;
+  opciones_respuestas?: OpcionRespuesta[];
 }
-
 interface Seccion {
     id: number;
     sigla: string;
     descripcion: string;
     preguntas: Pregunta[];
 }
-
 interface Encuesta {
-    id_encuesta: number;
-    nombre: string;
-    secciones: Seccion[];
+  id_encuesta: number;
+  nombre: string;
+  secciones: Seccion[];
 }
 
-interface MostrarEncuestaProps {
-    estudianteId: number;
-    encuestaId: number;
-}
+// Props ya no son necesarias si leemos de la URL
+// interface MostrarEncuestaProps {
+//   estudianteId: number;
+//   encuestaId: number; // Ya no se usa directamente
+// }
 
-const MostrarEncuesta: React.FC<MostrarEncuestaProps> = ({
-    estudianteId,
-    encuestaId,
-}) => {
-    const [encuesta, setEncuesta] = useState<Encuesta | null>(null);
-    const [error, setError] = useState<string | null>(null);
+const MostrarEncuesta: React.FC</*Ya no recibe props */> = (/* props */) => {
 
-    useEffect(() => {
-        const fetchEncuesta = async () => {
-            try {
-                const res = await fetch(
-                    `http://localhost:8000/estudiantes/${estudianteId}/encuestas/${encuestaId}/preguntas`
-                );
+  // --- CAMBIO: Leer inscripcionId de la URL ---
+  const { inscripcionId: inscripcionIdFromUrl } = useParams<{ inscripcionId: string }>();
+  const inscripcionId = inscripcionIdFromUrl ? parseInt(inscripcionIdFromUrl, 10) : null;
+  // Hardcodear estudianteId por ahora
+  const estudianteId = 1;
+  // --- FIN CAMBIO ---
 
-                if (!res.ok) {
-                    throw new Error(`Error ${res.status}`);
-                }
+  const [encuesta, setEncuesta] = useState<Encuesta | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [cargando, setCargando] = useState<boolean>(true);
 
-                const data: Encuesta = await res.json();
-                setEncuesta(data);
-            } catch (err: any) {
-                setError(err.message);
-            }
-        };
+  useEffect(() => {
+    // Solo cargar si el ID es válido
+    if (!inscripcionId) {
+      setError("ID de inscripción inválido en la URL.");
+      setCargando(false);
+      return;
+    }
 
-        fetchEncuesta();
-    }, [estudianteId, encuestaId]);
+    const fetchEncuesta = async () => {
+      try {
+        setCargando(true); // Poner cargando al inicio
+        setError(null);   // Limpiar errores
 
-    if (error) return <p>Error: {error}</p>;
-    if (!encuesta) return <p>Cargando encuesta...</p>;
+        // --- CAMBIO: Usar la URL correcta con inscripcionId ---
+        const res = await fetch(
+          `http://localhost:8000/estudiantes/${estudianteId}/inscripciones/${inscripcionId}/preguntas`
+        );
+        // --- FIN CAMBIO ---
 
-    return (
-    <div
-        style={{
-            padding: "2rem",
-            fontFamily: "Inter, system-ui, sans-serif",
-            color: "#111",
-            backgroundColor: "#f8fafc",
-            minHeight: "100vh",
-        }}
-    >
-        <h2
-            style={{
-                fontSize: "1.8rem",
-                fontWeight: 700,
-                marginBottom: "2rem",
-                color: "#1e293b",
-                textAlign: "center",
-            }}
-        >
-            {encuesta.nombre}
-        </h2>
+        if (!res.ok) {
+          throw new Error(`Error ${res.status} al cargar la encuesta`);
+        }
 
-        {encuesta.secciones.map((seccion) => (
-            <div
-                key={seccion.id}
-                style={{
-                    marginBottom: "2rem",
-                    padding: "1.5rem",
-                    border: "1px solid #e2e8f0",
-                    borderRadius: "12px",
-                    backgroundColor: "#ffffff",
-                    boxShadow: "0 2px 6px rgba(0, 0, 0, 0.05)",
-                    transition: "transform 0.2s ease, box-shadow 0.2s ease",
-                }}
-                onMouseEnter={(e) =>
-                    (e.currentTarget.style.boxShadow =
-                        "0 4px 12px rgba(0, 0, 0, 0.1)")
-                }
-                onMouseLeave={(e) =>
-                    (e.currentTarget.style.boxShadow =
-                        "0 2px 6px rgba(0, 0, 0, 0.05)")
-                }
-            >
-                <h3
-                    style={{
-                        fontSize: "1.25rem",
-                        fontWeight: 600,
-                        color: "#334155",
-                        marginBottom: "1rem",
-                        borderBottom: "2px solid #e2e8f0",
-                        paddingBottom: "0.3rem",
-                    }}
+        const data: Encuesta = await res.json();
+        setEncuesta(data);
+      } catch (err: any) {
+        setError(err.message);
+      } finally {
+        setCargando(false);
+      }
+    };
+
+    fetchEncuesta();
+  // --- CAMBIO: Dependencias actualizadas ---
+  }, [estudianteId, inscripcionId]); // Usar inscripcionId
+
+  // Renderizado
+  if (!inscripcionId) return <p style={{ color: "red" }}>Error: No se proporcionó un ID de inscripción válido.</p>;
+  if (cargando) return <p style={{ color: "#333" }}>Cargando encuesta...</p>;
+  if (error) return <p style={{ color: "red" }}>Error: {error}</p>;
+  if (!encuesta) return <p style={{ color: "#333" }}>No se encontró la encuesta para esta inscripción.</p>;
+
+  return (
+    // Aplicamos el estilo unificado
+    <div className="content-card">
+      <h3 className="content-title">{encuesta.nombre}</h3>
+      {/* Iteramos sobre secciones y luego preguntas */}
+      {encuesta.secciones?.map((seccion) => (
+          <div key={seccion.id} style={{ marginBottom: '2rem', /* Estilos opcionales para la sección */ }}>
+              <h4 style={{ fontSize: "1.3rem", fontWeight: 600, color: "#eee", marginBottom: "1.5rem", borderBottom: "1px solid #555", paddingBottom: "0.5rem" }}>
+                  {seccion.sigla} - {seccion.descripcion}
+              </h4>
+              {seccion.preguntas?.map((pregunta, index) => (
+                <div
+                  key={pregunta.id}
+                  style={{
+                    marginBottom: "1.5rem",
+                    paddingBottom: "1.5rem",
+                    borderBottom: index === (seccion.preguntas?.length ?? 0) - 1 ? 'none' : '1px solid #444'
+                  }}
                 >
-                    {seccion.sigla} — {seccion.descripcion}
-                </h3>
-
-                {seccion.preguntas.map((pregunta, index) => (
-                    <div
-                        key={pregunta.id}
-                        style={{
-                            marginBottom: "1.25rem",
-                            padding: "0.75rem 0",
-                            borderBottom: "1px solid #f1f5f9",
-                        }}
-                    >
-                        <p
-                            style={{
-                                marginBottom: "0.5rem",
-                                fontSize: "1rem",
-                                lineHeight: 1.5,
-                                color: "#1e293b",
-                            }}
-                        >
-                            <strong>
-                                {index + 1}. {pregunta.enunciado}
-                            </strong>{" "}
-                            {pregunta.obligatoria && (
-                                <span
-                                    style={{
-                                        color: "#dc2626",
-                                        marginLeft: "4px",
-                                        fontWeight: 600,
-                                    }}
-                                >
-                                    *
-                                </span>
-                            )}
-                        </p>
-
-                        {pregunta.tipo === "CERRADA" &&
-                            pregunta.opciones_respuestas &&
-                            pregunta.opciones_respuestas.length > 0 && (
-                                <ul
-                                    style={{
-                                        listStyleType: "none",
-                                        paddingLeft: "1rem",
-                                        margin: 0,
-                                    }}
-                                >
-                                    {pregunta.opciones_respuestas.map(
-                                        (opcion) => (
-                                            <li
-                                                key={opcion.id}
-                                                style={{
-                                                    marginBottom: "0.4rem",
-                                                    color: "#475569",
-                                                    fontSize: "0.95rem",
-                                                    display: "flex",
-                                                    alignItems: "center",
-                                                }}
-                                            >
-                                                <span
-                                                    style={{
-                                                        color: "#6366f1",
-                                                        marginRight: "0.5rem",
-                                                    }}
-                                                >
-                                                    ●
-                                                </span>
-                                                {opcion.descripcion}
-                                            </li>
-                                        )
-                                    )}
-                                </ul>
-                            )}
-
-                        {pregunta.tipo === "ABIERTA" && (
-                            <p
-                                style={{
-                                    fontStyle: "italic",
-                                    color: "#64748b",
-                                    fontSize: "0.95rem",
-                                    marginTop: "0.3rem",
-                                }}
-                            >
-                                (Respuesta abierta)
-                            </p>
-                        )}
-                    </div>
-                ))}
-            </div>
-        ))}
+                  <p style={{ fontSize: "1.1rem" }}>
+                    {pregunta.enunciado}{" "}
+                    {pregunta.obligatoria && <span style={{ color: "red", fontWeight: 'bold' }}>*</span>}
+                  </p>
+                  {pregunta.tipo === "CERRADA" && pregunta.opciones_respuestas && (
+                    <ul style={{ paddingLeft: "20px", listStyle: 'disc', color: '#ccc' }}>
+                      {pregunta.opciones_respuestas.map((opcion) => (
+                        <li key={opcion.id} style={{ margin: '5px 0' }}>{opcion.descripcion}</li>
+                      ))}
+                    </ul>
+                  )}
+                  {pregunta.tipo === "ABIERTA" && (
+                    <p style={{ fontStyle: "italic", color: "#888" }}>
+                      (Pregunta de respuesta abierta)
+                    </p>
+                  )}
+                </div>
+              ))}
+          </div>
+       ))}
     </div>
-    );
+  );
 };
 
 export default MostrarEncuesta;
