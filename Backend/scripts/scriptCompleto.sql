@@ -202,11 +202,11 @@ VALUES
 -- =====================================================
 -- MATERIAS
 -- =====================================================
-INSERT INTO materias (id_materia, nombre, anio, id_carrera, id_docente, encuesta_id)
+INSERT INTO materias (id_materia, nombre, anio, codigoMateria, id_carrera, id_docente, encuesta_id)
 VALUES
-    (1, 'Programación I', 1, 1, 1, 1),
-    (2, 'Bases de Datos', 2, 1, 2, 1),
-    (3, 'Sistemas Operativos', 3, 2, 3, 1);
+    (1, 'Algoritmica y Programacion I', 1, 'IF003', 1, 1, 1),
+    (2, 'Bases de Datos I', 2, 'IF007', 1, 2, 1),
+    (3, 'Sistemas Operativos', 3, 'IF011', 2, 3, 1);
 
 -- =====================================================
 -- ESTUDIANTES
@@ -278,9 +278,9 @@ INSERT INTO informesAC (
     resumenSecciones
 )
 VALUES
-    (1, 1, 1, 'Sede Central', 2025, NULL, '{}'),
-    (2, 2, 2, 'Sede Central', 2025, NULL, '{}'),
-    (3, 3, 3, 'Sede Central', 2025, NULL, '{}');
+    (1, 1, 1, 'Trelew', 2025, NULL, '{}'),
+    (2, 2, 2, 'Madryn', 2025, NULL, '{}'),
+    (3, 3, 3, 'Trelew', 2025, NULL, '{}');
 
 
 

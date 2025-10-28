@@ -71,10 +71,6 @@ function App() {
                   <Link to="/home/seleccionar">Seleccionar Encuestas</Link>
                 </DropdownMenu>
 
-                <DropdownMenu title="Funcionalidades Secretaría">
-                  <Link to="/home/informes-sinteticos">Informes Sintéticos</Link>
-                </DropdownMenu>
-
                 <DropdownMenu title="Funcionalidades Docente">
                   <Link to="/home/informes-doc">Listar Informes</Link>
                   <Link to="/home/generar-informe">Generar Informe AC</Link>
@@ -82,9 +78,12 @@ function App() {
                 </DropdownMenu>
 
                 <DropdownMenu title="Funcionalidades Departamento">
-                   <Link to="/home/informes-dep">Informes Dept.</Link>
+                  <Link to="/home/informes-dep">Informes Dept.</Link>
                 </DropdownMenu>
 
+                <DropdownMenu title="Funcionalidades Secretaría">
+                  <Link to="/home/informes-sinteticos">Informes Sintéticos</Link>
+                </DropdownMenu>
               </div>
 
               <div className="navbar-right">
