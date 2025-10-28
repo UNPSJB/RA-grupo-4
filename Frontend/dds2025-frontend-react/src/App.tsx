@@ -6,7 +6,7 @@ import LoginPage from "./Componentes/LoginPage";
 import SeleccionarEncuestas from "./Componentes/SeleccionarEncuestas";
 import ListadoInformesACDoc from "./Componentes/ListadoInformesACDoc";
 import SeleccionarInformeSinteticoSEC from "./Componentes/SeleccionarInformeSinteticoSEC";
-import ListadoInformesACDep from "./Componentes/ListadoInformesACDep";
+import FiltradoInformeACDep from "./Componentes/FiltradoInformeACDep";
 import ResponderEncuesta from "./Componentes/ResponderEncuesta";
 import PaginaEstadisticasDoc from "./Componentes/PaginaEstadisticasDoc";
 import HomePage from "./Componentes/HomePage";
@@ -99,7 +99,7 @@ function App() {
                   element={<HomePage />}
                 />
                 <Route path="seleccionar" element={<SeleccionarEncuestas />} />
-                <Route path="informes-dep" element={<ListadoInformesACDep />} />
+                <Route path="informes-dep" element={<FiltradoInformeACDep />} />
                 <Route path="informes-doc" element={<ListadoInformesACDoc />} />
                 <Route path="responder-encuesta/:inscripcionId" element={<ResponderEncuesta />} />
                 <Route path="informes-sinteticos" element={<SeleccionarInformeSinteticoSEC />} />

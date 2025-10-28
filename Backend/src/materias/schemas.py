@@ -42,7 +42,6 @@ class MateriaEstadisticas(BaseModel):
 class MateriaEstadisticaItem(BaseModel):
     id_materia: int
     nombre_materia: str
-    codigoMateria: str  
     total_inscriptos: int
     total_encuestas_procesadas: int
 

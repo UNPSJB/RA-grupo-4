@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import FiltradoInformeACDep from './FiltradoInformeACDep'; 
+import React from 'react';
 
 interface Docente {
   id_docente: number;
@@ -8,127 +7,86 @@ interface Docente {
 interface Materia {
   id_materia: number;
   nombre: string;
-  anio: string; 
+  anio: string;
 }
 interface InformeAC {
   id_informesAC: number;
   materia: Materia;
   docente: Docente;
 }
-interface FiltrosData {
-  anio?: string;
-  docente_id?: number;
+
+interface Props {
+  informes: InformeAC[];
 }
 
-const ListadoInformesACDep: React.FC = () => {
-  const [informes, setInformes] = useState<InformeAC[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null); 
-  const [mostrarTabla, setMostrarTabla] = useState(false);
-  const [mensaje, setMensaje] = useState<string | null>(null);
+const styles = {
+  table: {
+    width: '100%',
+    borderCollapse: 'collapse',
+    marginTop: '24px',
+    fontFamily: '"Segoe UI", "Roboto", sans-serif',
+  },
+  th: {
+    backgroundColor: '#e6f2ff',
+    color: '#003366',
+    padding: '12px',
+    textAlign: 'left' as const,
+    fontWeight: 'bold',
+    borderBottom: '2px solid #ccc',
+    fontSize: '15px',
+  },
+  td: {
+    padding: '12px',
+    borderBottom: '1px solid #ddd',
+    fontSize: '14px',
+    color: '#000',
+    height: '60px',
+    verticalAlign: 'middle' as const,
+  },
+  rowAlt: {
+    backgroundColor: '#f9f9f9',
+  },
+  rowBase: {
+    backgroundColor: '#ffffff',
+  },
+  noResults: {
+    fontSize: '15px',
+    color: '#666',
+    marginTop: '16px',
+    fontFamily: '"Segoe UI", "Roboto", sans-serif',
+  },
+};
 
-  const cargarInformes = async () => {
-    setLoading(true);
-    setError(null);
-    setMostrarTabla(false); 
-    setMensaje(null);
-    
-    try { 
-      const res = await fetch('http://localhost:8000/informesAC/listar');
-      if (!res.ok) {
-        throw new Error(`Error: ${res.status} - ${res.statusText}`);
-      }
-      const data: InformeAC[] = await res.json();
-      
-      if (data.length > 0) {
-        setInformes(data);
-        setMostrarTabla(true); 
-      } else {
-        setInformes([]);
-        setMensaje("No hay informes disponibles."); 
-      }
-    } catch (err: any) { 
-      console.error(err);
-      setError(err.message);
-    } finally { 
-      setLoading(false);
-    }
-  }; 
-  const cargarInformesFiltrados = async (filtros: FiltrosData) => {
-    setLoading(true);
-    setError(null);
-    setMostrarTabla(false); 
-    setMensaje(null);
-    try {
-      const url = new URL('http://localhost:8000/informesAC/listar');
-      if (filtros.anio) {
-        url.searchParams.append('anio', filtros.anio);
-      }
-      if (filtros.docente_id) {
-        url.searchParams.append('docente_id', String(filtros.docente_id));
-      }
-      const res = await fetch(url.toString());
-      if (!res.ok) {
-        throw new Error(`Error: ${res.status} - ${res.statusText}`);
-      }
-      const data: InformeAC[] = await res.json();
-      
-      if (data.length > 0) {
-        setInformes(data);
-        setMostrarTabla(true);
-      } else {
-        setInformes([]);
-        setMensaje("No hay informes con los filtros seleccionados.");
-      }
-      
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    cargarInformes(); 
-  }, []); 
+const ListadoInformesACDoc: React.FC<Props> = ({ informes }) => {
+  if (!informes || informes.length === 0) {
+    return <p style={styles.noResults}>No se encontraron informes.</p>;
+  }
 
   return (
-    <div className="content-card">
-      <h3 className="content-title">Listado de Informes de Actividad Curricular</h3>
-      
-      <FiltradoInformeACDep onFiltrar={cargarInformesFiltrados} />
-
-      {loading && <p style={{ color: "#333" }}>Cargando informes...</p>}
-      {error && <p style={{ color: "red" }}>Error: {error}</p>}
-      {!loading && mensaje && <p>{mensaje}</p>}
-
-
-      {!loading && !error && mostrarTabla && (
-        <table style={{ width: "100%", borderCollapse: "collapse", borderRadius: "6px", overflow: "hidden" }}>
-          <thead>
-            <tr style={{ backgroundColor: "#444", color: "white" }}>
-              <th style={{ border: "1px solid #555", padding: "12px", textAlign: "left" }}>ID</th>
-              <th style={{ border: "1px solid #555", padding: "12px", textAlign: "left" }}>Año</th>
-            
-              <th style={{ border: "1px solid #555", padding: "12px", textAlign: "left" }}>Materia</th>
-              <th style={{ border: "1px solid #555", padding: "12px", textAlign: "left" }}>Docente</th>
-            </tr>
-          </thead>
-          <tbody>
-            {informes.map((informe, index) => (
-              <tr key={informe.id_informesAC} style={{ backgroundColor: index % 2 === 0 ? "#2b2b2b" : "#1e1e1e", color: "white" }}>
-                <td style={{ border: "1px solid #444", padding: "12px" }}>{informe.id_informesAC}</td>
-                <td style={{ border: "1px solid #444", padding: "12px" }}>{informe.materia.anio}</td>
-          
-                <td style={{ border: "1px solid #444", padding: "12px" }}>{informe.materia.nombre}</td>
-                <td style={{ border: "1px solid #444", padding: "12px" }}>{informe.docente.nombre}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
-    </div>
+    <table style={styles.table}>
+      <thead>
+        <tr>
+          <th style={styles.th}>ID</th>
+          <th style={styles.th}>Año</th>
+          <th style={styles.th}>Materia</th>
+          <th style={styles.th}>Docente</th>
+        </tr>
+      </thead>
+      <tbody>
+        {informes.map((informe, index) => (
+          <tr
+            key={informe.id_informesAC}
+            style={index % 2 === 0 ? styles.rowBase : styles.rowAlt}
+          >
+            <td style={styles.td}>{informe.id_informesAC}</td>
+            <td style={styles.td}>{informe.materia.anio}</td>
+            <td style={styles.td}>{informe.materia.nombre}</td>
+            <td style={styles.td}>{informe.docente.nombre}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
   );
 };
 
-export default ListadoInformesACDep;
+export default ListadoInformesACDoc;
