@@ -1,12 +1,5 @@
 import React from 'react';
 
-// Estilos locales (sin cambios)
-const sectionStyle: React.CSSProperties = { marginBottom: '25px', paddingBottom: '25px', borderBottom: '1px solid #eee' };
-const labelStyle: React.CSSProperties = { display: 'block', fontWeight: 'bold', marginBottom: '8px', color: '#555' };
-const inputStyle: React.CSSProperties = { width: '100%', padding: '10px', border: '1px solid #ccc', borderRadius: '4px', boxSizing: 'border-box' };
-// --- AÑADIDO: Estilo para el párrafo descriptivo ---
-const descriptionStyle: React.CSSProperties = { color: '#666', fontSize: '0.9rem', marginBottom: '15px' };
-
 interface Props {
   formData: {
     porcentaje_contenido_abordado: string | number;
@@ -14,41 +7,123 @@ interface Props {
   handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
+const styles = {
+  container: {
+    maxWidth: '800px',
+    margin: '0 auto',
+    padding: '28px',
+    backgroundColor: '#ffffff',
+    borderRadius: '12px',
+    boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
+    fontFamily: '"Roboto", "Segoe UI", sans-serif',
+  },
+  instructions: {
+    color: '#000',
+    fontSize: '15px',
+    lineHeight: '1.5',
+    marginBottom: '24px',
+    padding: '14px',
+    backgroundColor: '#f9f9f9',
+    borderRadius: '8px',
+    border: '1px solid #ddd',
+  },
+  fieldset: {
+    border: '2px solid #003366',
+    borderRadius: '8px',
+    padding: '20px',
+    marginBottom: '28px',
+    animation: 'fadeIn 0.6s ease-in-out',
+  },
+  legend: {
+    fontSize: '17px',
+    fontWeight: 'bold',
+    color: '#003366',
+    padding: '0 10px',
+  },
+  label: {
+    fontWeight: 600,
+    marginBottom: '6px',
+    color: '#000',
+    fontSize: '16px',
+    display: 'block',
+  },
+  inputWrapper: {
+    position: 'relative' as const,
+  },
+  input: {
+    width: '100%',
+    height: '44px',
+    padding: '10px 14px 10px 36px',
+    borderRadius: '6px',
+    border: '1px solid #222',
+    fontSize: '16px',
+    backgroundColor: '#cce4f6',
+    color: '#111',
+    transition: 'all 0.3s ease',
+    outline: 'none',
+    boxSizing: 'border-box',
+  },
+  adornment: {
+    position: 'absolute' as const,
+    left: '12px',
+    top: '50%',
+    transform: 'translateY(-50%)',
+    color: '#003366',
+    fontWeight: 'bold',
+    fontSize: '16px',
+    pointerEvents: 'none',
+  },
+};
+
 const CompletarContenidoAbordadoDoc: React.FC<Props> = ({ formData, handleChange }) => {
   return (
-    <div style={sectionStyle}>
-      {/* --- CAMBIO: Título ajustado --- */}
-      <h4 style={{ marginTop: 0, marginBottom: '5px', color: '#333' }}>
-        2.A Desarrollo de Contenidos Planificados
-      </h4>
-      {/* --- AÑADIDO: Párrafo descriptivo --- */}
-      <p style={descriptionStyle}>
-        ¿Se logró desarrollar la totalidad de los contenidos planificados?
+    <div style={styles.container}>
+      <style>
+        {`
+          @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+          }
+          input:focus {
+            border-color: #0078D4;
+            box-shadow: 0 0 0 2px rgba(0,120,212,0.2);
+          }
+          input:hover {
+            border-color: #0078D4;
+          }
+        `}
+      </style>
+
+      <p style={styles.instructions}>
+        2.A. ¿Se logró desarrollar la totalidad de los contenidos planificados?
         Consigne el porcentaje de contenidos planificados alcanzados. En caso de ser
         necesario mencione las estrategias que planificará para el próximo dictado a
         fin de ajustar el cronograma.
       </p>
-      {/* --- FIN AÑADIDO --- */}
-      <div>
-        {/* --- CAMBIO: Label ajustado --- */}
-        <label htmlFor="porcentaje_contenido_abordado" style={labelStyle}>
-          Porcentaje de Contenidos Planificados Alcanzados (%):
+
+      {/* Recuadro institucional con legend */}
+      <fieldset style={styles.fieldset}>
+        <legend style={styles.legend}> Desarrollo de Contenidos Planificados</legend>
+
+        <label htmlFor="porcentaje_contenido_abordado" style={styles.label}>
+          Porcentaje de Contenidos Planificados Alcanzados:
         </label>
-        <input
-          type="number"
-          id="porcentaje_contenido_abordado"
-          name="porcentaje_contenido_abordado"
-          value={formData.porcentaje_contenido_abordado}
-          onChange={handleChange}
-          min="0"
-          max="100"
-          style={inputStyle}
-          placeholder="Ingrese un valor entre 0 y 100"
-        />
-      </div>
+        <div style={styles.inputWrapper}>
+          <span style={styles.adornment}>%</span>
+          <input
+            type="number"
+            id="porcentaje_contenido_abordado"
+            name="porcentaje_contenido_abordado"
+            value={formData.porcentaje_contenido_abordado}
+            onChange={handleChange}
+            min="0"
+            max="100"
+            style={styles.input}
+          />
+        </div>
+      </fieldset>
     </div>
   );
 };
 
 export default CompletarContenidoAbordadoDoc;
-

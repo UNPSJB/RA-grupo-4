@@ -9,6 +9,7 @@ class Materias(ModeloBase):
     id_materia: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     nombre: Mapped[str] = mapped_column(String, unique=True, index=True)
     anio: Mapped [int] = mapped_column(Integer, unique= True , index= True)
+    codigoMateria: Mapped[str] = mapped_column(String)#corregido que me equivoque de codigo para poner 
 
     id_carrera: Mapped[int] = mapped_column(ForeignKey("carreras.id_carrera"), nullable=False)
     carrera: Mapped["Carreras"] = relationship("Carreras", back_populates="materias")

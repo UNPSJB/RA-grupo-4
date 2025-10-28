@@ -1,10 +1,5 @@
-// Archivo: src/Componentes/CompletarDatosGeneralesDoc.tsx
-// ROL: Componente "Hijo" (Controlado)
-
 import React from 'react';
 
-// --- Definición de Props ---
-// Recibe todo del padre
 interface Props {
   materias: any[];
   docentes: any[];
@@ -12,52 +7,67 @@ interface Props {
     sede: string;
     ciclo_lectivo: string;
     id_materia: string;
+    codigoMateria: string;
     id_docente: string;
     cantidad_alumnos_inscriptos: string;
     cantidad_comisiones_teoricas: string;
     cantidad_comisiones_practicas: string;
   };
-  // Recibe la función para manejar cambios
   handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
   loading: boolean;
 }
 
-// --- (Estilos restaurados de tu versión original) ---
-const tableStyle: React.CSSProperties = {
+const fadeIn = {
+  animation: 'fadeIn 0.6s ease-in-out',
+};
+
+const sharedFieldStyle: React.CSSProperties = {
   width: '100%',
-  borderCollapse: 'collapse',
-  border: '1px solid #ddd',
-};
-const tdLabelStyle: React.CSSProperties = {
-  width: '40%',
-  padding: '16px',
-  fontWeight: '600',
-  color: '#444',
-  border: '1px solid #ddd',
-  backgroundColor: '#f9f9f9',
-  verticalAlign: 'middle',
-};
-const tdInputStyle: React.CSSProperties = {
-  width: '60%',
-  padding: '10px 16px',
-  border: '1px solid #ddd',
-  verticalAlign: 'middle',
-};
-const baseInputStyle: React.CSSProperties = {
-  width: '100%',
-  padding: '10px 12px',
-  boxSizing: 'border-box',
+  height: '44px',
+  padding: '10px 14px',
+  borderRadius: '6px',
   border: '1px solid #ccc',
-  borderRadius: '5px',
-  fontSize: '15px',
-  transition: 'border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
+  fontSize: '16px',
+  fontFamily: '"Roboto", "Segoe UI", sans-serif',
+  backgroundColor: '#cce4f6',
+  color: '#111',
+  transition: 'all 0.3s ease',
+  outline: 'none',
+  boxSizing: 'border-box',
 };
-const disabledInputStyle: React.CSSProperties = {
-  ...baseInputStyle,
-  backgroundColor: '#f5f5ff',
-  color: '#777',
+
+const sharedDisabledStyle: React.CSSProperties = {
+  ...sharedFieldStyle,
+  backgroundColor: '#d0dff0',
+  color: '#555',
   cursor: 'not-allowed',
-  border: '1px solid #ddd',
+};
+
+const styles = {
+  container: {
+    maxWidth: '800px',
+    margin: '0 auto',
+    padding: '28px',
+    backgroundColor: '#ffffff',
+    borderRadius: '12px',
+    boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
+    fontFamily: '"Roboto", "Segoe UI", sans-serif',
+  },
+  row: {
+    display: 'flex',
+    flexDirection: 'column' as const,
+    marginBottom: '14px',
+  },
+  label: {
+    fontWeight: 600,
+    marginBottom: '6px',
+    color: '#000000',
+    fontSize: '16px',
+  },
+  optionPlaceholder: {
+    fontFamily: 'Georgia, serif',
+    color: '#666',
+  },
 };
 
 const CompletarDatosGeneralesDoc: React.FC<Props> = ({
@@ -67,107 +77,85 @@ const CompletarDatosGeneralesDoc: React.FC<Props> = ({
   handleChange,
   loading
 }) => {
+  const sedeOptions = [
+    { value: "", label: "Seleccione" },
+    { value: "Trelew", label: "Trelew" },
+    { value: "Madryn", label: "Madryn" },
+    { value: "Esquel", label: "Esquel" },
+    { value: "Comodoro", label: "Comodoro" },
+  ];
 
-  if (loading) return <p>Cargando datos de materias y docentes...</p>;
+  if (loading) return <p style={{ textAlign: 'center', color: '#003366' }}>Cargando datos de materias y docentes...</p>;
 
-  // Este componente AHORA SOLO DEVUELVE LA TABLA
-  // No tiene useEffect, no tiene handleSubmit
   return (
-    <table style={tableStyle}>
-      <tbody>
-        <tr>
-          <td style={tdLabelStyle}>
-            <label htmlFor="sede">Sede</label>
-          </td>
-          <td style={tdInputStyle}>
-            <input id="sede" type="text" name="sede" value={formData.sede} onChange={handleChange} style={baseInputStyle} required />
-          </td>
-        </tr>
-        <tr>
-          <td style={tdLabelStyle}>
-            <label htmlFor="id_materia">Actividad curricular</label>
-          </td>
-          <td style={tdInputStyle}>
-            <select id="id_materia" name="id_materia" value={formData.id_materia} onChange={handleChange} style={baseInputStyle} required>
-              <option value="">Seleccione una materia</option>
-              {materias.map((m: any) => (
-                <option key={m.id_materia} value={m.id_materia}>{m.nombre}</option>
-              ))}
-            </select>
-          </td>
-        </tr>
-        <tr>
-          <td style={tdLabelStyle}>
-            <label>Código de la actividad curricular</label>
-          </td>
-          <td style={tdInputStyle}>
-            <input type="text" value={formData.id_materia} style={disabledInputStyle} readOnly disabled />
-          </td>
-        </tr>
-        <tr>
-          <td style={tdLabelStyle}>
-            <label htmlFor="ciclo_lectivo">Ciclo Lectivo</label>
-          </td>
-          <td style={tdInputStyle}>
-            <input id="ciclo_lectivo" type="number" name="ciclo_lectivo" value={formData.ciclo_lectivo} style={disabledInputStyle} readOnly disabled />
-          </td>
-        </tr>
-        <tr>
-          <td style={tdLabelStyle}>
-            <label htmlFor="id_docente">Docente Responsable</label>
-          </td>
-          <td style={tdInputStyle}>
+    <div style={styles.container}>
+      <style>
+        {`
+          @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+          }
+          select:focus, input:focus {
+            border-color: #0078D4;
+            box-shadow: 0 0 0 2px rgba(0,120,212,0.2);
+          }
+          select:hover, input:hover {
+            border-color: #0078D4;
+          }
+          select option[value=""] {
+            font-family: Georgia, serif;
+            color: #666;
+          }
+        `}
+      </style>
+
+      {[ 
+        { label: 'Sede', name: 'sede', type: 'select', options: sedeOptions, value: formData.sede, disabled: false },
+        { label: 'Actividad curricular', name: 'id_materia', type: 'select', options: [{ value: "", label: "Seleccione" }, ...materias.map(m => ({ value: m.id_materia, label: m.nombre }))], value: formData.id_materia, disabled: false },
+        { label: 'Código de la actividad curricular', name: 'codigoMateria', type: 'text', value: formData.codigoMateria, disabled: true },
+        { label: 'Ciclo Lectivo', name: 'ciclo_lectivo', type: 'number', value: formData.ciclo_lectivo, disabled: true },
+        { label: 'Docente Responsable', name: 'id_docente', type: 'select', options: docentes.map(d => ({ value: d.id_docente, label: d.nombre })), value: formData.id_docente, disabled: true },
+        { label: 'Cantidad de alumnos inscriptos', name: 'cantidad_alumnos_inscriptos', type: 'number', value: formData.cantidad_alumnos_inscriptos, disabled: true },
+        { label: 'Cantidad de comisiones teóricas', name: 'cantidad_comisiones_teoricas', type: 'number', value: formData.cantidad_comisiones_teoricas, disabled: false },
+        { label: 'Cantidad de comisiones prácticas', name: 'cantidad_comisiones_practicas', type: 'number', value: formData.cantidad_comisiones_practicas, disabled: false },
+      ].map((field, idx) => (
+        <div key={idx} style={{ ...styles.row, ...fadeIn }}>
+          <label style={styles.label} htmlFor={field.name}>{field.label}</label>
+          {field.type === 'select' ? (
             <select
-              id="id_docente"
-              name="id_docente"
-              value={formData.id_docente}
+              id={field.name}
+              name={field.name}
+              value={field.value}
               onChange={handleChange}
-              style={disabledInputStyle}
+              style={field.disabled ? sharedDisabledStyle : sharedFieldStyle}
+              disabled={field.disabled}
               required
-              disabled
             >
-              <option value="">Docente</option>
-              {docentes.map((d: any) => (
-                <option key={d.id_docente} value={d.id_docente}>{d.nombre}</option>
+              {field.options?.map((opt: any) => (
+                <option
+                  key={opt.value}
+                  value={opt.value}
+                  style={opt.value === "" ? styles.optionPlaceholder : {}}
+                >
+                  {opt.label}
+                </option>
               ))}
             </select>
-          </td>
-        </tr>
-        <tr>
-          <td style={tdLabelStyle}>
-            <label htmlFor="cantidad_alumnos_inscriptos">Cantidad de alumnos inscriptos</label>
-          </td>
-          <td style={tdInputStyle}>
+          ) : (
             <input
-              id="cantidad_alumnos_inscriptos"
-              type="number"
-              name="cantidad_alumnos_inscriptos"
-              value={formData.cantidad_alumnos_inscriptos}
+              id={field.name}
+              name={field.name}
+              type={field.type}
+              value={formData[field.name as keyof typeof formData]}
               onChange={handleChange}
-              style={disabledInputStyle}
+              style={field.disabled ? sharedDisabledStyle : sharedFieldStyle}
+              disabled={field.disabled}
               required
-              disabled
             />
-          </td>
-        </tr>
-        <tr>
-          <td style={tdLabelStyle}>
-            <label htmlFor="cantidad_comisiones_teoricas">Cantidad de comisiones teóricas</label>
-          </td>
-          <td style={tdInputStyle}>
-            <input id="cantidad_comisiones_teoricas" type="number" name="cantidad_comisiones_teoricas" value={formData.cantidad_comisiones_teoricas} onChange={handleChange} style={baseInputStyle} required />
-          </td>
-        </tr>
-        <tr>
-          <td style={tdLabelStyle}>
-            <label htmlFor="cantidad_comisiones_practicas">Cantidad de comisiones prácticas</label>
-          </td>
-          <td style={tdInputStyle}>
-            <input id="cantidad_comisiones_practicas" type="number" name="cantidad_comisiones_practicas" value={formData.cantidad_comisiones_practicas} onChange={handleChange} style={baseInputStyle} required />
-          </td>
-        </tr>
-      </tbody>
-    </table>
+          )}
+        </div>
+      ))}
+    </div>
   );
 };
 

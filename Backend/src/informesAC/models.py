@@ -1,9 +1,19 @@
 from sqlalchemy import Integer, String, ForeignKey, JSON, Text
+import enum
+from sqlalchemy import Enum as SQLAlchemyEnum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from src.models import ModeloBase
 from typing import Dict, Any, Optional, List
 #Uso text porque es mucho mas dinamico para la hora de guardar cadenas largas
 import json
+
+class SedeEnum(str, enum.Enum): #Agregado para mejora
+    # El "str" (str, enum.Enum) ayuda a que Pydantic (FastAPI) 
+    # y JSON lo entiendan automáticamente.
+    TRELEW = "Trelew"
+    MADRYN = "Madryn"
+    ESQUEL = "Esquel"
+    COMODORO = "Comodoro"
 
 class InformesAC(ModeloBase):
     __tablename__ = "informesAC"
@@ -16,7 +26,8 @@ class InformesAC(ModeloBase):
     id_docente: Mapped[int] = mapped_column(ForeignKey("docentes.id_docente"), nullable=False)
     docente: Mapped["Docentes"] = relationship("Docentes", back_populates="informesAC")
 
-    sede: Mapped[str] = mapped_column(String(100))
+    #Agregado para completar datos generales
+    sede: Mapped[SedeEnum] = mapped_column(SQLAlchemyEnum(SedeEnum))#agregado como mejora
     ciclo_lectivo: Mapped[int] = mapped_column(Integer)
     cantidad_alumnos_inscriptos: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
     cantidad_comisiones_teoricas: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)

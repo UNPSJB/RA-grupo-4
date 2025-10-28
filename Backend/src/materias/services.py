@@ -21,6 +21,7 @@ def get_materias_para_autocompletar(db: Session) -> List[dict]:
         resultado.append({
             "id_materia": m.id_materia,
             "nombre": m.nombre,
+            "codigoMateria": m.codigoMateria,
             "anio": m.anio,
             "id_docente": m.id_docente,
             "cantidad_inscripciones": len(m.inscripciones) if m.inscripciones else 0

@@ -1,6 +1,7 @@
 from pydantic import BaseModel, Field
 from typing import Optional, List, Literal, Dict
 from src.actividades.schemas import ActividadOut, ActividadBase 
+from src.informesAC.models import SedeEnum #importo el enum
 
 # --- Definición de la Calificación (para validación) ---
 CalificacionAuxiliar = Literal["E", "MB", "B", "R", "I"]
@@ -18,6 +19,7 @@ class DocenteOut(BaseModel):
 class MateriaOut(BaseModel):
     id_materia: int
     nombre: str
+    codigoMateria: str
     anio: int 
 
     model_config = {
@@ -58,7 +60,7 @@ class InformeACCreate(BaseModel):
     #Hdu completar datos generales
     id_docente: int
     id_materia: int
-    sede: str
+    sede: SedeEnum
     ciclo_lectivo: int
     cantidad_alumnos_inscriptos: Optional[int] = None
     cantidad_comisiones_teoricas: Optional[int] = None
@@ -98,7 +100,7 @@ class InformeACCreate(BaseModel):
 
 class InformeAC(BaseModel):
     id_informesAC: int
-    sede: str
+    sede: SedeEnum
     ciclo_lectivo: int
     cantidad_alumnos_inscriptos: Optional[int] = None
     cantidad_comisiones_teoricas: Optional[int] = None

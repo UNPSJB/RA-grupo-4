@@ -1,46 +1,87 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import HeaderInstitucional from './HeaderInstitucional';
 import CompletarDatosGeneralesDoc from './CompletarDatosGeneralesDoc';
 import CompletarNecesidadesDoc from './CompletarNecesidadesDoc';
 import CompletarPorcentajesDoc from './CompletarPorcentajesDoc';
 import CompletarContenidoAbordadoDoc from './CompletarContenidoAbordadoDoc';
 import CompletarProcesoAprendizajeDoc from './CompletarProcesoAprendizajeDoc';
 import ConsignarActividadesDoc from './ConsignarActividadesDoc';
-import CompletarValoracionAuxiliaresDoc, { ValoracionAuxiliarData } from './CompletarValoracionAuxiliaresDoc'; // Importación de la HDU 4
+import CompletarValoracionAuxiliaresDoc, { ValoracionAuxiliarData } from './CompletarValoracionAuxiliaresDoc';
 import ResumenSecciones from './ConsignarResumenValoresEncuesta';
-
 
 const BASE_URL = 'http://localhost:8000';
 
-// Estilos (sin cambios)
-const pageStyle: React.CSSProperties = { backgroundColor: '#f4f7f6', padding: '30px', minHeight: '100vh', fontFamily: 'Arial, sans-serif' };
-const formContainerStyle: React.CSSProperties = { maxWidth: '850px', margin: '0 auto', padding: '30px', backgroundColor: '#ffffff', borderRadius: '8px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' };
-const headerStyle: React.CSSProperties = { textAlign: 'center', color: '#333', borderBottom: '2px solid #f0f0f0', paddingBottom: '15px', marginBottom: '30px' };
-const buttonContainerStyle: React.CSSProperties = { textAlign: 'center', marginTop: '30px' };
-const submitButtonStyle: React.CSSProperties = { padding: '12px 25px', fontSize: '16px', fontWeight: 'bold', color: '#ffffff', backgroundColor: '#007bff', border: 'none', borderRadius: '5px', cursor: 'pointer', transition: 'background-color 0.2s, transform 0.1s' };
+const styles: { [key: string]: React.CSSProperties } = {
+  page: {
+    backgroundColor: '#f4f7f6',
+    padding: '0px',
+    minHeight: '100vh',
+    fontFamily: '"Segoe UI", "Roboto", sans-serif',
+  },
+  container: {
+    maxWidth: '950px',
+    margin: '0 auto',
+    padding: '30px',
+    backgroundColor: '#ffffff',
+    borderRadius: '8px',
+    boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
+  },
+  title: {
+    textAlign: 'center',
+    color: '#000',
+    fontSize: '20px',
+    fontWeight: 'bold',
+    marginBottom: '30px',
+    borderBottom: '2px solid #eee',
+    paddingBottom: '10px',
+  },
+  buttonContainer: {
+    textAlign: 'center',
+    marginTop: '40px',
+  },
+  submitButton: {
+    padding: '12px 25px',
+    fontSize: '16px',
+    fontWeight: 'bold',
+    color: '#ffffff',
+    backgroundColor: '#0078D4',
+    border: 'none',
+    borderRadius: '6px',
+    cursor: 'pointer',
+    transition: 'background-color 0.3s, transform 0.2s',
+  },
+  errorText: {
+    color: '#dc3545',
+    textAlign: 'center',
+    marginTop: '20px',
+    fontWeight: 'bold',
+    whiteSpace: 'pre-wrap',
+  },
+};
 
-// --- INTERFACES ---
 interface MateriaParaAutocompletar {
   id_materia: number;
   nombre: string;
+  codigoMateria: string;
   anio: number;
   id_docente: number;
   cantidad_inscripciones: number;
 }
 
 interface Docente {
-    id_docente: number;
-    nombre: string;
+  id_docente: number;
+  nombre: string;
 }
 
 interface SeccionResumen {
-    id: number;
-    sigla: string;
-    nombre: string;
-    porcentajes_opciones: Record<string, number>;
+  id: number;
+  sigla: string;
+  nombre: string;
+  porcentajes_opciones: Record<string, number>;
 }
-// Interface para la fila de actividad (basada en ConsignarActividadesDoc)
+
 interface Actividad {
   integranteCatedra: string;
   capacitacion: string;
@@ -49,7 +90,6 @@ interface Actividad {
   gestion: string;
   observacionComentarios: string;
 }
-
 
 const GenerarInformeACDoc: React.FC = () => {
   const navigate = useNavigate();
@@ -62,6 +102,7 @@ const GenerarInformeACDoc: React.FC = () => {
     sede: '',
     ciclo_lectivo: '',
     id_materia: '',
+    codigoMateria: '',
     id_docente: '',
     cantidad_alumnos_inscriptos: '',
     cantidad_comisiones_teoricas: '',
@@ -78,22 +119,17 @@ const GenerarInformeACDoc: React.FC = () => {
     resumen_reflexion: '',
   });
 
-  // Estados para los componentes hijos que manejan listas
   const [equipamiento, setEquipamiento] = useState<string[]>([]);
   const [bibliografia, setBibliografia] = useState<string[]>([]);
   const [valoracionesAuxiliares, setValoracionesAuxiliares] = useState<ValoracionAuxiliarData[]>([
-      { nombre_auxiliar: '', calificacion: '', justificacion: '' }
+    { nombre_auxiliar: '', calificacion: '', justificacion: '' },
   ]);
   const [actividades, setActividades] = useState<Actividad[]>([]);
-
+  const [resumenSecciones, setResumenSecciones] = useState<SeccionResumen[]>([]);
+  const [opinionSobreResumen, setOpinionSobreResumen] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
   const [informeGenerado, setInformeGenerado] = useState(null);
-  
-  const [resumenSecciones, setResumenSecciones] = useState<SeccionResumen[]>([]);
-  const [opinionSobreResumen, setOpinionSobreResumen] = useState<string>("");
 
-
-  // useEffect para cargar datos (sin cambios)
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -101,14 +137,10 @@ const GenerarInformeACDoc: React.FC = () => {
         setError(null);
         const materiasRes = await fetch(`${BASE_URL}/materias/listar`);
         const docentesRes = await fetch(`${BASE_URL}/docentes/listar`);
-        if (!materiasRes.ok) throw new Error(`Fallo al cargar materias (${materiasRes.status})`);
-        if (!docentesRes.ok) throw new Error(`Fallo al cargar docentes (${docentesRes.status})`);
-        const materiasData: MateriaParaAutocompletar[] = await materiasRes.json();
-        setMaterias(materiasData);
-        const docentesData: Docente[] = await docentesRes.json();
-        setDocentes(docentesData);
+        if (!materiasRes.ok || !docentesRes.ok) throw new Error('Error al cargar datos');
+        setMaterias(await materiasRes.json());
+        setDocentes(await docentesRes.json());
       } catch (err: any) {
-        console.error("Error en fetchData:", err);
         setError(err.message || 'Error cargando datos iniciales');
       } finally {
         setLoading(false);
@@ -117,169 +149,144 @@ const GenerarInformeACDoc: React.FC = () => {
     fetchData();
   }, []);
 
-  // handleFormChange (sin cambios)
   const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => {
-      let newState: any = { ...prev, [name]: value };
+      const newState = { ...prev, [name]: value };
       if (name === 'id_materia') {
-        const selectedMateria = materias.find(m => String(m.id_materia) === String(value));
-        newState.ciclo_lectivo = selectedMateria?.anio || '';
-        newState.id_docente = selectedMateria?.id_docente || '';
-        newState.cantidad_alumnos_inscriptos = selectedMateria?.cantidad_inscripciones || '';
+        const selected = materias.find(m => String(m.id_materia) === value);
+        newState.ciclo_lectivo = selected?.anio.toString() || '';
+        newState.id_docente = selected?.id_docente.toString() || '';
+        newState.cantidad_alumnos_inscriptos = selected?.cantidad_inscripciones.toString() || '';
+        newState.codigoMateria = selected?.codigoMateria || '';
       }
       return newState;
     });
   };
 
-  // handleNecesidadesChange (sin cambios)
-  const handleNecesidadesChange = ( tipo: 'equipamiento' | 'bibliografia', nuevaLista: string[]) => {
-    if (tipo === 'equipamiento') {
-      setEquipamiento(nuevaLista);
-    } else {
-      setBibliografia(nuevaLista);
-    }
+  const handleNecesidadesChange = (tipo: 'equipamiento' | 'bibliografia', nuevaLista: string[]) => {
+    tipo === 'equipamiento' ? setEquipamiento(nuevaLista) : setBibliografia(nuevaLista);
   };
 
-  // Handler para la lista de actividades
-  const handleActividadesChange = (nuevaLista: Actividad[]) => {
-    setActividades(nuevaLista);
-  };
-
-  //Handle para resumen valores encuesta
+  const handleActividadesChange = (nuevaLista: Actividad[]) => setActividades(nuevaLista);
   const handleResumenChange = (nuevoResumen: SeccionResumen[], nuevoComentario: string) => {
     setResumenSecciones(nuevoResumen);
     setOpinionSobreResumen(nuevoComentario);
   };
-  
-  // handleValoracionesChange (sin cambios)
-  const handleValoracionesChange = (nuevasValoraciones: ValoracionAuxiliarData[]) => {
-      setValoracionesAuxiliares(nuevasValoraciones);
-  };
+  const handleValoracionesChange = (nuevas: ValoracionAuxiliarData[]) => setValoracionesAuxiliares(nuevas);
 
-  // handleSubmit (VALIDACIÓN DE VALORACIONES MOVIDA ARRIBA DEL PAYLOAD)
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
 
-    // --- Validación de valoraciones auxiliares ---
     const valoracionesValidas = valoracionesAuxiliares.filter(
-        v => v.nombre_auxiliar.trim() !== '' || v.calificacion !== '' || v.justificacion.trim() !== ''
-    ); // Filtramos filas completamente vacías (opcional)
+      v => v.nombre_auxiliar.trim() || v.calificacion || v.justificacion.trim()
+    );
 
     for (let i = 0; i < valoracionesValidas.length; i++) {
-        const v = valoracionesValidas[i];
-        if (!v.nombre_auxiliar.trim()) {
-            setError(`Error en Fila ${i + 1} de Valoración: El campo 'JTP/Auxiliares' es obligatorio.`);
-            setLoading(false); // Detener carga si hay error
-            return;
-        }
-        if (v.calificacion === '') {
-            setError(`Error en Fila ${i + 1} de Valoración: Debe seleccionar una calificación.`);
-            setLoading(false); // Detener carga si hay error
-            return;
-        }
-        if (!v.justificacion.trim()) {
-            setError(`Error en Fila ${i + 1} de Valoración: El campo 'Justificación' es obligatorio.`);
-            setLoading(false); // Detener carga si hay error
-            return;
-        }
+      const v = valoracionesValidas[i];
+      if (!v.nombre_auxiliar.trim() || !v.calificacion || !v.justificacion.trim()) {
+        setError(`Error en Fila ${i + 1}: todos los campos son obligatorios.`);
+        return;
+      }
     }
-    // --- FIN VALIDACIÓN ---
-
-    setLoading(true); // Solo se activa si las validaciones pasaron
 
     const payload = {
-      sede: formData.sede,
-      ciclo_lectivo: Number(formData.ciclo_lectivo) || null,
-      id_materia: Number(formData.id_materia) || null,
-      id_docente: Number(formData.id_docente) || null,
-      cantidad_alumnos_inscriptos: Number(formData.cantidad_alumnos_inscriptos) || null,
-      cantidad_comisiones_teoricas: Number(formData.cantidad_comisiones_teoricas) || null,
-      cantidad_comisiones_practicas: Number(formData.cantidad_comisiones_practicas) || null,
-      porcentaje_teoricas: Number(formData.porcentaje_teoricas) || null,
-      porcentaje_practicas: Number(formData.porcentaje_practicas) || null,
-      justificacion_porcentaje: formData.justificacion_porcentaje || null,
-      porcentaje_contenido_abordado: Number(formData.porcentaje_contenido_abordado) || null,
-
-      resumenSecciones: resumenSecciones.map(s => ({
-        id: s.id,
-        sigla: s.sigla,
-        nombre: s.nombre,
-        porcentajes_opciones: s.porcentajes_opciones,
-      })),
-      opinionSobreResumen: opinionSobreResumen,
-      
-      aspectos_positivos_enseñanza: formData.aspectos_positivos_enseñanza || null,
-      aspectos_positivos_aprendizaje: formData.aspectos_positivos_aprendizaje || null,
-      obstaculos_enseñanza: formData.obstaculos_enseñanza || null,
-      obstaculos_aprendizaje: formData.obstaculos_aprendizaje || null,
-      estrategias_a_implementar: formData.estrategias_a_implementar || null,
-      resumen_reflexion: formData.resumen_reflexion || null,
+      ...formData,
+      ciclo_lectivo: Number(formData.ciclo_lectivo),
+      id_materia: Number(formData.id_materia),
+      id_docente: Number(formData.id_docente),
+      cantidad_alumnos_inscriptos: Number(formData.cantidad_alumnos_inscriptos),
+      cantidad_comisiones_teoricas: Number(formData.cantidad_comisiones_teoricas),
+      cantidad_comisiones_practicas: Number(formData.cantidad_comisiones_practicas),
+      porcentaje_teoricas: Number(formData.porcentaje_teoricas),
+      porcentaje_practicas: Number(formData.porcentaje_practicas),
+      porcentaje_contenido_abordado: Number(formData.porcentaje_contenido_abordado),
+      resumenSecciones,
+      opinionSobreResumen,
       necesidades_equipamiento: equipamiento,
       necesidades_bibliografia: bibliografia,
-      valoracion_auxiliares: valoracionesValidas.length > 0 ? valoracionesValidas : null,
-      actividades: actividades,
+      valoracion_auxiliares: valoracionesValidas,
+      actividades,
+      codigoMateria: formData.codigoMateria,
     };
 
     if (!payload.id_docente || !payload.id_materia) {
-        setError("Debe seleccionar un Docente y una Materia.");
-        setLoading(false);
-        return;
+      setError('Debe seleccionar una materia y un docente.');
+      return;
     }
 
-    console.log("Enviando payload al backend:", JSON.stringify(payload, null, 2));
-
     try {
+      setLoading(true);
       const res = await fetch(`${BASE_URL}/informesAC/crear`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
       });
+
       if (!res.ok) {
         const errData = await res.json();
         throw new Error(errData.detail || `Error en el envío (${res.status})`);
       }
-      const data = await res.json();
+            const data = await res.json();
       setInformeGenerado(data);
       alert('¡Informe creado exitosamente!');
       navigate(-1);
     } catch (err: any) {
-        console.error("Error en handleSubmit:", err);
-        setError(err.message);
-        alert(`Error al crear el informe: ${err.message}`);
-    } finally { setLoading(false); }
+      console.error("Error en handleSubmit:", err.message);
+      setError(err.message);
+      alert(`Error al crear el informe:\n${err.message}`);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  // Renderizado condicional inicial
   if (loading && materias.length === 0 && docentes.length === 0) {
-      return <p style={{ textAlign: 'center', fontSize: '18px', color: '#333' }}>Cargando datos iniciales...</p>;
+    return (
+      <div style={styles.page}>
+        <HeaderInstitucional />
+        <div style={styles.container}>
+          <p style={{ textAlign: 'center', fontSize: '18px', color: '#333' }}>Cargando datos iniciales...</p>
+        </div>
+      </div>
+    );
   }
 
-    // Renderizado de error de carga inicial
   if (error && materias.length === 0 && docentes.length === 0) {
-      return <p style={{ color: 'red', textAlign: 'center' }}>Error cargando datos: {error}</p>;
+    return (
+      <div style={styles.page}>
+        <HeaderInstitucional />
+        <div style={styles.container}>
+          <p style={styles.errorText}>Error cargando datos: {error}</p>
+        </div>
+      </div>
+    );
   }
 
-  // Renderizado de éxito
   if (informeGenerado) {
-      return (
-        <div style={pageStyle}>
-          <div style={formContainerStyle}>
-            <h2>Informe Generado con Éxito</h2>
-            <p>El informe ha sido guardado correctamente.</p>
-            <button onClick={() => navigate(-1)} style={submitButtonStyle}>Volver</button>
+    return (
+      <div style={styles.page}>
+        <HeaderInstitucional />
+        <div style={styles.container}>
+          <h2 style={styles.title}>Informe Generado con Éxito</h2>
+          <p>El informe ha sido guardado correctamente.</p>
+          <div style={styles.buttonContainer}>
+            <button onClick={() => navigate(-1)} style={styles.submitButton}>Volver</button>
           </div>
         </div>
-      );
+      </div>
+    );
   }
 
-  // Renderizado del formulario (Ubicación del componente corregida)
   return (
-    <div style={pageStyle}>
-      <div style={formContainerStyle}>
+    <div style={styles.page}>
+      <div style={styles.container}>
         <form onSubmit={handleSubmit}>
-          <h2 style={headerStyle}>Generar Informe de Actividad Curricular</h2>
+          <HeaderInstitucional />
+          <h2 style={{ textAlign: 'center', fontSize: '20px', fontWeight: 'bold', color: '#000', marginBottom: '10px' }}>
+            Anexo 1
+          </h2>
+          <h2 style={styles.title}>Informe de Actividad Curricular</h2>
 
           <CompletarDatosGeneralesDoc
             materias={materias}
@@ -289,65 +296,49 @@ const GenerarInformeACDoc: React.FC = () => {
             loading={loading}
           />
 
-          <hr style={{borderColor: '#eee', margin: '30px 0'}} />
-
           <CompletarNecesidadesDoc
             equipamiento={equipamiento}
             bibliografia={bibliografia}
             onNecesidadesChange={handleNecesidadesChange}
           />
 
-          <div style={{marginTop: '30px'}}>
-            <CompletarPorcentajesDoc
-              formData={formData}
-              handleChange={handleFormChange}
-            />
-          </div>
+          <CompletarPorcentajesDoc
+            formData={formData}
+            handleChange={handleFormChange}
+          />
 
-          <div style={{marginTop: '30px'}}>
-            <CompletarContenidoAbordadoDoc
-              formData={formData}
-              handleChange={handleFormChange}
-            />
-          </div>
+          <CompletarContenidoAbordadoDoc
+            formData={formData}
+            handleChange={handleFormChange}
+          />
 
-          <div style={{ marginTop: '30px' }}>
-            <ResumenSecciones
-              idMateria={Number(formData.id_materia)}
-              handleChange={handleResumenChange} 
-            />
-          </div>     
+          <ResumenSecciones
+            idMateria={Number(formData.id_materia)}
+            handleChange={handleResumenChange}
+          />
 
-          <div style={{marginTop: '30px'}}>
-            <CompletarProcesoAprendizajeDoc
-              formData={formData}
-              handleChange={handleFormChange}
-            />
-          </div>
+          <CompletarProcesoAprendizajeDoc
+            formData={formData}
+            handleChange={handleFormChange}
+          />
 
-          <div style={{marginTop: '30px'}}>
           <ConsignarActividadesDoc
             actividades={actividades}
             onActividadesChange={handleActividadesChange}
-            />
-          </div>
-          
-          <hr style={{borderColor: '#eee', margin: '30px 0'}} />
-
-            <CompletarValoracionAuxiliaresDoc
-                valoraciones={valoracionesAuxiliares}
-                onValoracionesChange={handleValoracionesChange}
           />
 
-          
-          <div style={buttonContainerStyle}>
-            <button type="submit" style={submitButtonStyle} disabled={loading}>
+          <CompletarValoracionAuxiliaresDoc
+            valoraciones={valoracionesAuxiliares}
+            onValoracionesChange={handleValoracionesChange}
+          />
+
+          <div style={styles.buttonContainer}>
+            <button type="submit" style={styles.submitButton} disabled={loading}>
               {loading ? 'Procesando...' : 'Generar Informe'}
             </button>
           </div>
 
-          {error && <p style={{color: 'red', textAlign: 'center', marginTop: '15px'}}>{error}</p>}
-
+          {error && <p style={styles.errorText}>{error}</p>}
         </form>
       </div>
     </div>
@@ -355,3 +346,4 @@ const GenerarInformeACDoc: React.FC = () => {
 };
 
 export default GenerarInformeACDoc;
+
