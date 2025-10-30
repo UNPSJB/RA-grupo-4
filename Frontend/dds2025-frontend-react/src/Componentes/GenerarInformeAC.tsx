@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 import HeaderInstitucional from './HeaderInstitucional';
 import CompletarDatosGeneralesDoc from './CompletarDatosGeneralesDoc';
@@ -13,6 +13,7 @@ import ResumenSecciones from './ConsignarResumenValoresEncuesta';
 
 const BASE_URL = 'http://localhost:8000';
 
+// (Tus estilos originales)
 const styles: { [key: string]: React.CSSProperties } = {
   page: {
     backgroundColor: '#f4f7f6',
@@ -61,6 +62,7 @@ const styles: { [key: string]: React.CSSProperties } = {
   },
 };
 
+// (Interfaces originales)
 interface MateriaParaAutocompletar {
   id_materia: number;
   nombre: string;
@@ -69,19 +71,16 @@ interface MateriaParaAutocompletar {
   id_docente: number;
   cantidad_inscripciones: number;
 }
-
 interface Docente {
   id_docente: number;
   nombre: string;
 }
-
 interface SeccionResumen {
   id: number;
   sigla: string;
   nombre: string;
   porcentajes_opciones: Record<string, number>;
 }
-
 interface Actividad {
   integranteCatedra: string;
   capacitacion: string;
@@ -91,19 +90,23 @@ interface Actividad {
   observacionComentarios: string;
 }
 
+
 const GenerarInformeACDoc: React.FC = () => {
   const navigate = useNavigate();
+  // --- MODIFICADO (id_materia siempre estará presente) ---
+  const { id_materia } = useParams<{ id_materia: string }>();
+  // ------------------------------------
 
   const [materias, setMaterias] = useState<MateriaParaAutocompletar[]>([]);
   const [docentes, setDocentes] = useState<Docente[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true); 
 
   const [formData, setFormData] = useState({
     sede: '',
     ciclo_lectivo: '',
     id_materia: '',
     codigoMateria: '',
-    id_docente: '',
+    id_docente: '', // Se seteará a '1' automáticamente
     cantidad_alumnos_inscriptos: '',
     cantidad_comisiones_teoricas: '',
     cantidad_comisiones_practicas: '',
@@ -119,6 +122,7 @@ const GenerarInformeACDoc: React.FC = () => {
     resumen_reflexion: '',
   });
 
+  // (Estados para componentes hijos, sin cambios)
   const [equipamiento, setEquipamiento] = useState<string[]>([]);
   const [bibliografia, setBibliografia] = useState<string[]>([]);
   const [valoracionesAuxiliares, setValoracionesAuxiliares] = useState<ValoracionAuxiliarData[]>([
@@ -130,16 +134,36 @@ const GenerarInformeACDoc: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [informeGenerado, setInformeGenerado] = useState(null);
 
+  // --- MODIFICADO (useEffect de carga) ---
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
         setError(null);
         const materiasRes = await fetch(`${BASE_URL}/materias/listar`);
-        const docentesRes = await fetch(`${BASE_URL}/docentes/listar`);
+        const docentesRes = await fetch(`${BASE_URL}/docentes/listar`); 
         if (!materiasRes.ok || !docentesRes.ok) throw new Error('Error al cargar datos');
-        setMaterias(await materiasRes.json());
+        
+        const materiasData: MateriaParaAutocompletar[] = await materiasRes.json();
+        setMaterias(materiasData);
         setDocentes(await docentesRes.json());
+
+        // --- LÓGICA DE PRECARGA (Simplificada) ---
+        // Ya no se comprueba 'isPreloadedMode', siempre se asume
+        const selectedMateria = materiasData.find((m: MateriaParaAutocompletar) => String(m.id_materia) === id_materia);
+        if (selectedMateria) {
+          // Precargamos el formulario
+          setFormData(prev => ({
+            ...prev,
+            id_materia: String(selectedMateria.id_materia),
+            codigoMateria: selectedMateria.codigoMateria || '',
+            ciclo_lectivo: String(selectedMateria.anio || ''), 
+            id_docente: '1', // <-- HARDCODEADO
+            cantidad_alumnos_inscriptos: String(selectedMateria.cantidad_inscripciones || ''), 
+          }));
+        }
+        // --- FIN LÓGICA DE PRECARGA ---
+
       } catch (err: any) {
         setError(err.message || 'Error cargando datos iniciales');
       } finally {
@@ -147,27 +171,22 @@ const GenerarInformeACDoc: React.FC = () => {
       }
     };
     fetchData();
-  }, []);
+  }, [id_materia]); // Solo depende del id_materia de la URL
 
+
+  // --- MODIFICADO (Lógica de selección manual eliminada) ---
   const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => {
-      const newState = { ...prev, [name]: value };
-      if (name === 'id_materia') {
-        const selected = materias.find(m => String(m.id_materia) === value);
-        newState.ciclo_lectivo = selected?.anio.toString() || '';
-        newState.id_docente = selected?.id_docente.toString() || '';
-        newState.cantidad_alumnos_inscriptos = selected?.cantidad_inscripciones.toString() || '';
-        newState.codigoMateria = selected?.codigoMateria || '';
-      }
-      return newState;
-    });
+    setFormData(prev => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
+  // (Tus otros handlers originales)
   const handleNecesidadesChange = (tipo: 'equipamiento' | 'bibliografia', nuevaLista: string[]) => {
     tipo === 'equipamiento' ? setEquipamiento(nuevaLista) : setBibliografia(nuevaLista);
   };
-
   const handleActividadesChange = (nuevaLista: Actividad[]) => setActividades(nuevaLista);
   const handleResumenChange = (nuevoResumen: SeccionResumen[], nuevoComentario: string) => {
     setResumenSecciones(nuevoResumen);
@@ -175,49 +194,57 @@ const GenerarInformeACDoc: React.FC = () => {
   };
   const handleValoracionesChange = (nuevas: ValoracionAuxiliarData[]) => setValoracionesAuxiliares(nuevas);
 
+
+  // --- HANDLESUBMIT (Solo POST) ---
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
 
+    // (Tu validación de valoraciones)
     const valoracionesValidas = valoracionesAuxiliares.filter(
       v => v.nombre_auxiliar.trim() || v.calificacion || v.justificacion.trim()
     );
-
     for (let i = 0; i < valoracionesValidas.length; i++) {
       const v = valoracionesValidas[i];
       if (!v.nombre_auxiliar.trim() || !v.calificacion || !v.justificacion.trim()) {
-        setError(`Error en Fila ${i + 1}: todos los campos son obligatorios.`);
+        setError(`Error en Fila ${i + 1} de Valoración Auxiliar: todos los campos son obligatorios.`);
         return;
       }
     }
 
     const payload = {
       ...formData,
-      ciclo_lectivo: Number(formData.ciclo_lectivo),
-      id_materia: Number(formData.id_materia),
-      id_docente: Number(formData.id_docente),
-      cantidad_alumnos_inscriptos: Number(formData.cantidad_alumnos_inscriptos),
-      cantidad_comisiones_teoricas: Number(formData.cantidad_comisiones_teoricas),
-      cantidad_comisiones_practicas: Number(formData.cantidad_comisiones_practicas),
-      porcentaje_teoricas: Number(formData.porcentaje_teoricas),
-      porcentaje_practicas: Number(formData.porcentaje_practicas),
-      porcentaje_contenido_abordado: Number(formData.porcentaje_contenido_abordado),
-      resumenSecciones,
-      opinionSobreResumen,
-      necesidades_equipamiento: equipamiento,
-      necesidades_bibliografia: bibliografia,
-      valoracion_auxiliares: valoracionesValidas,
-      actividades,
-      codigoMateria: formData.codigoMateria,
+      ciclo_lectivo: Number(formData.ciclo_lectivo) || null,
+      id_materia: Number(formData.id_materia) || null,
+      id_docente: Number(formData.id_docente) || null, // Se tomará el '1' del state
+      cantidad_alumnos_inscriptos: Number(formData.cantidad_alumnos_inscriptos) || null,
+      cantidad_comisiones_teoricas: Number(formData.cantidad_comisiones_teoricas) || null,
+      cantidad_comisiones_practicas: Number(formData.cantidad_comisiones_practicas) || null,
+      porcentaje_teoricas: Number(formData.porcentaje_teoricas) || null,
+      porcentaje_practicas: Number(formData.porcentaje_practicas) || null,
+      porcentaje_contenido_abordado: Number(formData.porcentaje_contenido_abordado) || null,
+      
+      // Opcionales
+      justificacion_porcentaje: formData.justificacion_porcentaje || null,
+      necesidades_equipamiento: equipamiento.length > 0 ? equipamiento : null,
+      necesidades_bibliografia: bibliografia.length > 0 ? bibliografia : null,
+      
+      // Obligatorios
+      resumenSecciones: resumenSecciones.length > 0 ? resumenSecciones : null,
+      opinionSobreResumen: opinionSobreResumen || null,
+      valoracion_auxiliares: valoracionesValidas.length > 0 ? valoracionesValidas : null,
+      actividades: actividades.length > 0 ? actividades : null,
+      codigoMateria: undefined, 
     };
 
     if (!payload.id_docente || !payload.id_materia) {
-      setError('Debe seleccionar una materia y un docente.');
+      setError('Debe seleccionar una materia.'); 
       return;
     }
 
     try {
       setLoading(true);
+      
       const res = await fetch(`${BASE_URL}/informesAC/crear`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -226,12 +253,18 @@ const GenerarInformeACDoc: React.FC = () => {
 
       if (!res.ok) {
         const errData = await res.json();
+        if (res.status === 422) {
+            const camposFaltantes = errData.detail.map((err: any) => `- ${err.loc[1]}`).join('\n');
+            throw new Error(`Faltan campos obligatorios o hay errores:\n${camposFaltantes}`);
+        }
         throw new Error(errData.detail || `Error en el envío (${res.status})`);
       }
-            const data = await res.json();
+      
+      const data = await res.json();
       setInformeGenerado(data);
       alert('¡Informe creado exitosamente!');
-      navigate(-1);
+      navigate('/home/informes-doc'); 
+      
     } catch (err: any) {
       console.error("Error en handleSubmit:", err.message);
       setError(err.message);
@@ -241,7 +274,8 @@ const GenerarInformeACDoc: React.FC = () => {
     }
   };
 
-  if (loading && materias.length === 0 && docentes.length === 0) {
+  // (Tus renderizados de 'loading', 'error' y 'success' originales)
+  if (loading && materias.length === 0) {
     return (
       <div style={styles.page}>
         <HeaderInstitucional />
@@ -252,7 +286,7 @@ const GenerarInformeACDoc: React.FC = () => {
     );
   }
 
-  if (error && materias.length === 0 && docentes.length === 0) {
+  if (error && materias.length === 0) {
     return (
       <div style={styles.page}>
         <HeaderInstitucional />
@@ -290,10 +324,11 @@ const GenerarInformeACDoc: React.FC = () => {
 
           <CompletarDatosGeneralesDoc
             materias={materias}
-            docentes={docentes}
+            docentes={docentes} 
             formData={formData}
             handleChange={handleFormChange}
             loading={loading}
+            disabled={true} // --- MODIFICADO (Siempre deshabilitado) ---
           />
 
           <CompletarNecesidadesDoc
@@ -333,7 +368,7 @@ const GenerarInformeACDoc: React.FC = () => {
           />
 
           <div style={styles.buttonContainer}>
-            <button type="submit" style={styles.submitButton} disabled={loading}>
+            <button type="submit" style={styles.submitButton} disabled={loading || !formData.id_materia}>
               {loading ? 'Procesando...' : 'Generar Informe'}
             </button>
           </div>
@@ -346,4 +381,3 @@ const GenerarInformeACDoc: React.FC = () => {
 };
 
 export default GenerarInformeACDoc;
-

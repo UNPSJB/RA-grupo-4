@@ -55,87 +55,73 @@ class ValoracionAuxiliar(ValoracionAuxiliarBase):
     pass
 
 
-
+# --- MODIFICADO (Campos obligatorios "Todo o Nada") ---
 class InformeACCreate(BaseModel):
-    #Hdu completar datos generales
+    # --- OBLIGATORIOS ---
     id_docente: int
     id_materia: int
     sede: SedeEnum
     ciclo_lectivo: int
-    cantidad_alumnos_inscriptos: Optional[int] = None
-    cantidad_comisiones_teoricas: Optional[int] = None
-    cantidad_comisiones_practicas: Optional[int] = None
+    cantidad_alumnos_inscriptos: int
+    cantidad_comisiones_teoricas: int
+    cantidad_comisiones_practicas: int
 
-    #Hdu completar necesidades
+    porcentaje_teoricas: int = Field(..., ge=0, le=100)
+    porcentaje_practicas: int = Field(..., ge=0, le=100)
+    
+    porcentaje_contenido_abordado: int = Field(..., ge=0, le=100)
+
+    opinionSobreResumen: str = Field(..., min_length=1)
+    resumenSecciones: List[SeccionResumen]
+    
+    valoracion_auxiliares: List[ValoracionAuxiliarBase] = Field(..., min_length=1)
+
+    aspectos_positivos_enseñanza: str = Field(..., min_length=1)
+    aspectos_positivos_aprendizaje: str = Field(..., min_length=1)
+    obstaculos_enseñanza: str = Field(..., min_length=1)
+    obstaculos_aprendizaje: str = Field(..., min_length=1)
+    estrategias_a_implementar: str = Field(..., min_length=1)
+    resumen_reflexion: str = Field(..., min_length=1)
+
+    actividades: List[ActividadBase] = Field(..., min_length=1)
+
+    # --- OPCIONALES (Tus 3 excepciones) ---
     necesidades_equipamiento: Optional[List[str]] = None
     necesidades_bibliografia: Optional[List[str]] = None
-
-    #Hdu consignar porcentaje horas
-    porcentaje_teoricas: Optional[int] = Field(None, ge=0, le=100)
-    porcentaje_practicas: Optional[int] = Field(None, ge=0, le=100)
     justificacion_porcentaje: Optional[str] = None
 
-    # HDU 3
-    porcentaje_contenido_abordado: Optional[int] = Field(None, ge=0, le=100)
 
-    #Hdu Consignar Valores resumen encuesta 
-    opinionSobreResumen: Optional[str] = None
-    resumenSecciones: Optional[List[SeccionResumen]] = None
-    
-    # --- AÑADIDO PARA HDU 4 ---
-    valoracion_auxiliares: Optional[List[ValoracionAuxiliarBase]] = None 
-
-    #Hdu completar proceso de aprendizaje
-    aspectos_positivos_enseñanza: Optional[str] = None
-    aspectos_positivos_aprendizaje: Optional[str] = None
-    obstaculos_enseñanza: Optional[str] = None
-    obstaculos_aprendizaje: Optional[str] = None
-    estrategias_a_implementar: Optional[str] = None
-    resumen_reflexion: Optional[str] = None
-
-
-    #Hdu consignar actividades
-    actividades: List[ActividadBase] = []
-
-
+# --- MODIFICADO (Añadido 'completado', quitado Optional) ---
 class InformeAC(BaseModel):
     id_informesAC: int
+    completado: int # Tu bandera (será 1)
     sede: SedeEnum
     ciclo_lectivo: int
-    cantidad_alumnos_inscriptos: Optional[int] = None
-    cantidad_comisiones_teoricas: Optional[int] = None
-    cantidad_comisiones_practicas: Optional[int] = None
+    cantidad_alumnos_inscriptos: int
+    cantidad_comisiones_teoricas: int
+    cantidad_comisiones_practicas: int
 
     docente: DocenteOut
     materia: MateriaOut
 
+    # Opcionales
     necesidades_equipamiento: Optional[List[str]] = None
     necesidades_bibliografia: Optional[List[str]] = None
-
-    porcentaje_teoricas: Optional[int] = None
-    porcentaje_practicas: Optional[int] = None
     justificacion_porcentaje: Optional[str] = None
 
-    porcentaje_contenido_abordado: Optional[int] = None # HDU 3
+    # Obligatorios
+    porcentaje_teoricas: int
+    porcentaje_practicas: int
+    porcentaje_contenido_abordado: int
+    valoracion_auxiliares: List[ValoracionAuxiliar]
+    aspectos_positivos_enseñanza: str
+    aspectos_positivos_aprendizaje: str
+    obstaculos_enseñanza: str
+    obstaculos_aprendizaje: str
+    estrategias_a_implementar: str
+    resumen_reflexion: str
+    actividades: List[ActividadOut]
+    opinionSobreResumen: str
+    resumenSecciones: List[SeccionResumen]
 
-    # --- AÑADIDO PARA HDU 4 ---
-    valoracion_auxiliares: Optional[List[ValoracionAuxiliar]] = None # Lista de valoraciones
-
-    aspectos_positivos_enseñanza: Optional[str] = None
-    aspectos_positivos_aprendizaje: Optional[str] = None
-    obstaculos_enseñanza: Optional[str] = None
-    obstaculos_aprendizaje: Optional[str] = None
-    estrategias_a_implementar: Optional[str] = None
-    resumen_reflexion: Optional[str] = None
-
-    #Hdu consignar actividades
-    actividades: List[ActividadOut] = []
-
-    #consignar resumen encuesta
-    opinionSobreResumen: Optional[str] = None
-    resumenSecciones: List[SeccionResumen]  # JSON convertido a lista de objetos
-
-    model_config = {
-        "from_attributes": True  
-    }
-
+    model_config = {"from_attributes": True}

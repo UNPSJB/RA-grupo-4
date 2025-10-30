@@ -26,22 +26,17 @@ def filtrado_informes_ac(
         id_docente=id_docente,
         id_materia=id_materia,
     )
-
     return informes
 
 @router.get("/docente/{id_docente}", response_model=List[schemas.InformeAC])
 def listar_informes_por_docente(id_docente: int, db: Session = Depends(get_db)):
-    # --- CORRECCIÓN: Eliminamos el argumento id_carrera ---
     informes = services.filtrar_informes(
         db=db,
         id_docente=id_docente,
         id_materia=None,
     )
-    
-
     if not informes:
         return []
-
     return informes
 
 @router.post("/crear", response_model=schemas.InformeAC)
@@ -52,29 +47,23 @@ def crear_nuevo_informe_ac(
     return services.create_informe_ac(db=db, informe=informe)
 
 
-
-
 @router.put("/{id_informe}/opinion", response_model=schemas.InformeAC)
 def actualizar_opinion(id_informe: int, opinion: str, db: Session = Depends(get_db)):
     informe_actualizado = services.actualizar_opinion_informe(db, id_informe, opinion)
     return schemas.InformeAC.from_orm(informe_actualizado)
 
 
-
 @router.get("/resumen/{id_informe}", response_model=List[schemas.SeccionResumen])
 def obtener_resumen_secciones_informeAC(id_informe: int, db: Session = Depends(get_db)):
     
     informe = services.read_informeAC(db, id_informe) 
-
     resumen_secciones = services.cargar_resumen_secciones_informe(informe, db)
-
     return resumen_secciones
 
 
 @router.get("/resumen/materia/{id_materia}", response_model=List[schemas.SeccionResumen])
 def obtener_resumen_secciones_por_materia_informeAC(id_materia: int, db: Session = Depends(get_db)):
     # Creamos un "informe temporal" para calcular el resumen
-
     informe_temp = InformesAC(id_materia=id_materia)
     resumen = services.cargar_resumen_secciones_informe(informe_temp, db)
     return resumen

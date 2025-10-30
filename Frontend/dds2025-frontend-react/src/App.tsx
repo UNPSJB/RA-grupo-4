@@ -14,12 +14,11 @@ import GenerarInformeACDoc from "./Componentes/GenerarInformeAC";
 
 
 const DropdownMenu: React.FC<{ title: string; children: React.ReactNode }> = ({ title, children }) => {
+  // (Tu componente DropdownMenu sin cambios)
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-
   const toggleDropdown = () => setIsOpen(!isOpen);
   const closeDropdown = () => setIsOpen(false);
-
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -29,7 +28,6 @@ const DropdownMenu: React.FC<{ title: string; children: React.ReactNode }> = ({ 
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
-
   return (
     <div className="dropdown" ref={dropdownRef}>
       <button onClick={toggleDropdown} className="dropdown-button">
@@ -71,9 +69,10 @@ function App() {
                   <Link to="/home/seleccionar">Seleccionar Encuestas</Link>
                 </DropdownMenu>
 
+                {/* --- MODIFICADO (Link eliminado) --- */}
                 <DropdownMenu title="Funcionalidades Docente">
-                  <Link to="/home/informes-doc">Listar Informes</Link>
-                  <Link to="/home/generar-informe">Generar Informe AC</Link>
+                  <Link to="/home/informes-doc">Informes Pendientes</Link>
+                  {/* <Link to="/home/generar-informe">Generar Informe AC</Link> <-- ELIMINADO */}
                   <Link to="/home/estadisticas-docente">Ver Estadísticas Materias</Link>
                 </DropdownMenu>
 
@@ -99,11 +98,22 @@ function App() {
                 />
                 <Route path="seleccionar" element={<SeleccionarEncuestas />} />
                 <Route path="informes-dep" element={<FiltradoInformeACDep />} />
+                
                 <Route path="informes-doc" element={<ListadoInformesACDoc />} />
+                
                 <Route path="responder-encuesta/:inscripcionId" element={<ResponderEncuesta />} />
                 <Route path="informes-sinteticos" element={<SeleccionarInformeSinteticoSEC />} />
                 <Route path="estadisticas-docente" element={<PaginaEstadisticasDoc />} />
-                <Route path="generar-informe" element={<GenerarInformeACDoc />} />
+                
+                {/* --- RUTA ELIMINADA --- */}
+                {/* <Route path="generar-informe" element={<GenerarInformeACDoc />} /> */}
+                
+                {/* --- RUTA MODIFICADA (Única forma de generar) --- */}
+                <Route 
+                  path="generar-informe/:id_materia" 
+                  element={<GenerarInformeACDoc />} 
+                />
+                {/* --- FIN MODIFICACIÓN --- */}
 
               </Routes>
             </div>
@@ -119,4 +129,3 @@ function App() {
 }
 
 export default App;
-
