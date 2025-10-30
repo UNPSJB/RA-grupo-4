@@ -31,11 +31,11 @@ VALUES
 -- =====================================================
 -- MATERIAS
 -- =====================================================
-INSERT INTO materias (id_materia, nombre, anio, codigoMateria, id_carrera, id_docente, encuesta_id)
+INSERT INTO materias (id_materia, nombre, anio, codigoMateria, id_carrera, id_docente, id_departamento, encuesta_id)
 VALUES
-    (1, 'Algoritmica y Programacion I', 1, 'IF003', 1, 1, 1),
-    (2, 'Bases de Datos I', 2, 'IF007', 1, 2, 1),
-    (3, 'Sistemas Operativos', 3, 'IF011', 2, 3, 1);
+    (1, 'Algoritmica y Programacion I', 1, 'IF003', 1, 1, 1, 1),
+    (2, 'Bases de Datos I', 2, 'IF007', 1, 2, 1, 1),
+    (3, 'Sistemas Operativos', 3, 'IF011', 2, 3, 1, 1);
 
 -- =====================================================
 -- ESTUDIANTES

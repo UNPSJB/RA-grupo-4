@@ -1,3 +1,4 @@
+from __future__ import annotations
 from pydantic import BaseModel
 from src.departamentos import exceptions
 from typing import Optional, List
@@ -21,6 +22,7 @@ class DepartamentoUpdate(DepartamentoBase):
 class Departamento(DepartamentoBase):
     id: int
     informesSinteticos: List[InformeSintetico] = []
+    materias: List["Materia"] = []
 
     model_config = {"from_attributes": True}
 

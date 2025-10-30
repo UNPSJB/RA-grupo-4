@@ -1,7 +1,6 @@
+from __future__ import annotations
 from pydantic import BaseModel, Field 
-from typing import List, Optional 
-
-
+from typing import List, Optional
 class MateriaBase(BaseModel):
     nombre: str
     id_materia: int
@@ -15,6 +14,8 @@ class MateriaUpdate(MateriaBase):
 
 class Materia(MateriaBase):
     anio: int
+    id_departamento: int
+    departamento: "Departamento"
     model_config = {"from_attributes": True}
 
 class MateriaOut(BaseModel):
