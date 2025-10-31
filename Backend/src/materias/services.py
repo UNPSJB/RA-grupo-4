@@ -1,7 +1,10 @@
-from sqlalchemy.orm import Session, subqueryload
+from sqlalchemy.orm import Session, subqueryload, joinedload
 from typing import List
 from . import models
+from src.materias.models import Materias
 from src.inscripciones.models import Inscripciones
+from src.respuestas.models import Respuesta
+from src.preguntas.models import Pregunta, TipoPregunta
 from . import schemas
 
 def get_materias(db: Session) -> List[models.Materias]:

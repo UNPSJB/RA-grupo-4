@@ -26,7 +26,7 @@ def leer_estadisticas_materia(materia_id: int, db: Session = Depends(get_db)):
     try:
         materia = db.get(models.Materias, materia_id)
         if not materia:
-             raise HTTPException(status_code=404, detail="Materia no encontrada")
+            raise HTTPException(status_code=404, detail="Materia no encontrada")
         estadisticas = services.get_estadisticas_materia(db=db, materia_id=materia_id)
         return estadisticas
     except Exception as e:
