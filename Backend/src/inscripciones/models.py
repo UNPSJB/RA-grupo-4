@@ -18,7 +18,7 @@ class Inscripciones(ModeloBase):
     
     fecha_inscripcion: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
-    encuesta_procesada: Mapped[bool] = mapped_column(Boolean, default=False, index=True)
+    encuesta_procesada: Mapped[bool] = mapped_column(Boolean, default=False)
 
     estudiante: Mapped["Estudiante"] = relationship("Estudiante", back_populates="inscripciones")
     materia: Mapped["Materias"] = relationship("Materias",back_populates="inscripciones")

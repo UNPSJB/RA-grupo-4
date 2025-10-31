@@ -26,3 +26,7 @@ class InformeSintetico(InformeSinteticoBase):
     departamento: "Departamento"      
 
     model_config = {"from_attributes": True}
+
+
+from src.departamentos.schemas import Departamento  # noqa: E402
+InformeSintetico.model_rebuild()

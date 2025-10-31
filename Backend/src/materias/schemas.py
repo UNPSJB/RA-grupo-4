@@ -48,3 +48,8 @@ class MateriaEstadisticaItem(BaseModel):
 
 class EstadisticasDocenteOut(BaseModel):
     estadisticas: List[MateriaEstadisticaItem]
+
+
+
+from src.departamentos.schemas import Departamento  # noqa: E402
+Materia.model_rebuild()

@@ -28,3 +28,8 @@ class Departamento(DepartamentoBase):
 
 class DepartamentoDelete(DepartamentoBase):
     id: int
+
+
+from src.informesSinteticos.schemas import InformeSintetico  # noqa: E402
+from src.materias.schemas import Materia
+Departamento.model_rebuild()
