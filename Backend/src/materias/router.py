@@ -46,3 +46,25 @@ def leer_estadisticas_por_docente(id_docente: int, db: Session = Depends(get_db)
     except Exception as e:
         raise HTTPException(status_code=500, detail="Error al obtener estadísticas del docente")
 
+
+
+
+
+
+
+
+
+
+
+@router.get("/{materia_id}/estadisticas/preguntas")
+def obtener_estadisticas_materia(materia_id: int, db: Session = Depends(get_db)):
+    """
+    Devuelve las estadísticas de preguntas cerradas por sección
+    para una materia específica, basadas en las encuestas procesadas.
+    """
+    resultado = services.obtener_estadisticas_materia(db, materia_id)
+    
+    if "error" in resultado:
+        raise HTTPException(status_code=404, detail=resultado["error"])
+    
+    return resultado

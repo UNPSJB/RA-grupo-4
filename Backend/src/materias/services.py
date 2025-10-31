@@ -73,3 +73,97 @@ def get_estadisticas_por_docente(db: Session, id_docente: int) -> List[schemas.M
 
     return resultado_estadisticas
 
+
+
+
+
+
+def obtener_estadisticas_materia(db: Session, materia_id: int):
+    # Traer la materia y todas las relaciones necesarias
+    materia = (
+        db.query(Materias)
+        .options(
+            joinedload(Materias.inscripciones)
+            .joinedload(Inscripciones.respuestas)
+            .joinedload(Respuesta.opcion_respuesta),
+            joinedload(Materias.inscripciones)
+            .joinedload(Inscripciones.respuestas)
+            .joinedload(Respuesta.pregunta)
+            .joinedload(Pregunta.seccion),
+        )
+        .filter(Materias.id_materia == materia_id)
+        .first()
+    )
+
+    if not materia:
+        return {"error": "Materia no encontrada"}
+
+    inscripciones = [i for i in materia.inscripciones if i.encuesta_procesada]
+    total_encuestas = len(inscripciones)
+
+    # Diccionario principal: seccion_id → datos de sección
+    estadisticas_por_seccion = {}
+
+    for inscripcion in inscripciones:
+        for respuesta in inscripcion.respuestas:
+            pregunta = respuesta.pregunta
+            if not pregunta or pregunta.tipo != TipoPregunta.CERRADA:
+                continue
+
+            seccion = pregunta.seccion
+            if not seccion:
+                continue  # ignorar preguntas sin sección
+
+            seccion_id = seccion.id
+            nombre_seccion = seccion.descripcion or f"Sección {seccion_id}"
+            sigla = seccion.sigla
+
+            # Crear entrada de sección si no existe
+            if seccion_id not in estadisticas_por_seccion:
+                estadisticas_por_seccion[seccion_id] = {
+                    "seccion_id": seccion_id,
+                    "sigla": sigla,
+                    "descripcion": nombre_seccion,
+                    "preguntas": {}
+                }
+
+            preguntas = estadisticas_por_seccion[seccion_id]["preguntas"]
+
+            # Crear entrada de pregunta si no existe
+            if pregunta.id not in preguntas:
+                preguntas[pregunta.id] = {
+                    "pregunta_id": pregunta.id,
+                    "enunciado": pregunta.enunciado,
+                    "opciones": {}
+                }
+
+            # Registrar respuesta seleccionada
+            if respuesta.opcion_respuesta:
+                desc = respuesta.opcion_respuesta.descripcion
+                preguntas[pregunta.id]["opciones"].setdefault(desc, 0)
+                preguntas[pregunta.id]["opciones"][desc] += 1
+
+    # Convertir a formato de salida
+    for seccion_data in estadisticas_por_seccion.values():
+        for pregunta in seccion_data["preguntas"].values():
+            total_respuestas = sum(pregunta["opciones"].values())
+            opciones_list = []
+            for desc, count in pregunta["opciones"].items():
+                porcentaje = (count / total_respuestas * 100) if total_respuestas > 0 else 0
+                opciones_list.append({
+                    "descripcion": desc,
+                    "cantidad": count,
+                    "porcentaje": round(porcentaje, 2)
+                })
+            pregunta["opciones"] = opciones_list
+
+        seccion_data["preguntas"] = list(seccion_data["preguntas"].values())
+
+    return {
+        "materia_id": materia.id_materia,
+        "nombre_materia": materia.nombre,
+        "total_inscriptos": len(materia.inscripciones),
+        "total_encuestas_procesadas": total_encuestas,
+        "secciones": list(estadisticas_por_seccion.values())
+    }
+
