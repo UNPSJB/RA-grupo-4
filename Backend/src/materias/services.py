@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session, subqueryload, joinedload
 from typing import List
 from . import models
+from src.materias import exceptions
 from src.materias.models import Materias
 from src.inscripciones.models import Inscripciones
 from src.respuestas.models import Respuesta
@@ -99,7 +100,7 @@ def obtener_estadisticas_materia(db: Session, materia_id: int):
     )
 
     if not materia:
-        return {"error": "Materia no encontrada"}
+        return exceptions.MateriaNoEncontrada
 
     inscripciones = [i for i in materia.inscripciones if i.encuesta_procesada]
     total_encuestas = len(inscripciones)
@@ -150,15 +151,40 @@ def obtener_estadisticas_materia(db: Session, materia_id: int):
     for seccion_data in estadisticas_por_seccion.values():
         for pregunta in seccion_data["preguntas"].values():
             total_respuestas = sum(pregunta["opciones"].values())
-            opciones_list = []
+            opciones_lista = []
             for desc, count in pregunta["opciones"].items():
                 porcentaje = (count / total_respuestas * 100) if total_respuestas > 0 else 0
-                opciones_list.append({
+                opciones_lista.append({
                     "descripcion": desc,
                     "cantidad": count,
                     "porcentaje": round(porcentaje, 2)
                 })
-            pregunta["opciones"] = opciones_list
+
+            # Mapa de orden semántico para las opciones respuesta
+            orden_semantico = {
+                "muy bueno": 1,
+                "bueno": 2,
+                "regular": 3,
+                "malo": 4,
+                "una":11,
+                "mas de una":12,
+                "mas 50%":21,
+                "entre 0 y 50%":22,
+                "suficientes":32,
+                "escasos":31
+            }
+            # Función de orden que busca coincidencias parciales y es case-insensitive
+            def prioridad(op):
+                desc = op["descripcion"].strip().lower()
+                for clave, valor in orden_semantico.items():
+                    if clave in desc:
+                        return valor
+                # si no coincide, mandalo al final
+                return 999  
+
+            opciones_lista.sort(key=prioridad)
+            # opciones_list.sort(key=prioridad, reverse=True) # invertir orden 
+            pregunta["opciones"] = opciones_lista
 
         seccion_data["preguntas"] = list(seccion_data["preguntas"].values())
 

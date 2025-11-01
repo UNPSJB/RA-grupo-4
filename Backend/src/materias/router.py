@@ -49,13 +49,6 @@ def leer_estadisticas_por_docente(id_docente: int, db: Session = Depends(get_db)
 
 
 
-
-
-
-
-
-
-
 @router.get("/{materia_id}/estadisticas/preguntas")
 def obtener_estadisticas_materia(materia_id: int, db: Session = Depends(get_db)):
     """
@@ -63,8 +56,5 @@ def obtener_estadisticas_materia(materia_id: int, db: Session = Depends(get_db))
     para una materia específica, basadas en las encuestas procesadas.
     """
     resultado = services.obtener_estadisticas_materia(db, materia_id)
-    
-    if "error" in resultado:
-        raise HTTPException(status_code=404, detail=resultado["error"])
     
     return resultado

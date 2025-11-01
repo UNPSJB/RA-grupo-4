@@ -12,6 +12,7 @@ import PaginaEstadisticasDoc from "./Componentes/PaginaEstadisticasDoc";
 import HomePage from "./Componentes/HomePage";
 import GenerarInformeACDoc from "./Componentes/GenerarInformeAC";
 
+import EstadisticasPreguntasPage from "./Componentes/EstadisticasPorPregunta";
 
 const DropdownMenu: React.FC<{ title: string; children: React.ReactNode }> = ({ title, children }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -75,6 +76,7 @@ function App() {
                   <Link to="/home/informes-doc">Listar Informes</Link>
                   <Link to="/home/generar-informe">Generar Informe AC</Link>
                   <Link to="/home/estadisticas-docente">Ver Estadísticas Materias</Link>
+                  <Link to="/home/estadisticas-preguntas">Ver Estadísticas de preguntas</Link>
                 </DropdownMenu>
 
                 <DropdownMenu title="Funcionalidades Departamento">
@@ -103,6 +105,7 @@ function App() {
                 <Route path="responder-encuesta/:inscripcionId" element={<ResponderEncuesta />} />
                 <Route path="informes-sinteticos" element={<SeleccionarInformeSinteticoSEC />} />
                 <Route path="estadisticas-docente" element={<PaginaEstadisticasDoc />} />
+                <Route path="estadisticas-preguntas" element={<EstadisticasPreguntasPage/>} />
                 <Route path="generar-informe" element={<GenerarInformeACDoc />} />
 
               </Routes>
