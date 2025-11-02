@@ -52,8 +52,8 @@ def leer_estadisticas_por_docente(id_docente: int, db: Session = Depends(get_db)
 @router.get("/{materia_id}/estadisticas/preguntas")
 def obtener_estadisticas_materia(materia_id: int, db: Session = Depends(get_db)):
     """
-    Devuelve las estadísticas de preguntas cerradas por sección
-    para una materia específica, basadas en las encuestas procesadas.
+    Devuelve las estadísticas de preguntas cerradas y abiertas por sección
+    para una materia específica, basado en las encuestas procesadas.
     """
     resultado = services.obtener_estadisticas_materia(db, materia_id)
     

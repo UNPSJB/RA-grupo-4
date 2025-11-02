@@ -111,7 +111,7 @@ def obtener_estadisticas_materia(db: Session, materia_id: int):
     for inscripcion in inscripciones:
         for respuesta in inscripcion.respuestas:
             pregunta = respuesta.pregunta
-            if not pregunta or pregunta.tipo != TipoPregunta.CERRADA:
+            if not pregunta: #or pregunta.tipo != TipoPregunta.CERRADA:
                 continue
 
             seccion = pregunta.seccion
@@ -138,53 +138,66 @@ def obtener_estadisticas_materia(db: Session, materia_id: int):
                 preguntas[pregunta.id] = {
                     "pregunta_id": pregunta.id,
                     "enunciado": pregunta.enunciado,
-                    "opciones": {}
+                    "tipo": pregunta.tipo,
+                    "opciones": {},
+                    "respuestas_abiertas": []
                 }
-
+            
             # Registrar respuesta seleccionada
-            if respuesta.opcion_respuesta:
-                desc = respuesta.opcion_respuesta.descripcion
-                preguntas[pregunta.id]["opciones"].setdefault(desc, 0)
-                preguntas[pregunta.id]["opciones"][desc] += 1
+            if pregunta.tipo == TipoPregunta.CERRADA:
+                if respuesta.opcion_respuesta:
+                    desc = respuesta.opcion_respuesta.descripcion
+                    preguntas[pregunta.id]["opciones"].setdefault(desc, 0)
+                    preguntas[pregunta.id]["opciones"][desc] += 1
+            
+            if pregunta.tipo == TipoPregunta.ABIERTA:
+                if respuesta.respuesta_abierta:
+                    preguntas[pregunta.id]["respuestas_abiertas"].append(respuesta.respuesta_abierta.strip())
 
     # Convertir a formato de salida
     for seccion_data in estadisticas_por_seccion.values():
         for pregunta in seccion_data["preguntas"].values():
-            total_respuestas = sum(pregunta["opciones"].values())
-            opciones_lista = []
-            for desc, count in pregunta["opciones"].items():
-                porcentaje = (count / total_respuestas * 100) if total_respuestas > 0 else 0
-                opciones_lista.append({
-                    "descripcion": desc,
-                    "cantidad": count,
-                    "porcentaje": round(porcentaje, 2)
-                })
+            
+            if pregunta["tipo"] == TipoPregunta.CERRADA:
+                #si es cerrada se calcula el porcentaje
+                total_respuestas = sum(pregunta["opciones"].values())
+                opciones_lista = []
+                for desc, count in pregunta["opciones"].items():
+                    porcentaje = (count / total_respuestas * 100) if total_respuestas > 0 else 0
+                    opciones_lista.append({
+                        "descripcion": desc,
+                        "cantidad": count,
+                        "porcentaje": round(porcentaje, 2)
+                    })
 
-            # Mapa de orden semántico para las opciones respuesta
-            orden_semantico = {
-                "muy bueno": 1,
-                "bueno": 2,
-                "regular": 3,
-                "malo": 4,
-                "una":11,
-                "mas de una":12,
-                "mas 50%":21,
-                "entre 0 y 50%":22,
-                "suficientes":32,
-                "escasos":31
-            }
-            # Función de orden que busca coincidencias parciales y es case-insensitive
-            def prioridad(op):
-                desc = op["descripcion"].strip().lower()
-                for clave, valor in orden_semantico.items():
-                    if clave in desc:
-                        return valor
-                # si no coincide, mandalo al final
-                return 999  
+                # Mapa de orden semántico para las opciones respuesta
+                orden_semantico = {
+                    "muy bueno": 1,
+                    "bueno": 2,
+                    "regular": 3,
+                    "malo": 4,
+                    "una":11,
+                    "mas de una":12,
+                    "mas 50%":21,
+                    "entre 0 y 50%":22,
+                    "suficientes":32,
+                    "escasos":31
+                }
+                # Función de orden que busca coincidencias parciales y es case-insensitive
+                def prioridad(op):
+                    desc = op["descripcion"].strip().lower()
+                    for clave, valor in orden_semantico.items():
+                        if clave in desc:
+                            return valor
+                    # si no coincide, mandalo al final
+                    return 999  
 
-            opciones_lista.sort(key=prioridad)
-            # opciones_list.sort(key=prioridad, reverse=True) # invertir orden 
-            pregunta["opciones"] = opciones_lista
+                opciones_lista.sort(key=prioridad)
+                # opciones_list.sort(key=prioridad, reverse=True) # invertir orden 
+                pregunta["opciones"] = opciones_lista
+
+            elif pregunta["tipo"] == TipoPregunta.ABIERTA:
+                pregunta.pop("opciones", None)  # vacia el diccionario de opciones (aunque debe estar vacio)
 
         seccion_data["preguntas"] = list(seccion_data["preguntas"].values())
 
