@@ -9,7 +9,8 @@ type OpcionRespuesta = {
 type Pregunta = {
     pregunta_id: number;
     enunciado: string;
-    opciones: OpcionRespuesta[];
+    opciones?: OpcionRespuesta[];
+    respuestas_abiertas?: string[];
 };
 
 type Seccion = {
@@ -31,10 +32,17 @@ export const MateriaEstadisticasAcordeones: React.FC<{ data: MateriaEstadisticas
     data,
 }) => {
     const [abiertas, setAbiertas] = useState<number[]>(data.secciones.map((s) => s.seccion_id));
+    const [preguntasAbiertas, setPreguntasAbiertas] = useState<number[]>([]);
 
     const toggleSeccion = (id: number) => {
         setAbiertas((prev) =>
             prev.includes(id) ? prev.filter((sid) => sid !== id) : [...prev, id]
+        );
+    };
+
+    const togglePregunta = (id: number) => {
+        setPreguntasAbiertas((prev) =>
+            prev.includes(id) ? prev.filter((pid) => pid !== id) : [...prev, id]
         );
     };
 
@@ -127,113 +135,205 @@ export const MateriaEstadisticasAcordeones: React.FC<{ data: MateriaEstadisticas
                                 >
                                     <legend style={{ display: "none" }} />
 
-                                    {seccion.preguntas.map((pregunta) => (
-                                        <div
-                                            key={pregunta.pregunta_id}
-                                            style={{
-                                                backgroundColor: "#fff",
-                                                border: "1px solid #e0e0e0",
-                                                borderRadius: "8px",
-                                                padding: "12px 16px 24px 16px",
-                                                display: "flex",
-                                                flexDirection: "column",
-                                                gap: "8px",
-                                                position: "relative",
-                                            }}
-                                        >
-                                            <h4
-                                                style={{
-                                                    color: "#000",
-                                                    fontWeight: "bold",
-                                                    fontSize: "15px",
-                                                    marginBottom: "4px",
-                                                }}
-                                            >
-                                                {pregunta.enunciado}
-                                            </h4>
+                                    {seccion.preguntas.map((pregunta) => {
+                                        const esAbierta =
+                                            pregunta.respuestas_abiertas &&
+                                            pregunta.respuestas_abiertas.length > 0;
+                                        const preguntaAbierta =
+                                            preguntasAbiertas.includes(pregunta.pregunta_id);
 
-                                            {/* Barras horizontales */}
+                                        return (
                                             <div
+                                                key={pregunta.pregunta_id}
                                                 style={{
+                                                    backgroundColor: "#fff",
+                                                    border: "1px solid #e0e0e0",
+                                                    borderRadius: "8px",
+                                                    padding: "12px 16px",
                                                     display: "flex",
                                                     flexDirection: "column",
                                                     gap: "8px",
                                                     position: "relative",
-                                                    borderTop: "1px dashed rgba(0,0,0,0.1)",
-                                                    paddingTop: "10px",
                                                 }}
                                             >
-                                                {pregunta.opciones.map((op, idx) => (
-                                                    <div
-                                                        key={idx}
+                                                {/* Encabezado de la pregunta */}
+                                                <div
+                                                    style={{
+                                                        display: "flex",
+                                                        justifyContent: "space-between",
+                                                        alignItems: "center",
+                                                    }}
+                                                >
+                                                    <h4
                                                         style={{
-                                                            display: "grid",
-                                                            gridTemplateColumns: "160px 1fr",
-                                                            alignItems: "center",
-                                                            gap: "8px",
+                                                            color: "#000",
+                                                            fontWeight: "bold",
+                                                            fontSize: "15px",
+                                                            margin: "0",
                                                         }}
                                                     >
-                                                        <span
+                                                        {pregunta.enunciado}
+                                                    </h4>
+
+                                                    {esAbierta && (
+                                                        <button
+                                                            onClick={() =>
+                                                                togglePregunta(pregunta.pregunta_id)
+                                                            }
                                                             style={{
+                                                                background: "none",
+                                                                border: "none",
+                                                                color: "#0078D4",
+                                                                cursor: "pointer",
                                                                 fontSize: "14px",
-                                                                color: "#000",
-                                                                textAlign: "right",
                                                             }}
                                                         >
-                                                            {op.descripcion}
-                                                        </span>
+                                                            {preguntaAbierta
+                                                                ? "Ocultar respuestas ▲"
+                                                                : "Ver respuestas ▼"}
+                                                        </button>
+                                                    )}
+                                                </div>
 
+                                                {/* Si es cerrada → mostrar barras */}
+                                                {pregunta.opciones &&
+                                                    pregunta.opciones.length > 0 && (
                                                         <div
                                                             style={{
-                                                                position: "relative",
-                                                                backgroundColor: "#eef5fb",
-                                                                borderRadius: "6px",
-                                                                height: "22px",
-                                                                overflow: "hidden",
+                                                                display: "flex",
+                                                                flexDirection: "column",
+                                                                gap: "8px",
+                                                                borderTop:
+                                                                    "1px dashed rgba(0,0,0,0.1)",
+                                                                paddingTop: "10px",
                                                             }}
                                                         >
-                                                            <div
-                                                                className="barra-animada"
-                                                                style={{
-                                                                    height: "100%",
-                                                                    width: `${op.porcentaje}%`,
-                                                                    backgroundColor: "#0078D4",
-                                                                    borderRadius: "6px",
-                                                                    display: "flex",
-                                                                    alignItems: "center",
-                                                                    justifyContent: "flex-end",
-                                                                    color: "#fff",
-                                                                    fontSize: "12px",
-                                                                    fontWeight: "bold",
-                                                                    paddingRight: "6px",
-                                                                    whiteSpace: "nowrap",
-                                                                }}
-                                                            >
-                                                                {op.porcentaje > 5 && `${op.porcentaje.toFixed(1)}%`}
-                                                            </div>
-
-                                                            {/* Si la barra es muy corta, mostrar el % afuera */}
-                                                            {op.porcentaje <= 5 && (
-                                                                <span
+                                                            {pregunta.opciones.map((op, idx) => (
+                                                                <div
+                                                                    key={idx}
                                                                     style={{
-                                                                        position: "absolute",
-                                                                        left: `${op.porcentaje + 1}%`,
-                                                                        top: "50%",
-                                                                        transform: "translateY(-50%)",
-                                                                        fontSize: "12px",
-                                                                        color: "#003366",
-                                                                        fontWeight: "bold",
+                                                                        display: "grid",
+                                                                        gridTemplateColumns:
+                                                                            "160px 1fr",
+                                                                        alignItems: "center",
+                                                                        gap: "8px",
                                                                     }}
                                                                 >
-                                                                    {op.porcentaje.toFixed(1)}%
-                                                                </span>
-                                                            )}
+                                                                    <span
+                                                                        style={{
+                                                                            fontSize: "14px",
+                                                                            color: "#000",
+                                                                            textAlign: "right",
+                                                                        }}
+                                                                    >
+                                                                        {op.descripcion}
+                                                                    </span>
+
+                                                                    <div
+                                                                        style={{
+                                                                            position: "relative",
+                                                                            backgroundColor:
+                                                                                "#eef5fb",
+                                                                            borderRadius: "6px",
+                                                                            height: "22px",
+                                                                            overflow: "hidden",
+                                                                        }}
+                                                                    >
+                                                                        <div
+                                                                            className="barra-animada"
+                                                                            style={{
+                                                                                height: "100%",
+                                                                                width: `${op.porcentaje}%`,
+                                                                                backgroundColor:
+                                                                                    "#0078D4",
+                                                                                borderRadius:
+                                                                                    "6px",
+                                                                                display: "flex",
+                                                                                alignItems:
+                                                                                    "center",
+                                                                                justifyContent:
+                                                                                    "flex-end",
+                                                                                color: "#fff",
+                                                                                fontSize: "12px",
+                                                                                fontWeight:
+                                                                                    "bold",
+                                                                                paddingRight:
+                                                                                    "6px",
+                                                                                whiteSpace:
+                                                                                    "nowrap",
+                                                                            }}
+                                                                        >
+                                                                            {op.porcentaje > 5 &&
+                                                                                `${op.porcentaje.toFixed(
+                                                                                    1
+                                                                                )}%`}
+                                                                        </div>
+
+                                                                        {op.porcentaje <= 5 && (
+                                                                            <span
+                                                                                style={{
+                                                                                    position:
+                                                                                        "absolute",
+                                                                                    left: `${
+                                                                                        op.porcentaje +
+                                                                                        1
+                                                                                    }%`,
+                                                                                    top: "50%",
+                                                                                    transform:
+                                                                                        "translateY(-50%)",
+                                                                                    fontSize:
+                                                                                        "12px",
+                                                                                    color: "#003366",
+                                                                                    fontWeight:
+                                                                                        "bold",
+                                                                                }}
+                                                                            >
+                                                                                {op.porcentaje.toFixed(
+                                                                                    1
+                                                                                )}
+                                                                                %
+                                                                            </span>
+                                                                        )}
+                                                                    </div>
+                                                                </div>
+                                                            ))}
                                                         </div>
+                                                    )}
+
+                                                {/* Si es abierta → mostrar respuestas */}
+                                                {esAbierta && preguntaAbierta && (
+                                                    <div
+                                                        style={{
+                                                            marginTop: "10px",
+                                                            padding: "10px",
+                                                            backgroundColor: "#f3f7fb",
+                                                            borderRadius: "6px",
+                                                            maxHeight: "250px",
+                                                            overflowY: "auto",
+                                                        }}
+                                                    >
+                                                        {pregunta.respuestas_abiertas!.map(
+                                                            (resp, idx) => (
+                                                                <p
+                                                                    key={idx}
+                                                                    style={{
+                                                                        fontSize: "14px",
+                                                                        color: "#000",
+                                                                        margin: "6px 0",
+                                                                        borderBottom:
+                                                                            "1px dashed #ccc",
+                                                                        paddingBottom: "4px",
+                                                                    }}
+                                                                >
+                                                                    • {resp}
+                                                                </p>
+                                                            )
+                                                        )}
                                                     </div>
-                                                ))}
+                                                )}
                                             </div>
-                                        </div>
-                                    ))}
+                                        );
+                                    })}
                                 </fieldset>
                             )}
                         </div>
