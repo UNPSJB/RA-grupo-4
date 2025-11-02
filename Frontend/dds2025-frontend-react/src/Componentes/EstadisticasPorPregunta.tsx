@@ -1,4 +1,13 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, memo } from "react";
+import {
+    BarChart,
+    Bar,
+    XAxis,
+    YAxis,
+    Tooltip,
+    ResponsiveContainer,
+    LabelList,
+} from "recharts";
 
 type OpcionRespuesta = {
     descripcion: string;
@@ -28,6 +37,43 @@ type MateriaEstadisticasProps = {
     secciones: Seccion[];
 };
 
+/* --- Componente memoizado para gráficos --- */
+const PreguntaGrafico: React.FC<{ opciones: OpcionRespuesta[] }> = memo(({ opciones }) => (
+    <ResponsiveContainer width="100%" height={40 * opciones.length}>
+        <BarChart
+            data={opciones}
+            layout="vertical"
+            margin={{ top: 5, right: 40, left: 0, bottom: 5 }}
+            barCategoryGap="15%"
+        >
+            <XAxis type="number" domain={[0, 100]} hide />
+            <YAxis
+                type="category"
+                dataKey="descripcion"
+                width={250}
+                tick={{ fontSize: 13, fill: "#000", textAnchor: "end" }}
+            />
+            <Tooltip
+                cursor={{ fill: "rgba(0,0,0,0.05)" }}
+                formatter={(value: number) => `${value.toFixed(1)}%`}
+            />
+            <Bar dataKey="porcentaje" fill="#0078D4" radius={[4, 4, 4, 4]}>
+                <LabelList
+                    dataKey="porcentaje"
+                    position="right"
+                    formatter={(v: number) => `${v.toFixed(1)}%`}
+                    style={{
+                        fill: "#003366",
+                        fontWeight: "bold",
+                        fontSize: 12,
+                    }}
+                />
+            </Bar>
+        </BarChart>
+    </ResponsiveContainer>
+));
+
+/* --- Componente principal --- */
 export const MateriaEstadisticasAcordeones: React.FC<{ data: MateriaEstadisticasProps }> = ({
     data,
 }) => {
@@ -64,9 +110,16 @@ export const MateriaEstadisticasAcordeones: React.FC<{ data: MateriaEstadisticas
                     to { opacity: 1; transform: translateY(0); }
                 }
 
-                .barra-animada {
-                    transition: width 0.6s ease;
-                    position: relative;
+                /* Scroll personalizado */
+                .scroll-area::-webkit-scrollbar {
+                    width: 8px;
+                }
+                .scroll-area::-webkit-scrollbar-thumb {
+                    background-color: #a5c7e6;
+                    border-radius: 8px;
+                }
+                .scroll-area::-webkit-scrollbar-thumb:hover {
+                    background-color: #7aaed6;
                 }
                 `}
             </style>
@@ -92,7 +145,6 @@ export const MateriaEstadisticasAcordeones: React.FC<{ data: MateriaEstadisticas
                                 boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
                             }}
                         >
-                            {/* Encabezado del acordeón */}
                             <button
                                 onClick={() => toggleSeccion(seccion.seccion_id)}
                                 style={{
@@ -117,17 +169,21 @@ export const MateriaEstadisticasAcordeones: React.FC<{ data: MateriaEstadisticas
                                 <span style={{ fontSize: "18px" }}>{abierta ? "▲" : "▼"}</span>
                             </button>
 
-                            {/* Contenido de preguntas */}
-                            {abierta && (
+                            <div
+                                style={{
+                                    maxHeight: abierta ? "5000px" : "0",
+                                    overflow: "hidden",
+                                    opacity: abierta ? 1 : 0,
+                                    transition: "all 0.5s ease",
+                                    backgroundColor: "#f9f9f9",
+                                }}
+                            >
                                 <fieldset
                                     style={{
                                         border: "2px solid #003366",
                                         borderTop: "none",
                                         borderRadius: "0 0 8px 8px",
-                                        backgroundColor: "#f9f9f9",
                                         padding: "20px",
-                                        marginTop: "0",
-                                        transition: "all 0.3s ease",
                                         display: "flex",
                                         flexDirection: "column",
                                         gap: "12px",
@@ -149,14 +205,13 @@ export const MateriaEstadisticasAcordeones: React.FC<{ data: MateriaEstadisticas
                                                     backgroundColor: "#fff",
                                                     border: "1px solid #e0e0e0",
                                                     borderRadius: "8px",
-                                                    padding: "12px 16px",
+                                                    padding: "16px",
                                                     display: "flex",
                                                     flexDirection: "column",
-                                                    gap: "8px",
-                                                    position: "relative",
+                                                    gap: "12px",
                                                 }}
                                             >
-                                                {/* Encabezado de la pregunta */}
+                                                {/* Encabezado */}
                                                 <div
                                                     style={{
                                                         display: "flex",
@@ -169,7 +224,7 @@ export const MateriaEstadisticasAcordeones: React.FC<{ data: MateriaEstadisticas
                                                             color: "#000",
                                                             fontWeight: "bold",
                                                             fontSize: "15px",
-                                                            margin: "0",
+                                                            margin: 0,
                                                         }}
                                                     >
                                                         {pregunta.enunciado}
@@ -177,156 +232,103 @@ export const MateriaEstadisticasAcordeones: React.FC<{ data: MateriaEstadisticas
 
                                                     {esAbierta && (
                                                         <button
-                                                            onClick={() =>
-                                                                togglePregunta(pregunta.pregunta_id)
-                                                            }
+                                                            onClick={() => togglePregunta(pregunta.pregunta_id)}
                                                             style={{
-                                                                background: "none",
-                                                                border: "none",
-                                                                color: "#0078D4",
+                                                                backgroundColor: "#e6f2ff",
+                                                                border: "1px solid #a5c7e6",
+                                                                color: "#003366",
+                                                                borderRadius: "8px",
                                                                 cursor: "pointer",
-                                                                fontSize: "14px",
+                                                                fontSize: "13px",
+                                                                fontWeight: "bold",
+                                                                width: "90px",
+                                                                height: "58px",
+                                                                lineHeight: "1.1",
+                                                                display: "flex",
+                                                                flexDirection: "column",
+                                                                justifyContent: "center",
+                                                                alignItems: "center",
+                                                                textAlign: "center",
+                                                                transition: "background-color 0.2s ease, transform 0.1s ease",
+                                                            }}
+                                                            onMouseEnter={(e) => {
+                                                                e.currentTarget.style.backgroundColor = "#d6e9ff";
+                                                                e.currentTarget.style.transform = "scale(1.03)";
+                                                            }}
+                                                            onMouseLeave={(e) => {
+                                                                e.currentTarget.style.backgroundColor = "#e6f2ff";
+                                                                e.currentTarget.style.transform = "scale(1)";
                                                             }}
                                                         >
-                                                            {preguntaAbierta
-                                                                ? "Ocultar respuestas ▲"
-                                                                : "Ver respuestas ▼"}
+                                                            {preguntaAbierta ? (
+                                                                <>
+                                                                    <span>Ocultar</span>
+                                                                    <span>Respuestas</span>
+                                                                    <span style={{ fontSize: "16px", lineHeight: "1" }}>▲</span>
+                                                                </>
+                                                            ) : (
+                                                                <>
+                                                                    <span>Ver</span>
+                                                                    <span>Respuestas</span>
+                                                                    <span style={{ fontSize: "16px", lineHeight: "1" }}>▼</span>
+                                                                </>
+                                                            )}
                                                         </button>
                                                     )}
                                                 </div>
 
-                                                {/* Si es cerrada → mostrar barras */}
+                                                {/* Cerradas con Recharts */}
                                                 {pregunta.opciones &&
                                                     pregunta.opciones.length > 0 && (
                                                         <div
                                                             style={{
-                                                                display: "flex",
-                                                                flexDirection: "column",
-                                                                gap: "8px",
-                                                                borderTop:
-                                                                    "1px dashed rgba(0,0,0,0.1)",
-                                                                paddingTop: "10px",
+                                                                backgroundColor: "#f3f7fb",
+                                                                borderRadius: "6px",
+                                                                padding: "10px 20px",
                                                             }}
                                                         >
-                                                            {pregunta.opciones.map((op, idx) => (
-                                                                <div
-                                                                    key={idx}
-                                                                    style={{
-                                                                        display: "grid",
-                                                                        gridTemplateColumns:
-                                                                            "160px 1fr",
-                                                                        alignItems: "center",
-                                                                        gap: "8px",
-                                                                    }}
-                                                                >
-                                                                    <span
-                                                                        style={{
-                                                                            fontSize: "14px",
-                                                                            color: "#000",
-                                                                            textAlign: "right",
-                                                                        }}
-                                                                    >
-                                                                        {op.descripcion}
-                                                                    </span>
-
-                                                                    <div
-                                                                        style={{
-                                                                            position: "relative",
-                                                                            backgroundColor:
-                                                                                "#eef5fb",
-                                                                            borderRadius: "6px",
-                                                                            height: "22px",
-                                                                            overflow: "hidden",
-                                                                        }}
-                                                                    >
-                                                                        <div
-                                                                            className="barra-animada"
-                                                                            style={{
-                                                                                height: "100%",
-                                                                                width: `${op.porcentaje}%`,
-                                                                                backgroundColor:
-                                                                                    "#0078D4",
-                                                                                borderRadius:
-                                                                                    "6px",
-                                                                                display: "flex",
-                                                                                alignItems:
-                                                                                    "center",
-                                                                                justifyContent:
-                                                                                    "flex-end",
-                                                                                color: "#fff",
-                                                                                fontSize: "12px",
-                                                                                fontWeight:
-                                                                                    "bold",
-                                                                                paddingRight:
-                                                                                    "6px",
-                                                                                whiteSpace:
-                                                                                    "nowrap",
-                                                                            }}
-                                                                        >
-                                                                            {op.porcentaje > 5 &&
-                                                                                `${op.porcentaje.toFixed(
-                                                                                    1
-                                                                                )}%`}
-                                                                        </div>
-
-                                                                        {op.porcentaje <= 5 && (
-                                                                            <span
-                                                                                style={{
-                                                                                    position:
-                                                                                        "absolute",
-                                                                                    left: `${
-                                                                                        op.porcentaje +
-                                                                                        1
-                                                                                    }%`,
-                                                                                    top: "50%",
-                                                                                    transform:
-                                                                                        "translateY(-50%)",
-                                                                                    fontSize:
-                                                                                        "12px",
-                                                                                    color: "#003366",
-                                                                                    fontWeight:
-                                                                                        "bold",
-                                                                                }}
-                                                                            >
-                                                                                {op.porcentaje.toFixed(
-                                                                                    1
-                                                                                )}
-                                                                                %
-                                                                            </span>
-                                                                        )}
-                                                                    </div>
-                                                                </div>
-                                                            ))}
+                                                            <PreguntaGrafico
+                                                                opciones={pregunta.opciones}
+                                                            />
                                                         </div>
                                                     )}
 
-                                                {/* Si es abierta → mostrar respuestas */}
+                                                {/* Abiertas con tarjetas */}
                                                 {esAbierta && preguntaAbierta && (
                                                     <div
+                                                        className="scroll-area"
                                                         style={{
-                                                            marginTop: "10px",
-                                                            padding: "10px",
+                                                            marginTop: "12px",
                                                             backgroundColor: "#f3f7fb",
-                                                            borderRadius: "6px",
-                                                            maxHeight: "250px",
+                                                            borderRadius: "8px",
+                                                            padding: "12px",
+                                                            maxHeight: "350px",
                                                             overflowY: "auto",
+                                                            display: "flex",
+                                                            flexDirection: "column",
+                                                            gap: "12px",
                                                         }}
                                                     >
                                                         {pregunta.respuestas_abiertas!.map(
                                                             (resp, idx) => (
-                                                                <p
+                                                                <div
                                                                     key={idx}
                                                                     style={{
+                                                                        backgroundColor: "#fff",
+                                                                        border: "1px solid #cce4f6",
+                                                                        borderRadius: "8px",
+                                                                        padding: "12px 14px",
                                                                         fontSize: "14px",
                                                                         color: "#000",
-                                                                        margin: "6px 0",
-                                                                        borderBottom:
-                                                                            "1px dashed #ccc",
-                                                                        paddingBottom: "4px",
+                                                                        boxShadow:
+                                                                            "0 2px 4px rgba(0,0,0,0.05)",
+                                                                        whiteSpace: "pre-wrap",
+                                                                        wordBreak: "break-word",
+                                                                        lineHeight: 1.5,
                                                                     }}
                                                                 >
-                                                                    • {resp}
-                                                                </p>
+                                                                    {resp}
+                                                                </div>
                                                             )
                                                         )}
                                                     </div>
@@ -335,7 +337,7 @@ export const MateriaEstadisticasAcordeones: React.FC<{ data: MateriaEstadisticas
                                         );
                                     })}
                                 </fieldset>
-                            )}
+                            </div>
                         </div>
                     );
                 })}
@@ -344,6 +346,7 @@ export const MateriaEstadisticasAcordeones: React.FC<{ data: MateriaEstadisticas
     );
 };
 
+/* --- Página principal --- */
 const EstadisticasPreguntasPage: React.FC = () => {
     const [data, setData] = useState<MateriaEstadisticasProps | null>(null);
     const [loading, setLoading] = useState(true);
@@ -367,10 +370,8 @@ const EstadisticasPreguntasPage: React.FC = () => {
 
     if (loading)
         return <p style={{ fontFamily: '"Segoe UI", "Roboto", sans-serif' }}>Cargando estadísticas...</p>;
-    if (error)
-        return <p style={{ color: "#dc3545", fontWeight: "bold" }}>Error: {error}</p>;
-    if (!data)
-        return <p>No hay datos para mostrar.</p>;
+    if (error) return <p style={{ color: "#dc3545", fontWeight: "bold" }}>Error: {error}</p>;
+    if (!data) return <p>No hay datos para mostrar.</p>;
 
     return (
         <div
