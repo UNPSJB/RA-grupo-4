@@ -11,10 +11,10 @@ import ResponderEncuesta from "./Componentes/ResponderEncuesta";
 import PaginaEstadisticasDoc from "./Componentes/PaginaEstadisticasDoc";
 import HomePage from "./Componentes/HomePage";
 import GenerarInformeACDoc from "./Componentes/GenerarInformeAC";
+import HistorialInformesACDoc from "./Componentes/HistorialInformesACDoc";
 
 
 const DropdownMenu: React.FC<{ title: string; children: React.ReactNode }> = ({ title, children }) => {
-  // (Tu componente DropdownMenu sin cambios)
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const toggleDropdown = () => setIsOpen(!isOpen);
@@ -69,10 +69,9 @@ function App() {
                   <Link to="/home/seleccionar">Seleccionar Encuestas</Link>
                 </DropdownMenu>
 
-                {/* --- MODIFICADO (Link eliminado) --- */}
                 <DropdownMenu title="Funcionalidades Docente">
                   <Link to="/home/informes-doc">Informes Pendientes</Link>
-                  {/* <Link to="/home/generar-informe">Generar Informe AC</Link> <-- ELIMINADO */}
+                  <Link to="/home/historial-informes">Historial de Informes</Link>
                   <Link to="/home/estadisticas-docente">Ver Estadísticas Materias</Link>
                 </DropdownMenu>
 
@@ -98,22 +97,13 @@ function App() {
                 />
                 <Route path="seleccionar" element={<SeleccionarEncuestas />} />
                 <Route path="informes-dep" element={<FiltradoInformeACDep />} />
-                
                 <Route path="informes-doc" element={<ListadoInformesACDoc />} />
-                
                 <Route path="responder-encuesta/:inscripcionId" element={<ResponderEncuesta />} />
                 <Route path="informes-sinteticos" element={<SeleccionarInformeSinteticoSEC />} />
                 <Route path="estadisticas-docente" element={<PaginaEstadisticasDoc />} />
-                
-                {/* --- RUTA ELIMINADA --- */}
-                {/* <Route path="generar-informe" element={<GenerarInformeACDoc />} /> */}
-                
-                {/* --- RUTA MODIFICADA (Única forma de generar) --- */}
-                <Route 
-                  path="generar-informe/:id_materia" 
-                  element={<GenerarInformeACDoc />} 
+                <Route path="generar-informe/:id_materia" element={<GenerarInformeACDoc />} />
+                <Route path="historial-informes" element={<HistorialInformesACDoc />} 
                 />
-                {/* --- FIN MODIFICACIÓN --- */}
 
               </Routes>
             </div>
