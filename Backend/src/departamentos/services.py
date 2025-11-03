@@ -2,7 +2,7 @@ from typing import List
 from sqlalchemy import delete, select, update
 from sqlalchemy.orm import Session
 from src.departamentos.models import Departamento
-from src.departamentos import schemas, exceptions
+from src.departamentos import schemas, exceptions, models
 
 
 # operaciones CRUD para Departamento
@@ -16,8 +16,10 @@ def crear_departamento(db: Session, departamento: schemas.DepartamentoCreate) ->
     return _departamento
 
 
-def listar_departamentos(db: Session) -> List[schemas.Departamento]:
-    return db.scalars(select(Departamento)).all()
+# def listar_departamentos(db: Session) -> List[schemas.Departamento]:
+#     return db.scalars(select(Departamento)).all()
+def listar_departamentos(db: Session):
+    return db.query(models.Departamento).all()
 
 
 def leer_departamento(db: Session, departamento_id: int) -> schemas.Departamento:

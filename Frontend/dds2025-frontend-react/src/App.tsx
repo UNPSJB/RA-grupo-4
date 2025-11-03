@@ -11,6 +11,8 @@ import ResponderEncuesta from "./Componentes/ResponderEncuesta";
 import PaginaEstadisticasDoc from "./Componentes/PaginaEstadisticasDoc";
 import HomePage from "./Componentes/HomePage";
 import GenerarInformeACDoc from "./Componentes/GenerarInformeAC";
+//nuevo
+import GenerarInformeSinteticoDep from "./Componentes/GenerarInformeSinteticoDep";
 
 import EstadisticasPreguntasPage from "./Componentes/EstadisticasPorPregunta";
 
@@ -81,6 +83,7 @@ function App() {
 
                 <DropdownMenu title="Funcionalidades Departamento">
                   <Link to="/home/informes-dep">Informes Dept.</Link>
+                  <Link to= "/home/generar-sintetico">Generar informe Sintetico.</Link>
                 </DropdownMenu>
 
                 <DropdownMenu title="Funcionalidades Secretaría">
@@ -107,7 +110,7 @@ function App() {
                 <Route path="estadisticas-docente" element={<PaginaEstadisticasDoc />} />
                 <Route path="estadisticas-preguntas" element={<EstadisticasPreguntasPage/>} />
                 <Route path="generar-informe" element={<GenerarInformeACDoc />} />
-
+                <Route path="generar-sintetico" element={<GenerarInformeSinteticoDep />} />
               </Routes>
             </div>
 
