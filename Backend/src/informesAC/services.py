@@ -33,8 +33,7 @@ def listar_todos_los_informes(db: Session):
     return db.query(models.InformesAC).all()
 
 
-# --- MODIFICADO ---
-# Esta función ahora solo lista informes COMPLETADOS (para el Historial)
+# --- MODIFICADO (Lógica de filtrado) ---
 def filtrar_informes(
     db: Session,
     id_docente: int | None = None,
@@ -51,9 +50,9 @@ def filtrar_informes(
     if id_materia is not None:
         query = query.filter(InformesAC.id_materia == id_materia)
         
-    # --- LÓGICA DE BANDERA ---
-    # Filtra solo por informes completados (completado = 1)
-    query = query.filter(InformesAC.completado == 1)
+    # --- LÓGICA DE BANDERA (MODIFICADA) ---
+    # Filtra solo por informes cuya materia asociada esté marcada como completada
+    query = query.join(Materias).filter(Materias.informeACCompletado == True)
     
     return query.all()
 
@@ -71,9 +70,9 @@ def actualizar_opinion_informe(db: Session, id_informe: int, opinion: str):
 
 
 def cargar_resumen_secciones_informe(informe: InformesAC, db: Session):
+    # (Tu función original sin cambios)
     if informe.resumenSecciones:
         return informe.resumenSecciones
-
     materia = (
         db.query(Materias)
         .options(
@@ -85,71 +84,64 @@ def cargar_resumen_secciones_informe(informe: InformesAC, db: Session):
         .filter(Materias.id_materia == informe.id_materia)
         .first()
     )
-
     if not materia:
         raise exceptionsMaterias.MateriaNoEncontrada
-        # raise HTTPException(status_code=404, detail="Materia no encontrada") # Esta línea estaba duplicada
-
     inscripciones = (
         db.query(Inscripciones)
         .options(joinedload(Inscripciones.respuestas).joinedload(Respuesta.opcion_respuesta))
         .filter(Inscripciones.materia_id == informe.id_materia)
         .all()
     )
-
     resumen_general = []
     for seccion in materia.encuesta.secciones:
         conteo_por_desc = defaultdict(int)
         total_respuestas = 0
         preguntas_ids = [p.id for p in seccion.preguntas]
-
         for ins in inscripciones:
             for r in ins.respuestas:
                 if r.pregunta_id in preguntas_ids and r.opcion_respuesta:
                     desc = r.opcion_respuesta.descripcion.strip()
                     conteo_por_desc[desc] += 1
                     total_respuestas += 1
-
         if total_respuestas == 0:
             continue
-
         orden_preferido = [
             "Malo, No Satisfactorio",
             "Regular, Poco Satisfactorio.",
             "Bueno, Satisfactorio.",
             "Muy Bueno, Muy satisfactorio.",
         ]
-
         opciones_texto = [o.descripcion.strip() for o in seccion.preguntas[0].opciones_respuestas]
-
         opciones_ordenadas = [
             opt for opt in orden_preferido if opt in opciones_texto
         ] + [
             opt for opt in opciones_texto if opt not in orden_preferido
         ]
-
         porcentajes = {}
         for desc in opciones_ordenadas:
             cantidad = conteo_por_desc.get(desc, 0)
             porcentajes[desc] = round((cantidad / total_respuestas) * 100, 2)
-
-
         resumen_general.append({
             "id": seccion.id,
             "sigla": seccion.sigla,
             "nombre": seccion.descripcion,
             "porcentajes_opciones": porcentajes
         })
-
     informe.resumenSecciones = resumen_general
     return informe.resumenSecciones
 
 
-# --- MODIFICADO (Seteamos la bandera 'completado = 1' al crear) ---
+# --- MODIFICADO (Seteamos la bandera 'completado = 1' en Materia) ---
 def create_informe_ac(db: Session, informe: schemas.InformeACCreate):
     
     # La validación "todo o nada" ya la hizo Pydantic
     
+    # 1. Buscar la materia
+    materia_db = db.get(Materias, informe.id_materia)
+    if not materia_db:
+        raise exceptionsMaterias.MateriaNoEncontrada()
+
+    # 2. Convertir datos JSON
     valoraciones_dict = None
     if informe.valoracion_auxiliares:
         valoraciones_dict = [v.model_dump() for v in informe.valoracion_auxiliares]
@@ -162,6 +154,7 @@ def create_informe_ac(db: Session, informe: schemas.InformeACCreate):
     if informe.actividades:
         db_actividades = [Actividades(**act.model_dump()) for act in informe.actividades]
 
+    # 3. Crear el objeto InformeAC
     db_informe = models.InformesAC(
         # --- LÓGICA DE BANDERA ---
         # Si Pydantic lo aceptó, está completo. Seteamos 1.
@@ -198,7 +191,17 @@ def create_informe_ac(db: Session, informe: schemas.InformeACCreate):
         actividades=db_actividades
     )
     
-    db.add(db_informe)
-    db.commit()
-    db.refresh(db_informe)
+    # 4. Actualizar la bandera en la materia
+    materia_db.informeACCompletado = True
+
+    # 5. Guardar ambos cambios en una transacción
+    try:
+        db.add(db_informe)
+        db.add(materia_db)
+        db.commit()
+        db.refresh(db_informe)
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Error al guardar: {e}")
+        
     return db_informe

@@ -23,7 +23,7 @@ CREATE TABLE informesSinteticos (
 
 -- Departamentos
 INSERT INTO departamentos (nombre) VALUES
-('Matemática'),
+('Informatica'),
 ('Física'),
 ('Computación'),
 ('Química');

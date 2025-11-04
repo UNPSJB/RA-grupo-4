@@ -1,6 +1,6 @@
-from sqlalchemy import Integer, String, ForeignKey, Date
+from sqlalchemy import Integer, String, ForeignKey, Date, Boolean
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from typing import List
+from typing import List, Optional
 from src.models import ModeloBase
 
 class Materias(ModeloBase):
@@ -16,6 +16,15 @@ class Materias(ModeloBase):
 
     id_docente: Mapped[int] = mapped_column(ForeignKey("docentes.id_docente"), nullable=False)
     docente: Mapped["Docentes"] = relationship("Docentes", back_populates="Materias")
+
+    id_departamento: Mapped[int] = mapped_column(ForeignKey("departamentos.id"), nullable=False)
+    departamento: Mapped["src.departamentos.models.Departamento"] = relationship( 
+        "src.departamentos.models.Departamento", back_populates="materias" )
+
+    # --- NUEVA BANDERA (Tu lógica: 0=pendiente, 1=completado) ---
+    # Usamos Boolean para que sea NULL/False (0) por defecto y True (1) al completarse.
+    informeACCompletado: Mapped[Optional[bool]] = mapped_column(Boolean, default=False, nullable=True)
+    # --- FIN NUEVO ---
 
     informesAC: Mapped[List["InformesAC"]] = relationship(
         "InformesAC",

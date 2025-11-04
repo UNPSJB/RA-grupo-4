@@ -1,7 +1,7 @@
+from __future__ import annotations
 from pydantic import BaseModel
 from src.departamentos import exceptions
 from typing import Optional, List
-from src.informesSinteticos.schemas import InformeSintetico
 # Los siguientes schemas contienen atributos sin muchas restricciones de tipo.
 # Podemos crear atributos con ciertas reglas mediante el uso de un "Field" adecuado.
 # https://docs.pydantic.dev/latest/concepts/fields/
@@ -20,10 +20,16 @@ class DepartamentoUpdate(DepartamentoBase):
 
 class Departamento(DepartamentoBase):
     id: int
-    informesSinteticos: List[InformeSintetico] = []
+    informesSinteticos: List["InformeSintetico"] = []
+    materias: List["Materia"] = []
 
     model_config = {"from_attributes": True}
 
 
 class DepartamentoDelete(DepartamentoBase):
     id: int
+
+
+from src.informesSinteticos.schemas import InformeSintetico  # noqa: E402
+from src.materias.schemas import Materia
+Departamento.model_rebuild()

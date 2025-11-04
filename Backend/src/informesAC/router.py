@@ -68,6 +68,7 @@ def actualizar_opinion(id_informe: int, opinion: str, db: Session = Depends(get_
 
 @router.get("/resumen/{id_informe}", response_model=List[schemas.SeccionResumen])
 def obtener_resumen_secciones_informeAC(id_informe: int, db: Session = Depends(get_db)):
+    
     informe = services.read_informeAC(db, id_informe) 
     resumen_secciones = services.cargar_resumen_secciones_informe(informe, db)
     return resumen_secciones

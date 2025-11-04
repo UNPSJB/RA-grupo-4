@@ -91,10 +91,10 @@ class InformeACCreate(BaseModel):
     justificacion_porcentaje: Optional[str] = None
 
 
-# --- MODIFICADO (Añadido 'completado', quitado Optional) ---
+# --- MODIFICADO (Quitado Optional y 'completado') ---
 class InformeAC(BaseModel):
     id_informesAC: int
-    completado: int # Tu bandera (será 1)
+    # 'completado' ya no está en este modelo
     sede: SedeEnum
     ciclo_lectivo: int
     cantidad_alumnos_inscriptos: int
@@ -102,7 +102,7 @@ class InformeAC(BaseModel):
     cantidad_comisiones_practicas: int
 
     docente: DocenteOut
-    materia: MateriaOut
+    materia: MateriaOut # Materia tendrá la bandera 'informeACCompletado'
 
     # Opcionales
     necesidades_equipamiento: Optional[List[str]] = None

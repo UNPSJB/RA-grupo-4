@@ -11,11 +11,13 @@ import ResponderEncuesta from "./Componentes/ResponderEncuesta";
 import PaginaEstadisticasDoc from "./Componentes/PaginaEstadisticasDoc";
 import HomePage from "./Componentes/HomePage";
 import GenerarInformeACDoc from "./Componentes/GenerarInformeAC";
+import GenerarInformeSinteticoDep from "./Componentes/GenerarInformeSinteticoDep";
 import HistorialInformesACDoc from "./Componentes/HistorialInformesACDoc";
-import VisualizarInformeAC from "./Componentes/VisualizarInformeACDoc";
-
+import VisualizarInformeACDoc from "./Componentes/VisualizarInformeACDoc"; // Tu import usa "VisualizarInformeAC"
+import EstadisticasPreguntasPage from "./Componentes/EstadisticasPorPregunta";
 
 const DropdownMenu: React.FC<{ title: string; children: React.ReactNode }> = ({ title, children }) => {
+  // (Tu componente DropdownMenu sin cambios)
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const toggleDropdown = () => setIsOpen(!isOpen);
@@ -74,10 +76,12 @@ function App() {
                   <Link to="/home/informes-doc">Informes Pendientes</Link>
                   <Link to="/home/historial-informes">Historial de Informes</Link>
                   <Link to="/home/estadisticas-docente">Ver Estadísticas Materias</Link>
+                  <Link to="/home/estadisticas-preguntas">Ver Estadísticas de preguntas</Link>
                 </DropdownMenu>
 
                 <DropdownMenu title="Funcionalidades Departamento">
                   <Link to="/home/informes-dep">Informes Dept.</Link>
+                  <Link to= "/home/generar-sintetico">Generar informe Sintetico.</Link>
                 </DropdownMenu>
 
                 <DropdownMenu title="Funcionalidades Secretaría">
@@ -104,12 +108,18 @@ function App() {
                 <Route path="responder-encuesta/:inscripcionId" element={<ResponderEncuesta />} />
                 <Route path="informes-sinteticos" element={<SeleccionarInformeSinteticoSEC />} />
                 <Route path="estadisticas-docente" element={<PaginaEstadisticasDoc />} />
+                <Route path="estadisticas-preguntas" element={<EstadisticasPreguntasPage/>} />
+                
+                {/* Tu ruta 'generar-informe' huérfana (la dejamos como está) */}
+                <Route path="generar-informe" element={<GenerarInformeACDoc />} /> 
                 
                 <Route path="generar-informe/:id_materia" element={<GenerarInformeACDoc />} />
                 
                 <Route path="historial-informes" element={<HistorialInformesACDoc />} />
-
-                <Route path="visualizar-informe/:id_informe" element={<VisualizarInformeAC />} />
+                <Route path="generar-sintetico" element={<GenerarInformeSinteticoDep />} />
+                
+                {/* Corregimos el nombre del componente aquí */}
+                <Route path="visualizar-informe/:id_informe" element={<VisualizarInformeACDoc />} /> 
 
               </Routes>
             </div>

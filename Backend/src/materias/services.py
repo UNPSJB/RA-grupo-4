@@ -1,10 +1,14 @@
-from sqlalchemy.orm import Session, subqueryload
+from sqlalchemy.orm import Session, subqueryload, joinedload
 from typing import List
 from . import models
+from src.materias import exceptions
+from src.materias.models import Materias
 from src.inscripciones.models import Inscripciones
+from src.respuestas.models import Respuesta
+from src.preguntas.models import Pregunta, TipoPregunta
 from . import schemas
-from src.informesAC.models import InformesAC # <-- NUEVA IMPORTACIÓN
-import datetime # <-- NUEVA IMPORTACIÓN
+from src.informesAC.models import InformesAC 
+import datetime 
 
 def get_materias(db: Session) -> List[models.Materias]:
     """
@@ -30,25 +34,14 @@ def get_materias_para_autocompletar(db: Session) -> List[dict]:
         })
     return resultado
 
-# --- NUEVA FUNCIÓN ---
+# --- MODIFICADO (Lógica de Pendientes) ---
 def get_materias_pendientes_docente(db: Session, id_docente: int, ciclo_lectivo: int) -> List[models.Materias]:
     """
     Obtiene la lista de materias de un docente para las cuales
-    AÚN NO se ha generado un InformeAC en el ciclo lectivo especificado.
+    AÚN NO se ha generado un InformeAC (bandera informeACCompletado = False o NULL).
     """
     
-    # 1. Obtener los IDs de las materias que SÍ tienen un informeAC
-    #    para este docente y este ciclo lectivo.
-    subquery = (
-        db.query(InformesAC.id_materia)
-        .filter(
-            InformesAC.id_docente == id_docente,
-            InformesAC.ciclo_lectivo == ciclo_lectivo,
-            InformesAC.completado == 1 # Aseguramos que solo contamos los completados
-        )
-    )
-    
-    # 2. Obtener todas las materias de ese docente...
+    # 1. Obtener todas las materias de ese docente y ciclo lectivo...
     query = (
         db.query(models.Materias)
         .filter(
@@ -57,11 +50,11 @@ def get_materias_pendientes_docente(db: Session, id_docente: int, ciclo_lectivo:
         )
     )
     
-    # 3. ...que NO ESTÉN en la lista de materias que ya tienen informe.
-    query = query.filter(models.Materias.id_materia.notin_(subquery))
+    # 2. ...que tengan la bandera en False o NULL.
+    query = query.filter(models.Materias.informeACCompletado.is_not(True))
     
     return query.all()
-# --- FIN NUEVA FUNCIÓN ---
+# --- FIN MODIFICADO ---
 
 def get_estadisticas_materia(db: Session, materia_id: int) -> dict:
     # (Tu código original sin cambios)
@@ -96,3 +89,95 @@ def get_estadisticas_por_docente(db: Session, id_docente: int) -> List[schemas.M
             total_encuestas_procesadas=stats["total_encuestas_procesadas"]
         ))
     return resultado_estadisticas
+
+def obtener_estadisticas_materia(db: Session, materia_id: int):
+    # (Tu código original sin cambios)
+    materia = (
+        db.query(Materias)
+        .options(
+            joinedload(Materias.inscripciones)
+            .joinedload(Inscripciones.respuestas)
+            .joinedload(Respuesta.opcion_respuesta),
+            joinedload(Materias.inscripciones)
+            .joinedload(Inscripciones.respuestas)
+            .joinedload(Respuesta.pregunta)
+            .joinedload(Pregunta.seccion),
+        )
+        .filter(Materias.id_materia == materia_id)
+        .first()
+    )
+    if not materia:
+        return exceptions.MateriaNoEncontrada
+    inscripciones = [i for i in materia.inscripciones if i.encuesta_procesada]
+    total_encuestas = len(inscripciones)
+    estadisticas_por_seccion = {}
+    for inscripcion in inscripciones:
+        for respuesta in inscripcion.respuestas:
+            pregunta = respuesta.pregunta
+            if not pregunta: #or pregunta.tipo != TipoPregunta.CERRADA:
+                continue
+            seccion = pregunta.seccion
+            if not seccion:
+                continue
+            seccion_id = seccion.id
+            nombre_seccion = seccion.descripcion or f"Sección {seccion_id}"
+            sigla = seccion.sigla
+            if seccion_id not in estadisticas_por_seccion:
+                estadisticas_por_seccion[seccion_id] = {
+                    "seccion_id": seccion_id,
+                    "sigla": sigla,
+                    "descripcion": nombre_seccion,
+                    "preguntas": {}
+                }
+            preguntas = estadisticas_por_seccion[seccion_id]["preguntas"]
+            if pregunta.id not in preguntas:
+                preguntas[pregunta.id] = {
+                    "pregunta_id": pregunta.id,
+                    "enunciado": pregunta.enunciado,
+                    "tipo": pregunta.tipo,
+                    "opciones": {},
+                    "respuestas_abiertas": []
+                }
+            if pregunta.tipo == TipoPregunta.CERRADA:
+                if respuesta.opcion_respuesta:
+                    desc = respuesta.opcion_respuesta.descripcion
+                    preguntas[pregunta.id]["opciones"].setdefault(desc, 0)
+                    preguntas[pregunta.id]["opciones"][desc] += 1
+            if pregunta.tipo == TipoPregunta.ABIERTA:
+                if respuesta.respuesta_abierta:
+                    preguntas[pregunta.id]["respuestas_abiertas"].append(respuesta.respuesta_abierta.strip())
+    for seccion_data in estadisticas_por_seccion.values():
+        for pregunta in seccion_data["preguntas"].values():
+            if pregunta["tipo"] == TipoPregunta.CERRADA:
+                total_respuestas = sum(pregunta["opciones"].values())
+                opciones_lista = []
+                for desc, count in pregunta["opciones"].items():
+                    porcentaje = (count / total_respuestas * 100) if total_respuestas > 0 else 0
+                    opciones_lista.append({
+                        "descripcion": desc,
+                        "cantidad": count,
+                        "porcentaje": round(porcentaje, 2)
+                    })
+                orden_semantico = {
+                    "muy bueno": 1, "bueno": 2, "regular": 3, "malo": 4,
+                    "una":11, "mas de una":12, "mas 50%":21, "entre 0 y 50%":22,
+                    "suficientes":32, "escasos":31
+                }
+                def prioridad(op):
+                    desc = op["descripcion"].strip().lower()
+                    for clave, valor in orden_semantico.items():
+                        if clave in desc:
+                            return valor
+                    return 999 
+                opciones_lista.sort(key=prioridad)
+                pregunta["opciones"] = opciones_lista
+            elif pregunta["tipo"] == TipoPregunta.ABIERTA:
+                pregunta.pop("opciones", None)
+        seccion_data["preguntas"] = list(seccion_data["preguntas"].values())
+    return {
+        "materia_id": materia.id_materia,
+        "nombre_materia": materia.nombre,
+        "total_inscriptos": len(materia.inscripciones),
+        "total_encuestas_procesadas": total_encuestas,
+        "secciones": list(estadisticas_por_seccion.values())
+    }

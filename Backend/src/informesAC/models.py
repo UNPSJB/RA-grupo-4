@@ -20,10 +20,7 @@ class InformesAC(ModeloBase):
 
     id_informesAC: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
 
-    # --- NUEVA BANDERA (Tu lógica: 1=completado) ---
-    # 1 = Completado (los incompletos no se guardan)
-    completado: Mapped[int] = mapped_column(Integer, nullable=False)
-    # --- FIN NUEVO ---
+    # --- CAMPO "COMPLETADO" ELIMINADO ---
 
     id_materia: Mapped[int] = mapped_column(ForeignKey("materias.id_materia"), nullable=False)
     materia: Mapped["Materias"] = relationship("Materias", back_populates="informesAC")
@@ -84,7 +81,6 @@ class InformesAC(ModeloBase):
             return []
         try:
             data = json.loads(self._resumenSecciones)
-            # Asegurar que siempre sea lista
             if isinstance(data, dict):
                 return [data] if data else []
             if isinstance(data, list):

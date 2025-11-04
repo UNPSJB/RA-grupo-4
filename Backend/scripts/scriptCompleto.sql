@@ -166,6 +166,44 @@ VALUES
 
 
 
+-- =========================================
+-- CREACIÓN DE TABLAS
+-- =========================================
+
+DROP TABLE IF EXISTS informesSinteticos;
+DROP TABLE IF EXISTS departamentos;
+
+CREATE TABLE departamentos (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    nombre TEXT NOT NULL
+);
+
+CREATE TABLE informesSinteticos (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    descripcion TEXT NOT NULL,
+    departamento_id INTEGER NOT NULL,
+    FOREIGN KEY (departamento_id) REFERENCES departamentos(id)
+);
+
+
+
+
+
+-- Departamentos
+INSERT INTO departamentos (nombre) VALUES
+('Informatica'),
+('Física'),
+('Computación'),
+('Química');
+
+-- Informes Sintéticos
+INSERT INTO informesSinteticos (descripcion, departamento_id) VALUES
+('Informe anual sobre rendimiento académico 2024', 1),
+('Análisis de encuestas docentes 2024', 1),
+('Informe de proyectos de investigación 2024', 2),
+('Síntesis de actividades de laboratorio 2024', 4),
+('Evaluación de estudiantes en programación 2024', 3),
+('Comparativa interdepartamental 2024', 3);
 
 
 
@@ -202,11 +240,11 @@ VALUES
 -- =====================================================
 -- MATERIAS
 -- =====================================================
-INSERT INTO materias (id_materia, nombre, anio, codigoMateria, id_carrera, id_docente, encuesta_id)
+INSERT INTO materias (id_materia, nombre, anio, codigoMateria, id_carrera, id_docente, id_departamento, encuesta_id)
 VALUES
-    (1, 'Algoritmica y Programacion I', 1, 'IF003', 1, 1, 1),
-    (2, 'Bases de Datos I', 2, 'IF007', 1, 2, 1),
-    (3, 'Sistemas Operativos', 3, 'IF011', 2, 3, 1);
+    (1, 'Algoritmica y Programacion I', 1, 'IF003', 1, 1, 1, 1),
+    (2, 'Bases de Datos I', 2, 'IF007', 1, 2, 1, 1),
+    (3, 'Sistemas Operativos', 3, 'IF011', 2, 3, 1, 1);
 
 -- =====================================================
 -- ESTUDIANTES
@@ -262,9 +300,7 @@ VALUES
     (11, 6, 4, 20, NULL),
     (12, 9, 4, 36, NULL);
 
--- =====================================================
--- INFORMES AC
--- =====================================================
+
 -- =====================================================
 -- INFORMES AC
 -- =====================================================
@@ -278,9 +314,9 @@ INSERT INTO informesAC (
     resumenSecciones
 )
 VALUES
-    (1, 1, 1, 'Trelew', 2025, NULL, '{}'),
-    (2, 2, 2, 'Madryn', 2025, NULL, '{}'),
-    (3, 3, 3, 'Trelew', 2025, NULL, '{}');
+    (1, 1, 1, 'TRELEW', 2025, NULL, '{}'),
+    (2, 2, 2, 'MADRYN', 2025, NULL, '{}'),
+    (3, 3, 3, 'TRELEW', 2025, NULL, '{}');
 
 
 
@@ -386,47 +422,3 @@ WHERE i.materia_id = 1;
 -- CONFIRMAR
 -- =====================================================
 SELECT COUNT(*) AS total_respuestas FROM respuestas;
-
-
-
-
-
-
--- =========================================
--- CREACIÓN DE TABLAS
--- =========================================
-
-DROP TABLE IF EXISTS informesSinteticos;
-DROP TABLE IF EXISTS departamentos;
-
-CREATE TABLE departamentos (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    nombre TEXT NOT NULL
-);
-
-CREATE TABLE informesSinteticos (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    descripcion TEXT NOT NULL,
-    departamento_id INTEGER NOT NULL,
-    FOREIGN KEY (departamento_id) REFERENCES departamentos(id)
-);
-
-
-
-
-
--- Departamentos
-INSERT INTO departamentos (nombre) VALUES
-('Matemática'),
-('Física'),
-('Computación'),
-('Química');
-
--- Informes Sintéticos
-INSERT INTO informesSinteticos (descripcion, departamento_id) VALUES
-('Informe anual sobre rendimiento académico 2024', 1),
-('Análisis de encuestas docentes 2024', 1),
-('Informe de proyectos de investigación 2024', 2),
-('Síntesis de actividades de laboratorio 2024', 4),
-('Evaluación de estudiantes en programación 2024', 3),
-('Comparativa interdepartamental 2024', 3);

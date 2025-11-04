@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+// --- NUEVO (Importar hook de navegación) ---
 import { useNavigate } from "react-router-dom";
 
 interface Docente {
@@ -31,7 +32,7 @@ const HistorialInformesACDoc: React.FC = () => {
   const [informes, setInformes] = useState<InformeAC[]>([]);
   const [cargando, setCargando] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const navigate = useNavigate(); 
+  const navigate = useNavigate(); // --- MODIFICADO (ya lo tenías) ---
 
   useEffect(() => {
     const fetchInformesCompletados = async () => {
@@ -60,9 +61,11 @@ const HistorialInformesACDoc: React.FC = () => {
   }, [idDocenteActual]);
 
 
+  // --- MODIFICADO (El botón ahora navega) ---
   const handleSeleccionar = (id_informe: number) => {
     navigate(`/home/visualizar-informe/${id_informe}`);
   };
+  // --- FIN MODIFICADO ---
 
 
   const styles = {
