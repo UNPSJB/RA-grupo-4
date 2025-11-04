@@ -33,3 +33,10 @@ def update_departamento(
 @router.delete("/{departamento_id}", response_model=schemas.DepartamentoDelete)
 def delete_departamento(departamento_id: int, db: Session = Depends(get_db)):
     return services.eliminar_departamento(db, departamento_id)
+
+@router.get("/{departamento_id}/resumen")
+def resumen_departamento(departamento_id: int, db: Session = Depends(get_db)):
+    """
+    Endpoint que devuelve los datos generales del departamento (para el informe sintético)
+    """
+    return services.obtener_resumen_departamento(db, departamento_id)

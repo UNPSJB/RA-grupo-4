@@ -1,7 +1,9 @@
-from sqlalchemy import Integer, String, ForeignKey, Enum
+from sqlalchemy import Integer, String, ForeignKey, Enum, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 import enum
 from src.models import ModeloBase
+from typing import List, Dict, Optional, Any
+import json
 
 class SedeEnum(str, enum.Enum):
     trelew = "Trelew"
@@ -22,3 +24,21 @@ class InformeSintetico(ModeloBase):
     departamento_id: Mapped[int] = mapped_column(ForeignKey("departamentos.id"))
     departamento: Mapped["src.departamentos.models.Departamento"] = relationship (
             "src.departamentos.models.Departamento", back_populates="informesSinteticos")
+    
+#nuevo hdu info general
+    resumen_general: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    
+
+    @property
+    def resumenGeneral(self) -> List[Dict[String, Any]]:
+        if not self.resumen_general:
+            return []
+        try:
+            data = json.loads(self.resumen_general)
+            return data if isinstance(data, list) else [data]
+        except json.JSONDecodeError:
+            return []
+
+    @resumenGeneral.setter
+    def resumenGeneral(self, value: List[Dict[str, Any]]):
+        self.resumen_general = json.dumps(value or [])

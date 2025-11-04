@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import HeaderInstitucional from "../componentes/HeaderInstitucional";
 import CompletarDatosCabecera from "../componentes/CompletarDatosCabeceraDep";
+import AutocompletarInformacionGeneral from "../componentes/AutocompletarInformacionGeneral";
 
 const styles: { [key: string]: React.CSSProperties } = {
   page: {
@@ -30,6 +31,8 @@ const styles: { [key: string]: React.CSSProperties } = {
 };
 
 const GenerarInformeSintetico: React.FC = () => {
+  const [departamentoSeleccionado, setDepartamentoSeleccionado] = useState<number | null>(null);
+
   return (
     <div style={styles.page}>
       <style>
@@ -43,7 +46,13 @@ const GenerarInformeSintetico: React.FC = () => {
       <div style={styles.container}>
         <HeaderInstitucional />
         <h1 style={styles.title}>Generar Informe Sintético</h1>
-        <CompletarDatosCabecera onSubmitSuccess={() => alert("Cabecera guardada")} />
+
+        <CompletarDatosCabecera
+          onSubmitSuccess={() => alert("Cabecera guardada")}
+          onDepartamentoSeleccionado={setDepartamentoSeleccionado}
+        />
+
+        <AutocompletarInformacionGeneral departamentoId={departamentoSeleccionado} />
       </div>
     </div>
   );

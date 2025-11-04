@@ -14,13 +14,10 @@ interface InformeSinteticoCreate {
 
 interface Props {
   onSubmitSuccess?: () => void;
+  onDepartamentoSeleccionado?: (id: number) => void;
 }
 
 const API_BASE = "http://localhost:8000";
-
-const fadeIn = {
-  animation: "fadeIn 0.6s ease-in-out",
-};
 
 const sharedFieldStyle: React.CSSProperties = {
   width: "100%",
@@ -66,7 +63,10 @@ const styles = {
   },
 };
 
-const CompletarDatosCabeceraDep: React.FC<Props> = ({ onSubmitSuccess }) => {
+const CompletarDatosCabeceraDep: React.FC<Props> = ({
+  onSubmitSuccess,
+  onDepartamentoSeleccionado,
+}) => {
   const [departamentos, setDepartamentos] = useState<Departamento[]>([]);
   const [formData, setFormData] = useState<InformeSinteticoCreate>({
     periodo: "",
@@ -84,7 +84,6 @@ const CompletarDatosCabeceraDep: React.FC<Props> = ({ onSubmitSuccess }) => {
         const res = await fetch(`${API_BASE}/departamentos/`);
         if (!res.ok) throw new Error("Error al obtener departamentos");
         const data = await res.json();
-        console.log("Departamentos cargados:", data); 
         setDepartamentos(data);
       } catch (error) {
         console.error("Error cargando departamentos:", error);
@@ -98,6 +97,10 @@ const CompletarDatosCabeceraDep: React.FC<Props> = ({ onSubmitSuccess }) => {
   ) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
+
+    if (name === "departamento_id" && onDepartamentoSeleccionado) {
+      onDepartamentoSeleccionado(Number(value));
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -132,28 +135,12 @@ const CompletarDatosCabeceraDep: React.FC<Props> = ({ onSubmitSuccess }) => {
 
   return (
     <div style={styles.container}>
-      <style>
-        {`
-          @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-          }
-          select:focus, input:focus, textarea:focus {
-            border-color: #0078D4;
-            box-shadow: 0 0 0 2px rgba(0,120,212,0.2);
-          }
-          select:hover, input:hover, textarea:hover {
-            border-color: #0078D4;
-          }
-        `}
-      </style>
-
       <h2 style={{ fontSize: "22px", fontWeight: "bold", marginBottom: "24px", color: "#333" }}>
         Completar Datos de Cabecera del Informe Sintético
       </h2>
 
       <form onSubmit={handleSubmit}>
-        <div style={{ ...styles.row, ...fadeIn }}>
+        <div style={styles.row}>
           <label style={styles.label} htmlFor="periodo">
             Ciclo Lectivo y/o cuatrimestre evaluado:
           </label>
@@ -168,9 +155,9 @@ const CompletarDatosCabeceraDep: React.FC<Props> = ({ onSubmitSuccess }) => {
           />
         </div>
 
-        <div style={{ ...styles.row, ...fadeIn }}>
+        <div style={styles.row}>
           <label style={styles.label} htmlFor="departamento_id">
-            Comisión Asesora de Carrera o Departamental correspondiente a:
+            Comisión Asesora / Departamento correspondiente a:
           </label>
           <select
             id="departamento_id"
@@ -189,7 +176,7 @@ const CompletarDatosCabeceraDep: React.FC<Props> = ({ onSubmitSuccess }) => {
           </select>
         </div>
 
-        <div style={{ ...styles.row, ...fadeIn }}>
+        <div style={styles.row}>
           <label style={styles.label} htmlFor="sede">Sede:</label>
           <select
             id="sede"
@@ -207,7 +194,7 @@ const CompletarDatosCabeceraDep: React.FC<Props> = ({ onSubmitSuccess }) => {
           </select>
         </div>
 
-        <div style={{ ...styles.row, ...fadeIn }}>
+        <div style={styles.row}>
           <label style={styles.label} htmlFor="integrantes">Integrantes:</label>
           <textarea
             id="integrantes"
