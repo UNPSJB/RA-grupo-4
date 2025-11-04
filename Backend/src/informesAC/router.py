@@ -39,6 +39,19 @@ def listar_informes_por_docente(id_docente: int, db: Session = Depends(get_db)):
         return []
     return informes
 
+
+@router.get("/{id_informe}", response_model=schemas.InformeAC)
+def get_informe_por_id(id_informe: int, db: Session = Depends(get_db)):
+    try:
+        db_informe = services.read_informeAC(db, id_informe)
+    except exceptions.InformesNoEncontrados:
+        raise HTTPException(status_code=404, detail="Informe no encontrado")
+        
+    if db_informe is None:
+        raise HTTPException(status_code=404, detail="Informe no encontrado")
+    return db_informe
+
+
 @router.post("/crear", response_model=schemas.InformeAC)
 def crear_nuevo_informe_ac(
     informe: schemas.InformeACCreate,
@@ -55,7 +68,6 @@ def actualizar_opinion(id_informe: int, opinion: str, db: Session = Depends(get_
 
 @router.get("/resumen/{id_informe}", response_model=List[schemas.SeccionResumen])
 def obtener_resumen_secciones_informeAC(id_informe: int, db: Session = Depends(get_db)):
-    
     informe = services.read_informeAC(db, id_informe) 
     resumen_secciones = services.cargar_resumen_secciones_informe(informe, db)
     return resumen_secciones

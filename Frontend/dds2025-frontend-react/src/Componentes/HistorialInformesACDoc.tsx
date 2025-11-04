@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 interface Docente {
   id_docente: number;
@@ -30,6 +31,7 @@ const HistorialInformesACDoc: React.FC = () => {
   const [informes, setInformes] = useState<InformeAC[]>([]);
   const [cargando, setCargando] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate(); 
 
   useEffect(() => {
     const fetchInformesCompletados = async () => {
@@ -57,11 +59,11 @@ const HistorialInformesACDoc: React.FC = () => {
     fetchInformesCompletados();
   }, [idDocenteActual]);
 
+
   const handleSeleccionar = (id_informe: number) => {
-    // --- HDU FUTURA ---
-    //por ahora no hace nada.
-    console.log(`HDU: Visualizar informe ${id_informe}`);
+    navigate(`/home/visualizar-informe/${id_informe}`);
   };
+
 
   const styles = {
     container: {

@@ -12,6 +12,7 @@ import PaginaEstadisticasDoc from "./Componentes/PaginaEstadisticasDoc";
 import HomePage from "./Componentes/HomePage";
 import GenerarInformeACDoc from "./Componentes/GenerarInformeAC";
 import HistorialInformesACDoc from "./Componentes/HistorialInformesACDoc";
+import VisualizarInformeAC from "./Componentes/VisualizarInformeACDoc";
 
 
 const DropdownMenu: React.FC<{ title: string; children: React.ReactNode }> = ({ title, children }) => {
@@ -97,13 +98,18 @@ function App() {
                 />
                 <Route path="seleccionar" element={<SeleccionarEncuestas />} />
                 <Route path="informes-dep" element={<FiltradoInformeACDep />} />
+                
                 <Route path="informes-doc" element={<ListadoInformesACDoc />} />
+                
                 <Route path="responder-encuesta/:inscripcionId" element={<ResponderEncuesta />} />
                 <Route path="informes-sinteticos" element={<SeleccionarInformeSinteticoSEC />} />
                 <Route path="estadisticas-docente" element={<PaginaEstadisticasDoc />} />
+                
                 <Route path="generar-informe/:id_materia" element={<GenerarInformeACDoc />} />
-                <Route path="historial-informes" element={<HistorialInformesACDoc />} 
-                />
+                
+                <Route path="historial-informes" element={<HistorialInformesACDoc />} />
+
+                <Route path="visualizar-informe/:id_informe" element={<VisualizarInformeAC />} />
 
               </Routes>
             </div>
