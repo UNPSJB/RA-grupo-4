@@ -52,7 +52,7 @@ def filtrar_informes(
         
     # --- LÓGICA DE BANDERA (MODIFICADA) ---
     # Filtra solo por informes cuya materia asociada esté marcada como completada
-    query = query.join(Materias).filter(Materias.informeACCompletado == True)
+    query = query.join(Materias).filter()#Materias.informeACCompletado == True)
     
     return query.all()
 
@@ -158,7 +158,7 @@ def create_informe_ac(db: Session, informe: schemas.InformeACCreate):
     db_informe = models.InformesAC(
         # --- LÓGICA DE BANDERA ---
         # Si Pydantic lo aceptó, está completo. Seteamos 1.
-        completado=1, 
+        #completado=1, 
         
         # Datos Generales
         id_docente=informe.id_docente,
@@ -192,7 +192,7 @@ def create_informe_ac(db: Session, informe: schemas.InformeACCreate):
     )
     
     # 4. Actualizar la bandera en la materia
-    materia_db.informeACCompletado = True
+    #materia_db.informeACCompletado = True
 
     # 5. Guardar ambos cambios en una transacción
     try:
