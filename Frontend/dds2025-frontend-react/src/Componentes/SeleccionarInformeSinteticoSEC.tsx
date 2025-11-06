@@ -17,7 +17,7 @@ const SeleccionarInformeSinteticoSEC: React.FC = () => {
         setCargando(true);
         setError(null);
         const response = await fetch(
-          `http://localhost:8000/informesSinteticos/`
+          `http://localhost:8000/informes-sinteticos/`
         );
         if (!response.ok) throw new Error("Error al obtener los informes sintéticos");
         const data: InformeSintetico[] = await response.json();

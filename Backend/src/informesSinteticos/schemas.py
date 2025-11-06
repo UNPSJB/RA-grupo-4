@@ -1,5 +1,6 @@
 from __future__ import annotations
 from pydantic import BaseModel, field_validator
+from typing import Optional
 from enum import Enum
 # Los siguientes schemas contienen atributos sin muchas restricciones de tipo.
 # Podemos crear atributos con ciertas reglas mediante el uso de un "Field" adecuado.
@@ -14,9 +15,10 @@ class SedeEnum(str, Enum):
 
 class InformeSinteticoBase(BaseModel):
     descripcion: str
+    anio: int
     periodo: str
     sede: SedeEnum
-    integrantes: str
+    integrantes: Optional[str]
     departamento_id: int
 
 class InformeSinteticoCreate(InformeSinteticoBase):
@@ -29,10 +31,10 @@ class InformeSinteticoUpdate(InformeSinteticoBase):
 
 class InformeSintetico(InformeSinteticoBase):
     id: int
-    departamento: Departamento
+    #departamento: Departamento   #genera importacion circular, si se necesita cambiarlo por un schema alterno de departamento, que no incluya informeSintetico
 
     class Config:
-        from_attributes = True
+        orm_mode = True
 
 
 class InformeSinteticoResponse(InformeSinteticoBase):

@@ -8,7 +8,7 @@ router = APIRouter(prefix="/informes-sinteticos", tags=["Informes Sintéticos"])
 
 
 @router.post("/", response_model=schemas.InformeSintetico)
-def crear_informe_sintetico(informe: schemas.InformeSinteticoCreate, db: Session = Depends(get_db)):
+def crear_informe_sintetico(informe: schemas.InformeSinteticoCreate, db: Session = Depends(get_db)): 
     return services.crear_informe_sintetico(db, informe)
 
 
