@@ -1,4 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+// Asegúrate de que la ruta de importación sea correcta según dónde guardaste el componente
+import ErrorCargaDatos from './ErrorCargaDatos';
 
 interface InformeSintetico {
   id: number;
@@ -9,45 +11,71 @@ interface InformeSintetico {
 const ListarInformesSinteticos: React.FC = () => {
   const [informes, setInformes] = useState<InformeSintetico[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  const fetchInformes = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      // URL del endpoint en FastAPI
+      const response = await fetch("http://localhost:8000/informesSinteticos");
+
+      if (!response.ok) {
+        throw new Error('Hubo un error al cargar los informes.');
+      }
+
+      const data: InformeSintetico[] = await response.json();
+      setInformes(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Error desconocido');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    const fetchInformes = async () => {
-      try {
-        const response = await fetch("http://localhost:8000/informesSinteticos"); // URL del endpoint en FastAPI
-
-        if (!response.ok) {
-          throw new Error('Hubo un error al cargar los informes.');
-        }
-
-        const data: InformeSintetico[] = await response.json();
-        setInformes(data);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Error desconocido');
-      }
-    };
-
     fetchInformes();
-  }, []); // El array vacío asegura que se ejecute una sola vez al montar el componente.
+  }, [fetchInformes]);
 
-  // Si hay error
+  // --- Renderizado condicional ---
+
+  if (loading) {
+    // Puedes crear un componente de Carga (Spinner) similar si quieres
+    return <div style={{ padding: 20, textAlign: 'center', color: '#003366' }}>Cargando informes...</div>;
+  }
+
   if (error) {
-    return <div>Error: {error}</div>;
+    return (
+      <ErrorCargaDatos 
+        mensajeError={error} 
+        onReintentar={fetchInformes} 
+      />
+    );
   }
 
-  // Si no hay informes
   if (informes.length === 0) {
-    return <div>No se encontraron informes sintéticos.</div>;
+    return <div style={{ padding: 20, textAlign: 'center', color: '#666' }}>No se encontraron informes sintéticos.</div>;
   }
 
-  // Si hay informes, mostrarlos
   return (
-    <div>
-      <h1>Informes Sintéticos</h1>
-      <ul>
+    <div style={{ maxWidth: 800, margin: '0 auto', padding: 20, fontFamily: 'Segoe UI, Roboto, sans-serif' }}>
+      <h1 style={{ color: '#003366', borderBottom: '2px solid #0078D4', paddingBottom: 10 }}>
+        Informes Sintéticos
+      </h1>
+      <ul style={{ listStyle: 'none', padding: 0 }}>
         {informes.map((informe) => (
-          <li key={informe.id}>
-            <strong>Descripción:</strong> {informe.descripcion} | 
-            <strong>Departamento ID:</strong> {informe.departamento_id}
+          <li 
+            key={informe.id} 
+            style={{ 
+              padding: '15px', 
+              marginBottom: '10px', 
+              backgroundColor: '#f9f9f9', 
+              border: '1px solid #ddd',
+              borderRadius: '8px'
+            }}
+          >
+            <strong style={{ color: '#003366' }}>Descripción:</strong> {informe.descripcion} <br/>
+            <small style={{ color: '#666' }}>Departamento ID: {informe.departamento_id}</small>
           </li>
         ))}
       </ul>

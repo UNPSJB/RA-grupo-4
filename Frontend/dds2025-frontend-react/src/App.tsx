@@ -93,7 +93,6 @@ function App() {
                   <Link to="/home/informes-sinteticos">Informes Sintéticos</Link>
                 </DropdownMenu>
               </div>
-
               <div className="navbar-right">
                 <Link to="/">Cerrar sesión</Link>
               </div>
