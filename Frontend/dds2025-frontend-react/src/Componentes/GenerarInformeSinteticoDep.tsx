@@ -1,6 +1,7 @@
 import React from "react";
-import HeaderInstitucional from "../componentes/HeaderInstitucional";
-import CompletarDatosCabecera from "../componentes/CompletarDatosCabeceraDep";
+import HeaderInstitucional from "./HeaderInstitucional.tsx";
+import CompletarDatosCabecera from "./CompletarDatosCabeceraDep.tsx";
+import ConsolidarDesarrolloDeActividades from "./ConsignarDesarrolloDeActividadesDep.tsx"; 
 
 const styles: { [key: string]: React.CSSProperties } = {
   page: {
@@ -27,9 +28,18 @@ const styles: { [key: string]: React.CSSProperties } = {
     borderBottom: "2px solid #eee",
     paddingBottom: "10px",
   },
+
+  sectionDivider: {
+    borderBottom: '1px solid #eee',
+    margin: '30px 0',
+  }
 };
 
 const GenerarInformeSintetico: React.FC = () => {
+  const handleCabeceraSuccess = () => {
+    console.log("Cabecera guardada exitosamente.");
+  };
+
   return (
     <div style={styles.page}>
       <style>
@@ -43,7 +53,16 @@ const GenerarInformeSintetico: React.FC = () => {
       <div style={styles.container}>
         <HeaderInstitucional />
         <h1 style={styles.title}>Generar Informe Sintético</h1>
-        <CompletarDatosCabecera onSubmitSuccess={() => alert("Cabecera guardada")} />
+        
+        {/* Componente 1: Cabecera  */}
+        <CompletarDatosCabecera onSubmitSuccess={handleCabeceraSuccess} />
+        
+        {/* Separador visual */}
+        <div style={styles.sectionDivider}></div>
+
+        {/* Componente 2: Consolidación de Actividades */}
+        <ConsolidarDesarrolloDeActividades />
+
       </div>
     </div>
   );

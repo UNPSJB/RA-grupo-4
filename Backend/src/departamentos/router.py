@@ -7,13 +7,18 @@ router = APIRouter(prefix="/departamentos", tags=["departamentos"])
 
 # Rutas para departamentos
 
-
 @router.post("/", response_model=schemas.Departamento)
 def create_departamento(departamento: schemas.DepartamentoCreate, db: Session = Depends(get_db)):
     return services.crear_departamento(db, departamento)
 
-
-@router.get("/", response_model=list[schemas.Departamento])
+# --- CORRECCIÓN DE ERROR 500 (BUCLE DE RECURSIÓN) ---
+# Se cambió el 'response_model' de esta ruta.
+# Antes: response_model=list[schemas.Departamento] (Esto causaba el bucle)
+# Ahora: response_model=list[schemas.DepartamentoSimple]
+#
+# 'DepartamentoSimple' solo devuelve 'id' y 'nombre', que es lo único
+# que necesita el dropdown del frontend y evita el bucle de recursión.
+@router.get("/", response_model=list[schemas.DepartamentoSimple])
 def read_departamentos(db: Session = Depends(get_db)):
     return services.listar_departamentos(db)
 

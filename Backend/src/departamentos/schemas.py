@@ -2,9 +2,8 @@ from __future__ import annotations
 from pydantic import BaseModel
 from src.departamentos import exceptions
 from typing import Optional, List
-# Los siguientes schemas contienen atributos sin muchas restricciones de tipo.
-# Podemos crear atributos con ciertas reglas mediante el uso de un "Field" adecuado.
-# https://docs.pydantic.dev/latest/concepts/fields/
+# Los imports de 'InformeSintetico' y 'Materia' se mueven al final
+# para romper la dependencia circular.
 
 
 class DepartamentoBase(BaseModel):
@@ -29,7 +28,19 @@ class Departamento(DepartamentoBase):
 class DepartamentoDelete(DepartamentoBase):
     id: int
 
+# --- NUEVO SCHEMA PARA SOLUCIONAR ERROR 500 (RECURSIÓN) ---
+# Se añade este schema simple. El endpoint GET /departamentos/
+# (que es para el dropdown del frontend) solo necesita id y nombre.
+# Usar 'schemas.Departamento' completo (como estaba antes) causa el bucle de recursión
+# (Departamento -> Materias -> Departamento).
+class DepartamentoSimple(BaseModel):
+    id: int
+    nombre: str
+    model_config = {"from_attributes": True}
 
-from src.informesSinteticos.schemas import InformeSintetico  # noqa: E402
-from src.materias.schemas import Materia
+
+from src.informesSinteticos.schemas import InformeSintetico  
+from src.materias.schemas import Materia 
+
+
 Departamento.model_rebuild()
