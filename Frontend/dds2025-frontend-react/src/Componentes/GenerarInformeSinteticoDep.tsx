@@ -3,6 +3,8 @@ import HeaderInstitucional from "../componentes/HeaderInstitucional";
 import CompletarDatosCabeceraDep from "./Departamento/CompletarDatosCabeceraDep";
 import AutocompletarInformacionGeneral from "./Departamento/AutoCompletarInformacionGeneral";
 import AutocompletarNecesidadesDep from "./Departamento/AutocompletarNecesidadesDep";
+// Importamos el nuevo componente
+import AutocompletarValoracionesDep from "./Departamento/AutocompletarValoracionesDep";
 
 const styles = {
   container: {
@@ -34,7 +36,6 @@ const styles = {
 const GenerarInformeSinteticoDep: React.FC = () => {
   const [departamentoSeleccionado, setDepartamentoSeleccionado] = useState<number | null>(null);
 
-  // Callback que viene desde CompletarDatosCabeceraDep
   const handleDepartamentoSeleccionado = (id: number) => {
     setDepartamentoSeleccionado(id);
   };
@@ -53,33 +54,27 @@ const GenerarInformeSinteticoDep: React.FC = () => {
           />
         </section>
 
-        {/* --- Separador visual --- */}
         <div style={styles.divider}></div>
 
         {/* --- Sección: Información general --- */}
         <section style={styles.section}>
-          {departamentoSeleccionado ? (
-            <AutocompletarInformacionGeneral departamentoId={departamentoSeleccionado} />
-          ) : (
-            <p style={{ textAlign: "center", color: "#666", fontSize: "16px" }}>
-              Seleccione un departamento para ver la información general.
-            </p>
-          )}
+          <AutocompletarInformacionGeneral departamentoId={departamentoSeleccionado} />
         </section>
 
-        {/* --- Separador visual --- */}
         <div style={styles.divider}></div>
 
         {/* --- Sección: Necesidades y equipamiento --- */}
         <section style={styles.section}>
-          {departamentoSeleccionado ? (
-            <AutocompletarNecesidadesDep departamentoId={departamentoSeleccionado} />
-          ) : (
-            <p style={{ textAlign: "center", color: "#666", fontSize: "16px" }}>
-              Seleccione un departamento para ver las necesidades y equipamiento.
-            </p>
-          )}
+          <AutocompletarNecesidadesDep departamentoId={departamentoSeleccionado} />
         </section>
+
+        <div style={styles.divider}></div>
+
+        {/* --- NUEVA SECCIÓN: Valoraciones de desempeño --- */}
+        <section style={styles.section}>
+          <AutocompletarValoracionesDep departamentoId={departamentoSeleccionado} />
+        </section>
+
       </div>
     </div>
   );

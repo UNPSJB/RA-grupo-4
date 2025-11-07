@@ -1,25 +1,20 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from typing import List
 from src.database import get_db
 from src.informesSinteticos import schemas, services
 from src.informesSinteticos.models import InformeSintetico
-from src.informesSinteticos.services import generar_resumen_informe_general
-from src.materias.models import Materias
-from src.inscripciones.models import Inscripciones
 
 router = APIRouter(prefix="/informes-sinteticos", tags=["Informes Sintéticos"])
 
-
+# --- CRUD Básico ---
 @router.post("/", response_model=schemas.InformeSintetico)
 def crear_informe_sintetico(informe: schemas.InformeSinteticoCreate, db: Session = Depends(get_db)):
     return services.crear_informe_sintetico(db, informe)
 
-
 @router.get("/", response_model=List[schemas.InformeSintetico])
 def leer_informesSinteticos(db: Session = Depends(get_db)):
     return services.listar_informesSinteticos(db)
-
 
 @router.get("/{informe_id}", response_model=schemas.InformeSintetico)
 def obtener_informe_sintetico(informe_id: int, db: Session = Depends(get_db)):
@@ -28,92 +23,75 @@ def obtener_informe_sintetico(informe_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Informe Sintético no encontrado")
     return informe
 
+# =========================================
+# === ENDPOINTS DE PREVIEW (GET) ===
+# Para usar en el formulario ANTES de crear el informe
+# =========================================
 
-#nuevo hdu informacion general
-@router.post("/informes-sinteticos/{id}/autocompletar-general")
+@router.get("/preview/general")
+def preview_informe_general(
+    departamento_id: int = Query(...), 
+    anio: int = Query(...), 
+    db: Session = Depends(get_db)
+):
+    return services.obtener_resumen_general_periodo(db, departamento_id, anio)
+
+@router.get("/preview/necesidades")
+def preview_necesidades(
+    departamento_id: int = Query(...), 
+    anio: int = Query(...), 
+    db: Session = Depends(get_db)
+):
+    return services.obtener_necesidades_periodo(db, departamento_id, anio)
+
+@router.get("/preview/valoraciones-miembros")
+def preview_valoraciones_miembros(
+    departamento_id: int = Query(...), 
+    anio: int = Query(...), 
+    db: Session = Depends(get_db)
+):
+    return services.obtener_miembros_periodo(db, departamento_id, anio)
+
+@router.get("/preview/auxiliares")
+def preview_auxiliares(
+    departamento_id: int = Query(...), 
+    anio: int = Query(...), 
+    db: Session = Depends(get_db)
+):
+    """Nuevo endpoint para recuperar auxiliares cargados por docentes."""
+    return services.obtener_auxiliares_periodo(db, departamento_id, anio)
+
+# =========================================
+# === ENDPOINTS DE AUTOCOMPLETADO (POST) ===
+# Para guardar datos en un informe YA CREADO
+# =========================================
+
+@router.post("/{id}/autocompletar-general")
 def autocompletar_informe_general(id: int, db: Session = Depends(get_db)):
     informe = db.query(InformeSintetico).filter_by(id=id).first()
-    if not informe:
-        return {"error": "Informe no encontrado"}
-
-    resumen = generar_resumen_informe_general(db, informe)
-    informe.resumen_general = resumen
+    if not informe: raise HTTPException(status_code=404, detail="Informe no encontrado")
+    
+    resumen = services.generar_resumen_informe_general(db, informe)
+    informe.resumen_general = resumen # Asegúrate que tu modelo soporte asignar JSON/dict directamente si usas un tipo JSON en SQLAlchemy, o usa json.dumps si es Text.
     db.commit()
+    return {"mensaje": "Resumen general generado", "resumen": resumen}
 
-    return {"mensaje": "Resumen generado", "resumen": resumen}
-
-@router.get("/{departamento_id}/resumen", response_model=List[dict])
-def obtener_resumen_departamento(departamento_id: int, db: Session = Depends(get_db)):
-    """
-    Devuelve resumen de materias del departamento indicado,
-    con la cantidad de alumnos y comisiones.
-    """
-    materias = (
-        db.query(Materias)
-        .filter(Materias.departamento_id == departamento_id)
-        .all()
-    )
-
-    if not materias:
-        raise HTTPException(status_code=404, detail="No se encontraron materias para este departamento")
-
-    resumen = []
-    for m in materias:
-        alumnos_inscriptos = (
-            db.query(Inscripciones)
-            .filter(Inscripciones.materia_id == m.id)
-            .count()
-        )
-
-        resumen.append({
-            "codigo": m.codigo,
-            "nombre": m.nombre,
-            "alumnos_inscriptos": alumnos_inscriptos,
-            "comisiones_teoricas": m.comisiones_teoricas if hasattr(m, "comisiones_teoricas") else 1,
-            "comisiones_practicas": m.comisiones_practicas if hasattr(m, "comisiones_practicas") else 1,
-        })
-
-    return resumen
-#--------------------------------------------------------------------------------#
-#nuevo hdu necesidades de equipamiento y bibliografia
-@router.post("/informes-sinteticos/{id}/autocompletar-necesidades")
+@router.post("/{id}/autocompletar-necesidades")
 def autocompletar_necesidades(id: int, db: Session = Depends(get_db)):
-    """
-    Genera un resumen con las necesidades de equipamiento y bibliografía
-    del departamento asociado al informe sintético.
-    """
     informe = db.query(InformeSintetico).filter_by(id=id).first()
-    if not informe:
-        raise HTTPException(status_code=404, detail="Informe no encontrado")
+    if not informe: raise HTTPException(status_code=404, detail="Informe no encontrado")
 
-    resumen_necesidades = services.generar_resumen_necesidades(db, informe)
-    informe.resumen_necesidades = resumen_necesidades  # campo JSON opcional
+    resumen = services.generar_resumen_necesidades(db, informe)
+    informe.resumen_necesidades = resumen
     db.commit()
+    return {"mensaje": "Resumen de necesidades generado", "resumen": resumen}
 
-    return {
-        "mensaje": "Resumen de necesidades generado correctamente",
-        "resumen": resumen_necesidades
-    }
-@router.get("/informes-sinteticos/{id}/necesidades")
-def obtener_necesidades_informe(id: int, db: Session = Depends(get_db)):
-    """
-    Devuelve el resumen de necesidades (equipamiento y bibliografía)
-    del informe sintético. Si no existe, lo genera automáticamente.
-    """
+@router.post("/{id}/autocompletar-valoraciones")
+def autocompletar_valoraciones_miembros(id: int, db: Session = Depends(get_db)):
     informe = db.query(InformeSintetico).filter_by(id=id).first()
-    if not informe:
-        raise HTTPException(status_code=404, detail="Informe no encontrado")
+    if not informe: raise HTTPException(status_code=404, detail="Informe no encontrado")
 
-    # Si ya tiene resumen generado, lo devolvemos
-    if informe.resumen_necesidades:
-        return {"resumen": informe.resumen_necesidades}
-
-    # Si no existe, lo generamos llamando al servicio
-    resumen_necesidades = services.generar_resumen_necesidades(db, informe)
-    informe.resumen_necesidades = resumen_necesidades
+    valoraciones = services.generar_valoracion_miembros(db, informe)
+    informe.valoracion_miembros = valoraciones
     db.commit()
-
-    return {
-        "mensaje": "Resumen generado automáticamente",
-        "resumen": resumen_necesidades
-    }
+    return {"mensaje": "Lista de valoración de miembros generada", "valoraciones": valoraciones}
