@@ -1,5 +1,6 @@
 from __future__ import annotations
 from pydantic import BaseModel
+from typing import Optional, List, Dict, Any
 from enum import Enum
 
 class SedeEnum(str, Enum):
@@ -8,14 +9,17 @@ class SedeEnum(str, Enum):
     madryn = "Puerto Madryn"
     comodoro = "Comodoro Rivadavia"
 
-
 class InformeSinteticoBase(BaseModel):
-    descripcion: str
     periodo: str
     sede: SedeEnum
-    integrantes: str
+    integrantes: Optional[str] = None
     departamento_id: int
-
+    # Campos opcionales que podrían venir llenos desde el front al crear
+    comentarios: Optional[str] = None
+    resumen_general: Optional[List[Dict[str, Any]]] = None
+    resumen_necesidades: Optional[List[Dict[str, Any]]] = None
+    valoracion_miembros: Optional[List[Dict[str, Any]]] = None
+    observaciones_actividades: Optional[List[Dict[str, Any]]] = None
 
 class InformeSinteticoCreate(InformeSinteticoBase):
     pass

@@ -138,7 +138,7 @@ const AutocompletarValoracionesDep: React.FC<AutocompletarValoracionesProps> = (
   const toggleMateria = (codigo: string) => setMateriaExpandida((prev) => (prev === codigo ? null : codigo));
 
   // --- RENDERIZADO PADRE ---
-  if (!departamentoId) return <div style={{ padding: "30px", textAlign: "center", color: "#666" }}>👥 Seleccione un departamento.</div>;
+  if (!departamentoId) return <div style={{ padding: "30px", textAlign: "center", color: "#666" }}>🏛️ Seleccione un departamento.</div>;
   if (error) return <ErrorCargaDatos mensajeError={error} onReintentar={fetchMiembros} />;
 
   return (
@@ -272,7 +272,7 @@ const AutocompletarValoracionesDep: React.FC<AutocompletarValoracionesProps> = (
       ) : materiasAgrupadas.length === 0 ? (
         <div style={{ padding: "40px", textAlign: "center", color: "#666", backgroundColor: "#fff", borderRadius: "12px", border: "2px dashed #ccc" }}>
           <div style={{ fontSize: "2rem", marginBottom: "10px" }}>📭</div>
-          <p>No se encontraron docentes para valorar en este período.</p>
+          <p>No se encontraron docentes para valorar en este periodo.</p>
         </div>
       ) : (
         <div>

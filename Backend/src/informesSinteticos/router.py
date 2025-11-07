@@ -7,6 +7,8 @@ from src.informesSinteticos.models import InformeSintetico
 
 router = APIRouter(prefix="/informes-sinteticos", tags=["Informes Sintéticos"])
 
+
+
 # --- CRUD Básico ---
 @router.post("/", response_model=schemas.InformeSintetico)
 def crear_informe_sintetico(informe: schemas.InformeSinteticoCreate, db: Session = Depends(get_db)):
@@ -95,3 +97,4 @@ def autocompletar_valoraciones_miembros(id: int, db: Session = Depends(get_db)):
     informe.valoracion_miembros = valoraciones
     db.commit()
     return {"mensaje": "Lista de valoración de miembros generada", "valoraciones": valoraciones}
+

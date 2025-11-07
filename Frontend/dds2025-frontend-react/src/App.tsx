@@ -14,8 +14,9 @@ import GenerarInformeACDoc from "./Componentes/GenerarInformeAC";
 //nuevo
 import GenerarInformeSinteticoDep from "./Componentes/GenerarInformeSinteticoDep";
 
+//exepciones
 import ErrorCargaDatos from "./Componentes/ErrorCargaDatos";
-
+import SinDatos from "./Componentes/SinDatos";
 import EstadisticasPreguntasPage from "./Componentes/EstadisticasPorPregunta";
 
 const DropdownMenu: React.FC<{ title: string; children: React.ReactNode }> = ({ title, children }) => {
@@ -87,6 +88,7 @@ function App() {
                   <Link to="/home/informes-dep">Informes Dept.</Link>
                   <Link to= "/home/generar-sintetico">Generar informe Sintetico.</Link>
                   <Link to= "/home/error">Error</Link>
+                  <Link to= "/home/sinDatos">Sin datos</Link>
                 </DropdownMenu>
 
                 <DropdownMenu title="Funcionalidades Secretaría">
@@ -114,6 +116,7 @@ function App() {
                 <Route path="generar-informe" element={<GenerarInformeACDoc />} />
                 <Route path="generar-sintetico" element={<GenerarInformeSinteticoDep />} />
                 <Route path="Error" element={<ErrorCargaDatos />} />
+                <Route path="sinDatos" element={<SinDatos />} />
               </Routes>
             </div>
 

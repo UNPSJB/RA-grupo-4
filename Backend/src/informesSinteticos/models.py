@@ -31,6 +31,8 @@ class InformeSintetico(ModeloBase):
     resumen_necesidades: Mapped[Optional[List[Dict[str, Any]]]] = mapped_column(JSON, nullable=True)
 #nuevo hdu valoracion miembros
     valoracion_miembros: Mapped[Optional[List[Dict[str, Any]]]] = mapped_column(JSON, nullable=True)
+#nuevo hdu agregar comentarios
+    comentarios: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
 
     @property
     def resumenGeneral(self) -> List[Dict[String, Any]]:

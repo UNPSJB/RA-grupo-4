@@ -1,10 +1,14 @@
 import React, { useState } from "react";
 import HeaderInstitucional from "../componentes/HeaderInstitucional";
+// Importa tus componentes hijos...
 import CompletarDatosCabeceraDep from "./Departamento/CompletarDatosCabeceraDep";
 import AutocompletarInformacionGeneral from "./Departamento/AutoCompletarInformacionGeneral";
 import AutocompletarNecesidadesDep from "./Departamento/AutocompletarNecesidadesDep";
-// Importamos el nuevo componente
 import AutocompletarValoracionesDep from "./Departamento/AutocompletarValoracionesDep";
+// Importamos el nuevo componente de comentarios
+import ComentariosFinalesDep from "./Departamento/ComentariosFinalesDep";
+
+const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
 const styles = {
   container: {
@@ -34,10 +38,58 @@ const styles = {
 };
 
 const GenerarInformeSinteticoDep: React.FC = () => {
-  const [departamentoSeleccionado, setDepartamentoSeleccionado] = useState<number | null>(null);
+  // Estado global del informe a crear
+  const [datosInforme, setDatosInforme] = useState({
+    departamento_id: 0,
+    periodo: "",
+    sede: "",
+    integrantes: "",
+    comentarios: "" 
+  });
+  const [creando, setCreando] = useState(false);
 
+  // Handlers para actualizar el estado desde los hijos
   const handleDepartamentoSeleccionado = (id: number) => {
-    setDepartamentoSeleccionado(id);
+      setDatosInforme(prev => ({ ...prev, departamento_id: id }));
+  };
+
+  // Handler para recibir los comentarios del componente hijo
+  const handleComentariosChange = (texto: string) => {
+    setDatosInforme(prev => ({ ...prev, comentarios: texto }));
+  };
+
+  // FUNCIÓN PRINCIPAL: CREAR EL INFORME
+  const handleCrearInformeFinal = async () => {
+    // Validación básica antes de enviar
+    if (!datosInforme.departamento_id) {
+        alert("Por favor seleccione un Departamento antes de continuar.");
+        return;
+    }
+    // Puedes agregar más validaciones aquí si periodo o sede son obligatorios desde el inicio
+
+    setCreando(true);
+    try {
+        const response = await fetch(`${API_BASE}/informes-sinteticos/`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            // Enviamos todo el estado junto
+            body: JSON.stringify(datosInforme)
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.detail || "Error al crear el informe");
+        }
+        
+        const data = await response.json();
+        alert(`¡Informe Sintético creado con éxito! ID: ${data.id}`);
+        // Aquí podrías redirigir al usuario o limpiar el formulario
+    } catch (error: any) {
+        console.error("Error creando informe:", error);
+        alert(`Error al crear el informe: ${error.message}`);
+    } finally {
+        setCreando(false);
+    }
   };
 
   return (
@@ -45,34 +97,68 @@ const GenerarInformeSinteticoDep: React.FC = () => {
       <HeaderInstitucional />
 
       <div style={styles.container}>
-        <h1 style={styles.titulo}>Informe Sintetico </h1>
+        <h1 style={styles.titulo}>Generar Informe Sintético</h1>
 
-        {/* --- Sección: Completar datos de cabecera --- */}
+        {/* SECCIÓN 1: CABECERA (Debe actualizar datosInforme, por ahora solo ID depto) */}
         <section>
-          <CompletarDatosCabeceraDep
-            onDepartamentoSeleccionado={handleDepartamentoSeleccionado}
-          />
+           {/* NOTA: Deberás ajustar CompletarDatosCabeceraDep para que pase 
+               periodo, sede e integrantes hacia arriba si quieres guardarlos también.
+               Por ahora solo recibe el ID. */}
+          <CompletarDatosCabeceraDep onDepartamentoSeleccionado={handleDepartamentoSeleccionado} />
         </section>
+
+        {/* SECCIONES DE PREVISUALIZACIÓN (Solo visibles si hay depto seleccionado) */}
+        {datosInforme.departamento_id > 0 && (
+            <>
+                <div style={styles.divider}></div>
+                <section style={styles.section}>
+                <AutocompletarInformacionGeneral departamentoId={datosInforme.departamento_id} />
+                </section>
+
+                <div style={styles.divider}></div>
+                <section style={styles.section}>
+                <AutocompletarNecesidadesDep departamentoId={datosInforme.departamento_id} />
+                </section>
+
+                <div style={styles.divider}></div>
+                <section style={styles.section}>
+                <AutocompletarValoracionesDep departamentoId={datosInforme.departamento_id} />
+                </section>
+            </>
+        )}
 
         <div style={styles.divider}></div>
 
-        {/* --- Sección: Información general --- */}
+        {/* SECCIÓN FINAL: COMENTARIOS Y BOTÓN DE CREACIÓN */}
         <section style={styles.section}>
-          <AutocompletarInformacionGeneral departamentoId={departamentoSeleccionado} />
-        </section>
+           <ComentariosFinalesDep 
+              informeId={null} // Aún no existe
+              modoCreacion={true} // Activamos modo creación
+              onChange={handleComentariosChange} // Recibimos el texto
+           />
 
-        <div style={styles.divider}></div>
-
-        {/* --- Sección: Necesidades y equipamiento --- */}
-        <section style={styles.section}>
-          <AutocompletarNecesidadesDep departamentoId={departamentoSeleccionado} />
-        </section>
-
-        <div style={styles.divider}></div>
-
-        {/* --- NUEVA SECCIÓN: Valoraciones de desempeño --- */}
-        <section style={styles.section}>
-          <AutocompletarValoracionesDep departamentoId={departamentoSeleccionado} />
+           {/* BOTÓN FINAL GRANDE */}
+           <div style={{ marginTop: 40, textAlign: 'right' }}>
+               <button 
+                   onClick={handleCrearInformeFinal}
+                   disabled={creando || !datosInforme.departamento_id}
+                   style={{
+                       padding: '15px 40px', 
+                       fontSize: '1.2rem', 
+                       fontWeight: 'bold', 
+                       color: 'white',
+                       backgroundColor: '#28a745', // Verde éxito
+                       border: 'none', 
+                       borderRadius: '8px', 
+                       cursor: 'pointer',
+                       boxShadow: '0 4px 12px rgba(40, 167, 69, 0.3)',
+                       transition: 'all 0.3s ease',
+                       opacity: (creando || !datosInforme.departamento_id) ? 0.6 : 1
+                   }}
+               >
+                   {creando ? "Generando..." : "✅ FINALIZAR Y CREAR INFORME"}
+               </button>
+           </div>
         </section>
 
       </div>
