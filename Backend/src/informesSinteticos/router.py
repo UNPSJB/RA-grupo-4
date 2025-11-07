@@ -74,3 +74,46 @@ def obtener_resumen_departamento(departamento_id: int, db: Session = Depends(get
         })
 
     return resumen
+#--------------------------------------------------------------------------------#
+#nuevo hdu necesidades de equipamiento y bibliografia
+@router.post("/informes-sinteticos/{id}/autocompletar-necesidades")
+def autocompletar_necesidades(id: int, db: Session = Depends(get_db)):
+    """
+    Genera un resumen con las necesidades de equipamiento y bibliografía
+    del departamento asociado al informe sintético.
+    """
+    informe = db.query(InformeSintetico).filter_by(id=id).first()
+    if not informe:
+        raise HTTPException(status_code=404, detail="Informe no encontrado")
+
+    resumen_necesidades = services.generar_resumen_necesidades(db, informe)
+    informe.resumen_necesidades = resumen_necesidades  # campo JSON opcional
+    db.commit()
+
+    return {
+        "mensaje": "Resumen de necesidades generado correctamente",
+        "resumen": resumen_necesidades
+    }
+@router.get("/informes-sinteticos/{id}/necesidades")
+def obtener_necesidades_informe(id: int, db: Session = Depends(get_db)):
+    """
+    Devuelve el resumen de necesidades (equipamiento y bibliografía)
+    del informe sintético. Si no existe, lo genera automáticamente.
+    """
+    informe = db.query(InformeSintetico).filter_by(id=id).first()
+    if not informe:
+        raise HTTPException(status_code=404, detail="Informe no encontrado")
+
+    # Si ya tiene resumen generado, lo devolvemos
+    if informe.resumen_necesidades:
+        return {"resumen": informe.resumen_necesidades}
+
+    # Si no existe, lo generamos llamando al servicio
+    resumen_necesidades = services.generar_resumen_necesidades(db, informe)
+    informe.resumen_necesidades = resumen_necesidades
+    db.commit()
+
+    return {
+        "mensaje": "Resumen generado automáticamente",
+        "resumen": resumen_necesidades
+    }

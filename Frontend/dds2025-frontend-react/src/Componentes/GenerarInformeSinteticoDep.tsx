@@ -1,61 +1,88 @@
 import React, { useState } from "react";
 import HeaderInstitucional from "../componentes/HeaderInstitucional";
-import CompletarDatosCabecera from "../componentes/CompletarDatosCabeceraDep";
-import AutocompletarInformacionGeneral from "../componentes/AutocompletarInformacionGeneral";
+import CompletarDatosCabeceraDep from "./Departamento/CompletarDatosCabeceraDep";
+import AutocompletarInformacionGeneral from "./Departamento/AutoCompletarInformacionGeneral";
+import AutocompletarNecesidadesDep from "./Departamento/AutocompletarNecesidadesDep";
 
-const styles: { [key: string]: React.CSSProperties } = {
-  page: {
-    backgroundColor: "#f4f7f6",
-    padding: "0px",
-    minHeight: "100vh",
-    fontFamily: '"Segoe UI", "Roboto", sans-serif',
-  },
+const styles = {
   container: {
-    maxWidth: "950px",
+    maxWidth: "1200px",
     margin: "0 auto",
     padding: "30px",
-    backgroundColor: "#ffffff",
-    borderRadius: "8px",
-    boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
-    animation: "fadeIn 0.6s ease-out",
+    backgroundColor: "#f9fbfd",
+    borderRadius: "12px",
+    boxShadow: "0 4px 16px rgba(0,0,0,0.08)",
+    fontFamily: '"Roboto", "Segoe UI", sans-serif',
   },
-  title: {
-    textAlign: "center",
-    color: "#000",
-    fontSize: "20px",
-    fontWeight: "bold",
-    marginBottom: "30px",
-    borderBottom: "2px solid #eee",
-    paddingBottom: "10px",
+  section: {
+    marginTop: "40px",
+  },
+  titulo: {
+    fontSize: "26px",
+    fontWeight: 700,
+    color: "#222",
+    marginBottom: "20px",
+  },
+  divider: {
+    height: "2px",
+    backgroundColor: "#0078D4",
+    margin: "30px 0",
+    borderRadius: "2px",
   },
 };
 
-const GenerarInformeSintetico: React.FC = () => {
+const GenerarInformeSinteticoDep: React.FC = () => {
   const [departamentoSeleccionado, setDepartamentoSeleccionado] = useState<number | null>(null);
 
+  // Callback que viene desde CompletarDatosCabeceraDep
+  const handleDepartamentoSeleccionado = (id: number) => {
+    setDepartamentoSeleccionado(id);
+  };
+
   return (
-    <div style={styles.page}>
-      <style>
-        {`
-          @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-          }
-        `}
-      </style>
+    <div>
+      <HeaderInstitucional />
+
       <div style={styles.container}>
-        <HeaderInstitucional />
-        <h1 style={styles.title}>Generar Informe Sintético</h1>
+        <h1 style={styles.titulo}>Informe Sintetico </h1>
 
-        <CompletarDatosCabecera
-          onSubmitSuccess={() => alert("Cabecera guardada")}
-          onDepartamentoSeleccionado={setDepartamentoSeleccionado}
-        />
+        {/* --- Sección: Completar datos de cabecera --- */}
+        <section>
+          <CompletarDatosCabeceraDep
+            onDepartamentoSeleccionado={handleDepartamentoSeleccionado}
+          />
+        </section>
 
-        <AutocompletarInformacionGeneral departamentoId={departamentoSeleccionado} />
+        {/* --- Separador visual --- */}
+        <div style={styles.divider}></div>
+
+        {/* --- Sección: Información general --- */}
+        <section style={styles.section}>
+          {departamentoSeleccionado ? (
+            <AutocompletarInformacionGeneral departamentoId={departamentoSeleccionado} />
+          ) : (
+            <p style={{ textAlign: "center", color: "#666", fontSize: "16px" }}>
+              Seleccione un departamento para ver la información general.
+            </p>
+          )}
+        </section>
+
+        {/* --- Separador visual --- */}
+        <div style={styles.divider}></div>
+
+        {/* --- Sección: Necesidades y equipamiento --- */}
+        <section style={styles.section}>
+          {departamentoSeleccionado ? (
+            <AutocompletarNecesidadesDep departamentoId={departamentoSeleccionado} />
+          ) : (
+            <p style={{ textAlign: "center", color: "#666", fontSize: "16px" }}>
+              Seleccione un departamento para ver las necesidades y equipamiento.
+            </p>
+          )}
+        </section>
       </div>
     </div>
   );
 };
 
-export default GenerarInformeSintetico;
+export default GenerarInformeSinteticoDep;

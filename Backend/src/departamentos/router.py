@@ -1,7 +1,10 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from src.database import get_db
 from src.departamentos import schemas, services
+
+from src.materias.models import Materias
+from src.informesAC.models import InformesAC
 
 router = APIRouter(prefix="/departamentos", tags=["departamentos"])
 
@@ -40,3 +43,25 @@ def resumen_departamento(departamento_id: int, db: Session = Depends(get_db)):
     Endpoint que devuelve los datos generales del departamento (para el informe sintético)
     """
     return services.obtener_resumen_departamento(db, departamento_id)
+
+@router.get("/{departamento_id}/necesidades")
+def obtener_necesidades_departamento(departamento_id: int, db: Session = Depends(get_db)):
+    """
+    Devuelve las necesidades de un departamento
+    """
+   
+    materias = db.query(Materias).filter(Materias.departamento.has(id=departamento_id)).all()
+    
+    if not materias:
+        raise HTTPException(status_code=404, detail="No se encontraron materias para este departamento")
+
+    resumen = []
+    for materia in materias:
+        for informe_ac in materia.informesAC:
+            resumen.append({
+                "codigo_materia": materia.codigoMateria,
+                "nombre_materia": materia.nombre,
+                "necesidades_equipamiento": informe_ac.necesidades_equipamiento or [],
+                "necesidades_bibliografia": informe_ac.necesidades_bibliografia or [],
+            })
+    return resumen

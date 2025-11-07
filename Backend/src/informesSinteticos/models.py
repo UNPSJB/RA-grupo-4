@@ -1,4 +1,4 @@
-from sqlalchemy import Integer, String, ForeignKey, Enum, Text
+from sqlalchemy import Integer, String, ForeignKey, Enum, Text, JSON
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 import enum
 from src.models import ModeloBase
@@ -27,8 +27,9 @@ class InformeSintetico(ModeloBase):
     
 #nuevo hdu info general
     resumen_general: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
-    
-
+#nuevo hdu completar necesidades y equipamientos   
+    resumen_necesidades: Mapped[Optional[List[Dict[str, Any]]]] = mapped_column(JSON, nullable=True)
+  
     @property
     def resumenGeneral(self) -> List[Dict[String, Any]]:
         if not self.resumen_general:

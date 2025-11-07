@@ -25,7 +25,6 @@ class InformeSinteticoUpdate(InformeSinteticoBase):
     pass
 
 
-# ✅ solo mostramos el id + nombre del departamento, no todo el objeto
 class InformeSintetico(BaseModel):
     id: int
     descripcion: str

@@ -57,3 +57,34 @@ def generar_resumen_informe_general(db: Session, informe_sintetico: InformeSinte
             })
 
     return resumen
+#-----------------------------------------------------------------------------------------------#
+def generar_resumen_necesidades(db: Session, informe_sintetico: InformeSintetico) -> List[dict]:
+    """
+    Genera un resumen de necesidades de equipamiento y bibliografía
+    basado en los informesAC de las materias del departamento.
+    """
+    resumen = []
+
+    # Obtener las materias del departamento
+    materias = db.query(Materias).filter(
+        Materias.id_departamento == informe_sintetico.departamento_id
+    ).all()
+
+    for materia in materias:
+        informe_ac = next(
+            (
+                inf for inf in materia.informesAC
+                if str(inf.ciclo_lectivo) == str(informe_sintetico.periodo)
+            ),
+            None
+        )
+
+        if informe_ac:
+            resumen.append({
+                "codigo_materia": materia.codigoMateria,
+                "nombre_materia": materia.nombre,
+                "necesidades_equipamiento": informe_ac.necesidades_equipamiento or [],
+                "necesidades_bibliografia": informe_ac.necesidades_bibliografia or [],
+            })
+
+    return resumen

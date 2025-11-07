@@ -6,7 +6,7 @@ import LoginPage from "./Componentes/LoginPage";
 import SeleccionarEncuestas from "./Componentes/SeleccionarEncuestas";
 import ListadoInformesACDoc from "./Componentes/ListadoInformesACDoc";
 import SeleccionarInformeSinteticoSEC from "./Componentes/SeleccionarInformeSinteticoSEC";
-import FiltradoInformeACDep from "./Componentes/FiltradoInformeACDep";
+import FiltradoInformeACDep from "./Componentes/Departamento/FiltradoInformeACDep";
 import ResponderEncuesta from "./Componentes/ResponderEncuesta";
 import PaginaEstadisticasDoc from "./Componentes/PaginaEstadisticasDoc";
 import HomePage from "./Componentes/HomePage";
