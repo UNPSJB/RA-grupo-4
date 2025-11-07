@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 
-// 1. Definir la interfaz 
+// 1️⃣ Interfaz de datos
 interface ActividadParaInformeRow {
   codigoMateria: string;
   nombreMateria: string;
@@ -12,211 +12,232 @@ interface ActividadParaInformeRow {
   observacionComentarios: string | null;
 }
 
-// (Azules: #0078D4, #cce4f6)
+// 2️⃣ Estilos inline
 const styles: { [key: string]: React.CSSProperties } = {
   container: {
-    marginTop: "20px",
-    fontFamily: '"Segoe UI", "Roboto", sans-serif',
+    marginTop: "25px",
+    padding: "20px",
+    backgroundColor: "#f9fafc",
+    borderRadius: "12px",
+    fontFamily: '"Segoe UI", "Roboto", "Helvetica Neue", sans-serif',
+  },
+  instruccion: {
+    fontSize: "14px",
+    color: "#333",
+    backgroundColor: "#eef5fb",
+    padding: "15px 18px",
+    borderRadius: "8px",
+    marginBottom: "20px",
+    lineHeight: "1.5",
+    borderLeft: "4px solid #0078D4",
   },
   title: {
-    color: "#333", 
-    fontSize: "18px",
-    fontWeight: "bold",
-    marginBottom: "15px",
-    borderBottom: "1px solid #eee",
-    paddingBottom: "10px",
+    color: "#0a2e52",
+    fontSize: "19px",
+    fontWeight: 600,
+    marginBottom: "18px",
+    borderBottom: "2px solid #0078D4",
+    paddingBottom: "8px",
   },
   table: {
     width: "100%",
     borderCollapse: "collapse",
-    marginTop: "10px",
-    border: "2px solid #0078D4", // Borde exterior azul
-    borderRadius: "8px",
-    overflow: "hidden", // Para redondear las esquinas
-    boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
+    borderRadius: "10px",
+    overflow: "hidden",
+    boxShadow: "0 3px 10px rgba(0,0,0,0.08)",
   },
-  // Cabecera (Azul claro, como los campos de CompletarDatosCabecera)
   th: {
-    backgroundColor: "#cce4f6", // Azul claro
-    color: "#111", // Texto oscuro
-    border: "1px solid #0078D4", // Bordes azules
-    padding: "12px 15px",
-    textAlign: "left",
+    backgroundColor: "#0078D4",
+    color: "white",
+    padding: "10px 12px",
     fontSize: "13px",
-    fontWeight: "bold",
+    textAlign: "center",
     textTransform: "uppercase",
+    letterSpacing: "0.03em",
   },
-  // Celdas
   td: {
-    border: "1px solid #b4d7f0", // Borde azul más suave
-    padding: "12px 15px",
+    border: "1px solid #dce7f3",
+    padding: "10px 12px",
     fontSize: "13px",
-    verticalAlign: "top", // Alinear arriba
     color: "#333",
   },
-  // Celda para Espacio Curricular (Código y Nombre)
   tdMateria: {
-    border: "1px solid #b4d7f0",
-    padding: "12px 15px",
+    border: "1px solid #dce7f3",
+    padding: "10px 12px",
     fontSize: "13px",
-    verticalAlign: "top",
-    width: "20%",
+    fontWeight: 500,
+    color: "#005a9e",
+    backgroundColor: "#f4f9ff",
   },
-  // Celda para la 'X' (centrada)
   tdCenter: {
-    border: "1px solid #b4d7f0",
-    padding: "12px 15px",
-    fontSize: "13px",
-    verticalAlign: "top",
+    border: "1px solid #dce7f3",
+    padding: "10px",
     textAlign: "center",
     fontWeight: "bold",
+    fontSize: "15px",
+    color: "#0078D4",
   },
   tdObs: {
-    border: "1px solid #b4d7f0",
-    padding: "12px 15px",
+    border: "1px solid #dce7f3",
+    padding: "10px 12px",
     fontSize: "12px",
-    verticalAlign: "top",
+    color: "#444",
     fontStyle: "italic",
-    color: "#333",
-    width: "25%",
-  },
-  materiaCodigo: {
-    fontWeight: "bold",
-    marginRight: "5px",
-    color: "#005a9e", 
-  },
-  materiaNombre: {
-    fontSize: "13px",
-    color: "#333",
+    backgroundColor: "#fafafa",
   },
   loading: {
     textAlign: "center",
     padding: "20px",
-    fontSize: "14px",
-    color: "#555",
+    fontSize: "15px",
+    color: "#333",
   },
   error: {
     textAlign: "center",
     padding: "20px",
     fontSize: "14px",
-    color: "red",
-    border: "1px solid #fdd",
-    backgroundColor: "#fff5f5",
-    borderRadius: "4px",
+    color: "#b00020",
+    backgroundColor: "#fff2f2",
+    border: "1px solid #ffcdd2",
+    borderRadius: "6px",
+  },
+  separadorMateria: {
+    height: "3px",
+    backgroundColor: "#0078D4",
+    opacity: 0.25,
   },
 };
 
+// 3️⃣ Auxiliar
 function tieneContenido(texto: string | null | undefined): boolean {
   return Boolean(texto && texto.trim().length > 0);
 }
 
+// 4️⃣ Agrupador de materias
+function agruparPorMateria(registros: ActividadParaInformeRow[]) {
+  const grupos: { [codigo: string]: ActividadParaInformeRow[] } = {};
+  registros.forEach((item) => {
+    if (!grupos[item.codigoMateria]) grupos[item.codigoMateria] = [];
+    grupos[item.codigoMateria].push(item);
+  });
+  return grupos;
+}
+
+// 5️⃣ Componente principal
 const ConsolidarDesarrolloDeActividades: React.FC = () => {
   const [registros, setRegistros] = useState<ActividadParaInformeRow[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  // 2. useEffect para cargar los datos 
   useEffect(() => {
     const fetchInformeActividades = async () => {
       setLoading(true);
       setError(null);
-      console.log("Iniciando fetch a /informes-sinteticos/actividades...");
 
       try {
         const response = await fetch("http://localhost:8000/informes-sinteticos/actividades");
-        
+
         if (!response.ok) {
           throw new Error(`Error ${response.status}: No se pudo obtener la información de actividades.`);
         }
-        
+
         const result = await response.json();
-        
         if (result.registros) {
-          console.log("Datos recibidos (individuales):", result.registros);
           setRegistros(result.registros);
         } else {
           throw new Error("Formato de datos incorrecto.");
         }
-        
       } catch (err) {
-        if (err instanceof Error) {
-          console.error("Error en fetchInformeActividades:", err.message);
-          setError(err.message);
-        } else {
-          setError("Ocurrió un error desconocido.");
-        }
+        if (err instanceof Error) setError(err.message);
+        else setError("Ocurrió un error desconocido.");
       } finally {
         setLoading(false);
       }
     };
 
     fetchInformeActividades();
-  }, []); 
+  }, []);
 
-  // 3. Renderizado de estados
-  if (loading) {
-    return <div style={styles.loading}>Cargando datos de actividades (Capacitación, Investigación, etc.)...</div>;
-  }
+  if (loading) return <div style={styles.loading}>Cargando datos de actividades...</div>;
+  if (error) return <div style={styles.error}>Error: {error}</div>;
+  if (registros.length === 0)
+    return <div style={styles.loading}>No hay datos de actividades para mostrar.</div>;
 
-  if (error) {
-    return <div style={styles.error}>Error: {error}</div>;
-  }
-  
-  if (registros.length === 0) {
-    return <div style={styles.loading}>No se encontraron datos de actividades para mostrar (La tabla 'Actividades' puede estar vacía).</div>;
-  }
+  const registrosAgrupados = agruparPorMateria(registros);
+  const codigosMaterias = Object.keys(registrosAgrupados);
 
-  // 4. Renderizado de la tabla 
   return (
     <div style={styles.container}>
       <h3 style={styles.title}>
         3. Desarrollo de Actividades (Capacitación, Investigación, Extensión y Gestión)
       </h3>
 
+      <p style={styles.instruccion}>
+        Señale con una cruz si ha desarrollado actividades de <strong>Capacitación, Investigación,
+        Extensión y Gestión</strong> en el ámbito de la Facultad de Ingeniería por cada uno de los
+        integrantes de la cátedra (Profesor Responsable, Profesores, JTP y Auxiliares) en el periodo
+        evaluado. Explicite las observaciones y comentarios que considere pertinentes.
+      </p>
+
       <table style={styles.table}>
         <thead>
           <tr>
-            <th style={styles.th}>Espacio curricular</th>
-            <th style={styles.th}>Responsable, Profesor, JTP y/o Auxiliares</th>
-            <th style={{...styles.th, ...styles.tdCenter}}>Capacitación</th>
-            <th style={{...styles.th, ...styles.tdCenter}}>Investigación</th>
-            <th style={{...styles.th, ...styles.tdCenter}}>Extensión</th>
-            <th style={{...styles.th, ...styles.tdCenter}}>Gestión</th>
-            <th style={styles.th}>Observaciones-Comentarios</th>
+            <th style={styles.th}>Espacio Curricular</th>
+            <th style={styles.th}>Responsable / Profesor / Auxiliar</th>
+            <th style={styles.th}>Capacitación</th>
+            <th style={styles.th}>Investigación</th>
+            <th style={styles.th}>Extensión</th>
+            <th style={styles.th}>Gestión</th>
+            <th style={styles.th}>Observaciones / Comentarios</th>
           </tr>
         </thead>
+
         <tbody>
-          {registros.map((item, index) => (
-            <tr key={index}>
-              {/* Celda de Espacio Curricular (combinada) */}
-              <td style={styles.tdMateria}>
-                {/* Lógica de renderizado para ID y Nombre */}
-                <span style={styles.materiaCodigo}>{item.codigoMateria}</span>
-                <span style={styles.materiaNombre}>- {item.nombreMateria}</span>
-              </td>
-              <td style={styles.td}>
-                {item.integranteCatedra}
-              </td>
-              
-              {/* Celdas de 'X' o '-' */}
-              <td style={styles.tdCenter}>
-                {tieneContenido(item.capacitacion) ? 'X' : '-'}
-              </td>
-              <td style={styles.tdCenter}>
-                {tieneContenido(item.investigacion) ? 'X' : '-'}
-              </td>
-              <td style={styles.tdCenter}>
-                {tieneContenido(item.extension) ? 'X' : '-'}
-              </td>
-              <td style={styles.tdCenter}>
-                {tieneContenido(item.gestion) ? 'X' : '-'}
-              </td>
-              
-              <td style={styles.tdObs}>
-                {item.observacionComentarios || ""}
-              </td>
-            </tr>
-          ))}
+          {codigosMaterias.map((codigo, materiaIndex) => {
+            const grupo = registrosAgrupados[codigo];
+            return (
+              <React.Fragment key={codigo}>
+                {grupo.map((item, index) => (
+                  <tr key={`${codigo}-${index}`}>
+                    {/* Mostrar la materia solo una vez (en la primera fila del grupo) */}
+                    {index === 0 ? (
+                      <td style={styles.tdMateria} rowSpan={grupo.length}>
+                        {item.codigoMateria} - {item.nombreMateria}
+                      </td>
+                    ) : null}
+
+                    <td style={styles.td}>{item.integranteCatedra}</td>
+
+                    {["capacitacion", "investigacion", "extension", "gestion"].map((campo) => {
+                      const valor = item[campo as keyof ActividadParaInformeRow] as string | null;
+                      const hayContenido = tieneContenido(valor);
+                      return (
+                        <td
+                          key={campo}
+                          style={{
+                            ...styles.tdCenter,
+                            backgroundColor: hayContenido ? "#e6f3fc" : "transparent",
+                            color: hayContenido ? "#0078D4" : "#999",
+                          }}
+                        >
+                          {hayContenido ? "X" : "-"}
+                        </td>
+                      );
+                    })}
+
+                    <td style={styles.tdObs}>{item.observacionComentarios || ""}</td>
+                  </tr>
+                ))}
+                {/* 🔹 Línea divisoria entre materias */}
+                {materiaIndex < codigosMaterias.length - 1 && (
+                  <tr>
+                    <td colSpan={7} style={{ padding: 0 }}>
+                      <div style={styles.separadorMateria}></div>
+                    </td>
+                  </tr>
+                )}
+              </React.Fragment>
+            );
+          })}
         </tbody>
       </table>
     </div>

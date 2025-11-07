@@ -19,6 +19,8 @@ class InformeSintetico(ModeloBase):
     sede: Mapped[SedeEnum] = mapped_column(Enum(SedeEnum), nullable=False)
     integrantes: Mapped[str] = mapped_column(String, nullable=True)
 
+    # Relación con Departamento
     departamento_id: Mapped[int] = mapped_column(ForeignKey("departamentos.id"))
-    departamento: Mapped["src.departamentos.models.Departamento"] = relationship (
-            "src.departamentos.models.Departamento", back_populates="informesSinteticos")
+    departamento: Mapped["Departamento"] = relationship(
+        "Departamento", back_populates="informesSinteticos"
+    )
