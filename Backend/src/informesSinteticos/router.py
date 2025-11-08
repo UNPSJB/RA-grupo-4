@@ -34,3 +34,7 @@ def obtener_informesAC_asociados_a_informeSintetico(departamento_id: int, anio: 
 @router.get("/departamento/{departamento_id}/periodo/{anio}/informesAC/porcentajes")
 def obtener_porcentajes_informesAC(departamento_id: int, anio: int, db: Session = Depends(get_db)):
     return services.get_porcentajes_informeSintetico(db, departamento_id, anio)
+
+@router.get("/departamento/{departamento_id}/periodo/{anio}/informesAC/aspectosPositivosObstaculos")
+def obtener_aspectosPosObs_informesAC(departamento_id: int, anio: int, db: Session = Depends(get_db)):
+    return services.get_aspectos_positivo_y_obstaculos__informeSintetico(db, departamento_id, anio)

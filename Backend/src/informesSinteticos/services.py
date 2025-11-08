@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from src.informesSinteticos import schemas, models
 from src.informesSinteticos.models import InformeSintetico
 from src.informesAC.models import InformesAC
+from src.informesAC.schemas import InformeACParaInformeSintetico, InformeAC as informeACSchema
 from src.materias.models import Materias
 
 def crear_informe_sintetico(db: Session, informe: schemas.InformeSinteticoCreate):
@@ -33,7 +34,7 @@ def get_informesAC_asociados_a_informeSintetico(db: Session, departamento_id: in
     )
     return informes
 
-def get_porcentajes_informeSintetico(db: Session, departamento_id: int, anio: int):
+def get_porcentajes_informeSintetico(db: Session, departamento_id: int, anio: int)-> List[InformeACParaInformeSintetico]:
     #Devuelve un JSON con los datos necesarios para mostrar los porcentajes en el informeSintetico. 
     informesAC = get_informesAC_asociados_a_informeSintetico(db, departamento_id, anio)
 
@@ -54,7 +55,31 @@ def get_porcentajes_informeSintetico(db: Session, departamento_id: int, anio: in
             "porcentaje_teoricas": informe.porcentaje_teoricas,
             "porcentaje_practicas": informe.porcentaje_practicas,
             "justificacion_porcentaje": informe.justificacion_porcentaje,
-            #luego se agrega #"horasTotalesPlanificadas": getattr(materia, "horasTotalesPlanificadas", None),
+            #"horasTotalesPlanificadas": 100,    #getattr(materia, "horasTotalesPlanificadas", None) # falta el campo de horas en materia.
+        })
+
+    return resultado
+
+
+
+
+def get_aspectos_positivo_y_obstaculos__informeSintetico(db: Session, departamento_id: int, anio: int)-> List[InformeACParaInformeSintetico]:
+    #Devuelve un JSON con los datos necesarios para mostrar los aspectos positivos y obstaculos  en el informeSintetico. 
+    informesAC = get_informesAC_asociados_a_informeSintetico(db, departamento_id, anio)
+
+    resultado = []
+    for informe in informesAC:
+        materia = informe.materia  
+
+        resultado.append({
+            "id_informeAC": informe.id_informesAC,
+            "codigoMateria": getattr(materia, "codigoMateria", None),
+            "nombreMateria": getattr(materia, "nombre", None),
+            "aspectosPositivosEnsenianza": informe.aspectos_positivos_enseñanza,
+            "aspectosPositivosAprendizaje": informe.aspectos_positivos_aprendizaje,
+            "ObstaculosEnsenianza": informe.obstaculos_enseñanza,
+            "obstaculosAprendizaje": informe.obstaculos_aprendizaje,
+            "estrategiasAImplementar": informe.estrategias_a_implementar,            
         })
 
     return resultado

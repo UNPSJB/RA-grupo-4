@@ -18,6 +18,13 @@ class Materia(MateriaBase):
     departamento: "Departamento"
     model_config = {"from_attributes": True}
 
+class MateriaSimple(MateriaBase):
+    anio: int
+    id_departamento: int
+    id_docente: int
+    cantidad_inscripciones: int
+    model_config = {"from_attributes": True}
+
 class MateriaOut(BaseModel):
     id_materia: int
     nombre: str

@@ -9,7 +9,7 @@ from typing import Optional, List
 
 class DepartamentoBase(BaseModel):
     nombre: str
-
+    id: int
 
 class DepartamentoCreate(DepartamentoBase):
     pass
@@ -19,7 +19,6 @@ class DepartamentoUpdate(DepartamentoBase):
 
 
 class Departamento(DepartamentoBase):
-    id: int
     informesSinteticos: List["InformeSintetico"] = []
     materias: List["Materia"] = []
 

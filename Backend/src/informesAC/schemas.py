@@ -125,3 +125,25 @@ class InformeAC(BaseModel):
     resumenSecciones: List[SeccionResumen]
 
     model_config = {"from_attributes": True}
+
+
+
+
+class InformeACParaInformeSintetico(BaseModel):
+    id_informesAC: int
+    codigoMateria: Optional[str]
+    nombreMateria: Optional[str]
+    resumenSecciones: Optional[List[SeccionResumen]] = []
+    opinionSobreResumen: Optional[str]
+    porcentaje_contenido_abordado: Optional[float]
+    porcentaje_teoricas: Optional[float]
+    porcentaje_practicas: Optional[float]
+    justificacion_porcentaje: Optional[str]
+    horasTotalesPlanificadas: Optional[int]
+    aspectos_positivos_enseñanza: Optional[str]
+    aspectos_positivos_aprendizaje: Optional[str]
+    obstaculos_enseñanza: Optional[str]
+    obstaculos_aprendizaje: Optional[str]
+    estrategias_a_implementar: Optional[str]
+    class Config:
+        orm_mode = True  # Muy importante para poder usar objetos SQLAlchemy
