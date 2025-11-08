@@ -13,7 +13,6 @@ import ResumenSecciones from './ConsignarResumenValoresEncuesta';
 
 const BASE_URL = 'http://localhost:8000';
 
-// (Tus estilos originales)
 const styles: { [key: string]: React.CSSProperties } = {
   page: {
     backgroundColor: '#f4f7f6',
@@ -62,7 +61,6 @@ const styles: { [key: string]: React.CSSProperties } = {
   },
 };
 
-// (Interfaces originales)
 interface MateriaParaAutocompletar {
   id_materia: number;
   nombre: string;
@@ -93,10 +91,7 @@ interface Actividad {
 
 const GenerarInformeACDoc: React.FC = () => {
   const navigate = useNavigate();
-  // --- MODIFICADO (id_materia siempre estará presente) ---
   const { id_materia } = useParams<{ id_materia: string }>();
-  // ------------------------------------
-
   const [materias, setMaterias] = useState<MateriaParaAutocompletar[]>([]);
   const [docentes, setDocentes] = useState<Docente[]>([]);
   const [loading, setLoading] = useState(true); 
@@ -134,7 +129,7 @@ const GenerarInformeACDoc: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [informeGenerado, setInformeGenerado] = useState(null);
 
-  // --- MODIFICADO (useEffect de carga) ---
+  // ---(useEffect de carga) ---
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -148,8 +143,6 @@ const GenerarInformeACDoc: React.FC = () => {
         setMaterias(materiasData);
         setDocentes(await docentesRes.json());
 
-        // --- LÓGICA DE PRECARGA (Simplificada) ---
-        // Ya no se comprueba 'isPreloadedMode', siempre se asume
         const selectedMateria = materiasData.find((m: MateriaParaAutocompletar) => String(m.id_materia) === id_materia);
         if (selectedMateria) {
           // Precargamos el formulario
@@ -162,7 +155,6 @@ const GenerarInformeACDoc: React.FC = () => {
             cantidad_alumnos_inscriptos: String(selectedMateria.cantidad_inscripciones || ''), 
           }));
         }
-        // --- FIN LÓGICA DE PRECARGA ---
 
       } catch (err: any) {
         setError(err.message || 'Error cargando datos iniciales');
@@ -171,10 +163,9 @@ const GenerarInformeACDoc: React.FC = () => {
       }
     };
     fetchData();
-  }, [id_materia]); // Solo depende del id_materia de la URL
+  }, [id_materia]); 
 
 
-  // --- MODIFICADO (Lógica de selección manual eliminada) ---
   const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -183,7 +174,6 @@ const GenerarInformeACDoc: React.FC = () => {
     }));
   };
 
-  // (Tus otros handlers originales)
   const handleNecesidadesChange = (tipo: 'equipamiento' | 'bibliografia', nuevaLista: string[]) => {
     tipo === 'equipamiento' ? setEquipamiento(nuevaLista) : setBibliografia(nuevaLista);
   };
@@ -194,8 +184,6 @@ const GenerarInformeACDoc: React.FC = () => {
   };
   const handleValoracionesChange = (nuevas: ValoracionAuxiliarData[]) => setValoracionesAuxiliares(nuevas);
 
-
-  // --- HANDLESUBMIT (Solo POST) ---
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
@@ -274,7 +262,6 @@ const GenerarInformeACDoc: React.FC = () => {
     }
   };
 
-  // (Tus renderizados de 'loading', 'error' y 'success' originales)
   if (loading && materias.length === 0) {
     return (
       <div style={styles.page}>
@@ -328,7 +315,7 @@ const GenerarInformeACDoc: React.FC = () => {
             formData={formData}
             handleChange={handleFormChange}
             loading={loading}
-            disabled={true} // --- MODIFICADO (Siempre deshabilitado) ---
+            disabled={true} 
           />
 
           <CompletarNecesidadesDoc

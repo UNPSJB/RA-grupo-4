@@ -10,6 +10,7 @@ interface Props {
     resumen_reflexion: string;
   };
   handleChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
+  disabled?: boolean; 
 }
 
 const styles = {
@@ -88,23 +89,23 @@ const styles = {
   },
 };
 
-const CompletarProcesoAprendizajeDoc: React.FC<Props> = ({ formData, handleChange }) => {
+const CompletarProcesoAprendizajeDoc: React.FC<Props> = ({ formData, handleChange, disabled = false }) => {
+  const textareaStyle = disabled ? { ...styles.textarea, backgroundColor: '#e9ecef', color: '#495057', cursor: 'not-allowed' } : styles.textarea;
+  const resumenStyle = disabled ? { ...styles.resumen, backgroundColor: '#e9ecef', color: '#495057', cursor: 'not-allowed' } : styles.resumen;
+
   return (
     <div style={styles.container}>
-      <style>
+       <style>
         {`
           textarea:focus {
             border-color: #0078D4;
             box-shadow: 0 0 0 2px rgba(0,120,212,0.2);
           }
-          textarea:hover {
-            border-color: #0078D4;
-          }
         `}
       </style>
 
       <p style={styles.instructions}>
-        2.C. ¿Cuáles fueron los principales aspectos positivos y los obstáculos que se manifestaron durante el desarrollo del espacio curricular? Centrándose específicamente en los procesos de enseñanza y/o aprendizaje. Complete en el siguiente cuadro.
+        2.C. ¿Cuáles fueron los principales aspectos positivos y los obstáculos...
       </p>
 
       <fieldset style={styles.fieldset}>
@@ -118,8 +119,9 @@ const CompletarProcesoAprendizajeDoc: React.FC<Props> = ({ formData, handleChang
                   name="aspectos_positivos_enseñanza"
                   value={formData.aspectos_positivos_enseñanza}
                   onChange={handleChange}
-                  style={styles.textarea}
+                  style={textareaStyle}
                   rows={4}
+                  disabled={disabled} 
                 />
               </td>
               <td style={styles.td}>
@@ -128,8 +130,9 @@ const CompletarProcesoAprendizajeDoc: React.FC<Props> = ({ formData, handleChang
                   name="aspectos_positivos_aprendizaje"
                   value={formData.aspectos_positivos_aprendizaje}
                   onChange={handleChange}
-                  style={styles.textarea}
+                  style={textareaStyle}
                   rows={4}
+                  disabled={disabled} 
                 />
               </td>
             </tr>
@@ -140,8 +143,9 @@ const CompletarProcesoAprendizajeDoc: React.FC<Props> = ({ formData, handleChang
                   name="obstaculos_enseñanza"
                   value={formData.obstaculos_enseñanza}
                   onChange={handleChange}
-                  style={styles.textarea}
+                  style={textareaStyle}
                   rows={4}
+                  disabled={disabled} 
                 />
               </td>
               <td style={styles.td}>
@@ -150,8 +154,9 @@ const CompletarProcesoAprendizajeDoc: React.FC<Props> = ({ formData, handleChang
                   name="obstaculos_aprendizaje"
                   value={formData.obstaculos_aprendizaje}
                   onChange={handleChange}
-                  style={styles.textarea}
+                  style={textareaStyle}
                   rows={4}
+                  disabled={disabled} 
                 />
               </td>
             </tr>
@@ -162,8 +167,9 @@ const CompletarProcesoAprendizajeDoc: React.FC<Props> = ({ formData, handleChang
                   name="estrategias_a_implementar"
                   value={formData.estrategias_a_implementar}
                   onChange={handleChange}
-                  style={styles.textarea}
+                  style={textareaStyle}
                   rows={4}
+                  disabled={disabled} 
                 />
               </td>
             </tr>
@@ -172,16 +178,17 @@ const CompletarProcesoAprendizajeDoc: React.FC<Props> = ({ formData, handleChang
       </fieldset>
 
       <p style={styles.instructions}>
-        Escriba un resumen de la reflexión sobre la práctica docente que se realizó en la reunión de equipo de cátedra. En caso de corresponder, consigne nuevas estrategias a implementar (cambio de cronograma, modificación del proceso de evaluación, etc.).
+        Escriba un resumen de la reflexión sobre la práctica docente...
       </p>
 
       <textarea
         name="resumen_reflexion"
         value={formData.resumen_reflexion}
         onChange={handleChange}
-        style={styles.resumen}
+        style={resumenStyle}
         rows={5}
         placeholder="Escriba aquí su resumen..."
+        disabled={disabled} 
       />
     </div>
   );
