@@ -61,12 +61,10 @@ const HistorialInformesACDoc: React.FC = () => {
   }, [idDocenteActual]);
 
 
-  // --- MODIFICADO (El botón ahora navega) ---
   const handleSeleccionar = (id_informe: number) => {
     navigate(`/home/visualizar-informe/${id_informe}`);
   };
-  // --- FIN MODIFICADO ---
-
+ 
 
   const styles = {
     container: {
