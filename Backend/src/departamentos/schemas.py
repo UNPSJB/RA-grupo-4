@@ -1,6 +1,8 @@
 from __future__ import annotations
 from pydantic import BaseModel
-from typing import List, Optional
+from typing import Optional, List
+# Los imports de 'InformeSintetico' y 'Materia' se mueven al final
+# para romper la dependencia circular.
 
 # ------------------------------------------------------------
 # Departamento
@@ -31,5 +33,13 @@ class Departamento(BaseModel):
 class DepartamentoDelete(DepartamentoBase):
     id: int
 
+#Schema de santi, verificar como funciona para conectar todo. borrar despues
+class DepartamentoSimple(BaseModel):
+    id: int
+    nombre: str
+    model_config = {"from_attributes": True}
+
+
+from src.informesSinteticos.schemas import InformeSintetico  #se podria borrar
 from src.materias.schemas import MateriaOut
 Departamento.model_rebuild()

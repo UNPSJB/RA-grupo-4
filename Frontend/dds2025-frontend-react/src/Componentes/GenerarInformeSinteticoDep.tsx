@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import HeaderInstitucional from "../componentes/HeaderInstitucional";
-// Importa tus componentes hijos...
+
+// --- Importaciones de Componentes Hijos ---
 import CompletarDatosCabeceraDep from "./Departamento/CompletarDatosCabeceraDep";
 import AutocompletarInformacionGeneral from "./Departamento/AutoCompletarInformacionGeneral";
 import AutocompletarNecesidadesDep from "./Departamento/AutocompletarNecesidadesDep";
 import AutocompletarValoracionesDep from "./Departamento/AutocompletarValoracionesDep";
-// Importamos el nuevo componente de comentarios
 import ComentariosFinalesDep from "./Departamento/ComentariosFinalesDep";
+import ConsolidarDesarrolloDeActividades from "./ConsignarDesarrolloDeActividadesDep.tsx";
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
@@ -44,7 +45,7 @@ const GenerarInformeSinteticoDep: React.FC = () => {
     periodo: "",
     sede: "",
     integrantes: "",
-    comentarios: "" 
+    comentarios: ""
   });
   const [creando, setCreando] = useState(false);
 
@@ -65,14 +66,12 @@ const GenerarInformeSinteticoDep: React.FC = () => {
         alert("Por favor seleccione un Departamento antes de continuar.");
         return;
     }
-    // Puedes agregar más validaciones aquí si periodo o sede son obligatorios desde el inicio
 
     setCreando(true);
     try {
         const response = await fetch(`${API_BASE}/informes-sinteticos/`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            // Enviamos todo el estado junto
             body: JSON.stringify(datosInforme)
         });
 
@@ -80,10 +79,9 @@ const GenerarInformeSinteticoDep: React.FC = () => {
             const errorData = await response.json();
             throw new Error(errorData.detail || "Error al crear el informe");
         }
-        
+
         const data = await response.json();
         alert(`¡Informe Sintético creado con éxito! ID: ${data.id}`);
-        // Aquí podrías redirigir al usuario o limpiar el formulario
     } catch (error: any) {
         console.error("Error creando informe:", error);
         alert(`Error al crear el informe: ${error.message}`);
@@ -99,64 +97,68 @@ const GenerarInformeSinteticoDep: React.FC = () => {
       <div style={styles.container}>
         <h1 style={styles.titulo}>Generar Informe Sintético</h1>
 
-        {/* SECCIÓN 1: CABECERA (Debe actualizar datosInforme, por ahora solo ID depto) */}
+        {/* Seccion cabecera*/}
         <section>
-           {/* NOTA: Deberás ajustar CompletarDatosCabeceraDep para que pase 
-               periodo, sede e integrantes hacia arriba si quieres guardarlos también.
-               Por ahora solo recibe el ID. */}
           <CompletarDatosCabeceraDep onDepartamentoSeleccionado={handleDepartamentoSeleccionado} />
         </section>
 
-        {/* SECCIONES DE PREVISUALIZACIÓN (Solo visibles si hay depto seleccionado) */}
+        {/* Seccione de vistas, solamente si selecciona un deparatamento en la cabecera, despues modificar cuando se agrege el periodo */}
         {datosInforme.departamento_id > 0 && (
             <>
+                {/* Información General */}
                 <div style={styles.divider}></div>
                 <section style={styles.section}>
-                <AutocompletarInformacionGeneral departamentoId={datosInforme.departamento_id} />
+                    <AutocompletarInformacionGeneral departamentoId={datosInforme.departamento_id} />
                 </section>
 
+                {/* Consolidación de Actividades-Santi */}
                 <div style={styles.divider}></div>
                 <section style={styles.section}>
-                <AutocompletarNecesidadesDep departamentoId={datosInforme.departamento_id} />
+                    <ConsolidarDesarrolloDeActividades />
                 </section>
 
+                {/* Necesidades */}
                 <div style={styles.divider}></div>
                 <section style={styles.section}>
-                <AutocompletarValoracionesDep departamentoId={datosInforme.departamento_id} />
+                    <AutocompletarNecesidadesDep departamentoId={datosInforme.departamento_id} />
+                </section>
+
+                {/* Valoraciones */}
+                <div style={styles.divider}></div>
+                <section style={styles.section}>
+                    <AutocompletarValoracionesDep departamentoId={datosInforme.departamento_id} />
                 </section>
             </>
         )}
 
         <div style={styles.divider}></div>
 
-        {/* SECCIÓN FINAL: COMENTARIOS Y BOTÓN DE CREACIÓN */}
         <section style={styles.section}>
-           <ComentariosFinalesDep 
-              informeId={null} // Aún no existe
-              modoCreacion={true} // Activamos modo creación
-              onChange={handleComentariosChange} // Recibimos el texto
+           <ComentariosFinalesDep
+              informeId={null}
+              modoCreacion={true}
+              onChange={handleComentariosChange}
            />
 
-           {/* BOTÓN FINAL GRANDE */}
            <div style={{ marginTop: 40, textAlign: 'right' }}>
-               <button 
+               <button
                    onClick={handleCrearInformeFinal}
                    disabled={creando || !datosInforme.departamento_id}
                    style={{
-                       padding: '15px 40px', 
-                       fontSize: '1.2rem', 
-                       fontWeight: 'bold', 
+                       padding: '15px 40px',
+                       fontSize: '1.2rem',
+                       fontWeight: 'bold',
                        color: 'white',
-                       backgroundColor: '#28a745', // Verde éxito
-                       border: 'none', 
-                       borderRadius: '8px', 
+                       backgroundColor: '#28a745',
+                       border: 'none',
+                       borderRadius: '8px',
                        cursor: 'pointer',
                        boxShadow: '0 4px 12px rgba(40, 167, 69, 0.3)',
                        transition: 'all 0.3s ease',
                        opacity: (creando || !datosInforme.departamento_id) ? 0.6 : 1
                    }}
                >
-                   {creando ? "Generando..." : "✅ FINALIZAR Y CREAR INFORME"}
+                   {creando ? "Generando..." : " FINALIZAR Y CREAR INFORME"}
                </button>
            </div>
         </section>

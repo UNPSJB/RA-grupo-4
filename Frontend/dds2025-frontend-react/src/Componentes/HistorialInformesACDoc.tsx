@@ -2,65 +2,72 @@ import React, { useEffect, useState } from "react";
 // --- NUEVO (Importar hook de navegación) ---
 import { useNavigate } from "react-router-dom";
 
-// --- Interfaces (MODIFICADAS) ---
-// Esta interfaz ahora representa una MATERIA, no un informe
-interface MateriaPendiente {
+interface Docente {
+  id_docente: number;
+  nombre: string;
+}
+
+interface Materia {
   id_materia: number;
   nombre: string;
   anio: number;
   codigoMateria?: string;
 }
-// --- FIN Interfaces ---
 
-const ListadoInformesACDoc: React.FC = () => {
-  // ID del docente hardcodeado (como pediste)
+interface InformeAC {
+  id_informesAC: number;
+  sede: string;
+  ciclo_lectivo: number;
+  cantidad_alumnos_inscriptos?: number;
+  cantidad_comisiones_teoricas?: number;
+  cantidad_comisiones_practicas?: number;
+  docente: Docente;
+  materia: Materia;
+  completado: number; 
+}
+
+const HistorialInformesACDoc: React.FC = () => {
   const idDocenteActual = 1;
-  const cicloLectivoActual = new Date().getFullYear(); // o 2025
 
-  // --- ESTADOS MODIFICADOS ---
-  const [materias, setMaterias] = useState<MateriaPendiente[]>([]);
+  const [informes, setInformes] = useState<InformeAC[]>([]);
   const [cargando, setCargando] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const navigate = useNavigate(); // Hook para navegar
-  // --- FIN ESTADOS ---
+  const navigate = useNavigate(); // --- MODIFICADO (ya lo tenías) ---
 
-  // --- LÓGICA MODIFICADA ---
   useEffect(() => {
-    const fetchMateriasPendientes = async () => {
+    const fetchInformesCompletados = async () => {
       try {
         setCargando(true);
         setError(null);
 
-        // Pedimos las MATERIAS PENDIENTES
         const response = await fetch(
-          `http://localhost:8000/materias/docente/${idDocenteActual}/pendientes?ciclo_lectivo=${cicloLectivoActual}`
+          `http://localhost:8000/informesAC/docente/${idDocenteActual}`
         );
 
         if (!response.ok) {
           const errorData = await response.json();
-          throw new Error(errorData.detail || "Error al obtener materias pendientes");
+          throw new Error(errorData.detail || "Error al obtener informes");
         }
 
-        const data: MateriaPendiente[] = await response.json();
-        setMaterias(data);
-
-      } catch (err: any)
-      {
+        const data: InformeAC[] = await response.json();
+        setInformes(data);
+      } catch (err: any) {
         setError(err.message || "Error desconocido");
       } finally {
         setCargando(false);
       }
     };
-    fetchMateriasPendientes();
-  }, [idDocenteActual, cicloLectivoActual]);
+    fetchInformesCompletados();
+  }, [idDocenteActual]);
 
-  // --- NUEVA FUNCIÓN (Navegación) ---
-  const handleSeleccionarMateria = (id_materia: number) => {
-    // Navega a la ruta que definimos en App.tsx
-    navigate(`/home/generar-informe/${id_materia}`);
+
+  // --- MODIFICADO (El botón ahora navega) ---
+  const handleSeleccionar = (id_informe: number) => {
+    navigate(`/home/visualizar-informe/${id_informe}`);
   };
+  // --- FIN MODIFICADO ---
 
-  // (Tus estilos originales)
+
   const styles = {
     container: {
       maxWidth: '1000px',
@@ -101,10 +108,6 @@ const ListadoInformesACDoc: React.FC = () => {
       height: '60px',
       verticalAlign: 'middle' as const,
     },
-    trClickable: {
-      cursor: 'pointer',
-      transition: 'background-color 0.2s',
-    },
     rowAlt: {
       backgroundColor: '#f9f9f9',
     },
@@ -121,16 +124,17 @@ const ListadoInformesACDoc: React.FC = () => {
       color: 'red',
       marginTop: '16px',
     },
-    completeButton: {
+    // --- ESTILO PARA EL BOTÓN ---
+    selectButton: {
       padding: '5px 10px',
       fontSize: '14px',
       fontWeight: 'bold',
       color: '#ffffff',
-      backgroundColor: '#0078D4',
+      backgroundColor: '#0078D4', 
       border: 'none',
       borderRadius: '6px',
       cursor: 'pointer',
-      transition: 'background-color 0.3s, transform 0.2s',
+      transition: 'background-color 0.3s',
     }
   };
 
@@ -142,53 +146,48 @@ const ListadoInformesACDoc: React.FC = () => {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
           }
-          .fila-materia:hover {
-             background-color: #f0f8ff !important;
-          }
-          .btn-generar:hover {
+          .btn-seleccionar:hover {
             background-color: #005a9e !important;
-            transform: scale(1.05);
           }
         `}
       </style>
 
-      <h3 style={styles.title}>Informes de Actividad Curricular Pendientes</h3>
+      <h3 style={styles.title}>Historial de Informes de Actividad Curricular</h3>
 
-      {cargando && <p style={styles.message}>Cargando materias pendientes...</p>}
+      {cargando && <p style={styles.message}>Cargando historial de informes...</p>}
       {error && <p style={styles.error}>Error: {error}</p>}
 
-      {!cargando && !error && materias.length === 0 ? (
-        <p style={styles.message}>No hay informes pendientes por generar para el ciclo lectivo {cicloLectivoActual}.</p>
+      {!cargando && !error && informes.length === 0 ? (
+        <p style={styles.message}>No hay informes completados en el historial.</p>
       ) : (
         <table style={styles.table}>
           <thead>
             <tr>
+              <th style={styles.th}>ID</th>
               <th style={styles.th}>Materia</th>
               <th style={styles.th}>Código</th>
-              <th style={styles.th}>Año</th>
+              <th style={styles.th}>Ciclo</th>
               <th style={styles.th}>Acción</th>
             </tr>
           </thead>
           <tbody>
-            {materias.map((materia, index) => (
+            {informes.map((inf, index) => (
               <tr
-                key={materia.id_materia}
-                style={{
-                  ...(index % 2 === 0 ? styles.rowBase : styles.rowAlt),
-                  ...styles.trClickable,
-                }}
-                className="fila-materia" // Para el hover
-                onClick={() => handleSeleccionarMateria(materia.id_materia)}
+                key={inf.id_informesAC}
+                style={index % 2 === 0 ? styles.rowBase : styles.rowAlt}
               >
-                <td style={styles.td}>{materia.nombre}</td>
-                <td style={styles.td}>{materia.codigoMateria ?? '—'}</td>
-                <td style={styles.td}>{materia.anio}</td>
+                <td style={styles.td}>{inf.id_informesAC}</td>
+                <td style={styles.td}>{inf.materia.nombre}</td>
+                <td style={styles.td}>{inf.materia.codigoMateria ?? '—'}</td>
+                <td style={styles.td}>{inf.ciclo_lectivo}</td>
                 <td style={styles.td}>
+
                   <button 
-                    style={styles.completeButton}
-                    className="btn-generar"
+                    style={styles.selectButton}
+                    className="btn-seleccionar"
+                    onClick={() => handleSeleccionar(inf.id_informesAC)}
                   >
-                    Generar Informe
+                    Seleccionar
                   </button>
                 </td>
               </tr>
@@ -200,4 +199,4 @@ const ListadoInformesACDoc: React.FC = () => {
   );
 };
 
-export default ListadoInformesACDoc;
+export default HistorialInformesACDoc;

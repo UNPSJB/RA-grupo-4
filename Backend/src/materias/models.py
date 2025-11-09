@@ -1,6 +1,6 @@
-from sqlalchemy import Integer, String, ForeignKey, Date
+from sqlalchemy import Integer, String, ForeignKey, Boolean
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from typing import List
+from typing import List, Optional
 from src.models import ModeloBase
 
 class Materias(ModeloBase):
@@ -8,8 +8,8 @@ class Materias(ModeloBase):
 
     id_materia: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     nombre: Mapped[str] = mapped_column(String, unique=True, index=True)
-    anio: Mapped [int] = mapped_column(Integer, unique= True , index= True)
-    codigoMateria: Mapped[str] = mapped_column(String)#corregido que me equivoque de codigo para poner 
+    anio: Mapped[int] = mapped_column(Integer, index=True)
+    codigoMateria: Mapped[str] = mapped_column(String)
 
     id_carrera: Mapped[int] = mapped_column(ForeignKey("carreras.id_carrera"), nullable=False)
     carrera: Mapped["Carreras"] = relationship("Carreras", back_populates="materias")
@@ -18,25 +18,27 @@ class Materias(ModeloBase):
     docente: Mapped["Docentes"] = relationship("Docentes", back_populates="Materias")
 
     id_departamento: Mapped[int] = mapped_column(ForeignKey("departamentos.id"), nullable=False)
-    departamento: Mapped["src.departamentos.models.Departamento"] = relationship( 
-        "src.departamentos.models.Departamento", back_populates="materias" )
+    departamento: Mapped["Departamento"] = relationship(
+        "Departamento", back_populates="materias"
+    )
 
+    informeACCompletado: Mapped[Optional[bool]] = mapped_column(Boolean, default=False, nullable=True)
 
     informesAC: Mapped[List["InformesAC"]] = relationship(
         "InformesAC",
         back_populates="materia"
     )
+
     inscripciones: Mapped[List["Inscripciones"]] = relationship(
-        "Inscripciones", 
+        "Inscripciones",
         back_populates="materia"
     )
-    
-    # encuesta que usa la materia
+
     encuesta_id: Mapped[int] = mapped_column(
         ForeignKey("encuestas.id_encuesta"),
         nullable=False
     )
-    encuesta: Mapped["src.encuesta.models.Encuesta"] = relationship(
-        "src.encuesta.models.Encuesta",
+    encuesta: Mapped["Encuesta"] = relationship(
+        "Encuesta",
         back_populates="materias"
     )
