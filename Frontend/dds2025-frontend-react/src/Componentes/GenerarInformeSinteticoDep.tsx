@@ -1,52 +1,171 @@
-import React from "react";
+import React, { useState } from "react";
 import HeaderInstitucional from "../componentes/HeaderInstitucional";
-import CompletarDatosCabecera from "../componentes/CompletarDatosCabeceraDep";
 
-const styles: { [key: string]: React.CSSProperties } = {
-  page: {
-    backgroundColor: "#f4f7f6",
-    padding: "0px",
-    minHeight: "100vh",
-    fontFamily: '"Segoe UI", "Roboto", sans-serif',
-  },
+// --- Importaciones de Componentes Hijos ---
+import CompletarDatosCabeceraDep from "./Departamento/CompletarDatosCabeceraDep";
+import AutocompletarInformacionGeneral from "./Departamento/AutoCompletarInformacionGeneral";
+import AutocompletarNecesidadesDep from "./Departamento/AutocompletarNecesidadesDep";
+import AutocompletarValoracionesDep from "./Departamento/AutocompletarValoracionesDep";
+import ComentariosFinalesDep from "./Departamento/ComentariosFinalesDep";
+import ConsolidarDesarrolloDeActividades from "./ConsignarDesarrolloDeActividadesDep.tsx";
+
+const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:8000";
+
+const styles = {
   container: {
-    maxWidth: "950px",
+    maxWidth: "1200px",
     margin: "0 auto",
     padding: "30px",
-    backgroundColor: "#ffffff",
-    borderRadius: "8px",
-    boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
-    animation: "fadeIn 0.6s ease-out",
+    backgroundColor: "#f9fbfd",
+    borderRadius: "12px",
+    boxShadow: "0 4px 16px rgba(0,0,0,0.08)",
+    fontFamily: '"Roboto", "Segoe UI", sans-serif',
   },
-  title: {
-    textAlign: "center",
-    color: "#000",
-    fontSize: "20px",
-    fontWeight: "bold",
-    marginBottom: "30px",
-    borderBottom: "2px solid #eee",
-    paddingBottom: "10px",
+  section: {
+    marginTop: "40px",
+  },
+  titulo: {
+    fontSize: "26px",
+    fontWeight: 700,
+    color: "#222",
+    marginBottom: "20px",
+  },
+  divider: {
+    height: "2px",
+    backgroundColor: "#0078D4",
+    margin: "30px 0",
+    borderRadius: "2px",
   },
 };
 
-const GenerarInformeSintetico: React.FC = () => {
+const GenerarInformeSinteticoDep: React.FC = () => {
+  // Estado global del informe a crear
+  const [datosInforme, setDatosInforme] = useState({
+    departamento_id: 0,
+    periodo: "",
+    sede: "",
+    integrantes: "",
+    comentarios: ""
+  });
+  const [creando, setCreando] = useState(false);
+
+  // Handlers para actualizar el estado desde los hijos
+  const handleDepartamentoSeleccionado = (id: number) => {
+      setDatosInforme(prev => ({ ...prev, departamento_id: id }));
+  };
+
+  // Handler para recibir los comentarios del componente hijo
+  const handleComentariosChange = (texto: string) => {
+    setDatosInforme(prev => ({ ...prev, comentarios: texto }));
+  };
+
+  // FUNCIÓN PRINCIPAL: CREAR EL INFORME
+  const handleCrearInformeFinal = async () => {
+    // Validación básica antes de enviar
+    if (!datosInforme.departamento_id) {
+        alert("Por favor seleccione un Departamento antes de continuar.");
+        return;
+    }
+
+    setCreando(true);
+    try {
+        const response = await fetch(`${API_BASE}/informes-sinteticos/`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(datosInforme)
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.detail || "Error al crear el informe");
+        }
+
+        const data = await response.json();
+        alert(`¡Informe Sintético creado con éxito! ID: ${data.id}`);
+    } catch (error: any) {
+        console.error("Error creando informe:", error);
+        alert(`Error al crear el informe: ${error.message}`);
+    } finally {
+        setCreando(false);
+    }
+  };
+
   return (
-    <div style={styles.page}>
-      <style>
-        {`
-          @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-          }
-        `}
-      </style>
+    <div>
+      <HeaderInstitucional />
+
       <div style={styles.container}>
-        <HeaderInstitucional />
-        <h1 style={styles.title}>Generar Informe Sintético</h1>
-        <CompletarDatosCabecera onSubmitSuccess={() => alert("Cabecera guardada")} />
+        <h1 style={styles.titulo}>Generar Informe Sintético</h1>
+
+        {/* Seccion cabecera*/}
+        <section>
+          <CompletarDatosCabeceraDep onDepartamentoSeleccionado={handleDepartamentoSeleccionado} />
+        </section>
+
+        {/* Seccione de vistas, solamente si selecciona un deparatamento en la cabecera, despues modificar cuando se agrege el periodo */}
+        {datosInforme.departamento_id > 0 && (
+            <>
+                {/* Información General */}
+                <div style={styles.divider}></div>
+                <section style={styles.section}>
+                    <AutocompletarInformacionGeneral departamentoId={datosInforme.departamento_id} />
+                </section>
+
+                {/* Consolidación de Actividades-Santi */}
+                <div style={styles.divider}></div>
+                <section style={styles.section}>
+                    <ConsolidarDesarrolloDeActividades />
+                </section>
+
+                {/* Necesidades */}
+                <div style={styles.divider}></div>
+                <section style={styles.section}>
+                    <AutocompletarNecesidadesDep departamentoId={datosInforme.departamento_id} />
+                </section>
+
+                {/* Valoraciones */}
+                <div style={styles.divider}></div>
+                <section style={styles.section}>
+                    <AutocompletarValoracionesDep departamentoId={datosInforme.departamento_id} />
+                </section>
+            </>
+        )}
+
+        <div style={styles.divider}></div>
+
+        <section style={styles.section}>
+           <ComentariosFinalesDep
+              informeId={null}
+              modoCreacion={true}
+              onChange={handleComentariosChange}
+           />
+
+           <div style={{ marginTop: 40, textAlign: 'right' }}>
+               <button
+                   onClick={handleCrearInformeFinal}
+                   disabled={creando || !datosInforme.departamento_id}
+                   style={{
+                       padding: '15px 40px',
+                       fontSize: '1.2rem',
+                       fontWeight: 'bold',
+                       color: 'white',
+                       backgroundColor: '#28a745',
+                       border: 'none',
+                       borderRadius: '8px',
+                       cursor: 'pointer',
+                       boxShadow: '0 4px 12px rgba(40, 167, 69, 0.3)',
+                       transition: 'all 0.3s ease',
+                       opacity: (creando || !datosInforme.departamento_id) ? 0.6 : 1
+                   }}
+               >
+                   {creando ? "Generando..." : " FINALIZAR Y CREAR INFORME"}
+               </button>
+           </div>
+        </section>
+
       </div>
     </div>
   );
 };
 
-export default GenerarInformeSintetico;
+export default GenerarInformeSinteticoDep;

@@ -1,27 +1,41 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Routes, Route, Link, Navigate } from "react-router-dom";
+import { Routes, Route, Link } from "react-router-dom";
 import "./App.css";
 
+// Componentes de autenticación y generales
 import LoginPage from "./Componentes/LoginPage";
-import SeleccionarEncuestas from "./Componentes/SeleccionarEncuestas";
-import ListadoInformesACDoc from "./Componentes/ListadoInformesACDoc";
-import SeleccionarInformeSinteticoSEC from "./Componentes/SeleccionarInformeSinteticoSEC";
-import FiltradoInformeACDep from "./Componentes/FiltradoInformeACDep";
-import ResponderEncuesta from "./Componentes/ResponderEncuesta";
-import PaginaEstadisticasDoc from "./Componentes/PaginaEstadisticasDoc";
 import HomePage from "./Componentes/HomePage";
-import GenerarInformeACDoc from "./Componentes/GenerarInformeAC";
-import GenerarInformeSinteticoDep from "./Componentes/GenerarInformeSinteticoDep";
-import HistorialInformesACDoc from "./Componentes/HistorialInformesACDoc";
-import VisualizarInformeACDoc from "./Componentes/VisualizarInformeACDoc"; // Tu import usa "VisualizarInformeAC"
-import EstadisticasPreguntasPage from "./Componentes/EstadisticasPorPregunta";
+import ErrorCargaDatos from "./Componentes/ErrorCargaDatos";
+import SinDatos from "./Componentes/SinDatos";
 
+// Componentes de Alumno
+import SeleccionarEncuestas from "./Componentes/SeleccionarEncuestas";
+import ResponderEncuesta from "./Componentes/ResponderEncuesta";
+
+// Componentes de Docente
+import ListadoInformesACDoc from "./Componentes/ListadoInformesACDoc";
+import HistorialInformesACDoc from "./Componentes/HistorialInformesACDoc";
+import PaginaEstadisticasDoc from "./Componentes/PaginaEstadisticasDoc";
+import EstadisticasPreguntasPage from "./Componentes/EstadisticasPorPregunta";
+import GenerarInformeACDoc from "./Componentes/GenerarInformeAC";
+import VisualizarInformeACDoc from "./Componentes/VisualizarInformeACDoc";
+
+// Componentes de Departamento
+import FiltradoInformeACDep from "./Componentes/Departamento/FiltradoInformeACDep";
+import ListadoInformesACDep from "./Componentes/Departamento/ListadoInformesACDep";
+import GenerarInformeSinteticoDep from "./Componentes/GenerarInformeSinteticoDep";
+
+// Componentes de Secretaría
+import SeleccionarInformeSinteticoSEC from "./Componentes/SeleccionarInformeSinteticoSEC";
+
+// --- Componente auxiliar para el menú desplegable ---
 const DropdownMenu: React.FC<{ title: string; children: React.ReactNode }> = ({ title, children }) => {
-  // (Tu componente DropdownMenu sin cambios)
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
   const toggleDropdown = () => setIsOpen(!isOpen);
   const closeDropdown = () => setIsOpen(false);
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -31,6 +45,7 @@ const DropdownMenu: React.FC<{ title: string; children: React.ReactNode }> = ({ 
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
   return (
     <div className="dropdown" ref={dropdownRef}>
       <button onClick={toggleDropdown} className="dropdown-button">
@@ -38,7 +53,7 @@ const DropdownMenu: React.FC<{ title: string; children: React.ReactNode }> = ({ 
       </button>
       {isOpen && (
         <div className="dropdown-content">
-          {React.Children.map(children, child =>
+          {React.Children.map(children, (child) =>
             React.isValidElement(child)
               ? React.cloneElement(child, { onClick: closeDropdown } as React.Attributes)
               : child
@@ -49,14 +64,13 @@ const DropdownMenu: React.FC<{ title: string; children: React.ReactNode }> = ({ 
   );
 };
 
-
 function App() {
   return (
     <Routes>
-      {/* Página de login */}
+      {/* Página de login (fuera de la estructura principal) */}
       <Route path="/" element={<LoginPage />} />
 
-      {/* Sistema principal */}
+      {/* Estructura principal del sistema con Navbar */}
       <Route
         path="/home/*"
         element={
@@ -67,7 +81,6 @@ function App() {
               </div>
 
               <div className="navbar-links">
-
                 <DropdownMenu title="Funcionalidades Alumno">
                   <Link to="/home/seleccionar">Seleccionar Encuestas</Link>
                 </DropdownMenu>
@@ -81,7 +94,7 @@ function App() {
 
                 <DropdownMenu title="Funcionalidades Departamento">
                   <Link to="/home/informes-dep">Informes Dept.</Link>
-                  <Link to= "/home/generar-sintetico">Generar informe Sintetico.</Link>
+                  <Link to="/home/generar-sintetico">Generar informe Sintetico</Link>
                 </DropdownMenu>
 
                 <DropdownMenu title="Funcionalidades Secretaría">
@@ -96,31 +109,33 @@ function App() {
 
             <div className="page-content">
               <Routes>
-                <Route
-                  index
-                  element={<HomePage />}
-                />
-                <Route path="seleccionar" element={<SeleccionarEncuestas />} />
-                <Route path="informes-dep" element={<FiltradoInformeACDep />} />
-                
-                <Route path="informes-doc" element={<ListadoInformesACDoc />} />
-                
-                <Route path="responder-encuesta/:inscripcionId" element={<ResponderEncuesta />} />
-                <Route path="informes-sinteticos" element={<SeleccionarInformeSinteticoSEC />} />
-                <Route path="estadisticas-docente" element={<PaginaEstadisticasDoc />} />
-                <Route path="estadisticas-preguntas" element={<EstadisticasPreguntasPage/>} />
-                
-                {/* Tu ruta 'generar-informe' huérfana (la dejamos como está) */}
-                <Route path="generar-informe" element={<GenerarInformeACDoc />} /> 
-                
-                <Route path="generar-informe/:id_materia" element={<GenerarInformeACDoc />} />
-                
-                <Route path="historial-informes" element={<HistorialInformesACDoc />} />
-                <Route path="generar-sintetico" element={<GenerarInformeSinteticoDep />} />
-                
-                {/* Corregimos el nombre del componente aquí */}
-                <Route path="visualizar-informe/:id_informe" element={<VisualizarInformeACDoc />} /> 
+                <Route index element={<HomePage />} />
 
+                {/* Rutas de Alumno */}
+                <Route path="seleccionar" element={<SeleccionarEncuestas />} />
+                <Route path="responder-encuesta/:inscripcionId" element={<ResponderEncuesta />} />
+
+                {/* Rutas de Docente */}
+                <Route path="informes-doc" element={<ListadoInformesACDoc />} />
+                <Route path="historial-informes" element={<HistorialInformesACDoc />} />
+                <Route path="estadisticas-docente" element={<PaginaEstadisticasDoc />} />
+                <Route path="estadisticas-preguntas" element={<EstadisticasPreguntasPage />} />
+                {/* Se mantienen ambas rutas para GenerarInformeACDoc por compatibilidad */}
+                <Route path="generar-informe" element={<GenerarInformeACDoc />} />
+                <Route path="generar-informe/:id_materia" element={<GenerarInformeACDoc />} />
+                <Route path="visualizar-informe/:id_informe" element={<VisualizarInformeACDoc />} />
+
+                {/* Rutas de Departamento */}
+                <Route path="informes-dep" element={<FiltradoInformeACDep />} />
+                <Route path="listado-informes-ac" element={<ListadoInformesACDep />} />
+                <Route path="generar-sintetico" element={<GenerarInformeSinteticoDep />} />
+
+                {/* Rutas de Secretaría */}
+                <Route path="informes-sinteticos" element={<SeleccionarInformeSinteticoSEC />} />
+
+                {/* Rutas de Error/Info */}
+                <Route path="error" element={<ErrorCargaDatos />} />
+                <Route path="sin-datos" element={<SinDatos />} />
               </Routes>
             </div>
 

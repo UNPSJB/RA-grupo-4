@@ -3,7 +3,8 @@ from sqlalchemy import delete, select, update
 from sqlalchemy.orm import Session
 from src.departamentos.models import Departamento
 from src.departamentos import schemas, exceptions, models
-
+from src.materias.models import Materias
+from src.informesAC.models import InformesAC
 
 # operaciones CRUD para Departamento
 
@@ -46,3 +47,30 @@ def eliminar_departamento(db: Session, departamento_id: int) -> schemas.Departam
     )
     db.commit()
     return db_departamento
+
+def obtener_resumen_departamento(db: Session, departamento_id: int):
+    """
+    Devuelve un resumen general del departamento:
+    materias, cantidad de alumnos inscriptos, comisiones teóricas y prácticas.
+    """
+    materias = db.query(Materias).filter(Materias.id_departamento == departamento_id).all()
+
+    resumen = []
+    for materia in materias:
+        # buscar el último informe asociado a la materia (si hay varios)
+        informe_ac = (
+            db.query(InformesAC)
+            .filter(InformesAC.id_materia == materia.id_materia)
+            .order_by(InformesAC.ciclo_lectivo.desc())
+            .first()
+        )
+        resumen.append({
+            "codigo": materia.codigoMateria,
+            "nombre": materia.nombre,
+            "anio": materia.anio,
+            "alumnos_inscriptos": informe_ac.cantidad_alumnos_inscriptos if informe_ac else 0,
+            "comisiones_teoricas": informe_ac.cantidad_comisiones_teoricas if informe_ac else 0,
+            "comisiones_practicas": informe_ac.cantidad_comisiones_practicas if informe_ac else 0,
+        })
+
+    return resumen
