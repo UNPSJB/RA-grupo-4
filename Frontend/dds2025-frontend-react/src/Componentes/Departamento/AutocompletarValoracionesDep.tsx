@@ -102,6 +102,7 @@ const AutocompletarValoracionesDep: React.FC<AutocompletarValoracionesProps> = (
       );
       if (!response.ok) throw new Error(`Error ${response.status}`);
       const data = await response.json();
+      console.log("Valoraciones recibidas del backend:", data);
       setMiembros(data);
     } catch (err: any) {
       setError(err.message || "Error desconocido.");

@@ -2,27 +2,34 @@ import React, { useState, useEffect, useRef } from "react";
 import { Routes, Route, Link } from "react-router-dom";
 import "./App.css";
 
+// Componentes de autenticación y generales
 import LoginPage from "./Componentes/LoginPage";
-import SeleccionarEncuestas from "./Componentes/SeleccionarEncuestas";
-import ListadoInformesACDoc from "./Componentes/ListadoInformesACDoc";
-import SeleccionarInformeSinteticoSEC from "./Componentes/SeleccionarInformeSinteticoSEC";
-import ResponderEncuesta from "./Componentes/ResponderEncuesta";
-import PaginaEstadisticasDoc from "./Componentes/PaginaEstadisticasDoc";
 import HomePage from "./Componentes/HomePage";
-import GenerarInformeACDoc from "./Componentes/GenerarInformeAC";
-import GenerarInformeSinteticoDep from "./Componentes/GenerarInformeSinteticoDep";
-import HistorialInformesACDoc from "./Componentes/HistorialInformesACDoc";
-import VisualizarInformeACDoc from "./Componentes/VisualizarInformeACDoc";
-//exepciones
 import ErrorCargaDatos from "./Componentes/ErrorCargaDatos";
 import SinDatos from "./Componentes/SinDatos";
-import EstadisticasPreguntasPage from "./Componentes/EstadisticasPorPregunta";
-import ListadoInformesACDep from "./Componentes/Departamento/ListadoInformesACDep";
 
-const DropdownMenu: React.FC<{ title: string; children: React.ReactNode }> = ({
-  title,
-  children,
-}) => {
+// Componentes de Alumno
+import SeleccionarEncuestas from "./Componentes/SeleccionarEncuestas";
+import ResponderEncuesta from "./Componentes/ResponderEncuesta";
+
+// Componentes de Docente
+import ListadoInformesACDoc from "./Componentes/ListadoInformesACDoc";
+import HistorialInformesACDoc from "./Componentes/HistorialInformesACDoc";
+import PaginaEstadisticasDoc from "./Componentes/PaginaEstadisticasDoc";
+import EstadisticasPreguntasPage from "./Componentes/EstadisticasPorPregunta";
+import GenerarInformeACDoc from "./Componentes/GenerarInformeAC";
+import VisualizarInformeACDoc from "./Componentes/VisualizarInformeACDoc";
+
+// Componentes de Departamento
+import FiltradoInformeACDep from "./Componentes/Departamento/FiltradoInformeACDep";
+import ListadoInformesACDep from "./Componentes/Departamento/ListadoInformesACDep";
+import GenerarInformeSinteticoDep from "./Componentes/GenerarInformeSinteticoDep";
+
+// Componentes de Secretaría
+import SeleccionarInformeSinteticoSEC from "./Componentes/SeleccionarInformeSinteticoSEC";
+
+// --- Componente auxiliar para el menú desplegable ---
+const DropdownMenu: React.FC<{ title: string; children: React.ReactNode }> = ({ title, children }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -60,15 +67,14 @@ const DropdownMenu: React.FC<{ title: string; children: React.ReactNode }> = ({
 function App() {
   return (
     <Routes>
-      {/* Página de login */}
+      {/* Página de login (fuera de la estructura principal) */}
       <Route path="/" element={<LoginPage />} />
 
-      {/* Sistema principal */}
+      {/* Estructura principal del sistema con Navbar */}
       <Route
         path="/home/*"
         element={
           <>
-            {/* 🔹 NAVBAR PRINCIPAL */}
             <nav className="navbar">
               <div className="navbar-left">
                 <span className="site-name">Sistema de encuestas UNPSJB</span>
@@ -87,47 +93,52 @@ function App() {
                 </DropdownMenu>
 
                 <DropdownMenu title="Funcionalidades Departamento">
-                  <Link to="/home/listado-informes-ac">Listado de Informes A.C</Link>
-                  <Link to="/home/generar-sintetico">Generar Informe Sintético</Link>
-                  <Link to= "/home/error">Error</Link>
-                  <Link to= "/home/sinDatos">Sin datos</Link>
+                  <Link to="/home/informes-dep">Informes Dept.</Link>
+                  <Link to="/home/generar-sintetico">Generar informe Sintetico</Link>
                 </DropdownMenu>
 
                 <DropdownMenu title="Funcionalidades Secretaría">
                   <Link to="/home/informes-sinteticos">Informes Sintéticos</Link>
                 </DropdownMenu>
               </div>
+
               <div className="navbar-right">
                 <Link to="/">Cerrar sesión</Link>
               </div>
             </nav>
 
-            {/* 🔹 CONTENIDO PRINCIPAL */}
             <div className="page-content">
               <Routes>
                 <Route index element={<HomePage />} />
-                <Route path="seleccionar" element={<SeleccionarEncuestas />} />
-                <Route path="listado-informes-ac" element={<ListadoInformesACDep />} /> 
 
-                <Route path="informes-doc" element={<ListadoInformesACDoc />} />
+                {/* Rutas de Alumno */}
+                <Route path="seleccionar" element={<SeleccionarEncuestas />} />
                 <Route path="responder-encuesta/:inscripcionId" element={<ResponderEncuesta />} />
-                <Route path="informes-sinteticos" element={<SeleccionarInformeSinteticoSEC />} />
+
+                {/* Rutas de Docente */}
+                <Route path="informes-doc" element={<ListadoInformesACDoc />} />
+                <Route path="historial-informes" element={<HistorialInformesACDoc />} />
                 <Route path="estadisticas-docente" element={<PaginaEstadisticasDoc />} />
                 <Route path="estadisticas-preguntas" element={<EstadisticasPreguntasPage />} />
-
-                {/* Informes de docente */}
+                {/* Se mantienen ambas rutas para GenerarInformeACDoc por compatibilidad */}
                 <Route path="generar-informe" element={<GenerarInformeACDoc />} />
                 <Route path="generar-informe/:id_materia" element={<GenerarInformeACDoc />} />
-
-                <Route path="historial-informes" element={<HistorialInformesACDoc />} />
-                <Route path="generar-sintetico" element={<GenerarInformeSinteticoDep />} />
                 <Route path="visualizar-informe/:id_informe" element={<VisualizarInformeACDoc />} />
-                <Route path="Error" element={<ErrorCargaDatos />} />
-                <Route path="sinDatos" element={<SinDatos />} />
+
+                {/* Rutas de Departamento */}
+                <Route path="informes-dep" element={<FiltradoInformeACDep />} />
+                <Route path="listado-informes-ac" element={<ListadoInformesACDep />} />
+                <Route path="generar-sintetico" element={<GenerarInformeSinteticoDep />} />
+
+                {/* Rutas de Secretaría */}
+                <Route path="informes-sinteticos" element={<SeleccionarInformeSinteticoSEC />} />
+
+                {/* Rutas de Error/Info */}
+                <Route path="error" element={<ErrorCargaDatos />} />
+                <Route path="sin-datos" element={<SinDatos />} />
               </Routes>
             </div>
 
-            {/* 🔹 FOOTER */}
             <footer className="footer">
               © 2025 HP TEAM — Sistema de encuestas UNPSJB
             </footer>

@@ -18,7 +18,7 @@ const ListarInformesSinteticos: React.FC = () => {
     setError(null);
     try {
       // URL del endpoint en FastAPI
-      const response = await fetch("http://localhost:8000/informesSinteticos");
+      const response = await fetch("http://localhost:8000/informes-sinteticos");
 
       if (!response.ok) {
         throw new Error('Hubo un error al cargar los informes.');

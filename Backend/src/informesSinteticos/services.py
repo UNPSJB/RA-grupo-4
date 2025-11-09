@@ -182,6 +182,7 @@ def obtener_auxiliares_periodo(db: Session, departamento_id: int, anio: int) -> 
                 })
     return lista_auxiliares
 
+
 # =========================================
 # === FUNCIONES DE AUTOCOMPLETADO (POST) ===
 # (Usan las auxiliares con un informe ya creado)
@@ -194,7 +195,11 @@ def generar_resumen_necesidades(db: Session, informe_sintetico: InformeSintetico
     return obtener_necesidades_periodo(db, informe_sintetico.departamento_id, int(informe_sintetico.periodo))
 
 def generar_valoracion_miembros(db: Session, informe_sintetico: InformeSintetico) -> List[dict]:
-    return obtener_miembros_periodo(db, informe_sintetico.departamento_id, int(informe_sintetico.periodo))
+    return obtener_valoraciones_miembros_periodo(
+        db,
+        informe_sintetico.departamento_id,
+        int(informe_sintetico.periodo)
+    )
 
 # (Opcional) Si quisieras guardar también los auxiliares en el informe sintético:
 # def generar_valoracion_auxiliares(db: Session, informe_sintetico: InformeSintetico) -> List[dict]:

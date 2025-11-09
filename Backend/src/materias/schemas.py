@@ -17,7 +17,7 @@ class MateriaCreate(MateriaBase):
 class MateriaUpdate(MateriaBase):
     anio: int
 
-# ✅ Esta versión corta el ciclo (no incluye departamento completo)
+
 class Materia(BaseModel):
     id_materia: int
     nombre: str
@@ -59,3 +59,13 @@ class MateriaEstadisticaItem(BaseModel):
 
 class EstadisticasDocenteOut(BaseModel):
     estadisticas: List[MateriaEstadisticaItem]
+
+class NecesidadMateriaSchema(BaseModel):
+    id_materia: int
+    nombre_materia: str
+    codigo_materia: str
+    necesidad_equipamiento: Optional[str] = None
+    necesidad_bibliografia: Optional[str] = None
+
+    class Config:
+        from_attributes = True

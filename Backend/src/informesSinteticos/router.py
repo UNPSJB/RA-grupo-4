@@ -4,6 +4,7 @@ from typing import List
 from src.database import get_db
 from src.informesSinteticos import schemas, services
 from src.informesSinteticos.models import InformeSintetico
+from src.materias.schemas import NecesidadMateriaSchema
 
 router = APIRouter(prefix="/informes-sinteticos", tags=["Informes Sintéticos"])
 
