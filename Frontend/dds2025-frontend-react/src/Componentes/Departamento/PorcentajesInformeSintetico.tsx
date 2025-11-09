@@ -46,7 +46,7 @@ const colores = [
 
 const SECCIONES_PERMITIDAS = ["B", "C", "D", "E-Teoria", "E-Practica"];
 
-const InformePorMateria: React.FC<Props> = ({ departamentoId, anio }) => {
+const PorcentajesInformeSintetico: React.FC<Props> = ({ departamentoId, anio }) => {
     const [informes, setInformes] = useState<InformeAC[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -218,7 +218,7 @@ const InformePorMateria: React.FC<Props> = ({ departamentoId, anio }) => {
     );
 };
 
-export default InformePorMateria;
+export default PorcentajesInformeSintetico;
 
 /* 🎨 Estilos */
 const styles: Record<string, React.CSSProperties> = {

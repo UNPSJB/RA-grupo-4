@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import HeaderInstitucional from "../componentes/HeaderInstitucional";
+import HeaderInstitucional from "../Componentes/HeaderInstitucional";
 
 // --- Importaciones de Componentes Hijos ---
 import CompletarDatosCabeceraDep from "./Departamento/CompletarDatosCabeceraDep";
@@ -8,6 +8,9 @@ import AutocompletarNecesidadesDep from "./Departamento/AutocompletarNecesidades
 import AutocompletarValoracionesDep from "./Departamento/AutocompletarValoracionesDep";
 import ComentariosFinalesDep from "./Departamento/ComentariosFinalesDep";
 import ConsolidarDesarrolloDeActividades from "./ConsignarDesarrolloDeActividadesDep.tsx";
+
+import PorcentajesInformeSintetico from "./Departamento/PorcentajesInformeSintetico.tsx";
+import AspecPosObstaculosInformeSintetico from "./Departamento/AspecPositivosObstaculosInformeSintetico.tsx";
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
@@ -121,6 +124,18 @@ const GenerarInformeSinteticoDep: React.FC = () => {
                 <div style={styles.divider}></div>
                 <section style={styles.section}>
                     <AutocompletarNecesidadesDep departamentoId={datosInforme.departamento_id} />
+                </section>
+
+                {/* Porcentajes */}
+                <div style={styles.divider}></div>
+                <section style={styles.section}>
+                    <PorcentajesInformeSintetico departamentoId={datosInforme.departamento_id} anio={2025} />
+                </section>
+
+                {/* Aspectos positivos y Obstaculos */}
+                <div style={styles.divider}></div>
+                <section style={styles.section}>
+                    <AspecPosObstaculosInformeSintetico departamentoId={datosInforme.departamento_id} anio={2025} />
                 </section>
 
                 {/* Valoraciones */}
