@@ -8,7 +8,7 @@ import AutocompletarInformacionGeneral from "../Departamento/AutoCompletarInform
 import AutocompletarNecesidadesDep from "../Departamento/AutocompletarNecesidadesDep";
 import AutocompletarValoracionesDep from "../Departamento/AutocompletarValoracionesDep";
 import ComentariosFinalesDep from "../Departamento/ComentariosFinalesDep";
-import ConsolidarDesarrolloDeActividades from "./ConsignarDesarrolloDeActividadesDep.tsx";
+import ConsignarDesarrolloDeActividadesDep from "./ConsignarDesarrolloDeActividadesDep.tsx";
 import PorcentajesInformeSintetico from "../Departamento/PorcentajesInformeSintetico.tsx";
 import AspecPosObstaculosInformeSintetico from "../Departamento/AspecPositivosObstaculosInformeSintetico.tsx";
 
@@ -301,7 +301,7 @@ const GenerarInformeSinteticoDep: React.FC = () => {
 
                         <div style={styles.divider}></div>
                         <section style={styles.section}>
-                            <ConsolidarDesarrolloDeActividades />
+                            <ConsignarDesarrolloDeActividadesDep departamentoId={datosInforme.departamento_id}/>
                         </section>
 
                         <div style={styles.divider}></div>
