@@ -187,7 +187,7 @@ const AspecPosObstaculosInformeSintetico: React.FC<Props> = ({ departamentoId, a
       `}</style>
 
       <div className="uni-header">
-        <h2 className="uni-title">2. Aspectos Positivos y Obstáculos</h2>
+        <h2 className="uni-title">Aspectos Positivos y Obstáculos</h2>
       </div>
 
       {cargando ? (
