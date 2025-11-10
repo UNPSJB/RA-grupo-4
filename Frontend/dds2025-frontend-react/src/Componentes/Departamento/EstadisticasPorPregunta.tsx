@@ -77,7 +77,7 @@ const PreguntaGrafico: React.FC<{ opciones: OpcionRespuesta[] }> = memo(({ opcio
 export const MateriaEstadisticasAcordeones: React.FC<{ data: MateriaEstadisticasProps }> = ({
     data,
 }) => {
-    const [abiertas, setAbiertas] = useState<number[]>(data.secciones.map((s) => s.seccion_id));
+    const [abiertas, setAbiertas] = useState<number[]>([]);
     const [preguntasAbiertas, setPreguntasAbiertas] = useState<number[]>([]);
 
     const toggleSeccion = (id: number) => {
