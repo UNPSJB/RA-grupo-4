@@ -2,6 +2,10 @@ import React, { useState, useEffect, useRef } from "react";
 import { Routes, Route, Link } from "react-router-dom";
 import "./App.css";
 
+// --- IMPORTACIONES DE IMÁGENES ---
+import logoUnpsjb from "./assets/logo_unpsjb.png";
+import userAvatar from "./assets/avatarOA.png";
+
 // Componentes de autenticación y generales
 import LoginPage from "./Componentes/LoginPage";
 import HomePage from "./Componentes/HomePage";
@@ -21,8 +25,7 @@ import GenerarInformeACDoc from "./Componentes/GenerarInformeAC";
 import VisualizarInformeACDoc from "./Componentes/VisualizarInformeACDoc";
 
 // Componentes de Departamento
-// ❌ ELIMINADO: import FiltradoInformeACDep from "./Componentes/Departamento/FiltradoInformeACDep";
-import ListadoInformesACDepREAL from "./Componentes/ListadoInformesACDepREAL"; // ✅ TU COMPONENTE INTEGRADO
+import ListadoInformesACDepREAL from "./Componentes/ListadoInformesACDepREAL";
 import GenerarInformeSinteticoDep from "./Componentes/GenerarInformeSinteticoDep";
 
 // Componentes de Secretaría
@@ -77,6 +80,8 @@ function App() {
           <>
             <nav className="navbar">
               <div className="navbar-left">
+                {/* --- LOGO UNPSJB --- */}
+                <img src={logoUnpsjb} alt="Logo UNPSJB" className="navbar-logo" />
                 <span className="site-name">Sistema de encuestas UNPSJB</span>
               </div>
 
@@ -93,7 +98,6 @@ function App() {
                 </DropdownMenu>
 
                 <DropdownMenu title="Funcionalidades Departamento">
-                  {/* ✅ ÚNICO ENLACE PARA GESTIÓN DE INFORMES */}
                   <Link to="/home/listado-informes-ac">Gestión Informes A.C.</Link>
                   <Link to="/home/generar-sintetico">Generar informe Sintetico</Link>
                 </DropdownMenu>
@@ -104,6 +108,8 @@ function App() {
               </div>
 
               <div className="navbar-right">
+                {/* --- AVATAR DE USUARIO --- */}
+                <img src={userAvatar} alt="Avatar Usuario" className="user-avatar" />
                 <Link to="/">Cerrar sesión</Link>
               </div>
             </nav>
@@ -126,11 +132,7 @@ function App() {
                 <Route path="visualizar-informe/:id_informe" element={<VisualizarInformeACDoc />} />
 
                 {/* Rutas de Departamento */}
-                {/* ❌ RUTA VIEJA ELIMINADA: <Route path="informes-dep" element={<FiltradoInformeACDep />} /> */}
-                
-                {/* ✅ RUTA ÚNICA Y DEFINITIVA */}
                 <Route path="listado-informes-ac" element={<ListadoInformesACDepREAL />} />
-                
                 <Route path="generar-sintetico" element={<GenerarInformeSinteticoDep />} />
 
                 {/* Rutas de Secretaría */}
