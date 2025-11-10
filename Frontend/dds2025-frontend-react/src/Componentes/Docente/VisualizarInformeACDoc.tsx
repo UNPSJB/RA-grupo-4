@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import HeaderInstitucional from '../Otros/HeaderInstitucional';
 import {
-    BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LabelList,
+  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LabelList,
 } from 'recharts';
 
 const BASE_URL = 'http://localhost:8000';
-
 
 interface Materia {
   id_materia: number;
@@ -48,14 +48,14 @@ interface InformeACCompleto {
   cantidad_comisiones_practicas: number;
   porcentaje_teoricas: number;
   porcentaje_practicas: number;
-  justificacion_porcentaje?: string; // Opcional
+  justificacion_porcentaje?: string;
   porcentaje_contenido_abordado: number;
   opinionSobreResumen: string;
   resumenSecciones: SeccionResumen[];
   valoracion_auxiliares: ValoracionAuxiliarData[];
   actividades: Actividad[];
-  necesidades_equipamiento?: string[]; // Opcional
-  necesidades_bibliografia?: string[]; // Opcional
+  necesidades_equipamiento?: string[];
+  necesidades_bibliografia?: string[];
   aspectos_positivos_enseñanza: string;
   aspectos_positivos_aprendizaje: string;
   obstaculos_enseñanza: string;
@@ -64,18 +64,17 @@ interface InformeACCompleto {
   resumen_reflexion: string;
 }
 
-
 interface DataFieldProps {
   label: string;
   value: string | number | undefined | null;
 }
+// Usamos los estilos definidos abajo
 const DataField: React.FC<DataFieldProps> = ({ label, value }) => (
   <div style={styles.fieldContainer}>
     <p style={styles.fieldLabel}>{label}</p>
     <p style={styles.fieldValue}>{value || 'No completado'}</p>
   </div>
 );
-
 
 interface DataListProps {
   label: string;
@@ -95,7 +94,6 @@ const DataList: React.FC<DataListProps> = ({ label, items }) => (
     )}
   </div>
 );
-
 
 const VisualizarInformeACDoc: React.FC = () => {
   const { id_informe } = useParams<{ id_informe: string }>();
@@ -144,9 +142,9 @@ const VisualizarInformeACDoc: React.FC = () => {
   return (
     <div style={styles.page}>
       <div style={styles.container}>
-        <h2 style={styles.title}>Informe de Actividad Curricular (ID: {informe.id_informesAC})</h2>
-        
+        <HeaderInstitucional/>
         {/* --- Sección 1: Datos Generales --- */}
+        <h2 style={styles.title}>Informe de Actividad Curricular</h2>
         <div style={styles.section}>
           <h3 style={styles.sectionTitle}>1. Datos Generales</h3>
           <div style={styles.grid}>
@@ -210,64 +208,70 @@ const VisualizarInformeACDoc: React.FC = () => {
         {/* --- Sección 5: Proceso de Aprendizaje --- */}
         <div style={styles.section}>
             <h3 style={styles.sectionTitle}>5. Proceso de Enseñanza-Aprendizaje</h3>
-            <DataField label="Aspectos Positivos (Enseñanza)" value={informe.aspectos_positivos_enseñanza} />
-            <DataField label="Aspectos Positivos (Aprendizaje)" value={informe.aspectos_positivos_aprendizaje} />
-            <DataField label="Obstáculos (Enseñanza)" value={informe.obstaculos_enseñanza} />
-            <DataField label="Obstáculos (Aprendizaje)" value={informe.obstaculos_aprendizaje} />
-            <DataField label="Estrategias a Implementar" value={informe.estrategias_a_implementar} />
-            <DataField label="Resumen y Reflexión" value={informe.resumen_reflexion} />
+            <div style={styles.gridFullWidth}> {/* Usamos un grid de una columna para textos largos */}
+                <DataField label="Aspectos Positivos (Enseñanza)" value={informe.aspectos_positivos_enseñanza} />
+                <DataField label="Aspectos Positivos (Aprendizaje)" value={informe.aspectos_positivos_aprendizaje} />
+                <DataField label="Obstáculos (Enseñanza)" value={informe.obstaculos_enseñanza} />
+                <DataField label="Obstáculos (Aprendizaje)" value={informe.obstaculos_aprendizaje} />
+                <DataField label="Estrategias a Implementar" value={informe.estrategias_a_implementar} />
+                <DataField label="Resumen y Reflexión" value={informe.resumen_reflexion} />
+            </div>
         </div>
 
         {/* --- Sección 6: Actividades --- */}
         <div style={styles.section}>
             <h3 style={styles.sectionTitle}>6. Actividades de Cátedra</h3>
-            <table style={styles.table}>
-                <thead>
-                    <tr>
-                        <th style={styles.th}>Integrante</th>
-                        <th style={styles.th}>Capacitación</th>
-                        <th style={styles.th}>Investigación</th>
-                        <th style={styles.th}>Extensión</th>
-                        <th style={styles.th}>Gestión</th>
-                        <th style={styles.th}>Observaciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {informe.actividades.map((act, index) => (
-                        <tr key={index} style={index % 2 === 0 ? styles.rowBase : styles.rowAlt}>
-                            <td style={styles.td}>{act.integranteCatedra}</td>
-                            <td style={styles.td}>{act.capacitacion}</td>
-                            <td style={styles.td}>{act.investigacion}</td>
-                            <td style={styles.td}>{act.extension}</td>
-                            <td style={styles.td}>{act.gestion}</td>
-                            <td style={styles.td}>{act.observacionComentarios}</td>
+            <div style={{overflowX: 'auto'}}>
+                <table style={styles.table}>
+                    <thead>
+                        <tr>
+                            <th style={styles.th}>Integrante</th>
+                            <th style={styles.th}>Capacitación</th>
+                            <th style={styles.th}>Investigación</th>
+                            <th style={styles.th}>Extensión</th>
+                            <th style={styles.th}>Gestión</th>
+                            <th style={styles.th}>Observaciones</th>
                         </tr>
-                    ))}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        {informe.actividades.map((act, index) => (
+                            <tr key={index} style={index % 2 === 0 ? styles.rowBase : styles.rowAlt}>
+                                <td style={styles.td}>{act.integranteCatedra}</td>
+                                <td style={styles.td}>{act.capacitacion}</td>
+                                <td style={styles.td}>{act.investigacion}</td>
+                                <td style={styles.td}>{act.extension}</td>
+                                <td style={styles.td}>{act.gestion}</td>
+                                <td style={styles.td}>{act.observacionComentarios}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
         </div>
 
         {/* --- Sección 7: Valoración Auxiliares --- */}
         <div style={styles.section}>
             <h3 style={styles.sectionTitle}>7. Valoración de Auxiliares</h3>
-            <table style={styles.table}>
-                <thead>
-                    <tr>
-                        <th style={styles.th}>Nombre Auxiliar</th>
-                        <th style={styles.th}>Calificación</th>
-                        <th style={styles.th}>Justificación</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {informe.valoracion_auxiliares.map((val, index) => (
-                        <tr key={index} style={index % 2 === 0 ? styles.rowBase : styles.rowAlt}>
-                            <td style={styles.td}>{val.nombre_auxiliar}</td>
-                            <td style={styles.td}>{val.calificacion}</td>
-                            <td style={styles.td}>{val.justificacion}</td>
+             <div style={{overflowX: 'auto'}}>
+                <table style={styles.table}>
+                    <thead>
+                        <tr>
+                            <th style={styles.th}>Nombre Auxiliar</th>
+                            <th style={styles.th}>Calificación</th>
+                            <th style={styles.th}>Justificación</th>
                         </tr>
-                    ))}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        {informe.valoracion_auxiliares.map((val, index) => (
+                            <tr key={index} style={index % 2 === 0 ? styles.rowBase : styles.rowAlt}>
+                                <td style={styles.td}>{val.nombre_auxiliar}</td>
+                                <td style={styles.td}>{val.calificacion}</td>
+                                <td style={styles.td}>{val.justificacion}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
         </div>
         
         <div style={styles.buttonContainer}>
@@ -318,23 +322,32 @@ const styles: { [key: string]: React.CSSProperties } = {
     gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
     gap: '20px',
   },
+  gridFullWidth: {
+     display: 'flex',
+     flexDirection: 'column',
+     gap: '20px',
+  },
   fieldContainer: {
-    backgroundColor: '#f9f9f9',
-    padding: '12px 16px',
-    borderRadius: '6px',
-    border: '1px solid #eee',
+    /* --- CAMBIO DE COLOR APLICADO AQUÍ --- */
+    backgroundColor: '#e0efff', // Celeste claro solicitado
+    padding: '15px 18px',
+    borderRadius: '8px',
+    border: '1px solid #cce5ff', // Borde un poco más oscuro para definir
   },
   fieldLabel: {
     fontSize: '14px',
     fontWeight: 'bold',
-    color: '#333',
-    margin: '0 0 5px 0',
+    color: '#003366', // Azul oscuro para el título del campo, combina mejor con el celeste
+    margin: '0 0 8px 0',
+    textTransform: 'uppercase',
+    letterSpacing: '0.5px',
   },
   fieldValue: {
     fontSize: '16px',
-    color: '#555',
+    color: '#333',
     margin: 0,
     whiteSpace: 'pre-wrap' as const,
+    lineHeight: '1.5',
   },
   ul: {
       paddingLeft: '20px',
@@ -342,48 +355,48 @@ const styles: { [key: string]: React.CSSProperties } = {
   },
   li: {
       fontSize: '16px',
-      color: '#555',
+      color: '#333',
       marginBottom: '5px',
   },
   chartBox: {
-    flex: `1 1 calc(33.33% - 1rem)`,
-    minWidth: "280px",
-    maxWidth: "400px",
-    padding: "0.5rem",
-    border: "1px solid #ccc",
-    borderRadius: "6px",
+    flex: `1 1 calc(50% - 1rem)`, // Gráficos un poco más grandes
+    minWidth: "300px",
+    padding: "1rem",
+    border: "1px solid #e0e0e0",
+    borderRadius: "8px",
     backgroundColor: "#fff",
+    boxShadow: "0 2px 5px rgba(0,0,0,0.05)"
   },
   chartTitle: {
     fontWeight: "600",
     fontSize: "1rem",
-    marginBottom: "0.3rem",
-    textAlign: "center" as const
+    marginBottom: "1rem",
+    textAlign: "center" as const,
+    color: "#555"
   },
   table: {
     width: '100%',
     borderCollapse: 'collapse',
-    marginTop: '16px',
+    marginTop: '10px',
     fontFamily: '"Segoe UI", "Roboto", sans-serif',
   },
   th: {
-    backgroundColor: '#e6f2ff',
-    color: '#003366',
-    padding: '14px',
+    backgroundColor: '#005f9e', // Encabezado de tabla más oscuro para contraste
+    color: '#ffffff',
+    padding: '12px 15px',
     textAlign: 'left' as const,
-    fontWeight: 'bold',
-    borderBottom: '2px solid #ccc',
-    fontSize: '15px',
+    fontWeight: '600',
+    fontSize: '14px',
   },
   td: {
-    padding: '14px',
-    borderBottom: '1px solid #ddd',
+    padding: '12px 15px',
+    borderBottom: '1px solid #e0e0e0',
     fontSize: '14px',
-    color: '#000',
-    verticalAlign: 'middle' as const,
+    color: '#333',
+    verticalAlign: 'top' as const, // Alineación superior para textos largos
   },
   rowAlt: {
-    backgroundColor: '#f9f9f9',
+    backgroundColor: '#f8fbff', // Alternar con un celeste muy muy suave
   },
   rowBase: {
     backgroundColor: '#ffffff',
@@ -391,9 +404,11 @@ const styles: { [key: string]: React.CSSProperties } = {
   buttonContainer: {
     textAlign: 'center',
     marginTop: '40px',
+    borderTop: '1px solid #eee',
+    paddingTop: '25px',
   },
   button: {
-    padding: '12px 25px',
+    padding: '12px 30px',
     fontSize: '16px',
     fontWeight: 'bold',
     color: '#ffffff',
@@ -401,19 +416,23 @@ const styles: { [key: string]: React.CSSProperties } = {
     border: 'none',
     borderRadius: '6px',
     cursor: 'pointer',
-    transition: 'background-color 0.3s, transform 0.2s',
+    transition: 'background-color 0.2s, transform 0.1s',
+    boxShadow: '0 2px 5px rgba(0,0,0,0.2)',
   },
   message: {
-    fontSize: '15px',
+    fontSize: '16px',
     color: '#666',
-    marginTop: '16px',
+    marginTop: '30px',
     textAlign: 'center' as const,
   },
   error: {
-    fontSize: '15px',
-    color: 'red',
-    marginTop: '16px',
+    fontSize: '16px',
+    color: '#d32f2f',
+    marginTop: '30px',
     textAlign: 'center' as const,
+    padding: '15px',
+    backgroundColor: '#ffebee',
+    borderRadius: '8px',
   },
 };
 
