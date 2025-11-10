@@ -54,7 +54,7 @@ const ConsignarDesarrolloDeActividadesDep: React.FC<Props> = ({ departamentoId }
       setError(null);
 
       try {
-        const response = await fetch(`${API_BASE}/informes-sinteticos/preview/actividades?departamento_id=${departamentoId}&anio=${ANIO_EVALUADO}`);
+        const response = await fetch(`${API_BASE}/informes-sinteticos/actividades`)
 
         if (!response.ok) {
           throw new Error(`Error ${response.status}: No se pudo obtener la información de actividades.`);
