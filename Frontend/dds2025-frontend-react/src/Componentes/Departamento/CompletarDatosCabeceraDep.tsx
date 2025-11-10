@@ -4,15 +4,21 @@ interface Departamento {
   id: number;
   nombre: string;
 }
-
+interface CabeceraData {
+  periodo: string;
+  sede: string;
+  integrantes: string;
+}
 interface Props {
   onDepartamentoSeleccionado?: (id: number) => void;
+  onCabeceraChange: (data: CabeceraData) => void;
 }
 
 const API_BASE = "http://localhost:8000";
 
 const CompletarDatosCabeceraDep: React.FC<Props> = ({
   onDepartamentoSeleccionado,
+  onCabeceraChange,
 }) => {
   const [departamentos, setDepartamentos] = useState<Departamento[]>([]);
   const [departamentoSeleccionado, setDepartamentoSeleccionado] = useState<number>(0);
@@ -45,7 +51,10 @@ const CompletarDatosCabeceraDep: React.FC<Props> = ({
       setDepartamentoSeleccionado(id);
       onDepartamentoSeleccionado && onDepartamentoSeleccionado(id);
     } else {
-      setFormData({ ...formData, [name]: value });
+      const newData = { ...formData, [name]: value };
+      setFormData(newData);
+      
+      onCabeceraChange(newData);
     }
   };
 

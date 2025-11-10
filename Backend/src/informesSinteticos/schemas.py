@@ -21,7 +21,7 @@ class InformeSinteticoBase(BaseModel):
     resumen_general: Optional[List[Dict[str, Any]]] = None
     resumen_necesidades: Optional[List[Dict[str, Any]]] = None
     valoracion_miembros: Optional[List[Dict[str, Any]]] = None
-    observaciones_actividades: Optional[List[Dict[str, Any]]] = None
+   #observaciones_actividades: Optional[List[Dict[str, Any]]] = None
 
 class InformeSinteticoCreate(InformeSinteticoBase):
     pass

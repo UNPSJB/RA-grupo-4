@@ -48,13 +48,26 @@ const GenerarInformeSinteticoDep: React.FC = () => {
     periodo: "",
     sede: "",
     integrantes: "",
-    comentarios: ""
+    comentarios: "",
+    descripcion: "Informe Sintético del Departamento", 
+    anio: 2025,
   });
   const [creando, setCreando] = useState(false);
 
   // Handlers para actualizar el estado desde los hijos
   const handleDepartamentoSeleccionado = (id: number) => {
       setDatosInforme(prev => ({ ...prev, departamento_id: id }));
+  };
+
+const handleCabeceraChange = (data: { periodo: string, sede: string, integrantes: string }) => {
+      setDatosInforme(prev => ({ 
+          ...prev, 
+          periodo: data.periodo,
+          sede: data.sede,
+          integrantes: data.integrantes,
+          // Nota: Si 'periodo' es un año (ej: "2025"), también podrías querer actualizar 'anio' aquí:
+          anio: Number(data.periodo) || 2025 
+      }));
   };
 
   // Handler para recibir los comentarios del componente hijo
@@ -69,9 +82,15 @@ const GenerarInformeSinteticoDep: React.FC = () => {
         alert("Por favor seleccione un Departamento antes de continuar.");
         return;
     }
+    
+    if (!datosInforme.sede || datosInforme.sede === "") {
+      alert("Por favor seleccione una Sede (Trelew, Esquel, etc.) antes de continuar.");
+      return;
+    }
 
     setCreando(true);
     try {
+        console.log("Datos que se enviarán:", datosInforme);
         const response = await fetch(`${API_BASE}/informes-sinteticos/`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -87,7 +106,8 @@ const GenerarInformeSinteticoDep: React.FC = () => {
         alert(`¡Informe Sintético creado con éxito! ID: ${data.id}`);
     } catch (error: any) {
         console.error("Error creando informe:", error);
-        alert(`Error al crear el informe: ${error.message}`);
+        const errorMessage = error.message || (error.response?.json()?.detail || "Error desconocido");
+        alert(`Error al crear el informe: ${JSON.stringify(errorMessage)}`);
     } finally {
         setCreando(false);
     }
@@ -102,7 +122,10 @@ const GenerarInformeSinteticoDep: React.FC = () => {
 
         {/* Seccion cabecera*/}
         <section>
-          <CompletarDatosCabeceraDep onDepartamentoSeleccionado={handleDepartamentoSeleccionado} />
+          <CompletarDatosCabeceraDep 
+            onDepartamentoSeleccionado={handleDepartamentoSeleccionado} 
+            onCabeceraChange={handleCabeceraChange} 
+          />
         </section>
 
         {/* Seccione de vistas, solamente si selecciona un deparatamento en la cabecera, despues modificar cuando se agrege el periodo */}
