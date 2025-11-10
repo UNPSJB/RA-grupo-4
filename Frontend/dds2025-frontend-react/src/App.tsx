@@ -3,30 +3,30 @@ import { Routes, Route, Link } from "react-router-dom";
 import "./App.css";
 
 // Componentes de autenticación y generales
-import LoginPage from "./Componentes/LoginPage";
-import HomePage from "./Componentes/HomePage";
-import ErrorCargaDatos from "./Componentes/ErrorCargaDatos";
-import SinDatos from "./Componentes/SinDatos";
+import LoginPage from "./Componentes/Otros/LoginPage";
+import HomePage from "./Componentes/Otros/HomePage";
+import ErrorCargaDatos from "./Componentes/Otros/ErrorCargaDatos";
+import SinDatos from "./Componentes/Otros/SinDatos";
 
 // Componentes de Alumno
-import SeleccionarEncuestas from "./Componentes/SeleccionarEncuestas";
-import ResponderEncuesta from "./Componentes/ResponderEncuesta";
+import SeleccionarEncuestas from "./Componentes/Estudiante/SeleccionarEncuestas";
+import ResponderEncuesta from "./Componentes/Estudiante/ResponderEncuesta";
 
 // Componentes de Docente
-import ListadoInformesACDoc from "./Componentes/ListadoInformesACDoc";
-import HistorialInformesACDoc from "./Componentes/HistorialInformesACDoc";
-import PaginaEstadisticasDoc from "./Componentes/PaginaEstadisticasDoc";
-import EstadisticasPreguntasPage from "./Componentes/EstadisticasPorPregunta";
-import GenerarInformeACDoc from "./Componentes/GenerarInformeAC";
-import VisualizarInformeACDoc from "./Componentes/VisualizarInformeACDoc";
+import ListadoInformesACDoc from "./Componentes/Docente/ListadoInformesACDoc";
+import HistorialInformesACDoc from "./Componentes/Docente/HistorialInformesACDoc";
+import PaginaEstadisticasDoc from "./Componentes/Docente/PaginaEstadisticasDoc";
+import EstadisticasPreguntasPage from "./Componentes/Departamento/EstadisticasPorPregunta";
+import GenerarInformeACDoc from "./Componentes/Docente/GenerarInformeAC";
+import VisualizarInformeACDoc from "./Componentes/Docente/VisualizarInformeACDoc";
 
 // Componentes de Departamento
 import FiltradoInformeACDep from "./Componentes/Departamento/FiltradoInformeACDep";
 import ListadoInformesACDep from "./Componentes/Departamento/ListadoInformesACDep";
-import GenerarInformeSinteticoDep from "./Componentes/GenerarInformeSinteticoDep";
+import GenerarInformeSinteticoDep from "./Componentes/Departamento/GenerarInformeSinteticoDep";
 
 // Componentes de Secretaría
-import SeleccionarInformeSinteticoSEC from "./Componentes/SeleccionarInformeSinteticoSEC";
+import SeleccionarInformeSinteticoSEC from "./Componentes/Secretaria/SeleccionarInformeSinteticoSEC";
 
 // --- Componente auxiliar para el menú desplegable ---
 const DropdownMenu: React.FC<{ title: string; children: React.ReactNode }> = ({ title, children }) => {

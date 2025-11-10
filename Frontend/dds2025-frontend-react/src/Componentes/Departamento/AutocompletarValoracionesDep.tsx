@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback, useMemo } from "react";
-import ErrorCargaDatos from "../ErrorCargaDatos";
+import ErrorCargaDatos from "../Otros/ErrorCargaDatos";
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
