@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import VisualizarInformeACDep from "./Departamento/VisualizarInformeACDep";
+import SinDatos from "./Otros/SinDatos";
 
 const API_BASE = "http://localhost:8000";
 
@@ -236,7 +237,9 @@ const ListadoInformesACDepREAL: React.FC = () => {
                 </table>
               </div>
             ) : (
-              <div className="status-message">No hay resultados para la búsqueda actual.</div>
+              <div>
+              <SinDatos/>
+              </div>
             )
           )}
         </div>
