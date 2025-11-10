@@ -312,11 +312,6 @@ const GenerarInformeSinteticoDep: React.FC = () => {
 
                         <div style={styles.divider}></div>
                         <section style={styles.section}>
-                            <ConsignarDesarrolloDeActividadesDep departamentoId={datosInforme.departamento_id}/>
-                        </section>
-
-                        <div style={styles.divider}></div>
-                        <section style={styles.section}>
                             <AutocompletarNecesidadesDep departamentoId={datosInforme.departamento_id} />
                         </section>
 
@@ -328,6 +323,11 @@ const GenerarInformeSinteticoDep: React.FC = () => {
                         <div style={styles.divider}></div>
                         <section style={styles.section}>
                             <AspecPosObstaculosInformeSintetico departamentoId={datosInforme.departamento_id} anio={2025} />
+                        </section>
+
+                        <div style={styles.divider}></div>
+                        <section style={styles.section}>
+                            <ConsignarDesarrolloDeActividadesDep departamentoId={datosInforme.departamento_id}/>
                         </section>
 
                         <div style={styles.divider}></div>

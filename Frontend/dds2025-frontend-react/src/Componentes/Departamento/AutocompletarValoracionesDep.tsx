@@ -262,7 +262,7 @@ const AutocompletarValoracionesDep: React.FC<AutocompletarValoracionesProps> = (
       `}</style>
 
       <div className="uni-header">
-        <h2 className="uni-title">3. Valoración de Desempeño Docente</h2>
+        <h2 className="uni-title">Valoración de Desempeño Docente</h2>
         {!cargando && materiasAgrupadas.length > 0 && (
           <span className="uni-badge">{materiasAgrupadas.length} Materias</span>
         )}
