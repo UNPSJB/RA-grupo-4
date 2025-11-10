@@ -1,6 +1,6 @@
 import React from "react";
-import logoUnpsjb from "../assets/logo_unpsjb.png"; 
-import sedeTrelew from "../assets/sede_trelew.jpg"; 
+import logoUnpsjb from "../../assets/logo_unpsjb.png"; 
+import sedeTrelew from "../../assets/sede_trelew.jpg"; 
 
 const HomePage: React.FC = () => {
   return (

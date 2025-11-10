@@ -1,13 +1,13 @@
 import React, { forwardRef } from 'react';
-import HeaderInstitucional from './HeaderInstitucional';
-import CompletarDatosGeneralesDoc from './Docente/CompletarDatosGeneralesDoc';
-import CompletarNecesidadesDoc from './Docente/CompletarNecesidadesDoc';
-import CompletarPorcentajesDoc from './Docente/CompletarPorcentajesDoc';
-import CompletarContenidoAbordadoDoc from './Docente/CompletarContenidoAbordadoDoc';
-import CompletarProcesoAprendizajeDoc from './Docente/CompletarProcesoAprendizajeDoc';
-import ConsignarActividadesDoc from './Docente/ConsignarActividadesDoc';
-import CompletarValoracionAuxiliaresDoc from './Docente/CompletarValoracionAuxiliaresDoc';
-import ResumenSecciones from './Departamento/ConsignarResumenValoresEncuesta';
+import HeaderInstitucional from '../Otros/HeaderInstitucional';
+import CompletarDatosGeneralesDoc from '../Docente/CompletarDatosGeneralesDoc';
+import CompletarNecesidadesDoc from '../Docente/CompletarNecesidadesDoc';
+import CompletarPorcentajesDoc from '../Docente/CompletarPorcentajesDoc';
+import CompletarContenidoAbordadoDoc from '../Docente/CompletarContenidoAbordadoDoc';
+import CompletarProcesoAprendizajeDoc from '../Docente/CompletarProcesoAprendizajeDoc';
+import ConsignarActividadesDoc from '../Docente/ConsignarActividadesDoc';
+import CompletarValoracionAuxiliaresDoc from '../Docente/CompletarValoracionAuxiliaresDoc';
+import ResumenSecciones from './ConsignarResumenValoresEncuesta';
 
 interface InformeImprimibleProps {
   data: any;

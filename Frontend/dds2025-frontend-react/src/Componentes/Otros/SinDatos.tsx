@@ -1,6 +1,6 @@
 import React from 'react';
 // Asegúrate de que la ruta sea correcta según tu proyecto
-import imgSinDatosDefault from '../assets/sinDatos.png';
+import imgSinDatosDefault from '../../assets/sinDatos.png';
 
 interface SinDatosProps {
   /** Ruta de la imagen a mostrar. Si no se provee, usa la imagen por defecto. */

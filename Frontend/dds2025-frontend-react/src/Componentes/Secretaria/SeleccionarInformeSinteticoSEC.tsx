@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { Link } from "react-router-dom";
 // Asegúrate de que la ruta de importación sea correcta
-import ErrorCargaDatos from "./ErrorCargaDatos";
+import ErrorCargaDatos from "../Otros/ErrorCargaDatos";
 
 interface InformeSintetico {
   id: number;

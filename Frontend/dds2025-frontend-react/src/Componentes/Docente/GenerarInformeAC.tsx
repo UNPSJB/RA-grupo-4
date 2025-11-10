@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
-import HeaderInstitucional from './HeaderInstitucional';
+import HeaderInstitucional from '../Otros/HeaderInstitucional';
 import CompletarDatosGeneralesDoc from './CompletarDatosGeneralesDoc';
 import CompletarNecesidadesDoc from './CompletarNecesidadesDoc';
 import CompletarPorcentajesDoc from './CompletarPorcentajesDoc';
@@ -9,7 +9,7 @@ import CompletarContenidoAbordadoDoc from './CompletarContenidoAbordadoDoc';
 import CompletarProcesoAprendizajeDoc from './CompletarProcesoAprendizajeDoc';
 import ConsignarActividadesDoc from './ConsignarActividadesDoc';
 import CompletarValoracionAuxiliaresDoc, { ValoracionAuxiliarData } from './CompletarValoracionAuxiliaresDoc';
-import ResumenSecciones from './Departamento/ConsignarResumenValoresEncuesta';
+import ResumenSecciones from '../Departamento/ConsignarResumenValoresEncuesta';
 
 const BASE_URL = 'http://localhost:8000';
 
