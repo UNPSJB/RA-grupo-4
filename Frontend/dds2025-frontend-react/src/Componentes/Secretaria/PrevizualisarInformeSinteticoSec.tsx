@@ -400,7 +400,7 @@ const PrevisualizarInformeSinteticoSec: React.FC = () => {
 
         {/* --- BARRA DE ACCIONES --- */}
         <div className="actions-bar">
-          <Link to="/home/seleccionar-informe-sintetico" className="btn btn-back">
+          <Link to="/home/informes-sinteticos" className="btn btn-back">
             ← Volver al listado
           </Link>
           <button className="btn btn-print" onClick={() => window.print()}>

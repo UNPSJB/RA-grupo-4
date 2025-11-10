@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import ErrorCargaDatos from './ErrorCargaDatos';
+import ErrorCargaDatos from '../Otros/ErrorCargaDatos';
 import SinDatos from '../Otros/SinDatos';
 
 interface InformeSintetico {
