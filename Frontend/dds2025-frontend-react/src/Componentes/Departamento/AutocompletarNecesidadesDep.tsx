@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:8000";
+const API_BASE = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_URL) || "http://localhost:8000";
 
 interface AutocompletarNecesidadesDepProps {
   departamentoId: number | null;
@@ -20,7 +20,11 @@ const AutocompletarNecesidadesDep: React.FC<AutocompletarNecesidadesDepProps> = 
 
   useEffect(() => {
     const obtenerResumen = async () => {
-      if (!departamentoId) return;
+      if (!departamentoId) {
+        setResumen([]); // Limpiar datos si no hay ID
+        setError(null);
+        return;
+      }
       setCargando(true);
       setError(null);
       try {
@@ -39,9 +43,8 @@ const AutocompletarNecesidadesDep: React.FC<AutocompletarNecesidadesDepProps> = 
 
   // --- Renderizado ---
 
-  // Estados de error y vacio inicial (usando estilos inline básicos para estos mensajes simples)
   if (!departamentoId) {
-    return <div style={{ padding: '30px', textAlign: 'center', color: '#555', backgroundColor: '#f9f9f9', borderRadius: '8px', border: '1px solid #ddd' }}>
+    return <div style={{ padding: '30px', textAlign: 'center', color: '#666' }}>
       🏛️ Seleccione un departamento para ver sus requerimientos.
     </div>;
   }
@@ -54,49 +57,59 @@ const AutocompletarNecesidadesDep: React.FC<AutocompletarNecesidadesDepProps> = 
 
   return (
     <div className="uni-wrapper">
-      {/* Inyectamos tus nuevos colores en las variables CSS */}
+      {/* Estilos unificados del diseño guardado */}
       <style>{`
+        /* PALETA DE COLORES (Diseño guardado) */
         :root {
-          --uni-primary: #003366;       /* Tu azul marino fuerte */
-          --uni-secondary: #007bff;     /* Tu azul brillante de acción */
-          --uni-bg: #f9f9f9;            /* Fondo general claro */
-          --uni-card-bg: #ffffff;       /* Fondo de tarjeta blanco */
-          --uni-text-primary: #111;     /* Texto casi negro como en tus inputs */
-          --uni-text-secondary: #555;   /* Texto secundario */
+          --uni-primary: #003366; /* Azul Oscuro Institucional */
+          --uni-secondary: #007bff; /* Azul Vivo de Acción */
+          --uni-bg: #f9f9f9; /* Fondo muy claro */
+          --uni-card-bg: #ffffff; /* Fondo blanco para tarjetas */
+          --uni-text-primary: #212529; /* Texto casi negro */
+          --uni-text-secondary: #6c757d; /* Texto gris */
+          --uni-border: #dee2e6; /* Borde gris claro */
+          --uni-shadow: rgba(0, 0, 0, 0.05); /* Sombra suave */
+          --uni-shadow-hover: rgba(0, 51, 102, 0.15); /* Sombra al pasar el ratón */
           
-          /* Tus colores específicos para fondos de elementos */
-          --tag-equip-bg: #cce4f6;      
+          /* Colores específicos para este componente */
+          --tag-equip-bg: #cce4f6;
           --tag-biblio-bg: #e6f2ff;
         }
 
+        /* TIPOGRAFÍA Y BASE (Diseño guardado) */
         .uni-wrapper {
-          font-family: "Roboto", "Segoe UI", sans-serif; /* Tu fuente preferida */
+          font-family: "Inter", "Segoe UI", Roboto, sans-serif; /* Fuente guardada */
           padding: 20px 0;
           animation: fadeIn 0.6s ease-out;
+          color: var(--uni-text-primary);
+          max-width: 1200px;
+          margin: 0 auto;
         }
 
+        /* HEADER PRINCIPAL (Diseño guardado) */
         .uni-header {
           display: flex;
           align-items: center;
+          justify-content: space-between;
           margin-bottom: 25px;
-          border-bottom: 3px solid var(--uni-primary); /* Usando tu azul fuerte */
+          border-bottom: 3px solid var(--uni-primary);
           padding-bottom: 15px;
         }
         .uni-title {
-          font-size: 1.5rem;
+          font-size: 1.8rem; /* Tamaño guardado */
           color: var(--uni-primary);
           font-weight: 800;
           margin: 0;
         }
-        .uni-badge-count {
+        .uni-badge { /* Clase de badge guardada */
           background: var(--uni-secondary);
           color: white;
-          padding: 4px 12px;
-          border-radius: 20px;
-          font-size: 0.9rem;
+          padding: 6px 15px;
+          border-radius: 25px;
+          font-size: 0.95rem;
           font-weight: bold;
-          margin-left: 15px;
-          box-shadow: 0 2px 5px rgba(0, 123, 255, 0.3);
+          margin-left: 20px;
+          box-shadow: 0 4px 8px rgba(0,123,255,0.2);
         }
 
         /* Grid de Tarjetas */
@@ -106,13 +119,13 @@ const AutocompletarNecesidadesDep: React.FC<AutocompletarNecesidadesDepProps> = 
           gap: 25px;
         }
 
-        /* Tarjeta Individual - Ahora con bordes más definidos como te gustan */
+        /* Tarjeta Individual - Adaptada al diseño guardado */
         .uni-card {
           background: var(--uni-card-bg);
           border-radius: 12px;
           overflow: hidden;
-          box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-          border: 2px solid #e0e0e0; /* Un borde base sólido */
+          box-shadow: 0 8px 24px var(--uni-shadow); /* Sombra guardada */
+          border: 1px solid var(--uni-border); /* Borde guardado */
           transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
           position: relative;
           display: flex;
@@ -120,24 +133,25 @@ const AutocompletarNecesidadesDep: React.FC<AutocompletarNecesidadesDepProps> = 
         }
         .uni-card:hover {
           transform: translateY(-5px);
-          box-shadow: 0 15px 30px -10px rgba(0, 51, 102, 0.2);
-          border-color: var(--uni-primary); /* Al hacer hover, el borde se pone de tu azul fuerte */
+          box-shadow: 0 18px 40px var(--uni-shadow-hover); /* Sombra hover guardada */
+          border-color: var(--uni-secondary); /* Color hover guardado */
         }
-        /* La barra superior de color ahora usa tus dos azules */
+        /* Barra superior de color (como en el diseño guardado de DocenteCard) */
         .uni-card::before {
           content: '';
           position: absolute;
           top: 0; left: 0; right: 0;
-          height: 6px;
+          height: 7px; /* Grosor guardado */
           background: linear-gradient(90deg, var(--uni-primary), var(--uni-secondary));
         }
 
         .uni-card-header {
           padding: 20px 20px 15px;
+          padding-top: 27px; /* Espacio para la barra superior */
         }
         .uni-materia-code {
           display: inline-block;
-          background: var(--uni-primary); /* Fondo oscuro para el código */
+          background: var(--uni-primary);
           color: #ffffff;
           font-size: 0.8rem;
           font-weight: 700;
@@ -152,6 +166,13 @@ const AutocompletarNecesidadesDep: React.FC<AutocompletarNecesidadesDepProps> = 
           color: var(--uni-text-primary);
           line-height: 1.3;
           margin: 0;
+          /* Limitar a 2 líneas */
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          min-height: 2.6em; /* 1.3 * 2 */
         }
 
         .uni-card-body {
@@ -165,13 +186,13 @@ const AutocompletarNecesidadesDep: React.FC<AutocompletarNecesidadesDepProps> = 
         .uni-section-title {
           font-size: 0.9rem;
           text-transform: uppercase;
-          color: var(--uni-primary); /* Títulos de sección en azul fuerte */
+          color: var(--uni-primary);
           font-weight: 700;
           margin-bottom: 10px;
           display: flex;
           align-items: center;
           gap: 8px;
-          border-bottom: 1px solid #eee;
+          border-bottom: 1px solid var(--uni-border);
           padding-bottom: 5px;
         }
         .uni-tags-container {
@@ -179,71 +200,113 @@ const AutocompletarNecesidadesDep: React.FC<AutocompletarNecesidadesDepProps> = 
           flex-wrap: wrap;
           gap: 8px;
         }
-        /* Estilos de Tags actualizados a tu paleta */
+        /* Estilos de Tags */
         .uni-tag {
           font-size: 0.9rem;
           padding: 6px 12px;
-          border-radius: 6px;
+          border-radius: 8px; /* Más redondeado */
           font-weight: 600;
-          color: #111;
-          border: 1px solid var(--uni-primary); /* Borde sólido azul oscuro para los tags */
+          color: var(--uni-text-primary);
+          border: 1px solid transparent; /* Borde transparente por defecto */
         }
         .tag-equip {
-          background-color: var(--tag-equip-bg); /* Tu color #cce4f6 */
+          background-color: var(--tag-equip-bg);
+          border-color: #a6d5f7; /* Borde sutil */
         }
         .tag-biblio {
-          background-color: var(--tag-biblio-bg); /* Tu color #e6f2ff */
+          background-color: var(--tag-biblio-bg);
+          border-color: #cce4f6; /* Borde sutil */
         }
         .uni-empty-state {
            font-style: italic;
-           color: #999;
+           color: var(--uni-text-secondary);
            font-size: 0.9rem;
+           padding: 6px 0;
+        }
+        
+        /* ESTADO VACÍO GLOBAL (Diseño guardado) */
+        .global-empty-state {
+          padding: 40px; 
+          text-align: center; 
+          color: var(--uni-text-secondary); 
+          background-color: var(--uni-card-bg); 
+          border-radius: 12px; 
+          border: 2px dashed var(--uni-border);
+        }
+        .global-empty-icon {
+          font-size: 2.5rem; 
+          margin-bottom: 15px;
+          color: var(--uni-primary);
+          opacity: 0.7;
         }
 
-        /* Animaciones */
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
-        
-        .skeleton {
-          background: #e0e0e0;
+        /* SKELETON (Diseño guardado) */
+        .skeleton-card {
+          height: 300px; /* Altura fija para el skeleton */
+          background: var(--uni-card-bg);
+          border-radius: 12px;
+          border: 1px solid var(--uni-border);
+          padding: 20px;
+          padding-top: 27px; /* Espacio para la barra ::before */
+          box-shadow: 0 8px 24px var(--uni-shadow);
+          position: relative;
+          overflow: hidden;
+        }
+        .skeleton-card::before { /* Skeleton también tiene la barra */
+          content: '';
+          position: absolute;
+          top: 0; left: 0; right: 0;
+          height: 7px;
+          background: #e9ecef; /* Barra en gris */
+        }
+        .skeleton-line {
+          background: #e9ecef;
           border-radius: 6px;
           animation: pulse 1.5s ease-in-out infinite;
+        }
+        @keyframes pulse { 
+          0% { background-color: #e9ecef; } 
+          50% { background-color: #f8f9fa; } 
+          100% { background-color: #e9ecef; } 
         }
       `}</style>
 
       <div className="uni-header">
         <h2 className="uni-title">Resumen de Necesidades</h2>
         {!cargando && resumen.length > 0 && (
-          <span className="uni-badge-count">{resumen.length} Materias</span>
+          <span className="uni-badge">{resumen.length} Materias</span>
         )}
       </div>
 
       {cargando ? (
         <div className="uni-grid">
           {[1, 2].map((i) => (
-            <div key={i} className="uni-card" style={{ height: '280px', padding: '25px', border: 'none', background: '#f0f0f0' }}>
-               <div className="skeleton" style={{ width: '25%', height: '24px', marginBottom: '20px', background: '#d1dae6' }}></div>
-               <div className="skeleton" style={{ width: '70%', height: '32px', marginBottom: '40px', background: '#d1dae6' }}></div>
-               <div className="skeleton" style={{ width: '100%', height: '100px', background: '#e8edf5' }}></div>
+            <div key={i} className="skeleton-card">
+              <div className="skeleton-line" style={{ width: '25%', height: '24px', marginBottom: '12px', background: '#e0e0e0' }}></div>
+              <div className="skeleton-line" style={{ width: '70%', height: '32px', marginBottom: '30px', background: '#e0e0e0' }}></div>
+              <div className="skeleton-line" style={{ width: '40%', height: '20px', marginBottom: '12px' }}></div>
+              <div className="skeleton-line" style={{ width: '100%', height: '40px', marginBottom: '30px' }}></div>
+              <div className="skeleton-line" style={{ width: '40%', height: '20px', marginBottom: '12px' }}></div>
+              <div className="skeleton-line" style={{ width: '100%', height: '40px' }}></div>
             </div>
           ))}
         </div>
       ) : resumen.length === 0 ? (
-        <div style={{ padding: '40px', textAlign: 'center', color: '#666', backgroundColor: '#fff', borderRadius: '12px', border: '2px dashed #ccc' }}>
-          <div style={{ fontSize: '3rem', marginBottom: '15px', opacity: 0.7 }}>✨</div>
-          <p>No hay necesidades registradas para este departamento actualmente.</p>
+        <div className="global-empty-state">
+          <div className="global-empty-icon">✨</div>
+          <p style={{fontSize: '1.1rem', fontWeight: 500}}>No hay necesidades registradas para este departamento actualmente.</p>
         </div>
       ) : (
         <div className="uni-grid">
           {resumen.map((item, index) => (
-            <div 
-              key={index} 
-              className="uni-card" 
-              style={{ animationDelay: `${index * 0.1}s` }}
+            <div
+              key={index}
+              className="uni-card"
+              style={{ animationDelay: `${index * 0.05}s` }}
             >
               <div className="uni-card-header">
                 <span className="uni-materia-code">{item.codigo_materia}</span>
-                <h3 className="uni-materia-title">{item.nombre_materia}</h3>
+                <h3 className="uni-materia-title" title={item.nombre_materia}>{item.nombre_materia}</h3>
               </div>
               
               <div className="uni-card-body">

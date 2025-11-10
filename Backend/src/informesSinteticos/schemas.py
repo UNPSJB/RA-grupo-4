@@ -85,3 +85,23 @@ class InformeSinteticoActividades(BaseModel):
 from src.departamentos.schemas import Departamento 
 
 InformeSintetico.model_rebuild()
+
+#schema para previzualizacion
+class InformeSinteticoDetail(BaseModel):
+    id: int
+    descripcion: str
+    anio: int
+    periodo: str
+    sede: SedeEnum
+    integrantes: Optional[str] = None
+    departamento_id: int
+    # Campo calculado o unido (asegúrate de que tu servicio/modelo lo llene)
+    departamento_nombre: Optional[str] = None 
+    # Campos de contenido largo (JSON en la BD)
+    comentarios: Optional[str] = None
+    resumen_general: Optional[List[Dict[str, Any]]] = None
+    resumen_necesidades: Optional[List[Dict[str, Any]]] = None
+    valoracion_miembros: Optional[List[Dict[str, Any]]] = None
+    # Si tienes más campos JSON, agrégalos aquí
+
+    model_config = ConfigDict(from_attributes=True)

@@ -29,6 +29,7 @@ import ListadoInformesACDepREAL from "./Componentes/ListadoInformesACDepREAL";
 import GenerarInformeSinteticoDep from "./Componentes/Departamento/GenerarInformeSinteticoDep";
 // Componentes de Secretaría
 import SeleccionarInformeSinteticoSEC from "./Componentes/Secretaria/SeleccionarInformeSinteticoSEC";
+import PrevisualizarInformeSinteticoSec from "./Componentes/Secretaria/PrevizualisarInformeSinteticoSec";
 
 // --- Componente auxiliar para el menú desplegable ---
 const DropdownMenu: React.FC<{ title: string; children: React.ReactNode }> = ({ title, children }) => {
@@ -102,7 +103,9 @@ function App() {
                 </DropdownMenu>
 
                 <DropdownMenu title="Funcionalidades Secretaría">
-                  <Link to="/home/informes-sinteticos">Informes Sintéticos</Link>
+                  <Link to="/home/informes-sinteticos">Listado informes sinteticos</Link>
+                  <Link to="/home/ver-sinteticos">ver sinteticos</Link>
+                  {/* borrar si no queremos ver datos hardcodeados */}
                 </DropdownMenu>
               </div>
 
@@ -136,6 +139,9 @@ function App() {
 
                 {/* Rutas de Secretaría */}
                 <Route path="informes-sinteticos" element={<SeleccionarInformeSinteticoSEC />} />
+                <Route path="ver-sinteticos" element={<PrevisualizarInformeSinteticoSec />} />
+                {/* Usar la ruta de arriba para ver datos hardcodeados, sino borrarla */}
+                <Route path="informe-sintetico/ver/:id" element={<PrevisualizarInformeSinteticoSec />} />
 
                 {/* Rutas de Error/Info */}
                 <Route path="error" element={<ErrorCargaDatos />} />

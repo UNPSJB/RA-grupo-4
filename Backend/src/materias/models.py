@@ -7,7 +7,7 @@ class Materias(ModeloBase):
     __tablename__ = "materias"
 
     id_materia: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
-    nombre: Mapped[str] = mapped_column(String, unique=True, index=True)
+    nombre: Mapped[str] = mapped_column(String, index=True)
     anio: Mapped[int] = mapped_column(Integer, index=True)
     codigoMateria: Mapped[str] = mapped_column(String)
 

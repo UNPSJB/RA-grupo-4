@@ -8,7 +8,6 @@ from src.informesSinteticos.models import InformeSintetico
 from src.docentes.models import Docentes
 from src.informesAC.schemas import InformeACParaInformeSintetico, InformeAC as informeACSchema
 from src.materias.models import Materias
-
 # --- FUNCIONES CRUD BÁSICAS ---
 def crear_informe_sintetico(db: Session, informe: schemas.InformeSinteticoCreate):
     nuevo_informe = models.InformeSintetico(**informe.dict())
@@ -269,3 +268,8 @@ def get_aspectos_positivo_y_obstaculos__informeSintetico(db: Session, departamen
         })
 
     return resultado
+
+def get_by_id(db: Session, informe_id: int):
+    """Busca un informe sintético por su ID primario"""
+    # Usamos models.InformeSintetico para ser consistentes con tus otras funciones
+    return db.query(models.InformeSintetico).filter(models.InformeSintetico.id == informe_id).first()

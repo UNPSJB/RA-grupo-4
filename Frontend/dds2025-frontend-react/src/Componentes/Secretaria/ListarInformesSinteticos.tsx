@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import ErrorCargaDatos from './ErrorCargaDatos';
+import SinDatos from '../Otros/SinDatos';
 
 interface InformeSintetico {
   id: number;
@@ -49,8 +50,9 @@ const ListarInformesSinteticos: React.FC = () => {
     );
   }
 
+  // --- USO DEL NUEVO COMPONENTE SIN DATOS ---
   if (informes.length === 0) {
-    return <div style={{ padding: 20, textAlign: 'center', color: '#666' }}>No se encontraron informes sintéticos.</div>;
+    return <SinDatos mensaje="No se encontraron informes sintéticos registrados." />;
   }
 
   return (

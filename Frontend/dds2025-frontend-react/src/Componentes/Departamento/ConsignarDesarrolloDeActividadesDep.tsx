@@ -125,7 +125,7 @@ const ConsignarDesarrolloDeActividadesDep: React.FC<Props> = ({ departamentoId }
             justify-content: space-between;
             align-items: center;
             background: linear-gradient(135deg, var(--uni-primary), #004e92);
-            color: white;
+            color: #fff;
             transition: background 0.3s ease;
         }
         .actividades-header:hover {

@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
-from typing import List
+from typing import List, Any
 from src.database import get_db
 from src.informesSinteticos import schemas, services
 from src.informesSinteticos.models import InformeSintetico
@@ -9,10 +9,6 @@ from src.materias.schemas import NecesidadMateriaSchema
 router = APIRouter(prefix="/informes-sinteticos", tags=["Informes Sintéticos"])
 
 
-# --- CORRECCIÓN DE LA HDU (Apuntando al nuevo servicio y schema) ---
-# Se ha cambiado 'generar_informe_sintetico_consolidado' por 'listar_actividades_para_informe'
-# y el 'response_model' ahora es 'InformeSinteticoActividades' (el que no consolida).
-# Esta ruta debe ir ANTES de '/{informe_id}' para evitar el error 422.
 @router.get(
     "/actividades", 
     response_model=schemas.InformeSinteticoActividades,
@@ -27,13 +23,6 @@ def get_informe_sintetico_actividades(db: Session = Depends(get_db)):
     # Llama a la nueva función de servicio
     return services.listar_actividades_para_informe(db=db)
 
-# --- FIN DE LA CORRECCIÓN ---
-
-
-# --- Tus Endpoints CRUD (Se mantienen sin cambios) ---
-
-
-# --- CRUD Básico ---
 
 @router.post("/", response_model=schemas.InformeSintetico)
 def crear_informe_sintetico(informe: schemas.InformeSinteticoCreate, db: Session = Depends(get_db)): 
@@ -89,6 +78,15 @@ def preview_auxiliares(
     """Nuevo endpoint para recuperar auxiliares cargados por docentes."""
     return services.obtener_auxiliares_periodo(db, departamento_id, anio)
 
+@router.get("/{informe_id}", response_model=schemas.InformeSinteticoDetail)
+def obtener_informe_sintetico(informe_id: int, db: Session = Depends(get_db)) -> Any:
+    informe = services.obtener_informe_sintetico(db, informe_id)
+    if not informe:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, 
+            detail=f"Informe Sintético con id {informe_id} no encontrado"
+        )
+    return informe
 # =========================================
 # === ENDPOINTS DE AUTOCOMPLETADO (POST) ===
 # Para guardar datos en un informe YA CREADO
