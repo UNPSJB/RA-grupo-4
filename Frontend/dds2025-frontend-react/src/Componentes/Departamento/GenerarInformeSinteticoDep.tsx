@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
-import HeaderInstitucional from "../Componentes/HeaderInstitucional";
+import HeaderInstitucional from "../Otros/HeaderInstitucional.tsx";
 
 // --- Importaciones de Componentes Hijos ---
-import CompletarDatosCabeceraDep from "./Departamento/CompletarDatosCabeceraDep";
-import AutocompletarInformacionGeneral from "./Departamento/AutoCompletarInformacionGeneral";
-import AutocompletarNecesidadesDep from "./Departamento/AutocompletarNecesidadesDep";
-import AutocompletarValoracionesDep from "./Departamento/AutocompletarValoracionesDep";
-import ComentariosFinalesDep from "./Departamento/ComentariosFinalesDep";
+import CompletarDatosCabeceraDep from "../Departamento/CompletarDatosCabeceraDep";
+import AutocompletarInformacionGeneral from "../Departamento/AutoCompletarInformacionGeneral";
+import AutocompletarNecesidadesDep from "../Departamento/AutocompletarNecesidadesDep";
+import AutocompletarValoracionesDep from "../Departamento/AutocompletarValoracionesDep";
+import ComentariosFinalesDep from "../Departamento/ComentariosFinalesDep";
 import ConsolidarDesarrolloDeActividades from "./ConsignarDesarrolloDeActividadesDep.tsx";
-import PorcentajesInformeSintetico from "./Departamento/PorcentajesInformeSintetico.tsx";
-import AspecPosObstaculosInformeSintetico from "./Departamento/AspecPositivosObstaculosInformeSintetico.tsx";
+import PorcentajesInformeSintetico from "../Departamento/PorcentajesInformeSintetico.tsx";
+import AspecPosObstaculosInformeSintetico from "../Departamento/AspecPositivosObstaculosInformeSintetico.tsx";
 
 import { createPortal } from "react-dom";
 

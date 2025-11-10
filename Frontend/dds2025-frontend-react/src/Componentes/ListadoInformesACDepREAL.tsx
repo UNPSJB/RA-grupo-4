@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import VisualizarInformeACDep from "./VisualizarInformeACDep";
+import VisualizarInformeACDep from "./Departamento/VisualizarInformeACDep";
 
 const API_BASE = "http://localhost:8000";
 

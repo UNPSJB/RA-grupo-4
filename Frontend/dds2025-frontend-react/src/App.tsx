@@ -26,8 +26,7 @@ import VisualizarInformeACDoc from "./Componentes/Docente/VisualizarInformeACDoc
 
 // Componentes de Departamento
 import ListadoInformesACDepREAL from "./Componentes/ListadoInformesACDepREAL";
-import GenerarInformeSinteticoDep from "./Componentes/GenerarInformeSinteticoDep";
-
+import GenerarInformeSinteticoDep from "./Componentes/Departamento/GenerarInformeSinteticoDep";
 // Componentes de Secretaría
 import SeleccionarInformeSinteticoSEC from "./Componentes/Secretaria/SeleccionarInformeSinteticoSEC";
 
