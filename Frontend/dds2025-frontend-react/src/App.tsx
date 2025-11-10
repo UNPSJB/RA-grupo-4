@@ -21,8 +21,8 @@ import GenerarInformeACDoc from "./Componentes/GenerarInformeAC";
 import VisualizarInformeACDoc from "./Componentes/VisualizarInformeACDoc";
 
 // Componentes de Departamento
-import FiltradoInformeACDep from "./Componentes/Departamento/FiltradoInformeACDep";
-import ListadoInformesACDep from "./Componentes/Departamento/ListadoInformesACDep";
+// ❌ ELIMINADO: import FiltradoInformeACDep from "./Componentes/Departamento/FiltradoInformeACDep";
+import ListadoInformesACDepREAL from "./Componentes/ListadoInformesACDepREAL"; // ✅ TU COMPONENTE INTEGRADO
 import GenerarInformeSinteticoDep from "./Componentes/GenerarInformeSinteticoDep";
 
 // Componentes de Secretaría
@@ -67,10 +67,10 @@ const DropdownMenu: React.FC<{ title: string; children: React.ReactNode }> = ({ 
 function App() {
   return (
     <Routes>
-      {/* Página de login (fuera de la estructura principal) */}
+      {/* Página de login */}
       <Route path="/" element={<LoginPage />} />
 
-      {/* Estructura principal del sistema con Navbar */}
+      {/* Estructura principal */}
       <Route
         path="/home/*"
         element={
@@ -93,7 +93,8 @@ function App() {
                 </DropdownMenu>
 
                 <DropdownMenu title="Funcionalidades Departamento">
-                  <Link to="/home/informes-dep">Informes Dept.</Link>
+                  {/* ✅ ÚNICO ENLACE PARA GESTIÓN DE INFORMES */}
+                  <Link to="/home/listado-informes-ac">Gestión Informes A.C.</Link>
                   <Link to="/home/generar-sintetico">Generar informe Sintetico</Link>
                 </DropdownMenu>
 
@@ -120,14 +121,16 @@ function App() {
                 <Route path="historial-informes" element={<HistorialInformesACDoc />} />
                 <Route path="estadisticas-docente" element={<PaginaEstadisticasDoc />} />
                 <Route path="estadisticas-preguntas" element={<EstadisticasPreguntasPage />} />
-                {/* Se mantienen ambas rutas para GenerarInformeACDoc por compatibilidad */}
                 <Route path="generar-informe" element={<GenerarInformeACDoc />} />
                 <Route path="generar-informe/:id_materia" element={<GenerarInformeACDoc />} />
                 <Route path="visualizar-informe/:id_informe" element={<VisualizarInformeACDoc />} />
 
                 {/* Rutas de Departamento */}
-                <Route path="informes-dep" element={<FiltradoInformeACDep />} />
-                <Route path="listado-informes-ac" element={<ListadoInformesACDep />} />
+                {/* ❌ RUTA VIEJA ELIMINADA: <Route path="informes-dep" element={<FiltradoInformeACDep />} /> */}
+                
+                {/* ✅ RUTA ÚNICA Y DEFINITIVA */}
+                <Route path="listado-informes-ac" element={<ListadoInformesACDepREAL />} />
+                
                 <Route path="generar-sintetico" element={<GenerarInformeSinteticoDep />} />
 
                 {/* Rutas de Secretaría */}

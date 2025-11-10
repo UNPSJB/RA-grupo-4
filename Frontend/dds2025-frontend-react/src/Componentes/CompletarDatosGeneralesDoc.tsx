@@ -20,24 +20,46 @@ interface Props {
 
 const styles = {
   container: {
-    maxWidth: '800px', margin: '0 auto', padding: '28px', backgroundColor: '#ffffff',
-    borderRadius: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.08)', fontFamily: '"Roboto", "Segoe UI", sans-serif',
+    maxWidth: '800px',
+    margin: '0 auto',
+    padding: '28px',
+    backgroundColor: '#ffffff',
+    borderRadius: '12px',
+    boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
+    fontFamily: '"Roboto", "Segoe UI", sans-serif',
   },
-  row: { display: 'flex', flexDirection: 'column' as const, marginBottom: '14px' },
-  label: { fontWeight: 600, marginBottom: '6px', color: '#000000', fontSize: '16px' },
-  // Estilo NORMAL (Edición)
-  field: {
-    width: '100%', height: '44px', padding: '10px 14px', borderRadius: '6px',
-    border: '1px solid #ccc', fontSize: '16px', fontFamily: '"Roboto", "Segoe UI", sans-serif',
-    backgroundColor: '#cce4f6', color: '#111', transition: 'all 0.3s ease',
-    outline: 'none', boxSizing: 'border-box' as const,
+  row: {
+    display: 'flex',
+    flexDirection: 'column' as const,
+    marginBottom: '14px',
   },
-  // Estilo SOLO LECTURA (Vista previa/Impresión) - Elimina el fondo azul y bordes
-  disabledField: {
+  label: {
+    fontWeight: 600,
+    marginBottom: '6px',
+    color: '#000000',
+    fontSize: '16px',
+  },
+  // ESTILO 1: Modo Edición (Fondo azulado)
+  fieldEditable: {
+    width: '100%',
+    height: '44px',
+    padding: '10px 14px',
+    borderRadius: '6px',
+    border: '1px solid #ccc',
+    fontSize: '16px',
+    fontFamily: '"Roboto", "Segoe UI", sans-serif',
+    backgroundColor: '#cce4f6', // El color celeste que te gusta para editar
+    color: '#111',
+    transition: 'all 0.3s ease',
+    outline: 'none',
+    boxSizing: 'border-box' as const,
+  },
+  // ESTILO 2: Modo Vista Previa/Impresión (Plano, parece texto)
+  fieldReadOnly: {
      width: '100%',
      backgroundColor: 'transparent',
      border: 'none',
-     borderBottom: '1px dashed #ccc', 
+     borderBottom: '1px dashed #ccc', // Una línea sutil para que se sepa que ahí va un dato
      borderRadius: '0',
      padding: '10px 0',
      color: '#000',
@@ -46,15 +68,20 @@ const styles = {
      cursor: 'default',
      fontWeight: 500,
      outline: 'none',
-     appearance: 'none' as const, 
+     boxShadow: 'none',
+     appearance: 'none' as const,
      MozAppearance: 'none' as const,
      WebkitAppearance: 'none' as const,
-     boxShadow: 'none',
   }
 };
 
 const CompletarDatosGeneralesDoc: React.FC<Props> = ({
-  materias, docentes, formData, handleChange, loading, disabled = false
+  materias,
+  docentes,
+  formData,
+  handleChange,
+  loading,
+  disabled = false
 }) => {
   const sedeOptions = [
     { value: "", label: "Seleccione" },
@@ -79,27 +106,31 @@ const CompletarDatosGeneralesDoc: React.FC<Props> = ({
 
   return (
     <div style={styles.container}>
-      {/* Estilos en línea para forzar limpieza en selects deshabilitados */}
+      {/* Estilos inline para asegurar que los selects deshabilitados se vean limpios en todos los navegadores */}
       <style>
         {`
            select:disabled::-ms-expand { display: none; }
-           select:disabled { 
+           select:disabled {
+               opacity: 1 !important;
+               color: #000 !important;
                background-image: none !important;
-               -webkit-appearance: none !important;
-               -moz-appearance: none !important;
-               text-indent: 1px;
-               text-overflow: '';
-               opacity: 1 !important; /* Evitar que algunos navegadores los pongan grises */
            }
            input:disabled {
                opacity: 1 !important;
+               color: #000 !important;
            }
         `}
       </style>
 
       {fieldsConfig.map((field, idx) => {
-         const isActuallyDisabled = disabled || ['codigoMateria', 'ciclo_lectivo', 'id_docente', 'cantidad_alumnos_inscriptos'].includes(field.name);
-         const currentStyle = isActuallyDisabled ? styles.disabledField : styles.field;
+         // 1. Determinar si el campo debe estar funcionalmente deshabilitado
+         //    Es true SI: el formulario entero está disabled O SI es un campo fijo (ej. código materia)
+         const isFunctionalDisabled = disabled || ['codigoMateria', 'ciclo_lectivo', 'id_docente', 'cantidad_alumnos_inscriptos', 'id_materia'].includes(field.name);
+         
+         // 2. Determinar el ESTILO VISUAL
+         //    Si el formulario entero está en modo 'Vista Previa' (disabled=true) -> Usamos estilo plano para TODO.
+         //    Si estamos editando (disabled=false) -> Usamos el estilo azul para TODO (incluso los campos fijos, para uniformidad).
+         const currentStyle = disabled ? styles.fieldReadOnly : styles.fieldEditable;
 
          return (
             <div key={idx} style={styles.row}>
@@ -112,10 +143,10 @@ const CompletarDatosGeneralesDoc: React.FC<Props> = ({
                         value={formData[field.name as keyof typeof formData]}
                         onChange={handleChange}
                         style={currentStyle}
-                        disabled={isActuallyDisabled}
+                        disabled={isFunctionalDisabled}
                     >
-                        {/* Si está deshabilitado y no tiene valor, mostrar guión */}
-                        {isActuallyDisabled && !formData[field.name as keyof typeof formData] && <option>-</option>}
+                        {/* Mostrar guión si está bloqueado y vacío */}
+                        {isFunctionalDisabled && !formData[field.name as keyof typeof formData] && <option value="">-</option>}
                         
                         {field.options?.map((opt: any) => (
                             <option key={opt.value} value={opt.value}>
@@ -131,8 +162,8 @@ const CompletarDatosGeneralesDoc: React.FC<Props> = ({
                         value={formData[field.name as keyof typeof formData]}
                         onChange={handleChange}
                         style={currentStyle}
-                        disabled={isActuallyDisabled}
-                        placeholder={isActuallyDisabled ? "-" : ""}
+                        disabled={isFunctionalDisabled}
+                        placeholder={isFunctionalDisabled && !formData[field.name as keyof typeof formData] ? "-" : ""}
                     />
                 )}
             </div>
