@@ -1,30 +1,23 @@
 import React, { useEffect, useState } from "react";
-// --- NUEVO (Importar hook de navegación) ---
 import { useNavigate } from "react-router-dom";
 
-// --- Interfaces (MODIFICADAS) ---
-// Esta interfaz ahora representa una MATERIA, no un informe
+
 interface MateriaPendiente {
   id_materia: number;
   nombre: string;
   anio: number;
   codigoMateria?: string;
 }
-// --- FIN Interfaces ---
 
 const ListadoInformesACDoc: React.FC = () => {
-  // ID del docente hardcodeado (como pediste)
+  // ID del docente hardcodeado 
   const idDocenteActual = 1;
-  const cicloLectivoActual = new Date().getFullYear(); // o 2025
-
-  // --- ESTADOS MODIFICADOS ---
+  const cicloLectivoActual = new Date().getFullYear(); 
   const [materias, setMaterias] = useState<MateriaPendiente[]>([]);
   const [cargando, setCargando] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const navigate = useNavigate(); // Hook para navegar
-  // --- FIN ESTADOS ---
-
-  // --- LÓGICA MODIFICADA ---
+  const navigate = useNavigate(); 
+  
   useEffect(() => {
     const fetchMateriasPendientes = async () => {
       try {
@@ -54,13 +47,11 @@ const ListadoInformesACDoc: React.FC = () => {
     fetchMateriasPendientes();
   }, [idDocenteActual, cicloLectivoActual]);
 
-  // --- NUEVA FUNCIÓN (Navegación) ---
+  // --- (Navegación) ---
   const handleSeleccionarMateria = (id_materia: number) => {
-    // Navega a la ruta que definimos en App.tsx
     navigate(`/home/generar-informe/${id_materia}`);
   };
 
-  // (Tus estilos originales)
   const styles = {
     container: {
       maxWidth: '1000px',
