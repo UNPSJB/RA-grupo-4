@@ -95,6 +95,7 @@ function App() {
                   <Link to="/home/historial-informes">Historial de Informes</Link>
                   <Link to="/home/estadisticas-docente">Ver Estadísticas Materias</Link>
                   <Link to="/home/estadisticas-preguntas">Ver Estadísticas de preguntas</Link>
+                  {/* <Link to="/home/generar-informe">Generar AC par debug</Link> */}
                 </DropdownMenu>
 
                 <DropdownMenu title="Funcionalidades Departamento">

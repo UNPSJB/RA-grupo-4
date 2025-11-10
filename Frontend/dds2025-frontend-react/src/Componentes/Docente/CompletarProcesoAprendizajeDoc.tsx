@@ -78,7 +78,7 @@ const styles = {
   resumen: {
     fontFamily: 'Georgia, serif',
     fontSize: '16px',
-    backgroundColor: '#fdfdfd',
+    backgroundColor: '#cce4f6',
     border: '1px solid #aaa',
     padding: '12px',
     borderRadius: '6px',
