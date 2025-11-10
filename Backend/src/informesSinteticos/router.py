@@ -32,29 +32,6 @@ def get_informe_sintetico_actividades(db: Session = Depends(get_db)):
 
 # --- Tus Endpoints CRUD (Se mantienen sin cambios) ---
 
-# --- CORRECCIÓN DE LA HDU (Apuntando al nuevo servicio y schema) ---
-# Se ha cambiado 'generar_informe_sintetico_consolidado' por 'listar_actividades_para_informe'
-# y el 'response_model' ahora es 'InformeSinteticoActividades' (el que no consolida).
-# Esta ruta debe ir ANTES de '/{informe_id}' para evitar el error 422.
-@router.get(
-    "/actividades", 
-    response_model=schemas.InformeSinteticoActividades,
-    summary="Genera el Informe Sintético listando las actividades de la cátedra."
-)
-def get_informe_sintetico_actividades(db: Session = Depends(get_db)):
-    """
-    Obtiene CADA registro de actividad individual, junto con los datos
-    de la materia a la que pertenece (Código y Nombre).
-    NO se agrupan ni consolidan los datos.
-    """
-    # Llama a la nueva función de servicio
-    return services.listar_actividades_para_informe(db=db)
-
-# --- FIN DE LA CORRECCIÓN ---
-
-
-# --- Tus Endpoints CRUD (Se mantienen sin cambios) ---
-
 
 # --- CRUD Básico ---
 

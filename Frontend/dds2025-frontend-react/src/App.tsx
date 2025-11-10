@@ -2,6 +2,10 @@ import React, { useState, useEffect, useRef } from "react";
 import { Routes, Route, Link } from "react-router-dom";
 import "./App.css";
 
+// --- IMPORTACIONES DE IMÁGENES ---
+import logoUnpsjb from "./assets/logo_unpsjb.png";
+import userAvatar from "./assets/avatarOA.png";
+
 // Componentes de autenticación y generales
 import LoginPage from "./Componentes/Otros/LoginPage";
 import HomePage from "./Componentes/Otros/HomePage";
@@ -21,9 +25,8 @@ import GenerarInformeACDoc from "./Componentes/Docente/GenerarInformeAC";
 import VisualizarInformeACDoc from "./Componentes/Docente/VisualizarInformeACDoc";
 
 // Componentes de Departamento
-import FiltradoInformeACDep from "./Componentes/Departamento/FiltradoInformeACDep";
-import ListadoInformesACDep from "./Componentes/Departamento/ListadoInformesACDep";
-import GenerarInformeSinteticoDep from "./Componentes/Departamento/GenerarInformeSinteticoDep";
+import ListadoInformesACDepREAL from "./Componentes/ListadoInformesACDepREAL";
+import GenerarInformeSinteticoDep from "./Componentes/GenerarInformeSinteticoDep";
 
 // Componentes de Secretaría
 import SeleccionarInformeSinteticoSEC from "./Componentes/Secretaria/SeleccionarInformeSinteticoSEC";
@@ -67,16 +70,18 @@ const DropdownMenu: React.FC<{ title: string; children: React.ReactNode }> = ({ 
 function App() {
   return (
     <Routes>
-      {/* Página de login (fuera de la estructura principal) */}
+      {/* Página de login */}
       <Route path="/" element={<LoginPage />} />
 
-      {/* Estructura principal del sistema con Navbar */}
+      {/* Estructura principal */}
       <Route
         path="/home/*"
         element={
           <>
             <nav className="navbar">
               <div className="navbar-left">
+                {/* --- LOGO UNPSJB --- */}
+                <img src={logoUnpsjb} alt="Logo UNPSJB" className="navbar-logo" />
                 <span className="site-name">Sistema de encuestas UNPSJB</span>
               </div>
 
@@ -93,7 +98,7 @@ function App() {
                 </DropdownMenu>
 
                 <DropdownMenu title="Funcionalidades Departamento">
-                  <Link to="/home/informes-dep">Informes Dept.</Link>
+                  <Link to="/home/listado-informes-ac">Gestión Informes A.C.</Link>
                   <Link to="/home/generar-sintetico">Generar informe Sintetico</Link>
                 </DropdownMenu>
 
@@ -103,6 +108,8 @@ function App() {
               </div>
 
               <div className="navbar-right">
+                {/* --- AVATAR DE USUARIO --- */}
+                <img src={userAvatar} alt="Avatar Usuario" className="user-avatar" />
                 <Link to="/">Cerrar sesión</Link>
               </div>
             </nav>
@@ -120,14 +127,12 @@ function App() {
                 <Route path="historial-informes" element={<HistorialInformesACDoc />} />
                 <Route path="estadisticas-docente" element={<PaginaEstadisticasDoc />} />
                 <Route path="estadisticas-preguntas" element={<EstadisticasPreguntasPage />} />
-                {/* Se mantienen ambas rutas para GenerarInformeACDoc por compatibilidad */}
                 <Route path="generar-informe" element={<GenerarInformeACDoc />} />
                 <Route path="generar-informe/:id_materia" element={<GenerarInformeACDoc />} />
                 <Route path="visualizar-informe/:id_informe" element={<VisualizarInformeACDoc />} />
 
                 {/* Rutas de Departamento */}
-                <Route path="informes-dep" element={<FiltradoInformeACDep />} />
-                <Route path="listado-informes-ac" element={<ListadoInformesACDep />} />
+                <Route path="listado-informes-ac" element={<ListadoInformesACDepREAL />} />
                 <Route path="generar-sintetico" element={<GenerarInformeSinteticoDep />} />
 
                 {/* Rutas de Secretaría */}

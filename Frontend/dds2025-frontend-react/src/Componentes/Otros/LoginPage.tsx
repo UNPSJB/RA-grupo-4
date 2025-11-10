@@ -1,11 +1,10 @@
-import "./LoginPage.css"; // importa los estilos ajustados
+import "./LoginPage.css"; 
 import { useNavigate } from "react-router-dom";
 
 function LoginPage() {
   const navigate = useNavigate();
 
   const handleLogin = () => {
-    // acá redirige al home o lo que corresponda
     navigate("/home");
   };
 

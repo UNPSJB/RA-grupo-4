@@ -1,10 +1,7 @@
-/* --- AÑADIDO: Cursor de Gaviota --- */
+/* --- Cursor de Gaviota --- */
 html, body {
-  /* --- CAMBIO: Nombre del archivo actualizado --- */
   cursor: url('./assets/gaviotaPunteroRedimensionada.png'), auto; 
 }
-/* --- FIN AÑADIDO --- */
-
 
 /* --- ESTILOS GENERALES (Navbar, Footer, etc.) --- */
 .navbar {
@@ -17,13 +14,26 @@ html, body {
   color: white;
 }
 
-/* ... (El resto de tu archivo App.css sin cambios) ... */
+/* --- Navbar Left con Logo --- */
+.navbar-left {
+  display: flex;
+  align-items: center;
+  gap: 15px; /* Espacio entre logo y texto */
+}
+
+.navbar-logo {
+  height: 45px; /* Ajusta según prefieras el tamaño del logo UNPSJB */
+  width: auto;
+  object-fit: contain;
+}
 
 .navbar-left .site-name {
   font-weight: bold;
-  font-size: 1.2rem;
+  font-size: 1.3rem;
+  letter-spacing: 0.5px;
 }
 
+/* --- Navbar Links --- */
 .navbar-links {
   display: flex;
   gap: 20px;
@@ -43,6 +53,23 @@ html, body {
   background-color: #007bff;
 }
 
+/* --- Navbar Right con Avatar --- */
+.navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 12px; /* Espacio entre avatar y "Cerrar sesión" */
+}
+
+.user-avatar {
+  width: 36px;       /* Tamaño del avatar */
+  height: 36px;
+  border-radius: 50%; /* Círculo perfecto */
+  object-fit: cover;  /* La imagen cubre el área sin deformarse */
+  border: 2px solid rgba(255, 255, 255, 0.8); /* Borde blanco semitransparente para que resalte */
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2); /* Sombra suave */
+}
+
+/* --- Resto de la página --- */
 .page-content {
   padding: 20px;
   min-height: calc(100vh - 100px);
@@ -50,7 +77,7 @@ html, body {
 }
 
 .footer {
-  background-color: #0d0d0eff;
+  background-color: #005f9e; 
   color: white;
   text-align: center;
   padding: 10px 0;
@@ -82,10 +109,10 @@ html, body {
 .dropdown-content {
   display: block;
   position: absolute;
-  background-color: #0d0d0eff;
-  border: 1px solid #007bff;
+  background-color: #f0f8ff; /* Fondo celeste claro */
+  border: 1px solid #cce5ff;
   min-width: 220px;
-  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.5);
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
   z-index: 10;
   border-radius: 4px;
   overflow: hidden;
@@ -93,15 +120,17 @@ html, body {
 }
 
 .dropdown-content a {
-  color: #f1f1f1;
+  color: #003366; /* Texto oscuro */
   padding: 12px 16px;
   text-decoration: none;
   display: block;
   text-align: left;
+  transition: background-color 0.2s;
 }
 
 .dropdown-content a:hover {
-  background-color: #007bff;
+  background-color: #cce5ff; /* Fondo más oscuro al hover */
+  color: #003366;
 }
 
 /* --- ESTILOS PARA LA PÁGINA DE BIENVENIDA --- */
@@ -165,9 +194,7 @@ html, body {
   margin-top: 20px;
 }
 
-
 /* --- SISTEMA DE DISEÑO UNIFICADO --- */
-
 .content-card {
   background-color: #1e1e1e;
   color: #e1e1e1;
@@ -224,10 +251,9 @@ html, body {
   transform: scale(1.05);
 }
 
-/* --- AÑADIDO (Para ocultar flecha en selects deshabilitados) --- */
 select[disabled] {
-  -webkit-appearance: none; 
-  -moz-appearance: none;    
-  appearance: none;         
-  background-image: none;   
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-image: none;
 }

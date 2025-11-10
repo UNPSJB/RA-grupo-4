@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useCallback } from 'react';
-// Asegúrate de que la ruta de importación sea correcta según dónde guardaste el componente
 import ErrorCargaDatos from './ErrorCargaDatos';
 
 interface InformeSintetico {
@@ -17,7 +16,6 @@ const ListarInformesSinteticos: React.FC = () => {
     setLoading(true);
     setError(null);
     try {
-      // URL del endpoint en FastAPI
       const response = await fetch("http://localhost:8000/informes-sinteticos");
 
       if (!response.ok) {
@@ -37,10 +35,8 @@ const ListarInformesSinteticos: React.FC = () => {
     fetchInformes();
   }, [fetchInformes]);
 
-  // --- Renderizado condicional ---
 
   if (loading) {
-    // Puedes crear un componente de Carga (Spinner) similar si quieres
     return <div style={{ padding: 20, textAlign: 'center', color: '#003366' }}>Cargando informes...</div>;
   }
 
