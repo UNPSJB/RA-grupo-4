@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from 'react-router-dom';
 import HeaderInstitucional from "../Componentes/HeaderInstitucional";
 
 // --- Importaciones de Componentes Hijos ---
@@ -8,202 +9,369 @@ import AutocompletarNecesidadesDep from "./Departamento/AutocompletarNecesidades
 import AutocompletarValoracionesDep from "./Departamento/AutocompletarValoracionesDep";
 import ComentariosFinalesDep from "./Departamento/ComentariosFinalesDep";
 import ConsolidarDesarrolloDeActividades from "./ConsignarDesarrolloDeActividadesDep.tsx";
-
 import PorcentajesInformeSintetico from "./Departamento/PorcentajesInformeSintetico.tsx";
 import AspecPosObstaculosInformeSintetico from "./Departamento/AspecPositivosObstaculosInformeSintetico.tsx";
 
+import { createPortal } from "react-dom";
+
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
+
 const styles = {
-  container: {
-    maxWidth: "1200px",
-    margin: "0 auto",
-    padding: "30px",
-    backgroundColor: "#f9fbfd",
-    borderRadius: "12px",
-    boxShadow: "0 4px 16px rgba(0,0,0,0.08)",
-    fontFamily: '"Roboto", "Segoe UI", sans-serif',
-  },
-  section: {
-    marginTop: "40px",
-  },
-  titulo: {
-    fontSize: "26px",
-    fontWeight: 700,
-    color: "#222",
-    marginBottom: "20px",
-  },
-  divider: {
-    height: "2px",
-    backgroundColor: "#0078D4",
-    margin: "30px 0",
-    borderRadius: "2px",
-  },
+    // --- ESTILOS DE LA NOTIFICACIÓN FLOTANTE ---
+  floatingNotification: {
+    position: 'fixed' as 'fixed', 
+    top: '20px', 
+    left: '50%', 
+    transform: 'translateX(-50%)', 
+    backgroundColor: 'white',
+    padding: '20px 25px',
+    borderRadius: '12px',
+    boxShadow: '0 10px 40px rgba(0,0,0,0.25)', 
+    zIndex: 1000,
+    display: 'flex',
+    flexDirection: 'column' as 'column',
+    alignItems: 'flex-start' as 'flex-start', 
+    maxWidth: '450px', 
+    width: '90%', 
+    animation: 'slideDownFade 0.5s ease-out forwards',
+    borderTop: '6px solid', // Color se definirá dinámicamente
+    borderLeft: '1px solid #eee',
+    borderRight: '1px solid #eee',
+    borderBottom: '1px solid #eee',
+  },
+  notificationHeader: {
+    display: 'flex',
+    alignItems: 'center',
+    width: '100%',
+    marginBottom: '15px',
+  },
+  notificationTitle: {
+    margin: '0 0 0 15px',
+    fontSize: '20px',
+    fontWeight: '700',
+    flexGrow: 1,
+  },
+  notificationText: {
+    color: '#555',
+    fontSize: '15px',
+    lineHeight: '1.5',
+    marginBottom: '10px',
+    width: '100%',
+  },
+  closeButton: {
+    background: 'transparent',
+    border: 'none',
+    color: '#999',
+    fontSize: '24px',
+    cursor: 'pointer',
+    padding: '0 5px',
+    lineHeight: '1',
+  },
+  redirectText: {
+    color: '#999',
+    fontSize: '13px',
+    fontStyle: 'italic',
+    marginBottom: '15px',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+  },
+    // --- ESTILOS DEL CONTENEDOR PRINCIPAL ---
+  container: {
+    maxWidth: "1200px",
+    margin: "0 auto",
+    padding: "30px",
+    backgroundColor: "#f9fbfd",
+    borderRadius: "12px",
+    boxShadow: "0 4px 16px rgba(0,0,0,0.08)",
+    fontFamily: '"Roboto", "Segoe UI", sans-serif',
+  },
+  section: {
+    marginTop: "40px",
+  },
+  titulo: {
+    fontSize: "26px",
+    fontWeight: 700,
+    color: "#222",
+    marginBottom: "20px",
+  },
+  divider: {
+    height: "2px",
+    backgroundColor: "#0078D4",
+    margin: "30px 0",
+    borderRadius: "2px",
+  },
 };
 
+// ------------------- NOTIFICACIÓN FLOTANTE -------------------
+const FloatingNotification: React.FC<{
+  tipo: "exito" | "error";
+  mensaje: string;
+  segundos?: number;
+  onClose: () => void;
+}> = ({ tipo, mensaje, segundos = 5, onClose }) => {
+  const [contador, setContador] = useState(segundos);
+  // No se usa `useNavigate` aquí, la redirección se maneja en el componente padre `onClose`
+  
+  // Colores base
+  const colorPrincipal = tipo === "exito" ? "#4CAF50" : "#dc3545";
+  const colorFondoIcono = tipo === "exito" ? "#e8f5e9" : "#f8d7da";
+  const titulo = tipo === "exito" ? "¡Informe Creado!" : "Error al Enviar";
+  const icono = tipo === "exito" ? '✔️' : '❌';
+
+  useEffect(() => {
+    const interval = setInterval(() => setContador((c) => c - 1), 1000);
+    // El timeout llama a onClose, que puede manejar el cierre y la redirección.
+    const timeout = setTimeout(onClose, segundos * 1000); 
+
+    return () => {
+      clearInterval(interval);
+      clearTimeout(timeout);
+    };
+  }, [segundos, onClose]);
+
+  return createPortal(
+    <>
+      <style>{`
+        /* Animación de caída desde arriba */
+        @keyframes slideDownFade { 
+          from { opacity: 0; transform: translate(-50%, -20px); } 
+          to { opacity: 1; transform: translate(-50%, 0); } 
+        }
+        /* Nota: checkmark y pulseGray se definen pero no se usan directamente aquí sin el SVG */
+        @keyframes pulseGray { 0% { color: #999; } 50% { color: #555; } 100% { color: #999; } }
+      `}</style>
+
+      <div style={{...styles.floatingNotification, borderTop: `6px solid ${colorPrincipal}`}}>
+          <div style={styles.notificationHeader}>
+            <div style={{ width: '35px', height: '35px', backgroundColor: colorFondoIcono, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+               <span style={{ fontSize: '20px', color: colorPrincipal }}>{icono}</span>
+            </div>
+            <h3 style={{...styles.notificationTitle, color: colorPrincipal}}>{titulo}</h3>
+            <button onClick={onClose} style={styles.closeButton} title="Cerrar notificación">×</button>
+          </div>
+
+          <p style={styles.notificationText}>
+            {mensaje}
+          </p>
+          
+          {tipo === "exito" && (
+            <div style={styles.redirectText}>
+              <span>{contador > 0 ? '⏳' : '✅'}</span> 
+              <span style={contador > 0 ? { animation: 'pulseGray 2s infinite' } : {}}>
+                {contador > 0 ? `Volviendo a la vista principal en ${contador}s...` : 'Redirigiendo...'}
+              </span>
+            </div>
+          )}
+      </div>
+    </>
+    , document.body
+  );
+};
+
+// ------------------- COMPONENTE PRINCIPAL -------------------
 const GenerarInformeSinteticoDep: React.FC = () => {
-  // Estado global del informe a crear
-  const [datosInforme, setDatosInforme] = useState({
-    departamento_id: 0,
-    periodo: "",
-    sede: "",
-    integrantes: "",
-    comentarios: "",
-    descripcion: "Informe Sintético del Departamento", 
-    anio: 2025,
-  });
-  const [creando, setCreando] = useState(false);
+    const navigate = useNavigate();
 
-  // Handlers para actualizar el estado desde los hijos
-  const handleDepartamentoSeleccionado = (id: number) => {
-      setDatosInforme(prev => ({ ...prev, departamento_id: id }));
-  };
+    const [datosInforme, setDatosInforme] = useState({
+        departamento_id: 0,
+        periodo: "",
+        sede: "",
+        integrantes: "",
+        comentarios: "",
+        descripcion: "Informe Sintético del Departamento",
+        anio: 2025,
+    });
+    const [creando, setCreando] = useState(false);
+    const [mensaje, setMensaje] = useState<{ tipo: "exito" | "error"; texto: string } | null>(null);
 
-const handleCabeceraChange = (data: { periodo: string, sede: string, integrantes: string }) => {
-      setDatosInforme(prev => ({ 
-          ...prev, 
-          periodo: data.periodo,
-          sede: data.sede,
-          integrantes: data.integrantes,
-          // Nota: Si 'periodo' es un año (ej: "2025"), también podrías querer actualizar 'anio' aquí:
-          anio: Number(data.periodo) || 2025 
-      }));
-  };
 
-  // Handler para recibir los comentarios del componente hijo
-  const handleComentariosChange = (texto: string) => {
-    setDatosInforme(prev => ({ ...prev, comentarios: texto }));
-  };
+    const [informeGenerado, setInformeGenerado] = useState<any>(null); 
+    const [segundosRestantes, setSegundosRestantes] = useState(5);
 
-  // FUNCIÓN PRINCIPAL: CREAR EL INFORME
-  const handleCrearInformeFinal = async () => {
-    // Validación básica antes de enviar
-    if (!datosInforme.departamento_id) {
-        alert("Por favor seleccione un Departamento antes de continuar.");
-        return;
-    }
+
+    useEffect(() => {
+        let timerRedirect: NodeJS.Timeout;
+        let timerCount: NodeJS.Timeout;
+
+        if (informeGenerado) {
+            setSegundosRestantes(5); 
+            
+            timerRedirect = setTimeout(() => {
+                navigate(-1); // Redirección automática después de 5 segundos
+            }, 5000);
+
+            timerCount = setInterval(() => {
+                setSegundosRestantes((prev) => prev - 1);
+            }, 1000);
+        }
+
+        return () => {
+            clearTimeout(timerRedirect);
+            clearInterval(timerCount);
+        };
     
-    if (!datosInforme.sede || datosInforme.sede === "") {
-      alert("Por favor seleccione una Sede (Trelew, Esquel, etc.) antes de continuar.");
-      return;
-    }
+  }, [informeGenerado]); 
 
-    setCreando(true);
-    try {
-        console.log("Datos que se enviarán:", datosInforme);
-        const response = await fetch(`${API_BASE}/informes-sinteticos/`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(datosInforme)
-        });
+    const handleDepartamentoSeleccionado = (id: number) => {
+        setDatosInforme((prev) => ({ ...prev, departamento_id: id }));
+    };
 
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.detail || "Error al crear el informe");
-        }
+    const handleCabeceraChange = (data: { periodo: string; sede: string; integrantes: string }) => {
+        setDatosInforme((prev) => ({
+            ...prev,
+            periodo: data.periodo,
+            sede: data.sede,
+            integrantes: data.integrantes,
+            anio: Number(data.periodo) || 2025,
+        }));
+    };
 
-        const data = await response.json();
-        alert(`¡Informe Sintético creado con éxito! ID: ${data.id}`);
-    } catch (error: any) {
-        console.error("Error creando informe:", error);
-        const errorMessage = error.message || (error.response?.json()?.detail || "Error desconocido");
-        alert(`Error al crear el informe: ${JSON.stringify(errorMessage)}`);
-    } finally {
-        setCreando(false);
-    }
-  };
+    const handleComentariosChange = (texto: string) => {
+        setDatosInforme((prev) => ({ ...prev, comentarios: texto }));
+    };
 
-  return (
-    <div>
-      <HeaderInstitucional />
+    const handleCrearInformeFinal = async () => {
+        if (!datosInforme.departamento_id) {
+            setMensaje({ tipo: "error", texto: "Por favor seleccione un Departamento antes de continuar." });
+            return;
+        }
+        if (!datosInforme.sede || datosInforme.sede === "") {
+            setMensaje({ tipo: "error", texto: "Por favor seleccione una Sede antes de continuar." });
+            return;
+        }
 
-      <div style={styles.container}>
-        <h1 style={styles.titulo}>Generar Informe Sintético</h1>
+        setCreando(true);
+        setMensaje(null);
+        setInformeGenerado(null);
 
-        {/* Seccion cabecera*/}
-        <section>
-          <CompletarDatosCabeceraDep 
-            onDepartamentoSeleccionado={handleDepartamentoSeleccionado} 
-            onCabeceraChange={handleCabeceraChange} 
-          />
-        </section>
+        try {
+            const response = await fetch(`${API_BASE}/informes-sinteticos/`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(datosInforme),
+            });
 
-        {/* Seccione de vistas, solamente si selecciona un deparatamento en la cabecera, despues modificar cuando se agrege el periodo */}
-        {datosInforme.departamento_id > 0 && (
-            <>
-                {/* Información General */}
-                <div style={styles.divider}></div>
-                <section style={styles.section}>
-                    <AutocompletarInformacionGeneral departamentoId={datosInforme.departamento_id} />
-                </section>
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.detail || "Error al crear el informe");
+            }
 
-                {/* Consolidación de Actividades-Santi */}
-                <div style={styles.divider}></div>
-                <section style={styles.section}>
-                    <ConsolidarDesarrolloDeActividades />
-                </section>
+            const data = await response.json();
+            setInformeGenerado(data); // Activa el useEffect para la cuenta regresiva
+            setMensaje({ tipo: "exito", texto: `El informe ha sido guardado correctamente. ID: ${data.id}` });
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        } catch (error: any) {
+            setMensaje({ tipo: "error", texto: `Error: ${error.message || "desconocido"}` });
+            setInformeGenerado(null); 
+        } finally {
+            setCreando(false);
+        }
+    };
 
-                {/* Necesidades */}
-                <div style={styles.divider}></div>
-                <section style={styles.section}>
-                    <AutocompletarNecesidadesDep departamentoId={datosInforme.departamento_id} />
-                </section>
+    return (
+        <div>
+            <HeaderInstitucional />
 
-                {/* Porcentajes */}
-                <div style={styles.divider}></div>
-                <section style={styles.section}>
-                    <PorcentajesInformeSintetico departamentoId={datosInforme.departamento_id} anio={2025} />
-                </section>
+            <div 
+                style={{
+                    ...styles.container, 
+                    opacity: informeGenerado || mensaje?.tipo === 'exito' ? 0.4 : 1, 
+                    filter: informeGenerado || mensaje?.tipo === 'exito' ? 'blur(2px)' : 'none', 
+                    transition: 'all 0.5s',
+                    pointerEvents: informeGenerado || mensaje?.tipo === 'exito' ? 'none' : 'auto' 
+                }}
+            >
+                <h1 style={styles.titulo}>Generar Informe Sintético</h1>
 
-                {/* Aspectos positivos y Obstaculos */}
-                <div style={styles.divider}></div>
-                <section style={styles.section}>
-                    <AspecPosObstaculosInformeSintetico departamentoId={datosInforme.departamento_id} anio={2025} />
-                </section>
+                <section>
+                    <CompletarDatosCabeceraDep
+                        onDepartamentoSeleccionado={handleDepartamentoSeleccionado}
+                        onCabeceraChange={handleCabeceraChange}
+                    />
+                </section>
 
-                {/* Valoraciones */}
-                <div style={styles.divider}></div>
-                <section style={styles.section}>
-                    <AutocompletarValoracionesDep departamentoId={datosInforme.departamento_id} />
-                </section>
-            </>
-        )}
+                {datosInforme.departamento_id > 0 && (
+                    <>
+                        <div style={styles.divider}></div>
+                        <section style={styles.section}>
+                            <AutocompletarInformacionGeneral departamentoId={datosInforme.departamento_id} />
+                        </section>
 
-        <div style={styles.divider}></div>
+                        <div style={styles.divider}></div>
+                        <section style={styles.section}>
+                            <ConsolidarDesarrolloDeActividades />
+                        </section>
 
-        <section style={styles.section}>
-           <ComentariosFinalesDep
-              informeId={null}
-              modoCreacion={true}
-              onChange={handleComentariosChange}
-           />
+                        <div style={styles.divider}></div>
+                        <section style={styles.section}>
+                            <AutocompletarNecesidadesDep departamentoId={datosInforme.departamento_id} />
+                        </section>
 
-           <div style={{ marginTop: 40, textAlign: 'right' }}>
-               <button
-                   onClick={handleCrearInformeFinal}
-                   disabled={creando || !datosInforme.departamento_id}
-                   style={{
-                       padding: '15px 40px',
-                       fontSize: '1.2rem',
-                       fontWeight: 'bold',
-                       color: 'white',
-                       backgroundColor: '#28a745',
-                       border: 'none',
-                       borderRadius: '8px',
-                       cursor: 'pointer',
-                       boxShadow: '0 4px 12px rgba(40, 167, 69, 0.3)',
-                       transition: 'all 0.3s ease',
-                       opacity: (creando || !datosInforme.departamento_id) ? 0.6 : 1
-                   }}
-               >
-                   {creando ? "Generando..." : " FINALIZAR Y CREAR INFORME"}
-               </button>
-           </div>
-        </section>
+                        <div style={styles.divider}></div>
+                        <section style={styles.section}>
+                            <PorcentajesInformeSintetico departamentoId={datosInforme.departamento_id} anio={2025} />
+                        </section>
 
-      </div>
-    </div>
-  );
+                        <div style={styles.divider}></div>
+                        <section style={styles.section}>
+                            <AspecPosObstaculosInformeSintetico departamentoId={datosInforme.departamento_id} anio={2025} />
+                        </section>
+
+                        <div style={styles.divider}></div>
+                        <section style={styles.section}>
+                            <AutocompletarValoracionesDep departamentoId={datosInforme.departamento_id} />
+                        </section>
+                    </>
+                )}
+
+                <div style={styles.divider}></div>
+
+                <section style={styles.section}>
+                    <ComentariosFinalesDep informeId={null} modoCreacion={true} onChange={handleComentariosChange} />
+
+                    <div style={{ marginTop: 40, textAlign: "right" }}>
+                        <button
+                            onClick={handleCrearInformeFinal}
+                            disabled={creando || !datosInforme.departamento_id}
+                            style={{
+                                padding: "15px 40px",
+                                fontSize: "1.2rem",
+                                fontWeight: "bold",
+                                color: "white",
+                                backgroundColor: "#28a745",
+                                border: "none",
+                                borderRadius: "8px",
+                                cursor: "pointer",
+                                boxShadow: "0 4px 12px rgba(40, 167, 69, 0.3)",
+                                transition: "all 0.3s ease",
+                                opacity: creando || !datosInforme.departamento_id ? 0.6 : 1,
+                            }}
+                        >
+                            {creando ? "Generando..." : "FINALIZAR Y CREAR INFORME"}
+                        </button>
+                    </div>
+                </section>
+            </div>
+            
+            {/* NOTIFICACIÓN FLOTANTE */}
+            {mensaje && (
+                <FloatingNotification
+                    tipo={mensaje.tipo}
+                    mensaje={mensaje.texto}
+                    segundos={5}
+                    onClose={() => {
+                        setMensaje(null);
+                        // Si es éxito, redirige al cerrar o al agotarse el tiempo
+                        if (informeGenerado && mensaje.tipo === 'exito') {
+                            navigate(-1); 
+                        }
+                    }}
+                />
+            )}
+        </div>
+    );
 };
 
 export default GenerarInformeSinteticoDep;
