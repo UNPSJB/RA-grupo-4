@@ -2,13 +2,26 @@ import os
 from contextlib import asynccontextmanager
 from dotenv import load_dotenv
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
 from src.database import engine
 from src.models import ModeloBase
 
-# importamos los routers desde nuestros modulos
-from src.personas.router import router as personas_router
-from src.mascotas.router import router as mascotas_router
-from src.productos.router import router as productos_router
+from src.informesAC.router import router as informesAC_router
+from src.estudiantes.router import router as estudiantes_router
+from src.encuesta.router import router as encuesta_router
+from src.preguntas.router import router as preguntas_router
+from src.respuestas.router import router as opcion_respuestas_router
+from src.respuestas.router import router_respuestas
+from src.materias.router import router as materias_router
+from src.carreras.router import router as carreras_router
+from src.docentes.router import router as docentes_router
+from src.inscripciones.router import router as inscripciones_router
+from src.informesSinteticos.router import router as informesSinteticos_router
+from src.departamentos.router import router as departamentos_router
+from src.secciones.router import router as secciones_router
+from src.actividades.router import router as actividades_router
+
 from fastapi.middleware.cors import CORSMiddleware
 
 load_dotenv()
@@ -16,17 +29,17 @@ load_dotenv()
 ENV = os.getenv("ENV")
 ROOT_PATH = os.getenv(f"ROOT_PATH_{ENV.upper()}")
 
-
 @asynccontextmanager
 async def db_creation_lifespan(app: FastAPI):
     ModeloBase.metadata.create_all(bind=engine)
     yield
 
-
 app = FastAPI(root_path=ROOT_PATH, lifespan=db_creation_lifespan)
 
 origins = [
-    "http://localhost:5173", # para recibir requests desde app React (puerto: 5173)
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://localhost:8000"
 ]
 
 app.add_middleware(
@@ -37,8 +50,17 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
-# asociamos los routers a nuestra app
-app.include_router(personas_router)
-app.include_router(mascotas_router)
-app.include_router(productos_router)
+app.include_router(preguntas_router)
+app.include_router(opcion_respuestas_router)
+app.include_router(router_respuestas)
+app.include_router(encuesta_router)
+app.include_router(estudiantes_router)
+app.include_router(materias_router)
+app.include_router(docentes_router)
+app.include_router(carreras_router)
+app.include_router(inscripciones_router)
+app.include_router(informesAC_router)
+app.include_router(informesSinteticos_router)
+app.include_router(departamentos_router)
+app.include_router(secciones_router)
+app.include_router(actividades_router)

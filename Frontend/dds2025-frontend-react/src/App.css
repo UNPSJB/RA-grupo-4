@@ -1,0 +1,225 @@
+/* --- AÑADIDO: Cursor de Gaviota --- */
+html, body {
+  /* --- CAMBIO: Nombre del archivo actualizado --- */
+  cursor: url('./assets/gaviotaPunteroRedimensionada.png'), auto; 
+}
+/* --- FIN AÑADIDO --- */
+
+
+/* --- ESTILOS GENERALES (Navbar, Footer, etc.) --- */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #005f9e;
+  padding: 0 20px;
+  height: 60px;
+  color: white;
+}
+
+/* ... (El resto de tu archivo App.css sin cambios) ... */
+
+.navbar-left .site-name {
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+
+.navbar-links {
+  display: flex;
+  gap: 20px;
+}
+
+.navbar-links a,
+.navbar-right a {
+  color: white;
+  text-decoration: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  transition: background-color 0.3s;
+}
+
+.navbar-links a:hover,
+.navbar-right a:hover {
+  background-color: #007bff;
+}
+
+.page-content {
+  padding: 20px;
+  min-height: calc(100vh - 100px);
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+}
+
+.footer {
+  background-color: #0d0d0eff;
+  color: white;
+  text-align: center;
+  padding: 10px 0;
+  height: 40px;
+}
+
+/* --- ESTILOS PARA MENÚS DESPLEGABLES --- */
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-button {
+  background-color: transparent;
+  color: white;
+  padding: 8px 12px;
+  font-size: 16px;
+  font-family: inherit;
+  border: none;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.3s;
+}
+
+.dropdown-button:hover {
+  background-color: #007bff;
+}
+
+.dropdown-content {
+  display: block;
+  position: absolute;
+  background-color: #0d0d0eff;
+  border: 1px solid #007bff;
+  min-width: 220px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.5);
+  z-index: 10;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-top: 5px;
+}
+
+.dropdown-content a {
+  color: #f1f1f1;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+  text-align: left;
+}
+
+.dropdown-content a:hover {
+  background-color: #007bff;
+}
+
+/* --- ESTILOS PARA LA PÁGINA DE BIENVENIDA --- */
+.home-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 40px 20px;
+  color: #333;
+}
+
+.home-logo {
+  width: 150px;
+  height: auto;
+  margin-bottom: 20px;
+}
+
+.home-title {
+  font-size: 2.5rem;
+  font-weight: 300;
+  margin-bottom: 10px;
+  color: #0d0d0eff;
+}
+
+.home-subtitle {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 40px;
+  color: #333;
+}
+
+.home-image-container {
+  max-width: 800px;
+  width: 100%;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+}
+
+.home-building-image {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.home-image-caption {
+  background-color: rgba(13, 13, 14, 0.8);
+  color: white;
+  padding: 10px;
+  margin-top: -5px;
+  font-style: italic;
+}
+
+.home-description {
+  font-size: 1.1rem;
+  color: #555;
+  max-width: 600px;
+  margin-top: 20px;
+}
+
+
+/* --- SISTEMA DE DISEÑO UNIFICADO --- */
+
+.content-card {
+  background-color: #1e1e1e;
+  color: #e1e1e1;
+  padding: 25px 30px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.content-title {
+  font-size: 1.8rem;
+  font-weight: 400;
+  margin-top: 0;
+  margin-bottom: 25px;
+  color: #ffffff;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #444;
+}
+
+.styled-list {
+  list-style: none;
+  padding: 0;
+}
+
+.styled-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  background-color: #2b2b2b;
+  border-radius: 5px;
+  margin-bottom: 10px;
+  font-size: 1.1rem;
+}
+
+.styled-button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+  transition: background-color 0.2s, transform 0.2s;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.styled-button:hover {
+  background-color: #0056b3;
+  transform: scale(1.05);
+}
