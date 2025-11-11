@@ -1,53 +1,49 @@
-import React, { useState, useEffect, useRef } from "react";
-import { Routes, Route, Link, Navigate } from "react-router-dom";
+import React from "react";
+import { Routes, Route, Link, Outlet } from "react-router-dom";
 import "./App.css";
 
-import LoginPage from "./Componentes/LoginPage";
-import SeleccionarEncuestas from "./Componentes/SeleccionarEncuestas";
-import ListadoInformesACDoc from "./Componentes/ListadoInformesACDoc";
-import SeleccionarInformeSinteticoSEC from "./Componentes/SeleccionarInformeSinteticoSEC";
-import FiltradoInformeACDep from "./Componentes/FiltradoInformeACDep";
-import ResponderEncuesta from "./Componentes/ResponderEncuesta";
-import PaginaEstadisticasDoc from "./Componentes/PaginaEstadisticasDoc";
-import HomePage from "./Componentes/HomePage";
-import GenerarInformeACDoc from "./Componentes/GenerarInformeAC";
-//nuevo
-import GenerarInformeSinteticoDep from "./Componentes/GenerarInformeSinteticoDep";
+// Componentes Generales
+import LoginPage from "./Componentes/Otros/LoginPage";
+import HomePage from "./Componentes/Otros/HomePage";
+import ErrorCargaDatos from "./Componentes/Otros/ErrorCargaDatos";
+import SinDatos from "./Componentes/Otros/SinDatos";
 
-import EstadisticasPreguntasPage from "./Componentes/EstadisticasPorPregunta";
+// --- MENÚS DE SECCIÓN (ROUTERS ANIDADOS) ---
+// Estos son los únicos componentes que App.tsx necesita saber
+import MenuAlumno from "./Componentes/Menus/MenuAlumno";
+// (Aquí también importarías tus otros menús)
+// import MenuDocente from "./Componentes/Menus/MenuDocente";
+// import MenuDepartamento from "./Componentes/Menus/MenuDepartamento";
+// import MenuSecretaria from "./Componentes/Menus/MenuSecretaria";
 
-const DropdownMenu: React.FC<{ title: string; children: React.ReactNode }> = ({ title, children }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
-
-  const toggleDropdown = () => setIsOpen(!isOpen);
-  const closeDropdown = () => setIsOpen(false);
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        closeDropdown();
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
+/**
+ * Un componente de Layout interno para no repetir la Navbar y Footer
+ */
+const MainLayout = () => {
   return (
-    <div className="dropdown" ref={dropdownRef}>
-      <button onClick={toggleDropdown} className="dropdown-button">
-        {title}
-      </button>
-      {isOpen && (
-        <div className="dropdown-content">
-          {React.Children.map(children, child =>
-            React.isValidElement(child)
-              ? React.cloneElement(child, { onClick: closeDropdown } as React.Attributes)
-              : child
-          )}
+    <>
+      <nav className="navbar">
+        <div className="navbar-left">
+          <Link to="/home" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
+            {/* <img src={logoUnpsjb} alt="Logo" className="navbar-logo" /> */}
+            <span className="site-name">Sistema de Encuestas UNPSJB</span>
+          </Link>
         </div>
-      )}
-    </div>
+        <div className="navbar-right">
+          {/* <img src={userAvatar} alt="Perfil" className="user-avatar" /> */}
+          <Link to="/" className="logout-link">Cerrar Sesión</Link>
+        </div>
+      </nav>
+
+      <div className="page-content">
+        {/* Outlet renderizará la ruta anidada (HomePage, MenuAlumno, etc.) */}
+        <Outlet />
+      </div>
+
+      <footer className="footer">
+        © 2025 HP TEAM — Sistema de encuestas UNPSJB
+      </footer>
+    </>
   );
 };
 
@@ -55,74 +51,36 @@ const DropdownMenu: React.FC<{ title: string; children: React.ReactNode }> = ({ 
 function App() {
   return (
     <Routes>
-      {/* Página de login */}
+      {/* Ruta de login (fuera del layout principal) */}
       <Route path="/" element={<LoginPage />} />
 
-      {/* Sistema principal */}
-      <Route
-        path="/home/*"
-        element={
-          <>
-            <nav className="navbar">
-              <div className="navbar-left">
-                <span className="site-name">Sistema de encuestas UNPSJB</span>
-              </div>
+      {/* Rutas principales que usan MainLayout (Navbar/Footer) */}
+      <Route path="/home" element={<MainLayout />}>
+        
+        {/* Ruta índice de /home -> El carrusel */}
+        <Route index element={<HomePage />} />
+        
+        {/* Rutas anidadas para cada sección */}
+        {/* Cualquier ruta que empiece con /home/alumno/* será manejada por MenuAlumno */}
+        <Route path="alumno/*" element={<MenuAlumno />} />
+        
+        {/* (Aquí pondrías las otras secciones) */}
+        {/* <Route path="docente/*" element={<MenuDocente />} /> */}
+        {/* <Route path="departamento/*" element={<MenuDepartamento />} /> */}
+        {/* <Route path="secretaria/*" element={<MenuSecretaria />} /> */}
 
-              <div className="navbar-links">
+        {/* Rutas de Error/Info */}
+        <Route path="error" element={<ErrorCargaDatos />} />
+        <Route path="sin-datos" element={<SinDatos />} />
 
-                <DropdownMenu title="Funcionalidades Alumno">
-                  <Link to="/home/seleccionar">Seleccionar Encuestas</Link>
-                </DropdownMenu>
-
-                <DropdownMenu title="Funcionalidades Docente">
-                  <Link to="/home/informes-doc">Listar Informes</Link>
-                  <Link to="/home/generar-informe">Generar Informe AC</Link>
-                  <Link to="/home/estadisticas-docente">Ver Estadísticas Materias</Link>
-                  <Link to="/home/estadisticas-preguntas">Ver Estadísticas de preguntas</Link>
-                </DropdownMenu>
-
-                <DropdownMenu title="Funcionalidades Departamento">
-                  <Link to="/home/informes-dep">Informes Dept.</Link>
-                  <Link to= "/home/generar-sintetico">Generar informe Sintetico.</Link>
-                </DropdownMenu>
-
-                <DropdownMenu title="Funcionalidades Secretaría">
-                  <Link to="/home/informes-sinteticos">Informes Sintéticos</Link>
-                </DropdownMenu>
-              </div>
-
-              <div className="navbar-right">
-                <Link to="/">Cerrar sesión</Link>
-              </div>
-            </nav>
-
-            <div className="page-content">
-              <Routes>
-                <Route
-                  index
-                  element={<HomePage />}
-                />
-                <Route path="seleccionar" element={<SeleccionarEncuestas />} />
-                <Route path="informes-dep" element={<FiltradoInformeACDep />} />
-                <Route path="informes-doc" element={<ListadoInformesACDoc />} />
-                <Route path="responder-encuesta/:inscripcionId" element={<ResponderEncuesta />} />
-                <Route path="informes-sinteticos" element={<SeleccionarInformeSinteticoSEC />} />
-                <Route path="estadisticas-docente" element={<PaginaEstadisticasDoc />} />
-                <Route path="estadisticas-preguntas" element={<EstadisticasPreguntasPage/>} />
-                <Route path="generar-informe" element={<GenerarInformeACDoc />} />
-                <Route path="generar-sintetico" element={<GenerarInformeSinteticoDep />} />
-              </Routes>
-            </div>
-
-            <footer className="footer">
-              © 2025 HP TEAM — Sistema de encuestas UNPSJB
-            </footer>
-          </>
-        }
-      />
+        {/* Ruta comodín para cualquier cosa no encontrada DENTRO de /home */}
+        <Route path="*" element={<HomePage />} /> 
+      </Route>
+      
+      {/* Ruta comodín general */}
+      <Route path="*" element={<LoginPage />} /> 
     </Routes>
   );
 }
 
 export default App;
-
