@@ -2,44 +2,45 @@
 /* --- ESTILOS BASE Y VARIABLES (DEBES TENERLOS) --- */
 /* --- ========================================= --- */
 :root {
-  --primary-color: #0056b3;
-  --primary-color-rgb: 0, 86, 179;
-  --secondary-color: #f8f9fa;
-  --text-color: #333;
-  --text-color-light: #666;
-  --bg-color: #f4f7f6;
-  --card-bg: #ffffff;
-  --border-radius: 12px;
+    --primary-color: #0056b3;
+    --primary-color-rgb: 0, 86, 179;
+    --secondary-color: #f8f9fa;
+    --text-color: #333;
+    --text-color-light: #666;
+    --bg-color: #f4f7f6;
+    --card-bg: #ffffff;
+    --border-radius: 12px;
 
-  --color-alumno: #28a745;
-  --color-docente: #17a2b8;
-  --color-departamento: #ffc107;
-  --color-secretaria: #dc3545;
+    --color-alumno: #28a745;
+    --color-docente: #17a2b8;
+    --color-departamento: #ffc107;
+    --color-secretaria: #dc3545;
 }
 
 body {
-  background-color: var(--bg-color) !important;
-  color: var(--text-color);
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  margin: 0;
+    background-color: var(--bg-color) !important;
+    color: var(--text-color);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
 }
 
 .page-content {
-  min-height: calc(100vh - 150px); /* Ajusta 150px a [altura navbar + altura footer] */
-  padding: 1px 0; /* Evita colapso de márgenes */
+    min-height: calc(100vh - 150px); 
+    padding: 1px 0; 
+    background-color: var(--bg-color); 
 }
 
 /* --- ESTILOS NAVBAR Y FOOTER (Básicos) --- */
 .navbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-color: #fff;
-  padding: 10px 20px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-  position: sticky;
-  top: 0;
-  z-index: 1000;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #fff;
+    padding: 10px 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
 }
 .navbar-left a { text-decoration: none; display: flex; align-items: center; }
 .site-name { font-size: 1.4rem; color: var(--primary-color); font-weight: 600; }
@@ -47,144 +48,152 @@ body {
 .logout-link { color: var(--text-color-light); text-decoration: none; font-weight: 500; padding: 8px 12px; }
 
 .footer {
-  text-align: center;
-  padding: 20px;
-  margin-top: auto;
-  color: var(--text-color-light);
-  border-top: 1px solid #eee;
-  background-color: #fff;
+    text-align: center;
+    padding: 20px;
+    margin-top: auto;
+    color: var(--text-color-light);
+    border-top: 1px solid #eee;
+    background-color: #fff;
 }
 
-
 /* --- ========================================= --- */
-/* --- ESTILOS CARRUSEL (HOMEPAGE)               --- */
+/* --- ESTILOS CARRUSEL (HOMEPAGE)               --- */
 /* --- ========================================= --- */
 .home-container {
-  padding: 4vh 2vw;
-  text-align: center;
-  overflow-x: hidden;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 80vh;
+    padding: 4vh 2vw;
+    text-align: center;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 80vh;
 }
 .home-title { color: var(--primary-color); margin-bottom: 0.5rem; font-size: clamp(1.8rem, 4vw, 2.8rem); }
 .home-subtitle { color: var(--text-color-light); margin-bottom: 4vh; font-size: clamp(1rem, 2vw, 1.3rem); }
 
 .carousel-3d-container {
-  width: 100%;
-  max-width: 1000px;
-  margin: 0 auto;
-  padding: 40px 0;
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 40px 0;
 }
 .slide-outer-wrapper { padding: 20px; perspective: 1500px; }
 
 .carousel-card {
-  background: var(--card-bg) !important;
-  border-radius: var(--border-radius);
-  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-  overflow: hidden;
-  height: clamp(380px, 55vh, 450px);
-  display: flex;
-  flex-direction: column;
-  opacity: 0.7;
-  transform: scale(0.85);
-  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-  pointer-events: none;
+    background: var(--card-bg) !important;
+    border-radius: var(--border-radius); /* Mantiene los bordes redondeados */
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    overflow: hidden; /* Mantiene el recorte */
+    height: clamp(380px, 55vh, 450px);
+    display: flex;
+    flex-direction: column;
+    opacity: 1; 
+    transform: scale(0.85); /* Tamaño de tarjetas laterales */
+    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    pointer-events: none;
+    transform-origin: center center;
 }
 .slick-center .carousel-card {
-  opacity: 1;
-  transform: scale(1.1);
-  z-index: 10;
-  box-shadow: 0 25px 50px rgba(0,0,0,0.2);
-  pointer-events: all;
+    opacity: 1;
+    transform: scale(1.1); /* Tamaño de tarjeta central */
+    z-index: 10;
+    box-shadow: 0 25px 50px rgba(0,0,0,0.2);
+    pointer-events: all;
 }
 .card-header { padding: 20px; color: white; min-height: 110px; }
 .card-icon { font-size: 3.5rem; margin-bottom: 10px; line-height: 1; }
 .card-header h3 { margin: 0; font-size: 1.5rem; font-weight: 600; }
 .card-body { padding: 20px 25px; flex-grow: 1; background-color: #fff; }
 
-a.carousel-card-link { text-decoration: none; display: block; }
-a.carousel-card-link .carousel-card { transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-a.carousel-card-link:hover .carousel-card {
-  transform: scale(1.15) !important; /* Damos !important para sobreescribir slick-center */
-  box-shadow: 0 25px 50px rgba(0,0,0,0.2);
+.carousel-card-link { 
+    text-decoration: none; 
+    display: block; 
+    cursor: pointer;
 }
+.carousel-card-link .carousel-card { 
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+}
+
+/* Efecto hover SUTIL (solo sombra y z-index) para TODAS las tarjetas */
+.carousel-card-link:hover .carousel-card {
+    box-shadow: 0 30px 60px rgba(0,0,0,0.25); /* Mantenemos la sombra como feedback "leve" */
+    z-index: 20; 
+}
+
+
 .carousel-card-cta {
-  font-size: 1.2rem;
-  font-weight: 600;
-  color: var(--text-color-light);
-  padding: 10px;
-  border-radius: 8px;
-  transition: all 0.3s ease;
-  position: relative;
-  top: 40%;
-  transform: translateY(-50%);
-  display: inline-block;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--text-color-light);
+    padding: 10px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    position: relative;
+    top: 40%;
+    transform: translateY(-50%);
+    display: inline-block;
 }
-a.carousel-card-link:hover .carousel-card-cta {
-  color: var(--primary-color);
-  background-color: rgba(255,255,255,0.5);
+.carousel-card-link:hover .carousel-card-cta {
+    color: var(--primary-color);
+    background-color: rgba(240, 240, 240, 0.7);
 }
-/* Estilos flechas slick (opcional pero recomendado) */
+
 .slick-prev:before, .slick-next:before { color: var(--primary-color) !important; }
 
-
 /* --- ========================================= --- */
-/* --- ESTILOS MENÚS SIMPLES (DOCENTE, DEPTO)    --- */
+/* --- ESTILOS MENÚS SIMPLES (DOCENTE, DEPTO)    --- */
 /* --- ========================================= --- */
 .menu-page-container {
-  max-width: 900px;
-  margin: 40px auto;
-  padding: 30px;
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 8px 30px rgba(0,0,0,0.08);
-  position: relative;
-  animation: fadeInUp 0.5s ease-out;
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 30px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+    position: relative;
+    animation: fadeInUp 0.5s ease-out;
 }
 .menu-header {
-  text-align: center;
-  margin-bottom: 30px;
-  padding-bottom: 20px;
-  border-bottom: 4px solid var(--menu-color, var(--primary-color));
+    text-align: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 4px solid var(--menu-color, var(--primary-color));
 }
 .menu-header h1 { font-size: 2.5rem; margin: 0 0 10px 0; color: var(--menu-color, var(--primary-color)); }
 .menu-header p { font-size: 1.1rem; color: var(--text-color-light); margin: 0; }
 .menu-link-list { display: flex; flex-direction: column; gap: 15px; }
 .menu-link {
-  display: block; padding: 18px 25px; background-color: var(--secondary-color);
-  color: var(--text-color); text-decoration: none; font-size: 1.1rem;
-  font-weight: 600; border-radius: 8px;
-  border-left: 5px solid var(--menu-color, var(--primary-color));
-  transition: all 0.2s ease-out;
+    display: block; padding: 18px 25px; background-color: var(--secondary-color);
+    color: var(--text-color); text-decoration: none; font-size: 1.1rem;
+    font-weight: 600; border-radius: 8px;
+    border-left: 5px solid var(--menu-color, var(--primary-color));
+    transition: all 0.2s ease-out;
 }
 .menu-link:hover {
-  background-color: #e9ecef;
-  transform: translateX(10px);
-  box-shadow: 0 5px 15px rgba(0,0,0,0.07);
+    background-color: #e9ecef;
+    transform: translateX(10px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.07);
 }
 
-/* Botón Regresar SIMPLE (para menús Docente, Depto, etc) */
 .back-button-simple {
-  position: absolute; top: 30px; right: 30px; display: flex; align-items: center;
-  gap: 8px; padding: 10px 18px; background-color: #f8f9fa;
-  color: var(--text-color-light); border: 1px solid #ddd; border-radius: 50px;
-  font-weight: 600; font-size: 0.9rem; cursor: pointer; transition: all 0.2s ease-out;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    position: absolute; top: 30px; right: 30px; display: flex; align-items: center;
+    gap: 8px; padding: 10px 18px; background-color: #f8f9fa;
+    color: var(--text-color-light); border: 1px solid #ddd; border-radius: 50px;
+    font-weight: 600; font-size: 0.9rem; cursor: pointer; transition: all 0.2s ease-out;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
 .back-button-simple:hover {
-  background-color: #fff; color: var(--primary-color); border-color: #bbb;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1); transform: translateY(-2px);
+    background-color: #fff; color: var(--primary-color); border-color: #bbb;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1); transform: translateY(-2px);
 }
 
 /* Keyframes para animación de entrada */
 @keyframes fadeInDown {
-  from { opacity: 0; transform: translateY(-30px); }
-  to { opacity: 1; transform: translateY(0); }
+    from { opacity: 0; transform: translateY(-30px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 @keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(30px); }
-  to { opacity: 1; transform: translateY(0); }
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
 }

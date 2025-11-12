@@ -1,36 +1,49 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Routes, Route, useNavigate, Outlet } from 'react-router-dom';
+import './MenuAlumno.css'; 
 import { ArrowLeft } from 'lucide-react';
-import '../../App.css'; // Usa el App.css general
+import MenuDocenteIndex from './MenuDocenteIndex'; 
+import GenerarInformeAC from '../Docente/GenerarInformeAC'; 
+import ListadoInformesACDoc from '../Docente/ListadoInformesACDoc';
+import PaginaEstadisticasDoc from '../Docente/PaginaEstadisticasDoc';
+import SinDatos from '../Otros/SinDatos'; 
 
+
+const DocenteLayout = () => {
+  const navigate = useNavigate();
+  
+  return (
+    <div className="menu-alumno-container">
+      <button onClick={() => navigate("/home/docente")} className="back-button"> 
+        <ArrowLeft size={18} /> Regresar al Menú
+      </button>
+
+      <header className="menu-alumno-header">
+        <h1>Home Docente</h1>
+        <p>Bienvenido. ¿Qué te gustaría hacer hoy?</p>
+      </header>
+      <main>
+        <Outlet /> 
+      </main>
+    </div>
+  );
+};
+
+/**
+ * 2. El router anidado
+ */
 const MenuDocente = () => {
-    const navigate = useNavigate();
-    
-    // Lista de enlaces que SÍ existen en tu App.tsx
-    const links = [
-        { ruta: "/home/informes-doc", texto: "Informes Pendientes" },
-        { ruta: "/home/historial-informes", texto: "Historial de Informes" },
-        { ruta: "/home/estadisticas-docente", texto: "Ver Estadísticas Materias" },
-    ];
-
-    return (
-        <div className="menu-page-container">
-            <button onClick={() => navigate(-1)} className="back-button-simple">
-                <ArrowLeft size={18} /> Regresar
-            </button>
-            <header className="menu-header" style={{ '--menu-color': 'var(--color-docente)' }}>
-                <h1>Portal del Docente</h1>
-                <p>Gestione sus informes y estadísticas.</p>
-            </header>
-            <div className="menu-link-list">
-                {links.map((link, index) => (
-                    <Link key={index} to={link.ruta} className="menu-link">
-                        {link.texto}
-                    </Link>
-                ))}
-            </div>
-        </div>
-    );
+  return (
+    <Routes>
+      <Route path="/" element={<DocenteLayout />}>
+        <Route index element={<MenuDocenteIndex />} />
+        <Route path="generar-informe" element={<GenerarInformeAC />} /> 
+        <Route path="historial-informes" element={<ListadoInformesACDoc />} />
+        <Route path="estadisticas" element={<PaginaEstadisticasDoc />} />
+        <Route path="mi-perfil" element={<SinDatos />} />
+      </Route>
+    </Routes>
+  );
 };
 
 export default MenuDocente;

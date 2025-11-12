@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import './MenuAlumno.css'; // Reutiliza el mismo CSS
+import './MenuAlumno.css'; 
 import { CheckSquare, History, ClipboardList, User } from 'lucide-react';
 
 /**

@@ -1,10 +1,7 @@
 import React from 'react';
 import { Routes, Route, useNavigate, Outlet } from 'react-router-dom';
-import './MenuAlumno.css'; // Importa el CSS "WOW"
+import './MenuAlumno.css'; 
 import { ArrowLeft } from 'lucide-react';
-
-// --- ¡AQUÍ IMPORTAS TUS COMPONENTES! ---
-// Estos componentes solo los conoce MenuAlumno, no App.tsx
 import MenuAlumnoIndex from './MenuAlumnoIndex';
 import SeleccionarEncuestas from '../Estudiante/SeleccionarEncuestas';
 import SinDatos from '../Otros/SinDatos';

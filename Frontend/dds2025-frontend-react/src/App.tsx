@@ -12,7 +12,7 @@ import SinDatos from "./Componentes/Otros/SinDatos";
 // Estos son los únicos componentes que App.tsx necesita saber
 import MenuAlumno from "./Componentes/Menus/MenuAlumno";
 // (Aquí también importarías tus otros menús)
-// import MenuDocente from "./Componentes/Menus/MenuDocente";
+import MenuDocente from "./Componentes/Menus/MenuDocente";
 // import MenuDepartamento from "./Componentes/Menus/MenuDepartamento";
 // import MenuSecretaria from "./Componentes/Menus/MenuSecretaria";
 
@@ -64,7 +64,7 @@ function App() {
         <Route path="alumno/*" element={<MenuAlumno />} />
         
         {/* (Aquí pondrías las otras secciones) */}
-        {/* <Route path="docente/*" element={<MenuDocente />} /> */}
+        <Route path="docente/*" element={<MenuDocente />} /> 
         {/* <Route path="departamento/*" element={<MenuDepartamento />} /> */}
         {/* <Route path="secretaria/*" element={<MenuSecretaria />} /> */}
 
