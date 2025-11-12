@@ -96,6 +96,7 @@ VALUES
 -- =====================================================
 INSERT INTO informesAC (
     id_informesAC,
+    completado,
     id_materia,
     id_docente,
     sede,
@@ -104,6 +105,6 @@ INSERT INTO informesAC (
     resumenSecciones
 )
 VALUES
-    (1, 1, 1, 'Trelew', 2025, NULL, '{}'),
-    (2, 2, 2, 'Madryn', 2025, NULL, '{}'),
-    (3, 3, 3, 'Trelew', 2025, NULL, '{}');
+    (1, 0, 1, 1, 'Trelew', 2025, NULL, '{}'),
+    (2, 0, 2, 2, 'Madryn', 2025, NULL, '{}'),
+    (3, 0, 3, 3, 'Trelew', 2025, NULL, '{}');

@@ -14,8 +14,8 @@ interface SinDatosProps {
 const SinDatos: React.FC<SinDatosProps> = ({
   // Aquí asignamos tu imagen importada como valor por defecto
   imagenSrc = imgSinDatosDefault,
-  titulo = "No se encontraron datos",
-  mensaje = "No hay información disponible para mostrar con los criterios actuales."
+  titulo = "Ups, parece que no hay nada por aqui..",
+  mensaje = "Aun no hay datos cargados"
 }) => {
   return (
     <div className="no-data-wrapper">
@@ -53,7 +53,7 @@ const SinDatos: React.FC<SinDatosProps> = ({
         }
 
         .no-data-title {
-          font-size: 1.25rem;
+          font-size: 1.50rem;
           font-weight: 700;
           color: #003366;
           margin: 0 0 10px 0;
@@ -78,7 +78,7 @@ const SinDatos: React.FC<SinDatosProps> = ({
       </div>
 
       <h3 className="no-data-title">{titulo}</h3>
-      <p className="no-data-text">{mensaje}</p>
+      <p className="no-data-text">{mensaje}</p> 
     </div>
   );
 };

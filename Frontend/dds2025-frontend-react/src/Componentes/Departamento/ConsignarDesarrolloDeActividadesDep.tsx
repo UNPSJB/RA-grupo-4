@@ -54,7 +54,7 @@ const ConsignarDesarrolloDeActividadesDep: React.FC<Props> = ({ departamentoId }
       setError(null);
 
       try {
-        const response = await fetch(`${API_BASE}/informes-sinteticos/preview/actividades?departamento_id=${departamentoId}&anio=${ANIO_EVALUADO}`);
+        const response = await fetch(`${API_BASE}/informes-sinteticos/actividades`)
 
         if (!response.ok) {
           throw new Error(`Error ${response.status}: No se pudo obtener la información de actividades.`);
@@ -94,7 +94,7 @@ const ConsignarDesarrolloDeActividadesDep: React.FC<Props> = ({ departamentoId }
           --uni-bg: #f9f9f9;
           --uni-card-bg: #ffffff;
           --uni-border: #e0e0e0;
-          --uni-text: #111;
+          --uni-text: #fff;
           --uni-input-bg: #d0dff0; 
         }
 
@@ -125,7 +125,7 @@ const ConsignarDesarrolloDeActividadesDep: React.FC<Props> = ({ departamentoId }
             justify-content: space-between;
             align-items: center;
             background: linear-gradient(135deg, var(--uni-primary), #004e92);
-            color: white;
+            color: #fff;
             transition: background 0.3s ease;
         }
         .actividades-header:hover {
@@ -140,6 +140,7 @@ const ConsignarDesarrolloDeActividadesDep: React.FC<Props> = ({ departamentoId }
             align-items: center;
             gap: 12px;
             letter-spacing: 0.5px;
+            color: #fff;
         }
         .actividades-icon {
             width: 24px;
@@ -265,11 +266,12 @@ const ConsignarDesarrolloDeActividadesDep: React.FC<Props> = ({ departamentoId }
         {/* HEADER CLICKABLE */}
         <div className="actividades-header" onClick={() => setIsExpanded(!isExpanded)}>
           <h3 className="actividades-title">
+            Desarrollo de Actividades
              {/* Icono de lista/actividad */}
-             <svg className="actividades-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+             {/* <svg className="actividades-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                 <path d="M12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm-1 15h2v-6h-2v6zm0-8h2V7h-2v2z"/>
              </svg>
-             3. Desarrollo de Actividades
+              */}
           </h3>
           <span className={`chevron ${isExpanded ? 'rotated' : ''}`}>▼</span>
         </div>

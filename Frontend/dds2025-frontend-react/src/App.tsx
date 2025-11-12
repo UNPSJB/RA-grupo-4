@@ -47,7 +47,6 @@ const MainLayout = () => {
   );
 };
 
-
 function App() {
   return (
     <Routes>

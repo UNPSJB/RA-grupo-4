@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import { Link } from "react-router-dom";
 // Asegúrate de que la ruta de importación sea correcta
 import ErrorCargaDatos from "../Otros/ErrorCargaDatos";
+import SinDatos from "../Otros/SinDatos";
 
 interface InformeSintetico {
   id: number;
@@ -124,7 +125,7 @@ const SeleccionarInformeSinteticoSEC: React.FC = () => {
 
       {informes.length === 0 ? (
         <div style={{ padding: "30px", textAlign: "center", background: "#f9f9f9", borderRadius: "8px" }}>
-          No hay informes sintéticos disponibles.
+          <SinDatos/>
         </div>
       ) : (
         <table className="uni-table">
