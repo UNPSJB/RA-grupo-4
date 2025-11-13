@@ -134,7 +134,9 @@ export const MateriaEstadisticasAcordeones: React.FC<{ data: MateriaEstadisticas
 
             {/* Acordeones de secciones */}
             <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-                {data.secciones.map((seccion) => {
+                
+                {/* CORRECCIÓN AQUI: Añadido el '?' antes de .map */}
+                {data.secciones?.map((seccion) => {
                     const abierta = abiertas.includes(seccion.seccion_id);
                     return (
                         <div
@@ -191,7 +193,8 @@ export const MateriaEstadisticasAcordeones: React.FC<{ data: MateriaEstadisticas
                                 >
                                     <legend style={{ display: "none" }} />
 
-                                    {seccion.preguntas.map((pregunta) => {
+                                    {/* CORRECCIÓN AQUI: Añadido el '?' antes de .map */}
+                                    {seccion.preguntas?.map((pregunta) => {
                                         const esAbierta =
                                             pregunta.respuestas_abiertas &&
                                             pregunta.respuestas_abiertas.length > 0;
@@ -309,7 +312,7 @@ export const MateriaEstadisticasAcordeones: React.FC<{ data: MateriaEstadisticas
                                                             gap: "12px",
                                                         }}
                                                     >
-                                                        {pregunta.respuestas_abiertas!.map(
+                                                        {pregunta.respuestas_abiertas?.map(
                                                             (resp, idx) => (
                                                                 <div
                                                                     key={idx}
@@ -353,6 +356,8 @@ const EstadisticasPreguntasPage: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
+        // Aquí es donde deberías obtener la materia real dinámicamente
+        // Por ahora dejamos el ID 1 como ejemplo
         fetch("http://localhost:8000/materias/1/estadisticas/preguntas")
             .then((res) => {
                 if (!res.ok) throw new Error("Error al cargar datos");
