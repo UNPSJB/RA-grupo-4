@@ -8,9 +8,10 @@ import HomePage from "./Componentes/Otros/HomePage";
 import ErrorCargaDatos from "./Componentes/Otros/ErrorCargaDatos";
 import SinDatos from "./Componentes/Otros/SinDatos";
 
-// MENÚS DE SECCIÓN
+// --- MENÚS DE SECCIÓN (ROUTERS ANIDADOS) ---
 import MenuAlumno from "./Componentes/Menus/MenuAlumno";
 import MenuDocente from "./Componentes/Menus/MenuDocente";
+import MenuDepartamento from "./Componentes/Menus/MenuDepartamento"; 
 import MenuSecretaria from "./Componentes/Menus/MenuSecretaria";
 
 /**
@@ -40,6 +41,7 @@ const MainLayout = () => (
 function App() {
   return (
     <Routes>
+      {/* Ruta de login */}
       <Route path="/" element={<LoginPage />} />
 
       <Route path="/home" element={<MainLayout />}>
@@ -48,6 +50,7 @@ function App() {
         {/* Secciones anidadas */}
         <Route path="alumno/*" element={<MenuAlumno />} />
         <Route path="docente/*" element={<MenuDocente />} />
+        <Route path="departamento/*" element={<MenuDepartamento />} />
         <Route path="secretaria/*" element={<MenuSecretaria />} />
 
         {/* Rutas de error/info */}

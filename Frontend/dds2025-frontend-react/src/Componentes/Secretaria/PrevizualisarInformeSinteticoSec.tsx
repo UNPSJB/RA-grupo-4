@@ -84,7 +84,7 @@ const PrevisualizarInformeSinteticoSec: React.FC = () => {
   const fetchInformeDetalle = useCallback(async () => {
     // Si estamos en modo debug, usamos los datos falsos y salimos
     if (USE_DEBUG_DATA) {
-      console.log("⚡ MODO DEBUG ACTIVADO: Usando datos mock");
+      console.log(" MODO DEBUG ACTIVADO: Usando datos mock");
       setTimeout(() => {
         setInforme(MOCK_INFORME_DATA);
         setCargando(false);
