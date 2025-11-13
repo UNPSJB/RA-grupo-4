@@ -1,4 +1,4 @@
-
+// no lo usamos
 import React, { useState } from "react";
 
 interface Opcion {
