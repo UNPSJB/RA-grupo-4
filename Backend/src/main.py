@@ -21,6 +21,7 @@ from src.informesSinteticos.router import router as informesSinteticos_router
 from src.departamentos.router import router as departamentos_router
 from src.secciones.router import router as secciones_router
 from src.actividades.router import router as actividades_router
+from src.periodos.router import router as periodos_router
 
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -64,3 +65,4 @@ app.include_router(informesSinteticos_router)
 app.include_router(departamentos_router)
 app.include_router(secciones_router)
 app.include_router(actividades_router)
+app.include_router(periodos_router)
