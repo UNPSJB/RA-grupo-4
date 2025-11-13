@@ -1,68 +1,50 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import './MenuAlumno.css'; 
-import { CheckSquare, History, ClipboardList, User } from 'lucide-react';
+import { CheckSquare, History, User } from 'lucide-react'; 
 
-/**
- * Este componente es SÓLO la grilla de tarjetas.
- * Se renderiza en el <Outlet> de MenuAlumno.tsx
- */
-const MenuAlumnoIndex = () => {
-  const menuItems = [
-    {
-      titulo: "Responder Encuestas",
-      descripcion: "Accede a tus encuestas pendientes y danos tu opinión.",
-      link: "seleccionar", // <-- RUTA RELATIVA
-      icon: <CheckSquare size={48} />,
-      color: "var(--color-alumno)"
-    },
-    {
-      titulo: "Historial",
-      descripcion: "Revisa las encuestas que ya has completado.",
-      link: "historial-encuestas", // <-- RUTA RELATIVA
-      icon: <History size={48} />,
-      color: "var(--primary-color)"
-    },
-    {
-      titulo: "Mis Materias",
-      descripcion: "Consulta información sobre tus materias inscritas.",
-      link: "mis-materias", // <-- RUTA RELATIVA
-      icon: <ClipboardList size={48} />,
-      color: "var(--color-docente)"
-    },
-    {
-      titulo: "Mi Perfil",
-      descripcion: "Verifica y actualiza tu información personal.",
-      link: "mi-perfil", // <-- RUTA RELATIVA
-      icon: <User size={48} />,
-      color: "#6c757d"
-    }
-  ];
+// Estilo específico para Alumno (Verde)
+const cardStyle = { '--card-color': 'var(--color-alumno)' } as React.CSSProperties;
 
-  return (
-    <div className="menu-alumno-grid">
-      {menuItems.map((item, index) => (
-        <Link
-          to={item.link}
-          key={index}
-          className="menu-card-wow"
-          style={{ '--card-color': item.color } as React.CSSProperties}
-        >
-          <div className="animated-border-glow" />
-          <div className="card-content">
-            <div className="icon-wrapper">
-              {item.icon}
-            </div>
-            <h3>{item.titulo}</h3>
-            <p>{item.descripcion}</p>
-            <span className="card-cta">
-              Acceder
-            </span>
-          </div>
-        </Link>
-      ))}
-    </div>
-  );
+const MenuAlumnoIndex: React.FC = () => {
+    return (
+        <div className="menu-alumno-grid">
+
+            {/* Tarjeta 1: Encuestas Pendientes */}
+            <Link to="encuestas-pendientes" className="menu-card-wow" style={cardStyle}>
+                <div className="animated-border-glow"></div>
+                <div className="card-content">
+                    <div className="icon-wrapper"><CheckSquare size={64} /></div>
+                    <h3>Responder Encuestas</h3>
+                    <p>Accede a tus encuestas pendientes y danos tu opinión.</p>
+                    <span className="card-cta">Ver Pendientes</span>
+                </div>
+            </Link>
+
+            {/* Tarjeta 2: Historial */}
+            <Link to="historial" className="menu-card-wow" style={cardStyle}>
+                <div className="animated-border-glow"></div>
+                <div className="card-content">
+                    <div className="icon-wrapper"><History size={64} /></div>
+                    <h3>Historial</h3>
+                    <p>Revisa las encuestas que ya has completado anteriormente.</p>
+                    <span className="card-cta">Ver Historial</span>
+                </div>
+            </Link>
+
+             {/* Tarjeta 3: Mi Perfil */}
+             <Link to="mi-perfil" className="menu-card-wow" style={cardStyle}>
+                <div className="animated-border-glow"></div>
+                <div className="card-content">
+                    <div className="icon-wrapper"><User size={64} /></div>
+                    <h3>Mi Perfil</h3>
+                    <p>Verifica y actualiza tu información personal.</p>
+                    <span className="card-cta">Acceder</span>
+                </div>
+            </Link>
+
+        </div>
+    );
 };
 
 export default MenuAlumnoIndex;
