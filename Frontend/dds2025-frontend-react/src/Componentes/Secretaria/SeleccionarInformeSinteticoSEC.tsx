@@ -142,9 +142,9 @@ const SeleccionarInformeSinteticoSEC: React.FC = () => {
                 <td className="uni-td">{inf.id}</td>
                 <td className="uni-td">{inf.descripcion}</td>
                 <td className="uni-td">
-                  <Link to={`/home/informe-sintetico/ver/${inf.id}`} className="styled-button">
-                    Seleccionar
-                  </Link>
+                <Link to={`/home/secretaria/informe-sintetico/ver/${inf.id}`} className="styled-button">
+                Ver Informe
+                </Link>
                 </td>
               </tr>
             ))}
