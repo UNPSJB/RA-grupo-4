@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { Link } from "react-router-dom";
-// Asegúrate de que la ruta de importación sea correcta
+import { Link, useNavigate } from "react-router-dom";
 import ErrorCargaDatos from "../Otros/ErrorCargaDatos";
 import SinDatos from "../Otros/SinDatos";
 
@@ -13,18 +12,16 @@ const SeleccionarInformeSinteticoSEC: React.FC = () => {
   const [informes, setInformes] = useState<InformeSintetico[]>([]);
   const [cargando, setCargando] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   const fetchInformesSinteticos = useCallback(async () => {
     try {
       setCargando(true);
       setError(null);
-      const response = await fetch(
-        `http://localhost:8000/informes-sinteticos/`
-      );
+      const response = await fetch(`http://localhost:8000/informes-sinteticos/`);
       if (!response.ok) throw new Error("Error al obtener los informes sintéticos");
       const data: InformeSintetico[] = await response.json();
       setInformes(data);
-      
     } catch (err: any) {
       setError(err.message || "Error desconocido");
     } finally {
@@ -37,27 +34,26 @@ const SeleccionarInformeSinteticoSEC: React.FC = () => {
   }, [fetchInformesSinteticos]);
 
   if (cargando) {
-      return <div style={{ padding: "30px", textAlign: "center", color: "#003366" }}>Cargando informes...</div>;
+    return <div style={{ padding: "30px", textAlign: "center", color: "#003366" }}>Cargando informes...</div>;
   }
 
   if (error) {
     return (
-        <ErrorCargaDatos 
-            mensajeError={error}
-            onReintentar={fetchInformesSinteticos}
-        />
+      <ErrorCargaDatos 
+        mensajeError={error}
+        onReintentar={fetchInformesSinteticos}
+      />
     );
   }
 
   return (
     <div className="uni-wrapper">
-      {/* Estilos alineados con la paleta institucional */}
       <style>{`
         :root {
-          --uni-primary: #003366;
+          --uni-primary: #1f65acff; 
           --uni-secondary: #0078D4;
           --uni-bg-main: #ffffff;
-          --uni-bg-alt: #f9f9f9;
+          --uni-bg-alt: #f4f6f9;
           --uni-border: #ddd;
           --uni-text: #111;
         }
@@ -70,13 +66,44 @@ const SeleccionarInformeSinteticoSEC: React.FC = () => {
           color: var(--uni-text);
         }
 
+        .header-bar {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          background-color: var(--uni-primary);
+          color: white;
+          padding: 16px 20px;
+          border-radius: 8px;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+          margin-bottom: 30px;
+        }
+
         .content-title {
-          font-size: 22px;
-          color: var(--uni-primary);
+          font-size: 20px;
           font-weight: bold;
-          margin-bottom: 20px;
-          border-bottom: 2px solid var(--uni-primary);
-          padding-bottom: 10px;
+          display: flex;
+          align-items: center;
+          gap: 10px;
+        }
+
+        .content-title i {
+          font-size: 1.2rem;
+        }
+
+        .back-button {
+          background-color: #e8f4ff;
+          color: #003366;
+          border: none;
+          padding: 8px 16px;
+          border-radius: 6px;
+          font-weight: bold;
+          cursor: pointer;
+          box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+          transition: background-color 0.3s ease;
+        }
+
+        .back-button:hover {
+          background-color: #d0e8ff;
         }
 
         .uni-table {
@@ -105,27 +132,35 @@ const SeleccionarInformeSinteticoSEC: React.FC = () => {
 
         .styled-button {
           display: inline-block;
-          padding: 8px 16px;
+          padding: 10px 18px;
           background-color: var(--uni-secondary);
           color: white;
           text-decoration: none;
           border-radius: 6px;
           font-weight: bold;
           font-size: 0.9rem;
-          transition: background-color 0.2s;
+          box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+          transition: background-color 0.3s ease;
         }
+
         .styled-button:hover {
           background-color: #005fa3;
         }
       `}</style>
 
-      <h3 className="content-title">
-        Seleccionar Informe Sintético
-      </h3>
+      <div className="header-bar">
+        <div className="content-title">
+          <i className="fas fa-file-alt"></i>
+          Seleccionar Informe Sintético
+        </div>
+        <button className="back-button" onClick={() => navigate("/home/secretaria")}>
+          ← volver al panel principal
+        </button>
+      </div>
 
       {informes.length === 0 ? (
         <div style={{ padding: "30px", textAlign: "center", background: "#f9f9f9", borderRadius: "8px" }}>
-          <SinDatos/>
+          <SinDatos />
         </div>
       ) : (
         <table className="uni-table">
@@ -142,9 +177,9 @@ const SeleccionarInformeSinteticoSEC: React.FC = () => {
                 <td className="uni-td">{inf.id}</td>
                 <td className="uni-td">{inf.descripcion}</td>
                 <td className="uni-td">
-                <Link to={`/home/secretaria/informe-sintetico/ver/${inf.id}`} className="styled-button">
-                Ver Informe
-                </Link>
+                  <Link to={`/home/secretaria/informe-sintetico/ver/${inf.id}`} className="styled-button">
+                    Ver Informe
+                  </Link>
                 </td>
               </tr>
             ))}

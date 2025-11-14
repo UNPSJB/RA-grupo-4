@@ -40,6 +40,11 @@ def obtener_informe_sintetico(informe_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Informe Sintético no encontrado")
     return informe
 
+@router.get("/cantidad", response_model=int)
+def cantidad_informes_sinteticos(db: Session = Depends(get_db)):
+    return db.query(InformeSintetico).filter(InformeSintetico.estado == "pendiente").count()
+
+
 # =========================================
 # === ENDPOINTS DE PREVIEW (GET) ===
 # Para usar en el formulario ANTES de crear el informe

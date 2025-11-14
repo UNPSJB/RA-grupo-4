@@ -81,3 +81,23 @@ def responder_encuesta(
     except Exception as e:
         print(f"Error inesperado en POST /respuestas: {e}") 
         raise HTTPException(status_code=500, detail="Error interno al guardar respuestas")
+    
+#mini estadisticas para front
+@router.get("/{estudiante_id}/encuestas/resumen")
+def resumen_encuestas_estudiante(estudiante_id: int, db: Session = Depends(get_db)):
+    estudiante_existe = db.query(Inscripciones).filter(Inscripciones.estudiante_id == estudiante_id).first()
+    if not estudiante_existe:
+        raise HTTPException(status_code=404, detail="Estudiante no encontrado o sin inscripciones")
+
+    total = db.query(Inscripciones).filter(Inscripciones.estudiante_id == estudiante_id).count()
+    respondidas = db.query(Inscripciones).filter(
+        Inscripciones.estudiante_id == estudiante_id,
+        Inscripciones.encuesta_procesada == True
+    ).count()
+    pendientes = total - respondidas
+
+    return {
+        "total": total,
+        "respondidas": respondidas,
+        "pendientes": pendientes
+    }

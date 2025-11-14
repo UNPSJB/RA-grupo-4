@@ -36,7 +36,6 @@ const ListarInformesSinteticos: React.FC = () => {
     fetchInformes();
   }, [fetchInformes]);
 
-
   if (loading) {
     return <div style={{ padding: 20, textAlign: 'center', color: '#003366' }}>Cargando informes...</div>;
   }
@@ -50,9 +49,8 @@ const ListarInformesSinteticos: React.FC = () => {
     );
   }
 
-  // --- USO DEL NUEVO COMPONENTE SIN DATOS ---
   if (informes.length === 0) {
-    return <SinDatos mensaje="No se encontraron informes sintéticos registrados." />;
+    return <SinDatos mensaje="No se encontraraon informes sintéticos registrados." />;
   }
 
   return (

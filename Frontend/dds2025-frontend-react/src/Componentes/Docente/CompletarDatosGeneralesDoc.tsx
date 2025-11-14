@@ -48,7 +48,7 @@ const styles = {
     border: '1px solid #ccc',
     fontSize: '16px',
     fontFamily: '"Roboto", "Segoe UI", sans-serif',
-    backgroundColor: '#cce4f6', // El color celeste que te gusta para editar
+    backgroundColor: '#cce4f6', 
     color: '#111',
     transition: 'all 0.3s ease',
     outline: 'none',
