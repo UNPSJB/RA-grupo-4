@@ -18,7 +18,7 @@ def leer_encuestas_disponibles_estudiante(estudiante_id: int, db: Session = Depe
     try:
         return services.listar_encuestas_disponibles(db, estudiante_id)
     except exceptions.UsuarioNoEncontrado:
-         raise HTTPException(status_code=404, detail="Estudiante no encontrado")
+        raise HTTPException(status_code=404, detail="Estudiante no encontrado")
     except Exception as e:
         print(f"Error inesperado en /encuestas: {e}") 
         raise HTTPException(status_code=500, detail="Error interno al listar encuestas")
@@ -31,7 +31,7 @@ def ver_preguntas_encuesta_inscripcion(estudiante_id: int, inscripcion_id: int, 
         encuesta = services.obtener_preguntas_de_encuesta_estudiante(db, estudiante_id, inscripcion_id)
         return encuesta
     except exceptions.UsuarioNoEncontrado:
-         raise HTTPException(status_code=404, detail="Estudiante no encontrado")
+        raise HTTPException(status_code=404, detail="Estudiante no encontrado")
     except EncuestaNoEncontrada:
         raise HTTPException(status_code=404, detail="Encuesta no encontrada para esta inscripción")
     except HTTPException as http_exc: 
@@ -59,7 +59,7 @@ def responder_encuesta(
 
     # --- Verificación temprana si ya está procesada ---
     if inscripcion.encuesta_procesada:
-         raise HTTPException(status_code=400, detail="Esta encuesta ya ha sido respondida.")
+        raise HTTPException(status_code=400, detail="Esta encuesta ya ha sido respondida.")
     # --- FIN Verificación ---
 
 
@@ -69,7 +69,7 @@ def responder_encuesta(
     # Asignar la inscripcion_id a cada respuesta y validar
     for r in respuestas:
         if r.inscripcion_id != inscripcion_id:
-             raise HTTPException(status_code=400, detail="Inconsistencia en el ID de inscripción de las respuestas.")
+            raise HTTPException(status_code=400, detail="Inconsistencia en el ID de inscripción de las respuestas.")
     
 
     try:
@@ -81,6 +81,8 @@ def responder_encuesta(
     except Exception as e:
         print(f"Error inesperado en POST /respuestas: {e}") 
         raise HTTPException(status_code=500, detail="Error interno al guardar respuestas")
+    
+
     
 #mini estadisticas para front
 @router.get("/{estudiante_id}/encuestas/resumen")
@@ -101,3 +103,48 @@ def resumen_encuestas_estudiante(estudiante_id: int, db: Session = Depends(get_d
         "respondidas": respondidas,
         "pendientes": pendientes
     }
+#[TODO] ESTAS ESTADISTICAS, MODIFICARLAS PARA QUE CORRESPONDAN AL PERIODO ACTUAL, O POR LO MENOS LAS PENDIENTES.
+#aca  abajo dejo la funcion pensada para el periodo activo de encuestas.
+# @router.get("/{estudiante_id}/encuestas/resumen")
+# def resumen_encuestas_estudiante(estudiante_id: int, db: Session = Depends(get_db)):
+
+#     # 1. Obtener período activo
+#     periodo_activo = get_periodo_encuestas_actual(db)
+#     if not periodo_activo:
+#         return {
+#             "total": 0,
+#             "respondidas": 0,
+#             "pendientes": 0
+#         }
+
+#     # 2. Verificar que existan inscripciones del estudiante
+#     estudiante_existe = db.query(Inscripciones).filter(
+#         Inscripciones.estudiante_id == estudiante_id
+#     ).first()
+
+#     if not estudiante_existe:
+#         raise HTTPException(status_code=404, detail="Estudiante no encontrado o sin inscripciones")
+
+#     # 3. Filtrar inscripciones del período activo
+#     query_base = (
+#         db.query(Inscripciones)
+#         .join(Inscripciones.materia)
+#         .filter(
+#             Inscripciones.estudiante_id == estudiante_id,
+#             Materias.periodo_id == periodo_activo.id
+#         )
+#     )
+
+#     total = query_base.count()
+
+#     respondidas = query_base.filter(
+#         Inscripciones.encuesta_procesada == True
+#     ).count()
+
+#     pendientes = total - respondidas
+
+#     return {
+#         "total": total,
+#         "respondidas": respondidas,
+#         "pendientes": pendientes
+#     } 
