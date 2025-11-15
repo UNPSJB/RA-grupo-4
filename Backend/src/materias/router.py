@@ -2,9 +2,10 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from src.database import get_db
 from . import schemas, services, models
-from typing import List
+from typing import List, Optional
 import datetime # <-- NUEVA IMPORTACIÓN
 from pydantic import BaseModel # <-- NUEVA IMPORTACIÓN
+from src.periodos.services import get_periodo_informesAC_actual 
 
 router = APIRouter(prefix="/materias", tags=["Materias"])
 
@@ -17,46 +18,40 @@ def listar_materias(db: Session = Depends(get_db)):
     return services.get_materias_para_autocompletar(db)
 
 
-# --- NUEVO ENDPOINT (Para la lista de pendientes) ---
-# (Definimos un schema de salida simple aquí mismo)
-class MateriaPendiente(BaseModel): 
-    id_materia: int
-    nombre: str
-    codigoMateria: str
-    anio: int 
-    
-    class Config:
-        from_attributes = True
-
-@router.get("/docente/{id_docente}/pendientes", response_model=List[MateriaPendiente])
+@router.get("/docente/{id_docente}/pendientes", response_model=List[schemas.MateriaPendiente])
 def listar_materias_pendientes(
     id_docente: int, 
-    # Usamos Query para obtener el ciclo lectivo, con el año actual como default
-    ciclo_lectivo: int = Query(default_factory=lambda: datetime.date.today().year),
+    id_periodo: Optional[int] = None,
     db: Session = Depends(get_db)
 ):
     """
     Obtiene la lista de materias de un docente para las cuales
-    AÚN NO se ha generado un InformeAC en el ciclo lectivo especificado.
-    """
+    AÚN NO se ha generado un InformeAC en el periodo especificado.
+    """ 
+    if id_periodo is None:
+        periodo_actual = get_periodo_informesAC_actual(db)
+        if not periodo_actual:
+            raise HTTPException(404, "No es período activo de informes de Actividad Curricular.")
+        id_periodo = periodo_actual.id
+
     materias = services.get_materias_pendientes_docente(
         db=db, 
         id_docente=id_docente, 
-        ciclo_lectivo=ciclo_lectivo
+        id_periodo=id_periodo
     )
     return materias
-# --- FIN NUEVO ENDPOINT ---
+
 
 
 @router.get(
     "/{materia_id}/estadisticas", response_model=schemas.MateriaEstadisticas
 )
 def leer_estadisticas_materia(materia_id: int, db: Session = Depends(get_db)):
-    # (Tu código original sin cambios)
+
     try:
         materia = db.get(models.Materias, materia_id)
         if not materia:
-             raise HTTPException(status_code=404, detail="Materia no encontrada")
+            raise HTTPException(status_code=404, detail="Materia no encontrada")
         estadisticas = services.get_estadisticas_materia(db=db, materia_id=materia_id)
         return estadisticas
     except Exception as e:
@@ -65,7 +60,7 @@ def leer_estadisticas_materia(materia_id: int, db: Session = Depends(get_db)):
 
 @router.get("/docente/{id_docente}/estadisticas", response_model=schemas.EstadisticasDocenteOut)
 def leer_estadisticas_por_docente(id_docente: int, db: Session = Depends(get_db)):
-    # (Tu código original sin cambios)
+    
     try:
         estadisticas_lista = services.get_estadisticas_por_docente(db=db, id_docente=id_docente)
         return schemas.EstadisticasDocenteOut(estadisticas=estadisticas_lista)

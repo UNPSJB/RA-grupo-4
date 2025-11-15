@@ -3,7 +3,7 @@ from sqlalchemy import delete, select, update
 from sqlalchemy.orm import Session
 from src.periodos.models import Periodo, CuatrimestreEnum
 from src.periodos import schemas, exceptions
-
+from datetime import date
 # operaciones CRUD para Periodoes
 
 def crear_periodo(db: Session, periodo: schemas.PeriodoCreate) -> schemas.Periodo:
@@ -35,6 +35,22 @@ def leer_periodo(db: Session, periodo_id: int) -> schemas.Periodo:
     if db_periodo is None:
         raise exceptions.PeriodoNoEncontrado()
     return db_periodo
+
+
+
+def get_periodo_informesAC_actual(db: Session) -> Periodo | None:
+    today = date.today()
+
+    return (
+        db.query(Periodo)
+        .filter(
+            Periodo.fecha_apertura_informesAC <= today,
+            Periodo.fecha_cierre_informesAC >= today
+        )
+        .order_by(Periodo.fecha_apertura_informesAC.desc())
+        .first()
+    )
+
 
 
 

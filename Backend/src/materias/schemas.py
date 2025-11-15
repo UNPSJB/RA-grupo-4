@@ -1,6 +1,7 @@
 from __future__ import annotations
 from pydantic import BaseModel, Field
 from typing import List, Optional
+from src.periodos.schemas import Periodo as PeriodoSchema 
 
 # ------------------------------------------------------------
 # Materia (Base y derivadas)
@@ -12,14 +13,14 @@ class MateriaBase(BaseModel):
     codigoMateria: str
 
 class MateriaCreate(MateriaBase):
-    anio: int
+    pass
 
 class MateriaUpdate(MateriaBase):
-    anio: int
+    pass
 
 
 class MateriaSimple(MateriaBase):
-    anio: int
+    periodo: PeriodoSchema
     id_departamento: int
     id_docente: int
     cantidad_inscripciones: int
@@ -28,7 +29,7 @@ class MateriaSimple(MateriaBase):
 class Materia(BaseModel):
     id_materia: int
     nombre: str
-    anio: int
+    periodo: PeriodoSchema
     codigoMateria: str
     id_departamento: int
 
@@ -44,7 +45,8 @@ class MateriaAutocompletar(BaseModel):
     id_materia: int
     nombre: str
     codigoMateria: str
-    anio: int
+    ciclo_lectivo: int
+    cuatrimestre: str
     id_docente: int
     cantidad_inscripciones: int
 
@@ -74,5 +76,14 @@ class NecesidadMateriaSchema(BaseModel):
     necesidad_equipamiento: Optional[str] = None
     necesidad_bibliografia: Optional[str] = None
 
+    class Config:
+        from_attributes = True
+
+class MateriaPendiente(BaseModel): 
+    id_materia: int
+    nombre: str
+    codigoMateria: str
+    periodo: PeriodoSchema
+    
     class Config:
         from_attributes = True

@@ -6,3 +6,6 @@ class PeriodoNoEncontrado(NotFound):
 
 class PeriodoYaExiste(BadRequest):
     DETAIL = ErrorCode.PERIODO_YA_EXISTE
+
+class PeriodoInformesACNoDisponible(NotFound):
+    DETAIL = ErrorCode.PERIODO_INFORMESAC_NO_DISPONIBLE

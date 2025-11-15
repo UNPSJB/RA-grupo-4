@@ -9,8 +9,8 @@ from src.models import ModeloBase
 class CuatrimestreEnum(str, enum.Enum): #Agregado para mejora
     # El "str" (str, enum.Enum) ayuda a que Pydantic (FastAPI) 
     # y JSON lo entiendan automáticamente.
-    PRIMER = "Primer"
-    SEGUNDO = "Segundo"
+    PRIMER = "Primer Cuatrimestre"
+    SEGUNDO = "Segundo Cuatrimestre"
 
 
 class Periodo(ModeloBase):

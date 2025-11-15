@@ -28,14 +28,15 @@ def get_materias_para_autocompletar(db: Session) -> List[dict]:
             "id_materia": m.id_materia,
             "nombre": m.nombre,
             "codigoMateria": m.codigoMateria,
-            "anio": m.anio,
+            "ciclo_lectivo": m.periodo.ciclo_lectivo,
+            "cuatrimestre": m.periodo.cuatrimestre,
             "id_docente": m.id_docente,
             "cantidad_inscripciones": len(m.inscripciones) if m.inscripciones else 0
         })
     return resultado
 
 # --- MODIFICADO (Lógica de Pendientes) ---
-def get_materias_pendientes_docente(db: Session, id_docente: int, ciclo_lectivo: int) -> List[models.Materias]:
+def get_materias_pendientes_docente(db: Session, id_docente: int, id_periodo: int) -> List[models.Materias]:
     """
     Obtiene la lista de materias de un docente para las cuales
     AÚN NO se ha generado un InformeAC (bandera informeACCompletado = False o NULL).
@@ -46,7 +47,7 @@ def get_materias_pendientes_docente(db: Session, id_docente: int, ciclo_lectivo:
         db.query(models.Materias)
         .filter(
             models.Materias.id_docente == id_docente,
-            models.Materias.anio == ciclo_lectivo
+            models.Materias.id_periodo == id_periodo
         )
     )
     
@@ -57,7 +58,7 @@ def get_materias_pendientes_docente(db: Session, id_docente: int, ciclo_lectivo:
 # --- FIN MODIFICADO ---
 
 def get_estadisticas_materia(db: Session, materia_id: int) -> dict:
-    # (Tu código original sin cambios)
+
     total_inscriptos = (
         db.query(Inscripciones)
         .filter(Inscripciones.materia_id == materia_id)
@@ -76,8 +77,10 @@ def get_estadisticas_materia(db: Session, materia_id: int) -> dict:
         "total_encuestas_procesadas": total_encuestas_procesadas,
     }
 
+
+
 def get_estadisticas_por_docente(db: Session, id_docente: int) -> List[schemas.MateriaEstadisticaItem]:
-    # (Tu código original sin cambios)
+
     materias_docente = db.query(models.Materias).filter(models.Materias.id_docente == id_docente).all()
     resultado_estadisticas = []
     for materia in materias_docente:
@@ -91,7 +94,6 @@ def get_estadisticas_por_docente(db: Session, id_docente: int) -> List[schemas.M
     return resultado_estadisticas
 
 def obtener_estadisticas_materia(db: Session, materia_id: int):
-    # (Tu código original sin cambios)
     materia = (
         db.query(Materias)
         .options(
@@ -108,6 +110,7 @@ def obtener_estadisticas_materia(db: Session, materia_id: int):
     )
     if not materia:
         return exceptions.MateriaNoEncontrada
+    
     inscripciones = [i for i in materia.inscripciones if i.encuesta_procesada]
     total_encuestas = len(inscripciones)
     estadisticas_por_seccion = {}
