@@ -16,14 +16,13 @@ def listar_encuestas_disponibles(db: Session, estudiante_id: int) -> List[schema
     Lista las encuestas que un estudiante tiene PENDIENTES de responder del periodo activo.
     """
     periodo_activo = get_periodo_encuestas_actual(db)
-
+    print("PERIODO ACTIVO ID =", periodo_activo.id if periodo_activo else None)
     if not periodo_activo:
         return []
     
     alumno = db.query(Estudiante).options(
         selectinload(Estudiante.inscripciones)
             .selectinload(Inscripciones.materia)
-            .selectinload(Materias.encuesta)
             .selectinload(Materias.periodo)
     ).get(estudiante_id)
 
