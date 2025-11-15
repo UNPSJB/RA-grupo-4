@@ -1,206 +1,371 @@
-/* --- ========================================= --- */
-/* --- ESTILOS MENÚ ALUMNO "WOW" (MODERNO)       --- */
-/* --- ========================================= --- */
-
-.menu-alumno-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 40px 20px;
-  perspective: 1500px;
-  position: relative; /* Contenedor relativo para el botón */
+/* --- Variables CSS (Paleta Limpia y Profesional) --- */
+:root {
+    --color-principal: #003366; /* Azul Oscuro Institucional */
+    --color-secundario: #0078D4; /* Celeste Brillante/Activo */
+    --color-terciario: #e8f4ff; /* Azul muy claro para fondos sutiles */
+    --color-alerta: #e76f51; /* Naranja para Alertas */
+    --color-fondo-base: #f0f4f8; /* Fondo claro general */
+    --color-fondo-tarjeta: #ffffff;
+    --color-texto-oscuro: #222;
+    --sombra-tarjeta: 0 8px 20px rgba(0, 0, 0, 0.08); /* Sombra suave */
+    --transicion-suave: 0.3s ease;
+    --borde-radio-lg: 12px;
 }
 
-/* Cabecera con gradiente de texto */
-.menu-alumno-header {
-  text-align: center;
-  margin-bottom: 50px;
-  animation: fadeInDown 0.8s ease-out;
-}
-.menu-alumno-header h1 {
-  font-size: 3rem;
-  margin: 0;
-  font-weight: 700;
-  background: linear-gradient(135deg, var(--primary-color), var(--color-docente));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  text-fill-color: transparent;
-}
-.menu-alumno-header p {
-  font-size: 1.2rem;
-  color: var(--text-color-light);
-  margin-top: 10px;
+/* --- Colores de Tarjetas de Navegación --- */
+.card-blue { --card-color: #3d5a80; } 
+.card-yellow { --card-color: #e09f3e; } 
+.card-purple { --card-color: #70587c; } 
+
+
+/* -------------------------------------------
+   1. Estructura General y Márgenes
+   ------------------------------------------- */
+
+.menu-alumno-layout-full {
+    background-color: var(--color-fondo-base);
+    min-height: 100vh;
 }
 
-/* Grid de tarjetas responsivo */
-.menu-alumno-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 35px;
+.menu-alumno-content {
+    padding: 30px; /* Margen superior e inferior amplio */
+    max-width: 2000px; /* Aumenta el ancho máximo */
+    margin: 0 auto; /* Centra el contenido */
+    color: var(--color-texto-oscuro);
 }
 
-/* --- LA TARJETA WOW (Contenedor) --- */
-.menu-card-wow {
-  position: relative;
-  display: block;
-  text-decoration: none;
-  color: var(--text-color);
-  border-radius: 16px;
-  overflow: hidden;
-  background-color: var(--card-bg);
-  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.1);
-  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275),
-              box-shadow 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  animation: fadeInUp 0.6s ease-out backwards;
-}
-.menu-card-wow:nth-child(2) { animation-delay: 0.1s; }
-.menu-card-wow:nth-child(3) { animation-delay: 0.2s; }
-.menu-card-wow:nth-child(4) { animation-delay: 0.3s; }
-
-.menu-card-wow:hover {
-  transform: translateY(-12px) scale(1.03) rotateX(3deg);
-  box-shadow: 0 25px 45px -10px rgba(var(--primary-color-rgb, 0, 86, 179), 0.3);
-  z-index: 10;
+.back-button-bar {
+    padding: 20px 30px 0 30px; /* Padding superior para el botón */
+    max-width: 1400px;
+    margin: 0 auto;
 }
 
-/* --- BORDE ANIMADO (AZUL/CELESTE) --- */
-.animated-border-glow {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 2;
-  border-radius: 16px;
-  background: linear-gradient(
-    135deg, 
-    var(--color-docente),
-    var(--primary-color),
-    var(--color-docente),
-    var(--primary-color)
-  );
-  background-size: 400% 400%;
-  animation: moveGradient 4s ease infinite;
-  opacity: 0;
-  transition: opacity 0.4s ease-out;
-  -webkit-mask: 
-    linear-gradient(#fff 0 0) content-box, 
-    linear-gradient(#fff 0 0);
-  mask: 
-    linear-gradient(#fff 0 0) content-box, 
-    linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  padding: 3px;
-}
-.menu-card-wow:hover .animated-border-glow {
-  opacity: 1;
-}
-
-/* --- CONTENIDO INTERNO (Soluciona el tamaño) --- */
-.card-content {
-  position: relative;
-  z-index: 3;
-  background: var(--card-bg);
-  border-radius: 13px;
-  padding: 30px;
-  height: 100%;
-  min-height: 340px;
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-}
-.icon-wrapper {
-  color: var(--card-color);
-  margin-bottom: 20px;
-  transition: transform 0.3s ease;
-}
-.menu-card-wow:hover .icon-wrapper {
-  transform: scale(1.15) rotate(5deg);
-}
-.card-content h3 {
-  margin: 0 0 10px 0;
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: #222;
-}
-.card-content p {
-  color: var(--text-color-light);
-  font-size: 1rem;
-  line-height: 1.5;
-  margin-bottom: 25px;
-  flex-grow: 1; /* Empuja el botón CTA hacia abajo */
-}
-
-/* --- BOTÓN CTA (Arreglado) --- */
-.card-cta {
-  display: inline-block;
-  padding: 12px 30px;
-  color: white;
-  background-color: var(--card-color);
-  border-radius: 30px;
-  font-weight: 600;
-  font-size: 1rem;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 15px -5px var(--card-color);
-}
-.menu-card-wow:hover .card-cta {
-  transform: scale(1.05);
-  box-shadow: 0 8px 25px -8px var(--card-color);
-}
-
-/* --- BOTÓN REGRESAR (Personalizado para este menú) --- */
-.back-button {
-  position: absolute;
-  top: 40px;
-  right: 30px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 18px;
-  background-color: #f8f9fa;
-  color: var(--text-color-light);
-  border: 1px solid #ddd;
-  border-radius: 50px;
-  font-weight: 600;
-  font-size: 0.9rem;
-  cursor: pointer;
-  transition: all 0.2s ease-out;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-}
-.back-button:hover {
-  background-color: #fff;
-  color: var(--primary-color);
-  border-color: #bbb;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-  transform: translateY(-2px);
-}
-@media (max-width: 768px) {
-  .back-button {
-    position: relative;
-    top: 0;
-    right: 0;
-    margin: 0 auto 30px;
+.back-button-link {
     display: inline-flex;
-  }
-  .menu-alumno-header {
-    margin-bottom: 30px;
-  }
+    align-items: center;
+    gap: 8px;
+    padding: 8px 15px;
+    background-color: var(--color-fondo-tarjeta);
+    border: 1px solid var(--color-terciario);
+    border-radius: 8px;
+    text-decoration: none;
+    color: var(--color-principal);
+    font-weight: 600;
+    transition: all 0.2s ease-in-out;
 }
 
-/* --- Keyframes (Asegúrate de tenerlos) --- */
-@keyframes moveGradient {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+.back-button-link:hover {
+    background-color: var(--color-principal);
+    color: var(--color-fondo-tarjeta);
+    box-shadow: 0 4px 10px rgba(0, 51, 102, 0.3);
 }
-@keyframes fadeInDown {
-  from { opacity: 0; transform: translateY(-30px); }
-  to { opacity: 1; transform: translateY(0); }
+
+/* -------------------------------------------
+   2. Dashboard Layout 
+   ------------------------------------------- */
+
+.dashboard-main-view {
+    display: flex;
+    flex-direction: column;
+    gap: 35px; /* Más espacio entre secciones */
 }
-@keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(30px); }
-  to { opacity: 1; transform: translateY(0); }
+
+/* Contenedor Superior (Bienvenida + Stats) */
+.dashboard-header-container {
+    display: grid;
+    /* Divide el espacio: 3 partes para bienvenida, 1 parte para estadísticas */
+    grid-template-columns: 3fr 1fr;
+    gap: 30px;
+    align-items: stretch;
+}
+
+
+.bienvenida-box {
+    background-color: var(--color-fondo-tarjeta);
+    background-image: linear-gradient(to right, #ffffff 90%, var(--color-terciario) 100%);
+    padding: 30px;
+    border-radius: var(--borde-radio-lg);
+    box-shadow: var(--sombra-tarjeta);
+    border-left: 6px solid var(--color-secundario); /* Borde decorativo */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.welcome-title {
+    font-size: 2rem;
+    color: var(--color-principal);
+    margin-bottom: 8px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+}
+
+.welcome-title .hand-icon {
+    color: var(--color-secundario);
+    margin-right: 15px;
+    animation: wave-hand 2.5s ease-in-out infinite;
+}
+@keyframes wave-hand {
+    0%, 100% { transform: rotate(0deg); }
+    50% { transform: rotate(5deg); }
+}
+
+.panel-subtitle {
+    font-size: 1.1rem;
+    color: #555;
+}
+
+/* === Caja de Estadísticas === */
+.estadisticas-box {
+    padding: 80px;
+    background-color: var(--color-fondo-tarjeta);
+    border-radius: var(--borde-radio-lg);
+    box-shadow: var(--sombra-tarjeta);
+}
+.stats-title {
+    font-size: 1.2rem;
+    color: var(--color-principal);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+}
+
+
+/* === Secciones de Contenido General === */
+
+.seccion-box {
+    background-color: var(--color-fondo-tarjeta);
+    padding: 25px;
+    border-radius: var(--borde-radio-lg);
+    box-shadow: var(--sombra-tarjeta);
+}
+
+.seccion-title {
+    font-size: 1.6rem;
+    color: var(--color-principal);
+    margin-bottom: 25px;
+    border-left: 5px solid var(--color-secundario);
+    padding-left: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.seccion-title svg {
+    color: var(--color-secundario);
+}
+
+
+/* -------------------------------------------
+   3. Tarjetas de Navegación
+   ------------------------------------------- */
+
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
+}
+
+.nav-card {
+    position: relative;
+    overflow: hidden;
+    padding: 30px;
+    background-color: var(--color-fondo-tarjeta);
+    border-radius: var(--borde-radio-lg);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    cursor: pointer;
+    transition: all var(--transicion-suave);
+    border-top: 5px solid var(--card-color);
+}
+
+.nav-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.nav-card svg {
+    color: var(--card-color);
+    margin-bottom: 15px;
+}
+
+.nav-card h3 {
+    font-size: 1.4rem;
+    color: var(--color-principal);
+    margin-bottom: 8px;
+}
+
+.nav-card p {
+    font-size: 0.95rem;
+    color: #666;
+}
+
+
+/* -------------------------------------------
+   4. Media Queries
+   ------------------------------------------- */
+
+@media (max-width: 992px) {
+    .dashboard-header-container {
+        grid-template-columns: 1fr; /* Apila bienvenida y stats */
+    }
+    .card-grid {
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    }
+}
+
+@media (max-width: 800px) {
+    .menu-alumno-content {
+        padding: 20px 15px;
+    }
+    .back-button-bar {
+        padding: 15px 15px 0 15px;
+    }
+    .dashboard-main-view {
+        gap: 25px;
+    }
+    .bienvenida-box {
+        padding: 20px;
+    }
+    .welcome-title {
+        font-size: 1.5rem;
+    }
+    .seccion-box {
+        padding: 20px;
+    }
+    .seccion-title {
+        font-size: 1.4rem;
+        padding-left: 10px;
+    }
+    .card-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+}
+/* --- NUEVAS VARIABLES DE ESTADO --- */
+:root {
+    /* Variables de Paleta Institucional ya definidas */
+    --color-principal: #003366; 
+    --color-secundario: #0078D4; 
+    --color-fondo-tarjeta: #ffffff;
+    --sombra-tarjeta: 0 8px 20px rgba(0, 0, 0, 0.08);
+
+    /* Colores Específicos para las Stats */
+    --color-stat-bg-total: var(--color-principal); /* Azul Institucional */
+    --color-stat-bg-done: #e8f4ff; /* Fondo claro para Respondidas */
+    --color-stat-bg-pending: #fff0e8; /* Fondo muy claro para Pendientes */
+    
+    --color-stat-text-done: #38a3a5; /* Teal para Respondidas */
+    --color-stat-text-pending: #e76f51; /* Naranja para Pendientes */
+}
+
+/* -------------------------------------------
+   5. MINI ESTADÍSTICAS (Diseño de Tarjeta Compacta Legible)
+   ------------------------------------------- */
+
+/* Contenedor principal de las estadísticas */
+.mini-stats-est-container {
+    padding: 0; 
+    width: 100%;
+    /* La animación fadeIn se define en el CSS de la versión anterior y se reutiliza aquí */
+}
+
+.mini-stats-grid {
+    display: grid;
+    /* Divide el espacio del panel lateral en 3 columnas */
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px; 
+    padding: 0;
+}
+
+.mini-stat-box {
+    /* Estilo de tarjeta compacta */
+    border-radius: 8px;
+    padding: 10px 5px; 
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    transition: transform var(--transicion-suave), box-shadow var(--transicion-suave);
+    min-height: 70px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.mini-stat-box:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+/* --- Estilos de Texto y Número --- */
+.mini-stat-number {
+    font-size: 1.8rem; 
+    font-weight: 700;
+    line-height: 1.1;
+    margin-bottom: 3px;
+}
+
+.mini-stat-label {
+    font-size: 0.75rem; 
+    color: #555;
+    font-weight: 500;
+}
+
+/* --- Colores Específicos --- */
+
+/* 1. Total (Fondo principal) */
+.mini-stat-box.stat-total { 
+    background-color: var(--color-stat-bg-total); 
+}
+.mini-stat-box.stat-total .mini-stat-number { 
+    color: var(--color-fondo-tarjeta); /* Blanco */
+}
+.mini-stat-box.stat-total .mini-stat-label { 
+    color: rgba(255, 255, 255, 0.8); 
+}
+
+/* 2. Respondidas (Fondo claro con color secundario) */
+.mini-stat-box.stat-done { 
+    background-color: var(--color-stat-bg-done); 
+}
+.mini-stat-box.stat-done .mini-stat-number { 
+    color: var(--color-stat-text-done); 
+}
+.mini-stat-box.stat-done .mini-stat-label { 
+    color: var(--color-principal); 
+}
+
+/* 3. Pendientes (Fondo claro de alerta con color de alerta) */
+.mini-stat-box.stat-pending { 
+    background-color: var(--color-stat-bg-pending); 
+    border: 1px solid rgba(231, 111, 81, 0.3); /* Borde sutil para destacar */
+}
+.mini-stat-box.stat-pending .mini-stat-number { 
+    color: var(--color-stat-text-pending); 
+}
+.mini-stat-box.stat-pending .mini-stat-label { 
+    color: var(--color-stat-text-pending);
+    font-weight: 600;
+    /* Reutiliza tu animación de pulso si está definida en el CSS principal */
+}
+
+
+/* -------------------------------------------
+   6. AJUSTES RESPONSIVOS PARA STATS 
+   ------------------------------------------- */
+@media (max-width: 992px) {
+    /* Cuando se apila el panel lateral, las estadísticas pueden ser más grandes */
+    .mini-stats-grid {
+        gap: 20px;
+    }
+    .mini-stat-box {
+        padding: 15px 10px;
+    }
+}
+@media (max-width: 600px) {
+    .mini-stats-grid {
+        /* En móvil, apilamos las estadísticas para que no sean demasiado estrechas */
+        grid-template-columns: 1fr; 
+        gap: 15px;
+    }
 }

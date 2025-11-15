@@ -1,0 +1,137 @@
+/* Paleta de colores principal (puedes moverla a App.css) */
+:root {
+  --color-secretaria: #0D47A1; 
+  --color-secretaria-light: #1976D2;
+}
+
+/* Animación de entrada */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Título principal del dashboard */
+.stats-main-title {
+  font-size: 2rem;
+  font-weight: 600;
+  text-align: center;
+  color: var(--color-secretaria);
+  margin-bottom: 2rem;
+  /* Ocupa todo el ancho del grid */
+  grid-column: 1 / -1; 
+}
+
+/* Contenedor del Grid */
+.stats-container {
+  max-width: 1200px;
+  margin: 2rem auto;
+  display: grid;
+  /* Grid responsivo: 
+     - 1 columna en móviles pequeños
+     - 2 columnas en medianos
+     - 4 columnas en grandes
+  */
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  font-family: "Segoe UI", "Roboto", sans-serif;
+}
+
+/* Estilo base de todas las tarjetas */
+.stat-card {
+  background-color: #fff;
+  border-radius: 12px;
+  border: 1px solid #e0e0e0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+  padding: 1.5rem;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  
+  /* Aplicamos la animación */
+  animation: fadeIn 0.5s ease-out forwards;
+  opacity: 0; /* Inicia oculto para la animación */
+}
+
+.stat-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
+}
+
+/* --- Tarjetas de KPI (Número grande) --- */
+.kpi-card {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.kpi-icon {
+  flex-shrink: 0;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.kpi-content {
+  flex-grow: 1;
+}
+
+.kpi-value {
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: #212529;
+  line-height: 1.2;
+}
+
+.kpi-title {
+  font-size: 1rem;
+  color: #6c757d;
+}
+
+/* --- Tarjetas de Gráficos (Donas y Barras) --- */
+.chart-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.chart-title {
+  text-align: center;
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: #343a40;
+  margin-bottom: 1.5rem;
+}
+
+/* Contenedor para los gráficos de dona (altura fija) */
+.chart-wrapper {
+  position: relative;
+  height: 200px; /* Ajusta la altura de las donas */
+}
+
+/* Contenedor para el gráfico de barras (altura fija) */
+.chart-wrapper-bar {
+  position: relative;
+  height: 300px; /* Más alto para el gráfico de barras */
+}
+
+/* Tarjeta de gráfico de barras (ocupa más espacio) */
+.bar-chart-card {
+  /* Hacemos que esta tarjeta ocupe 2 columnas en pantallas medianas
+     y 4 columnas en pantallas grandes */
+  
+  /* Para pantallas medianas (cuando hay 2 columnas) */
+  @media (min-width: 600px) {
+    grid-column: span 2;
+  }
+  
+  /* Para pantallas grandes (cuando hay 4 columnas) */
+  @media (min-width: 1200px) {
+    grid-column: span 4;
+  }
+}

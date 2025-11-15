@@ -1,52 +1,99 @@
 import React from 'react';
-import { Routes, Route, useNavigate, Outlet } from 'react-router-dom';
-import './MenuAlumno.css'; 
-import { ArrowLeft } from 'lucide-react';
-import MenuAlumnoIndex from './MenuAlumnoIndex';
+import { Routes, Route, NavLink, useNavigate } from 'react-router-dom';
+import { ArrowLeft, FileText, List, BookOpen, Clock, Hand, BarChart3 } from 'lucide-react'; 
+import MiniEstadisticasEst from '../Estudiante/MiniEstadisticasEst';
 import SeleccionarEncuestas from '../Estudiante/SeleccionarEncuestas';
-import SinDatos from '../Otros/SinDatos';
 import ResponderEncuesta from '../Estudiante/ResponderEncuesta';
+import SinDatos from '../Otros/SinDatos';
+import './MenuAlumno.css'; 
 
-const AlumnoLayout = () => {
-  const navigate = useNavigate();
-  
-  return (
-    <div className="menu-alumno-container">
-      {/* --- BOTÓN REGRESAR --- */}
-      <button onClick={() => navigate("/home")} className="back-button">
-        <ArrowLeft size={18} /> Regresar al Inicio
-      </button>
+// --- Componente Dashboard Principal ---
+const AlumnoDashboard = ({ estudianteId }) => {
+    const navigate = useNavigate();
 
-      <header className="menu-alumno-header">
-        <h1>Home Alumno</h1>
-        <p>Bienvenido. ¿Qué te gustaría hacer hoy?</p>
-      </header>
-      <main>
-        <Outlet />
-      </main>
-    </div>
-  );
+    return (
+        <div className="dashboard-main-view">
+            
+            {/* 1. Bienvenida (Panel Lateral) + Estadísticas (Fila Superior) */}
+            <div className="dashboard-header-container">
+                
+                <aside className="bienvenida-box">
+                    <h1 className="welcome-title"><Hand size={30} className="hand-icon" /> ¡Bienvenido/a, Alumno!</h1>
+                    <p className="panel-subtitle">Accedé a tus encuestas, materias y recursos institucionales.</p>
+                </aside>
+
+                <div className="estadisticas-box card-box">
+                    <h2 className="stats-title"><BarChart3 size={20} /> Tus encuestas</h2>
+                    <MiniEstadisticasEst estudianteId={estudianteId} />
+                </div>
+            </div>
+
+            {/* 2. Encuestas pendientes (Sección Principal) */}
+            <div className="seccion-box informes-principales">
+                <h2 className="seccion-title"><FileText size={20} /> Tus encuestas pendientes</h2>
+                {/* Se renderiza aquí, y usa el Link corregido para navegar a la ruta anidada */}
+                <SeleccionarEncuestas/>
+            </div>
+
+            {/* 3. Navegación (Tarjetas Abajo) */}
+            <div className="seccion-box navegacion-secundaria">
+                <h2 className="seccion-title"><List size={20} /> Navegación y Acceso Rápido</h2>
+                <div className="card-grid">
+                    <div className="nav-card card-blue" onClick={() => navigate("mis-materias")}>
+                        <BookOpen size={36} />
+                        <h3>Mis Materias</h3>
+                        <p>Consulta el listado de asignaturas en las que estás inscrito.</p>
+                    </div>
+                    <div className="nav-card card-yellow" onClick={() => navigate("historial-encuestas")}>
+                        <Clock size={36} />
+                        <h3>Historial de Encuestas</h3>
+                        <p>Revisa las encuestas que ya completaste.</p>
+                    </div>
+                    <div className="nav-card card-purple" onClick={() => navigate("recursos-extra")}>
+                        <List size={36} />
+                        <h3>Otros Recursos</h3>
+                        <p>Documentación y ayuda adicional.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
 };
 
+
+// --- COMPONENTE PRINCIPAL (Definición de Rutas) ---
 const MenuAlumno = () => {
-  return (
-    <Routes>
-      {/* La ruta base (/home/alumno) usa AlumnoLayout */}
-      <Route path="/" element={<AlumnoLayout />}>
+    const estudianteId = 1;
 
-        <Route index element={<MenuAlumnoIndex />} />
-        
-        <Route path="seleccionar" element={<SeleccionarEncuestas />} />
-        <Route path="responder-encuesta/:inscripcionId" element={<ResponderEncuesta />} />
-        
-        {/* Rutas de ejemplo */}
-        <Route path="historial-encuestas" element={<SinDatos />} />
-        <Route path="mis-materias" element={<SinDatos />} />
+    return (
+        <div className="menu-alumno-layout-full">
+            
+            {/* Botón de regreso */}
+            <div className="back-button-bar">
+                <NavLink to="/home" className="back-button-link">
+                    <ArrowLeft size={18} /> Regresar al Inicio
+                </NavLink>
+            </div>
+            
+            <main className="menu-alumno-content">
+                <Routes>
+                    {/* RUTA INDEX: Carga el Dashboard completo */}
+                    <Route index element={<AlumnoDashboard estudianteId={estudianteId} />} />
 
-        
-      </Route>
-    </Routes>
-  );
+                    {/* RUTA DE SELECCIÓN: (Aunque no se usa directamente en el Index, es bueno tenerla si se navega aquí) */}
+                    <Route path="seleccionar" element={<SeleccionarEncuestas />} />
+                    
+                    {/* RUTA DESTINO: Permite responder la encuesta - ¡CORRECTA! */}
+                    <Route path="responder-encuesta/:inscripcionId" element={<ResponderEncuesta />} />
+                    
+                    {/* Otras rutas de navegación */}
+                    <Route path="historial-encuestas" element={<SinDatos titulo="Historial de Encuestas" />} />
+                    <Route path="mis-materias" element={<SinDatos titulo="Mis Materias" />} />
+                    <Route path="recursos-extra" element={<SinDatos titulo="Recursos Adicionales" />} />
+                </Routes>
+            </main>
+        </div>
+    );
 };
 
 export default MenuAlumno;
