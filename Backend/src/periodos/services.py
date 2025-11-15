@@ -38,14 +38,27 @@ def leer_periodo(db: Session, periodo_id: int) -> schemas.Periodo:
 
 
 
-def get_periodo_informesAC_actual(db: Session) -> Periodo | None:
-    today = date.today()
+def get_periodo_encuestas_actual(db: Session) -> Periodo | None:
+    hoy = date.today()
 
     return (
         db.query(Periodo)
         .filter(
-            Periodo.fecha_apertura_informesAC <= today,
-            Periodo.fecha_cierre_informesAC >= today
+            Periodo.fecha_apertura_encuestas <= hoy,
+            Periodo.fecha_cierre_encuestas >= hoy
+        )
+        .first()
+    )
+
+
+def get_periodo_informesAC_actual(db: Session) -> Periodo | None:
+    hoy = date.today()
+
+    return (
+        db.query(Periodo)
+        .filter(
+            Periodo.fecha_apertura_informesAC <= hoy,
+            Periodo.fecha_cierre_informesAC >= hoy
         )
         .order_by(Periodo.fecha_apertura_informesAC.desc())
         .first()
