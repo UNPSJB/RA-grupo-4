@@ -2,8 +2,8 @@ import React, { useEffect, useState } from "react";
 import ErrorCargaDatos from "../Otros/ErrorCargaDatos";
 import SinDatos from "../Otros/SinDatos";
 
-// --- IMPORTACIONES PARA GRÁFICOS ---
-// Necesitarás instalar chart.js y react-chartjs-2
+//instalen esto
+//npm install chart.js y react-chartjs-2
 // npm install chart.js react-chartjs-2
 import {
   Chart as ChartJS,
@@ -17,13 +17,10 @@ import {
 } from "chart.js";
 import { Doughnut, Bar } from "react-chartjs-2";
 
-// --- IMPORTACIONES DE ICONOS ---
 import { Users, GraduationCap, FileText, Percent, UserSwitch } from "lucide-react";
 
-// --- IMPORTACIÓN DE NUEVO CSS ---
 import "./EstadisticasSecDeco.css";
 
-// --- REGISTRO DE COMPONENTES DE CHART.JS ---
 ChartJS.register(
   ArcElement,
   Tooltip,
@@ -34,16 +31,13 @@ ChartJS.register(
   Title
 );
 
-// --- INTERFACES ---
 interface KpiData {
   titulo: string;
   valor: string | number;
-  // Añadimos 'icon' para usar lucide-react
   icon: React.ElementType; 
   color: string;
 }
 
-// Opciones comunes para los gráficos de dona
 const commonDoughnutOptions = {
   responsive: true,
   maintainAspectRatio: false,
@@ -61,7 +55,6 @@ const commonDoughnutOptions = {
 };
 
 const EstadisticasSecDeco: React.FC = () => {
-  // --- ESTADOS ---
   const [kpiDatos, setKpiDatos] = useState<KpiData[]>([]);
   const [informesData, setInformesData] = useState<any>(null);
   const [tasaEgresoData, setTasaEgresoData] = useState<any>(null);
@@ -70,7 +63,6 @@ const EstadisticasSecDeco: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // --- Paleta de colores Azul ---
   const colorPrimario = "#0D47A1"; // --color-secretaria
   const colorSecundario = "#1976D2";
   const colorAcento = "#42A5F5";
@@ -83,7 +75,7 @@ const EstadisticasSecDeco: React.FC = () => {
         setLoading(true);
         setError(null);
 
-        // --- SIMULACIÓN DE DATOS (KPIs) ---
+        //simulacion para ver front
         const simulacionKpi: KpiData[] = [
           {
             titulo: "Alumnos Activos",
@@ -100,14 +92,12 @@ const EstadisticasSecDeco: React.FC = () => {
         ];
         setKpiDatos(simulacionKpi);
 
-        // --- DATOS GRÁFICO 1: Informes Procesados ---
-        // (Inventamos un valor de "pendientes" para que el gráfico sea útil)
         setInformesData({
           labels: ["Procesados", "Pendientes"],
           datasets: [
             {
               label: "Informes",
-              data: [3120, 450], // Datos originales + inventados
+              data: [3120, 450],
               backgroundColor: [colorSecundario, colorGris],
               borderColor: ["#fff", "#fff"],
               borderWidth: 2,
@@ -115,7 +105,6 @@ const EstadisticasSecDeco: React.FC = () => {
           ],
         });
 
-        // --- DATOS GRÁFICO 2: Tasa de Egreso ---
         setTasaEgresoData({
           labels: ["Egreso", "Permanencia"],
           datasets: [
