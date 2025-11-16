@@ -28,14 +28,14 @@
 }
 
 .menu-alumno-content {
-    padding: 30px; /* Margen superior e inferior amplio */
-    max-width: 2000px; /* Aumenta el ancho máximo */
-    margin: 0 auto; /* Centra el contenido */
+    padding: 30px; 
+    max-width: 2000px; 
+    margin: 0 auto; 
     color: var(--color-texto-oscuro);
 }
 
 .back-button-bar {
-    padding: 20px 30px 0 30px; /* Padding superior para el botón */
+    padding: 20px 30px 0 30px; 
     max-width: 1400px;
     margin: 0 auto;
 }
@@ -67,14 +67,13 @@
 .dashboard-main-view {
     display: flex;
     flex-direction: column;
-    gap: 35px; /* Más espacio entre secciones */
+    gap: 35px; 
 }
 
 /* Contenedor Superior (Bienvenida + Stats) */
 .dashboard-header-container {
     display: grid;
-    /* Divide el espacio: 3 partes para bienvenida, 1 parte para estadísticas */
-    grid-template-columns: 3fr 1fr;
+    grid-template-columns: 2fr 1fr;
     gap: 30px;
     align-items: stretch;
 }
@@ -86,7 +85,7 @@
     padding: 30px;
     border-radius: var(--borde-radio-lg);
     box-shadow: var(--sombra-tarjeta);
-    border-left: 6px solid var(--color-secundario); /* Borde decorativo */
+    border-left: 6px solid var(--color-secundario); 
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -118,10 +117,13 @@
 
 /* === Caja de Estadísticas === */
 .estadisticas-box {
-    padding: 80px;
+    padding: 50px;
     background-color: var(--color-fondo-tarjeta);
     border-radius: var(--borde-radio-lg);
     box-shadow: var(--sombra-tarjeta);
+    display: flex; /* Añadido para mejor alineación */
+    flex-direction: column;
+    justify-content: flex-start;
 }
 .stats-title {
     font-size: 1.2rem;
@@ -252,23 +254,22 @@
     --sombra-tarjeta: 0 8px 20px rgba(0, 0, 0, 0.08);
 
     /* Colores Específicos para las Stats */
-    --color-stat-bg-total: var(--color-principal); /* Azul Institucional */
-    --color-stat-bg-done: #e8f4ff; /* Fondo claro para Respondidas */
-    --color-stat-bg-pending: #fff0e8; /* Fondo muy claro para Pendientes */
+    --color-stat-bg-total: var(--color-principal); 
+    --color-stat-bg-done: #e8f4ff; 
+    --color-stat-bg-pending: #fff0e8; 
     
-    --color-stat-text-done: #38a3a5; /* Teal para Respondidas */
-    --color-stat-text-pending: #e76f51; /* Naranja para Pendientes */
+    --color-stat-text-done: #38a3a5; 
+    --color-stat-text-pending: #e76f51; 
 }
 
 /* -------------------------------------------
-   5. MINI ESTADÍSTICAS (Diseño de Tarjeta Compacta Legible)
+   5. MINI ESTADÍSTICAS (Diseño de Tarjeta Compacta Legible) - CLASES DE COMPONENTE
    ------------------------------------------- */
 
 /* Contenedor principal de las estadísticas */
 .mini-stats-est-container {
     padding: 0; 
     width: 100%;
-    /* La animación fadeIn se define en el CSS de la versión anterior y se reutiliza aquí */
 }
 
 .mini-stats-grid {
@@ -318,7 +319,7 @@
     background-color: var(--color-stat-bg-total); 
 }
 .mini-stat-box.stat-total .mini-stat-number { 
-    color: var(--color-fondo-tarjeta); /* Blanco */
+    color: var(--color-fondo-tarjeta); 
 }
 .mini-stat-box.stat-total .mini-stat-label { 
     color: rgba(255, 255, 255, 0.8); 
@@ -338,7 +339,7 @@
 /* 3. Pendientes (Fondo claro de alerta con color de alerta) */
 .mini-stat-box.stat-pending { 
     background-color: var(--color-stat-bg-pending); 
-    border: 1px solid rgba(231, 111, 81, 0.3); /* Borde sutil para destacar */
+    border: 1px solid rgba(231, 111, 81, 0.3); 
 }
 .mini-stat-box.stat-pending .mini-stat-number { 
     color: var(--color-stat-text-pending); 
@@ -346,7 +347,6 @@
 .mini-stat-box.stat-pending .mini-stat-label { 
     color: var(--color-stat-text-pending);
     font-weight: 600;
-    /* Reutiliza tu animación de pulso si está definida en el CSS principal */
 }
 
 
