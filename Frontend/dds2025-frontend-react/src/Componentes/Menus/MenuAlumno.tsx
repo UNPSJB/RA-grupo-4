@@ -30,7 +30,6 @@ const AlumnoDashboard = ({ estudianteId }) => {
             {/* 2. Encuestas pendientes (Sección Principal) */}
             <div className="seccion-box informes-principales">
                 <h2 className="seccion-title"><FileText size={20} /> Tus encuestas pendientes</h2>
-                {/* Se renderiza aquí, y usa el Link corregido para navegar a la ruta anidada */}
                 <SeleccionarEncuestas/>
             </div>
 
