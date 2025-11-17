@@ -1,5 +1,4 @@
 import React from 'react';
-// Asegúrate de que la ruta a tu imagen sea la correcta según tu estructura de carpetas.
 import errorImg from '../../assets/error.png';
 
 interface ErrorCargaDatosProps {

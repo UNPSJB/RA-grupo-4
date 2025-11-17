@@ -1,5 +1,4 @@
 import React from 'react';
-// Asegúrate de que la ruta sea correcta según tu proyecto
 import imgSinDatosDefault from '../../assets/sinDatos.png';
 
 interface SinDatosProps {

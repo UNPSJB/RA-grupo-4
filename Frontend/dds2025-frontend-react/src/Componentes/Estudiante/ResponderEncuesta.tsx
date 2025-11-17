@@ -62,7 +62,6 @@ const PreguntaAbierta: React.FC<any> = ({ pregunta, respuesta, onChange }) => (
         className="input-abierta"
         id={`pregunta-${pregunta.id}`}
         required={pregunta.obligatoria}
-        // --- CÓDIGO CORREGIDO PARA FONDO CELESTE ---
         style={{ backgroundColor: "#cce4f6" }}
     />
 );

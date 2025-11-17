@@ -14,7 +14,6 @@ const AlumnoDashboard = ({ estudianteId }) => {
     return (
         <div className="dashboard-main-view">
             
-            {/* 1. Bienvenida (Panel Lateral) + Estadísticas (Fila Superior) */}
             <div className="dashboard-header-container">
                 
                 <aside className="bienvenida-box">
@@ -23,7 +22,7 @@ const AlumnoDashboard = ({ estudianteId }) => {
                 </aside>
 
                 <div className="estadisticas-box card-box">
-                    <h2 className="stats-title"><BarChart3 size={20} /> Tus encuestas</h2>
+                    {/* <h2 className="stats-title"><BarChart3 size={20} /> Tus encuestas</h2> */}
                     <MiniEstadisticasEst estudianteId={estudianteId} />
                 </div>
             </div>
@@ -60,8 +59,6 @@ const AlumnoDashboard = ({ estudianteId }) => {
     );
 };
 
-
-// --- COMPONENTE PRINCIPAL (Definición de Rutas) ---
 const MenuAlumno = () => {
     const estudianteId = 1;
 
@@ -77,16 +74,12 @@ const MenuAlumno = () => {
             
             <main className="menu-alumno-content">
                 <Routes>
-                    {/* RUTA INDEX: Carga el Dashboard completo */}
                     <Route index element={<AlumnoDashboard estudianteId={estudianteId} />} />
 
-                    {/* RUTA DE SELECCIÓN: (Aunque no se usa directamente en el Index, es bueno tenerla si se navega aquí) */}
                     <Route path="seleccionar" element={<SeleccionarEncuestas />} />
                     
-                    {/* RUTA DESTINO: Permite responder la encuesta - ¡CORRECTA! */}
                     <Route path="responder-encuesta/:inscripcionId" element={<ResponderEncuesta />} />
                     
-                    {/* Otras rutas de navegación */}
                     <Route path="historial-encuestas" element={<SinDatos titulo="Historial de Encuestas" />} />
                     <Route path="mis-materias" element={<SinDatos titulo="Mis Materias" />} />
                     <Route path="recursos-extra" element={<SinDatos titulo="Recursos Adicionales" />} />

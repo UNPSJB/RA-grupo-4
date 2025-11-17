@@ -3,11 +3,74 @@ import { BarChart2 } from "lucide-react";
 import SinDatos from "../Otros/SinDatos"; 
 import ErrorCargaDatos from "../Otros/ErrorCargaDatos"; 
 
+// --- INTERFACES ---
 interface Estadisticas {
   total: number;
   respondidas: number;
   pendientes: number;
 }
+
+
+// --- ESTILOS EN LÍNEA BASE (Para evitar un archivo CSS separado) ---
+const styles = {
+    container: {
+        padding: '15px',
+        borderRadius: '12px',
+        backgroundColor: '#fff',
+        boxShadow: '0 4px 10px rgba(0, 0, 0, 0.08)',
+    } as React.CSSProperties, 
+    grid: {
+        display: 'grid',
+        gridTemplateColumns: 'repeat(3, 1fr)',
+        gap: '10px',
+        marginTop: '15px',
+    } as React.CSSProperties,
+    statBox: {
+        padding: '10px',
+        borderRadius: '8px',
+        textAlign: 'center',
+        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+        borderLeft: '5px solid',
+    } as React.CSSProperties,
+    statNumber: {
+        fontSize: '1.8em',
+        fontWeight: 700,
+        marginBottom: '2px',
+    } as React.CSSProperties,
+    statLabel: {
+        fontSize: '0.8em',
+        color: '#555',
+        fontWeight: 500,
+    } as React.CSSProperties,
+    // Estilos de la barra de progreso (la de color)
+    progressBarContainer: {
+        display: 'flex',
+        width: '100%',
+        height: '35px', /* Altura de la barra */
+        borderRadius: '6px',
+        overflow: 'hidden',
+        boxShadow: '0 1px 5px rgba(0, 0, 0, 0.1)',
+    } as React.CSSProperties,
+    barSegment: {
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        color: 'white',
+        fontWeight: 'bold',
+        fontSize: '0.9em',
+        transition: 'width 0.5s ease-out',
+        padding: '0 5px',
+    } as React.CSSProperties,
+};
+
+// --- COLORES ---
+const COLOR_TOTAL = '#4169e1';    // Azul
+const COLOR_RESPONDIDAS = '#9acd32'; // Amarillo Verdoso
+const COLOR_PENDIENTES = '#dc143c'; // Rojo Carmesí
+const BG_TOTAL = '#e6e6fa';
+const BG_RESPONDIDAS = '#f0fff0';
+const BG_PENDIENTES = '#ffe4e1';
+
 
 const MiniEstadisticasEst: React.FC<{ estudianteId: number }> = ({ estudianteId }) => {
   const [stats, setStats] = useState<Estadisticas>({ total: 0, respondidas: 0, pendientes: 0 });
@@ -53,8 +116,8 @@ const MiniEstadisticasEst: React.FC<{ estudianteId: number }> = ({ estudianteId 
 
   if (loading) {
     return (
-      <div className="mini-stats-est-container loading-state">
-        <p>Cargando estadísticas...</p>
+      <div style={styles.container as React.CSSProperties}>
+        <p style={{ textAlign: 'center' }}>Cargando estadísticas...</p>
       </div>
     );
   }
@@ -72,27 +135,93 @@ const MiniEstadisticasEst: React.FC<{ estudianteId: number }> = ({ estudianteId 
       />
     );
   }
+//porcentaJES
+  const total = stats.total;
+  
+  const porcentajeRespondidas = total > 0 ? (stats.respondidas / total) * 100 : 0;
+  const porcentajePendientes = total > 0 ? (stats.pendientes / total) * 100 : 0;
+  const anchoBarraFija = 33.33; 
+  // ------------------------------------------
 
   return (
-    <div className={`mini-stats-est-container ${animar ? 'animated' : ''}`}>
-      <div className="mini-stats-grid">
+    <div style={styles.container as React.CSSProperties} className={animar ? 'animated' : ''}>
+      
+      {/* 1. La Barra de Progreso a Color (siguiendo la imagen) */}
+      <div style={styles.progressBarContainer}>
+        
+        {/* Total (Azul) */}
+        <div 
+          style={{ 
+            ...styles.barSegment, 
+            width: `${anchoBarraFija}%`, 
+            backgroundColor: COLOR_TOTAL,
+            borderRight: '1px solid rgba(0,0,0,0.1)',
+          }}
+        >
+          Total
+        </div>
+
+        {/* Respondidas (Verde) */}
+        <div 
+          style={{ 
+            ...styles.barSegment, 
+            width: `${anchoBarraFija}%`, 
+            backgroundColor: COLOR_RESPONDIDAS,
+            borderRight: '1px solid rgba(0,0,0,0.1)',
+          }}
+        >
+          Respondidas
+        </div>
+
+        {/* Pendientes (Rojo) */}
+        <div 
+          style={{ 
+            ...styles.barSegment, 
+            width: `${anchoBarraFija}%`, 
+            backgroundColor: COLOR_PENDIENTES 
+          }}
+        >
+          Pendientes
+        </div>
+      </div>
+      
+      {/* 2. La Malla con los Números y el Porcentaje */}
+      <div style={styles.grid}>
         
         {/* Total Asignadas */}
-        <div className="mini-stat-box stat-total">
-          <div className="mini-stat-number">{stats.total}</div>
-          <div className="mini-stat-label">Total</div>
+        <div 
+            style={{ 
+                ...styles.statBox, 
+                backgroundColor: BG_TOTAL, 
+                borderLeftColor: COLOR_TOTAL 
+            }}
+        >
+          <div style={styles.statNumber}>{stats.total}</div>
+          <div style={styles.statLabel}>Total</div>
         </div>
 
         {/* Respondidas */}
-        <div className="mini-stat-box stat-done">
-          <div className="mini-stat-number">{stats.respondidas}</div>
-          <div className="mini-stat-label">Respondidas</div>
+        <div 
+            style={{ 
+                ...styles.statBox, 
+                backgroundColor: BG_RESPONDIDAS, 
+                borderLeftColor: COLOR_RESPONDIDAS 
+            }}
+        >
+          <div style={styles.statNumber}>{stats.respondidas}</div>
+          <div style={styles.statLabel}>Respondidas ({porcentajeRespondidas.toFixed(1)}%)</div>
         </div>
 
         {/* Pendientes */}
-        <div className="mini-stat-box stat-pending">
-          <div className="mini-stat-number">{stats.pendientes}</div>
-          <div className="mini-stat-label">Pendientes</div>
+        <div 
+            style={{ 
+                ...styles.statBox, 
+                backgroundColor: BG_PENDIENTES, 
+                borderLeftColor: COLOR_PENDIENTES 
+            }}
+        >
+          <div style={styles.statNumber}>{stats.pendientes}</div>
+          <div style={styles.statLabel}>Pendientes ({porcentajePendientes.toFixed(1)}%)</div>
         </div>
       </div>
     </div>
