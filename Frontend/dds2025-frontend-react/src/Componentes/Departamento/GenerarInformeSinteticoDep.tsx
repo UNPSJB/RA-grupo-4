@@ -317,7 +317,8 @@ const GenerarInformeSinteticoDep: React.FC = () => {
 
                         <div style={styles.divider}></div>
                         <section style={styles.section}>
-                            <PorcentajesInformeSintetico departamentoId={datosInforme.departamento_id} anio={2025} />
+                            {/* <PorcentajesInformeSintetico departamentoId={datosInforme.departamento_id} anio={2025} />*/}
+                            <PorcentajesInformeSintetico departamentoId={datosInforme.departamento_id} anio={datosInforme.anio} />    
                         </section>
 
                         <div style={styles.divider}></div>
