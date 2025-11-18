@@ -1,6 +1,4 @@
-/* src/Componentes/Menus/MenuDocente.css */
-
-/* --- 1. Variables CSS (Paleta Limpia y Profesional) --- */
+/* --- 1. Variables CSS  --- */
 :root {
     --color-principal: #003366; 
     --color-secundario: #0078D4; 
@@ -30,7 +28,7 @@
 }
 .dashboard-content {
     padding: 30px; 
-    max-width: 1400px; 
+    max-width: 2000px; 
     margin: 0 auto; 
     color: var(--color-texto-oscuro);
 }
