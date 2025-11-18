@@ -5,41 +5,16 @@ import {
     BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LabelList,
 } from 'recharts';
 import { useReactToPrint } from 'react-to-print';
-// --- 👇 AQUÍ ESTÁ LA CORRECCIÓN 👇 ---
-import InformeImprimible from '../Departamento/InformeImprimible'; 
+import InformeImprimible from '../Departamento/InformeImprimible';
 
 const BASE_URL = 'http://localhost:8000';
 
-// --- INTERFACES ---
-interface Materia {
-    id_materia: number;
-    nombre: string;
-    codigoMateria: string;
-    anio: number; 
-}
-interface Docente {
-    id_docente: number;
-    nombre: string;
-}
-interface ValoracionAuxiliarData {
-    nombre_auxiliar: string;
-    calificacion: string;
-    justificacion: string;
-}
-interface Actividad {
-    integranteCatedra: string;
-    capacitacion: string;
-    investigacion: string;
-    extension: string;
-    gestion: string;
-    observacionComentarios: string;
-}
-interface SeccionResumen {
-    id: number;
-    sigla: string;
-    nombre: string;
-    porcentajes_opciones: Record<string, number>;
-}
+// --- INTERFACES (Sin cambios) ---
+interface Materia { id_materia: number; nombre: string; codigoMateria: string; anio: number; }
+interface Docente { id_docente: number; nombre: string; }
+interface ValoracionAuxiliarData { nombre_auxiliar: string; calificacion: string; justificacion: string; }
+interface Actividad { integranteCatedra: string; capacitacion: string; investigacion: string; extension: string; gestion: string; observacionComentarios: string; }
+interface SeccionResumen { id: number; sigla: string; nombre: string; porcentajes_opciones: Record<string, number>; }
 interface InformeACCompleto {
     id_informesAC: number;
     completado: number;
@@ -68,11 +43,8 @@ interface InformeACCompleto {
     resumen_reflexion: string;
 }
 
-// --- COMPONENTES INTERNOS ---
-interface DataFieldProps {
-    label: string;
-    value: string | number | undefined | null;
-}
+// --- COMPONENTES VISUALES ---
+interface DataFieldProps { label: string; value: string | number | undefined | null; }
 const DataField: React.FC<DataFieldProps> = ({ label, value }) => (
     <div style={styles.fieldContainer}>
         <p style={styles.fieldLabel}>{label}</p>
@@ -80,10 +52,7 @@ const DataField: React.FC<DataFieldProps> = ({ label, value }) => (
     </div>
 );
 
-interface DataListProps {
-    label: string;
-    items: string[] | undefined | null;
-}
+interface DataListProps { label: string; items: string[] | undefined | null; }
 const DataList: React.FC<DataListProps> = ({ label, items }) => (
     <div style={styles.fieldContainer}>
         <p style={styles.fieldLabel}>{label}</p>
@@ -107,24 +76,23 @@ const VisualizarInformeACDoc: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-    // --- LÓGICA DE IMPRESIÓN ---
+    // Referencia al DIV contenedor
     const printRef = useRef<HTMLDivElement>(null); 
     const [isReady, setIsReady] = useState(false);
 
     useEffect(() => {
-        if (informe) {
-            const timer = setTimeout(() => setIsReady(true), 300);
-            return () => clearTimeout(timer);
+        // Verificamos que el informe exista y la ref esté asignada
+        if (informe && printRef.current) {
+            setIsReady(true);
         }
     }, [informe]);
 
     const handlePrintFn = useReactToPrint({ 
-        content: () => printRef.current,
-        documentTitle: `Informe_${informe?.materia?.nombre || 'AC'}_${informe?.ciclo_lectivo || ''}`,
-        onPrintError: (_, err) => alert("Error al intentar generar el PDF."),
+        contentRef: printRef, 
+        documentTitle: `Informe_${informe?.materia?.nombre || 'AC'}`,
+        onPrintError: (_, err) => console.error("Error impresión:", err),
     });
 
-    // --- LÓGICA DE CARGA DE DATOS ---
     useEffect(() => {
         const fetchInforme = async () => {
             try {
@@ -142,76 +110,48 @@ const VisualizarInformeACDoc: React.FC = () => {
                 setLoading(false);
             }
         };
-
-        if (id_informe) {
-            fetchInforme();
-        }
+        if (id_informe) fetchInforme();
     }, [id_informe]);
 
-    // --- RENDERIZADO CONDICIONAL ---
-    if (loading) {
-        return <div style={styles.container}><p style={styles.message}>Cargando informe...</p></div>;
-    }
-    if (error) {
-        return <div style={styles.container}><p style={styles.error}>{error}</p></div>;
-    }
-    if (!informe) {
-        return <div style={styles.container}><p style={styles.message}>No se encontró el informe.</p></div>;
-    }
+    if (loading) return <div style={styles.loadingContainer}>Cargando informe...</div>;
+    if (error) return <div style={styles.errorContainer}>Error: {error}</div>;
+    if (!informe) return <div style={styles.errorContainer}>Informe no encontrado.</div>;
     
     const seccionesFiltradas = informe.resumenSecciones?.filter(s =>
         ["B", "C", "D", "E-Teoria", "E-Practica"].includes(s.sigla)
     ) || [];
 
-    // --- RENDERIZADO PRINCIPAL ---
     return (
         <div style={styles.page}>
 
-            {/* BARRA DE BOTONES SUPERIOR */}
-            <div style={{
-                backgroundColor: '#fff', padding: '12px 25px', borderRadius: '50px',
-                boxShadow: '0 4px 20px rgba(0,0,0,0.15)', marginBottom: '30px',
-                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                position: 'sticky', top: '20px', zIndex: 10, width: '95%', maxWidth: '1000px',
-                margin: '0 auto 30px auto' 
-            }}>
-                <button 
-                    onClick={() => navigate(-1)} 
-                    style={{
-                        display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 16px', 
-                        border: '1px solid #ddd', borderRadius: '25px', backgroundColor: '#fff', 
-                        cursor: 'pointer', fontSize: '15px', color: '#555', fontWeight: '500'
-                    }}
-                >
+            {/* BARRA SUPERIOR */}
+            <div style={styles.topBar}>
+                <button onClick={() => navigate(-1)} style={styles.backButton}>
                     ⬅ Volver al Historial
                 </button>
 
                 <div style={{ fontSize: '16px', fontWeight: 'bold', color: '#333' }}>
-                    Vista Previa (Solo Lectura)
+                    Vista Previa (Diseño Web)
                 </div>
 
                 <button 
                     onClick={() => handlePrintFn()}
                     disabled={!isReady}
                     style={{
-                        display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 24px', 
-                        border: 'none', borderRadius: '25px',
-                        backgroundColor: isReady ? '#2e7d32' : '#999', 
-                        color: 'white', cursor: isReady ? 'pointer' : 'not-allowed', 
-                        fontSize: '15px', fontWeight: 'bold', 
-                        boxShadow: isReady ? '0 4px 10px rgba(46, 125, 50, 0.3)' : 'none'
+                        ...styles.printButton,
+                        backgroundColor: isReady ? '#2e7d32' : '#999',
+                        cursor: isReady ? 'pointer' : 'wait'
                     }}
                 >
                     🖨️ Imprimir / PDF
                 </button>
             </div>
 
-            {/* CONTENEDOR DEL INFORME (PARA IMPRESIÓN) */}
+            {/* === VISTA WEB (VISIBLE) === */}
             <div style={styles.container}> 
                 <HeaderInstitucional/>
                 <h2 style={styles.title}>Informe de Actividad Curricular</h2>
 
-                {/* --- Sección 1: Datos Generales --- */}
                 <div style={styles.section}>
                     <h3 style={styles.sectionTitle}>1. Datos Generales</h3>
                     <div style={styles.grid}>
@@ -226,7 +166,6 @@ const VisualizarInformeACDoc: React.FC = () => {
                     </div>
                 </div>
 
-                {/* --- Sección 2: Necesidades --- */}
                 <div style={styles.section}>
                     <h3 style={styles.sectionTitle}>2. Necesidades (Opcional)</h3>
                     <div style={styles.grid}>
@@ -235,7 +174,6 @@ const VisualizarInformeACDoc: React.FC = () => {
                     </div>
                 </div>
 
-                {/* --- Sección 3: Porcentajes --- */}
                 <div style={styles.section}>
                     <h3 style={styles.sectionTitle}>3. Porcentajes</h3>
                     <div style={styles.grid}>
@@ -246,7 +184,6 @@ const VisualizarInformeACDoc: React.FC = () => {
                     </div>
                 </div>
 
-                {/* --- Sección 4: Resumen Encuesta --- */}
                 <div style={styles.section}>
                     <h3 style={styles.sectionTitle}>4. Resumen Valores de Encuesta</h3>
                     <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "1rem", margin: "1rem 0" }}>
@@ -272,7 +209,6 @@ const VisualizarInformeACDoc: React.FC = () => {
                     <DataField label="Observaciones sobre valores" value={informe.opinionSobreResumen} />
                 </div>
 
-                {/* --- Sección 5: Proceso de Aprendizaje --- */}
                 <div style={styles.section}>
                     <h3 style={styles.sectionTitle}>5. Proceso de Enseñanza-Aprendizaje</h3>
                     <div style={styles.gridFullWidth}>
@@ -285,7 +221,6 @@ const VisualizarInformeACDoc: React.FC = () => {
                     </div>
                 </div>
 
-                {/* --- Sección 6: Actividades --- */}
                 <div style={styles.section}>
                     <h3 style={styles.sectionTitle}>6. Actividades de Cátedra</h3>
                     <div style={{overflowX: 'auto'}}>
@@ -316,7 +251,6 @@ const VisualizarInformeACDoc: React.FC = () => {
                     </div>
                 </div>
 
-                {/* --- Sección 7: Valoración Auxiliares --- */}
                 <div style={styles.section}>
                     <h3 style={styles.sectionTitle}>7. Valoración de Auxiliares</h3>
                     <div style={{overflowX: 'auto'}}>
@@ -324,7 +258,7 @@ const VisualizarInformeACDoc: React.FC = () => {
                             <thead>
                                 <tr>
                                     <th style={styles.th}>Nombre Auxiliar</th>
-                                    <th styleS tyle={styles.th}>Calificación</th>
+                                    <th style={styles.th}>Calificación</th>
                                     <th style={styles.th}>Justificación</th>
                                 </tr>
                             </thead>
@@ -342,22 +276,57 @@ const VisualizarInformeACDoc: React.FC = () => {
                 </div>
             </div>
             
-            {/* Contenido oculto solo para impresión (Aquí va el ref) */}
+            {/* === VISTA OCULTA DE IMPRESIÓN === 
+                Usamos display: none. Esto es lo estándar.
+                Al estar el componente ya renderizado y la ref asignada,
+                react-to-print clonará este nodo y lo imprimirá completo.
+            */}
             <div style={{ display: "none" }}>
-                <InformeImprimible ref={printRef} data={informe} />
+                <div ref={printRef}>
+                    <InformeImprimible data={informe} />
+                </div>
             </div>
 
         </div>
     );
 };
 
-// --- ESTILOS (Re-indentados a 4 espacios) ---
+// --- ESTILOS (Sin cambios) ---
 const styles: { [key: string]: React.CSSProperties } = {
     page: {
         backgroundColor: '#f4f7f6',
         padding: '30px 20px',
         minHeight: '100vh',
         fontFamily: '"Segoe UI", "Roboto", sans-serif',
+        position: 'relative',
+        overflowX: 'hidden',
+    },
+    loadingContainer: {
+        display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh',
+        backgroundColor: '#f4f7f6', fontSize: '18px', color: '#666'
+    },
+    errorContainer: {
+        display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh',
+        backgroundColor: '#f4f7f6', color: 'red', fontSize: '18px'
+    },
+    topBar: {
+        backgroundColor: '#fff', padding: '12px 25px', borderRadius: '50px',
+        boxShadow: '0 4px 20px rgba(0,0,0,0.15)', marginBottom: '30px',
+        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+        position: 'sticky', top: '20px', zIndex: 100, width: '95%', maxWidth: '1000px',
+        margin: '0 auto 30px auto' 
+    },
+    backButton: {
+        display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 16px', 
+        border: '1px solid #ddd', borderRadius: '25px', backgroundColor: '#fff', 
+        cursor: 'pointer', fontSize: '15px', color: '#555', fontWeight: '500'
+    },
+    printButton: {
+        display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 24px', 
+        border: 'none', borderRadius: '25px',
+        color: 'white', 
+        fontSize: '15px', fontWeight: 'bold', 
+        boxShadow: '0 4px 10px rgba(46, 125, 50, 0.3)'
     },
     container: {
         maxWidth: '950px',
@@ -376,9 +345,7 @@ const styles: { [key: string]: React.CSSProperties } = {
         borderBottom: '2px solid #eee',
         paddingBottom: '15px',
     },
-    section: {
-        marginBottom: '30px',
-    },
+    section: { marginBottom: '30px' },
     sectionTitle: {
         fontSize: '18px',
         fontWeight: 'bold',
@@ -418,15 +385,8 @@ const styles: { [key: string]: React.CSSProperties } = {
         whiteSpace: 'pre-wrap' as const,
         lineHeight: '1.5',
     },
-    ul: {
-        paddingLeft: '20px',
-        margin: 0,
-    },
-    li: {
-        fontSize: '16px',
-        color: '#333',
-        marginBottom: '5px',
-    },
+    ul: { paddingLeft: '20px', margin: 0 },
+    li: { fontSize: '16px', color: '#333', marginBottom: '5px' },
     chartBox: {
         flex: `1 1 calc(50% - 1rem)`, 
         minWidth: "300px",
@@ -464,36 +424,9 @@ const styles: { [key: string]: React.CSSProperties } = {
         color: '#333',
         verticalAlign: 'top' as const, 
     },
-    rowAlt: {
-        backgroundColor: '#f8fbff', 
-    },
-    rowBase: {
-        backgroundColor: '#ffffff',
-    },
-    buttonContainer: {
-        textAlign: 'center',
-        marginTop: '40px',
-        borderTop: '1px solid #eee',
-        paddingTop: '25px',
-    },
-    button: {
-        padding: '12px 30px',
-        fontSize: '16px',
-        fontWeight: 'bold',
-        color: '#ffffff',
-        backgroundColor: '#0078D4',
-        border: 'none',
-        borderRadius: '6px',
-        cursor: 'pointer',
-        transition: 'background-color 0.2s, transform 0.1s',
-        boxShadow: '0 2px 5px rgba(0,0,0,0.2)',
-    },
-    message: {
-        fontSize: '16px',
-        color: '#666',
-        marginTop: '30px',
-        textAlign: 'center' as const,
-    },
+    rowAlt: { backgroundColor: '#f8fbff' },
+    rowBase: { backgroundColor: '#ffffff' },
+    message: { fontSize: '16px', color: '#666', marginTop: '30px', textAlign: 'center' as const },
     error: {
         fontSize: '16px',
         color: '#d32f2f',
