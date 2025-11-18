@@ -1,318 +1,260 @@
 import React, { forwardRef } from 'react';
 import HeaderInstitucional from '../Otros/HeaderInstitucional';
-// Las siguientes importaciones no se usan en el componente final, pero las mantengo por si las necesitas en otro lugar.
-import CompletarDatosGeneralesDoc from '../Docente/CompletarDatosGeneralesDoc';
-import CompletarNecesidadesDoc from '../Docente/CompletarNecesidadesDoc';
-import CompletarPorcentajesDoc from '../Docente/CompletarPorcentajesDoc';
-import CompletarContenidoAbordadoDoc from '../Docente/CompletarContenidoAbordadoDoc';
-import CompletarProcesoAprendizajeDoc from '../Docente/CompletarProcesoAprendizajeDoc';
-import ConsignarActividadesDoc from '../Docente/ConsignarActividadesDoc';
-import CompletarValoracionAuxiliaresDoc from '../Docente/CompletarValoracionAuxiliaresDoc';
-import ResumenSecciones from './ConsignarResumenValoresEncuesta';
 
 interface InformeImprimibleProps {
     data: any;
 }
 
 const InformeImprimible = forwardRef<HTMLDivElement, InformeImprimibleProps>(({ data }, ref) => {
-    if (!data) return <div ref={ref} style={{ padding: 20, fontFamily: 'Arial' }}>Cargando datos para vista previa...</div>;
+    if (!data) return <div ref={ref}>Cargando datos...</div>;
 
-    // Mapeo de datos seguro
-    const d = {
-        // Generales
-        materiaNombre: data.materia?.nombre || '-',
-        materiaCodigo: data.materia?.codigoMateria || '-',
-        docenteNombre: data.docente?.nombre || data.docente_responsable || '-',
-        ciclo: data.ciclo_lectivo || '-',
-        sede: data.sede || '-',
-        inscriptos: data.cantidad_alumnos_inscriptos || 0,
-        comTeo: data.cantidad_comisiones_teoricas || 0,
-        comPra: data.cantidad_comisiones_practicas || 0,
-
-        // Porcentajes
-        pctTeo: data.porcentaje_teoricas || 0,
-        pctPra: data.porcentaje_practicas || 0,
-        justifPct: data.justificacion_porcentaje || 'Sin justificación.',
-        pctContenido: data.porcentaje_contenido_abordado || 0,
-
-        // Desarrollo / Reflexión
-        posEns: data.aspectos_positivos_enseñanza || 'No registrado.',
-        posApr: data.aspectos_positivos_aprendizaje || 'No registrado.',
-        obsEns: data.obstaculos_enseñanza || 'No registrado.',
-        obsApr: data.obstaculos_aprendizaje || 'No registrado.',
-        estrategias: data.estrategias_a_implementar || 'No registrado.',
-        reflexion: data.resumen_reflexion || data.opinionSobreResumen || 'No registrado.',
-
-        // Listas (asegurar que sean arrays)
-        necesidadesEq: Array.isArray(data.necesidades_equipamiento) ? data.necesidades_equipamiento : (data.necesidades_equipamiento ? [data.necesidades_equipamiento] : []),
-        necesidadesBib: Array.isArray(data.necesidades_bibliografia) ? data.necesidades_bibliografia : (data.necesidades_bibliografia ? [data.necesidades_bibliografia] : []),
-        valoraciones: data.valoracion_auxiliares || [],
-        actividades: data.actividades || [],
-        resumenSecciones: data.resumenSecciones || [],
-    };
-
-    const getTexto = (text: string | number) => (String(text).trim() || 'No registrado.');
-
+    const txt = (val: any) => (val ? String(val) : '-');
 
     return (
-        <div ref={ref} className="informe-root-print">
+        <div ref={ref} className="print-document">
             <style>
                 {`
-                /* --- ESTILOS BASE (VISTA PREVIA Y PANTALLA) --- */
-                .informe-root-print {
-                    background-color: #fff !important;
-                    color: #000 !important;
-                    font-family: 'Segoe UI', Roboto, Arial, sans-serif !important;
-                    line-height: 1.5;
-                    padding: 40px;
-                    font-size: 11pt;
+                @media print {
+                    @page { size: A4; margin: 10mm; } /* Margen de hoja controlado */
+                    body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+                    .print-document { margin: 0; padding: 0 !important; width: 100%; }
                 }
-                h1, h2 {
-                    text-transform: uppercase;
-                    font-weight: 700;
-                    color: #003366;
-                    border-bottom: 2px solid #003366;
-                    padding-bottom: 5px;
-                    margin-top: 30px;
-                    margin-bottom: 15px;
+                .print-document {
+                    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                    font-size: 10pt; /* Letra un poco más chica para que entre todo */
+                    color: #000;
+                    background: #fff;
+                    padding: 40px; /* Padding solo para vista en pantalla */
+                    width: 100%;
+                    box-sizing: border-box;
                 }
-                h1 { font-size: 20px; text-align: center; }
-                h2 { font-size: 16px; }
-
-                .tabla-info {
+                
+                /* Estilos de Tablas (La clave para que no se rompa) */
+                .full-width-table {
                     width: 100%;
                     border-collapse: collapse;
-                    margin-bottom: 15px;
+                    margin-bottom: 20px;
+                    page-break-inside: avoid; /* Intenta no cortar tablas a la mitad */
                 }
-                .tabla-info th, .tabla-info td {
-                    border: 1px solid #ccc;
-                    padding: 8px 12px;
-                    vertical-align: top;
-                    font-size: 11pt;
+                .full-width-table th, .full-width-table td {
+                    border: 1px solid #999;
+                    padding: 6px 8px;
+                    vertical-align: middle;
+                    text-align: left;
                 }
-                .tabla-info th {
-                    background-color: #f0f5ff;
-                    font-weight: 600;
-                    width: 30%;
+                .full-width-table th {
+                    background-color: #e6f2ff !important; /* Forzar color al imprimir */
                     color: #003366;
+                    font-weight: bold;
+                    width: 25%;
                 }
-                .text-area-view {
-                    border: 1px solid #ddd;
-                    padding: 10px;
-                    background-color: #f9f9f9;
-                    white-space: pre-wrap;
-                    min-height: 50px;
-                    display: block;
+                .full-width-table td {
+                    width: 25%;
                 }
-                .center { text-align: center; }
-                .referencia {
+
+                /* Títulos */
+                h1.main-title { 
+                    font-size: 18pt; 
+                    text-align: center; 
+                    color: #003366; 
+                    text-transform: uppercase; 
+                    margin: 10px 0; 
+                    border-bottom: 2px solid #003366;
+                }
+                .section-header {
+                    background-color: #003366 !important;
+                    color: white !important;
+                    font-weight: bold;
+                    padding: 5px 10px;
+                    font-size: 11pt;
+                    margin-top: 15px;
+                    margin-bottom: 5px;
+                    -webkit-print-color-adjust: exact;
+                }
+
+                /* Gráficos de Barras CSS */
+                .bar-chart-row {
+                    display: flex;
+                    align-items: center;
+                    margin-bottom: 4px;
                     font-size: 9pt;
-                    color: #666;
-                    margin-top: 5px;
-                    margin-left: 5px;
                 }
-                .lista-recursos {
-                    list-style-type: disc;
-                    padding-left: 20px;
-                    margin: 5px 0;
-                }
+                .bar-label { width: 45%; text-align: right; padding-right: 10px; }
+                .bar-track { flex-grow: 1; background: #eee; height: 12px; border: 1px solid #ccc; }
+                .bar-fill { background: #4f46e5 !important; height: 100%; display: block; -webkit-print-color-adjust: exact; }
+                .bar-value { width: 40px; padding-left: 5px; font-weight: bold; }
                 
-                /* Ocultar elementos de formulario nativos molestos */
-                .informe-root-print .no-print { display: none !important; }
-                
-                /* --- ESTILOS DE IMPRESIÓN --- */
-                @media print {
-                    @page { size: A4; margin: 15mm; }
-                    html, body { 
-                        -webkit-print-color-adjust: exact !important;
-                        print-color-adjust: exact !important;
-                    }
-                    .informe-root-print { padding: 0 !important; }
-                    .tabla-info th { background-color: #e0e7f5 !important; -webkit-print-color-adjust: exact; }
-                    .seccion-print, table {
-                        page-break-inside: avoid !important;
-                        break-inside: avoid !important;
-                    }
-                }
+                .center-text { text-align: center !important; }
                 `}
             </style>
 
+            {/* ENCABEZADO */}
             <div style={{ marginBottom: '20px' }}>
                 <HeaderInstitucional />
+                <h1 className="main-title">Informe de Actividad Curricular</h1>
+                <div style={{ textAlign: 'center', fontSize: '11pt' }}>
+                    <strong>{data.materia?.nombre} ({data.materia?.codigoMateria})</strong> | Ciclo: {data.ciclo_lectivo}
+                    <br/>
+                    Docente Responsable: {data.docente?.nombre} | Sede: {data.sede}
+                </div>
             </div>
 
-            <div style={{ textAlign: 'center', marginBottom: '30px', borderBottom: '2px solid #000', paddingBottom: '10px' }}>
-                <h1 style={{ margin: '0', fontSize: '24px', textTransform: 'uppercase', fontWeight: 'bold' }}>
-                    Informe de Actividad Curricular
-                </h1>
-            </div>
+            {/* 1. DATOS GENERALES (Ahora es una tabla real) */}
+            <div className="section-header">1. DATOS GENERALES Y MATRÍCULA</div>
+            <table className="full-width-table">
+                <tbody>
+                    <tr>
+                        <th>Alumnos Inscriptos</th>
+                        <td>{txt(data.cantidad_alumnos_inscriptos)}</td>
+                        <th>Comisiones Teóricas</th>
+                        <td>{txt(data.cantidad_comisiones_teoricas)}</td>
+                    </tr>
+                    <tr>
+                        <th>Comisiones Prácticas</th>
+                        <td>{txt(data.cantidad_comisiones_practicas)}</td>
+                        <th>Código Materia</th>
+                        <td>{txt(data.materia?.codigoMateria)}</td>
+                    </tr>
+                </tbody>
+            </table>
 
-            <div style={{ textAlign: 'center', marginBottom: '30px' }}>
-                <h2 style={{ fontSize: '16px', margin: '5px 0', borderBottom: 'none', paddingBottom: 0 }}>{d.materiaNombre} ({d.materiaCodigo}) - Ciclo {d.ciclo}</h2>
-                <p style={{ margin: '5px 0' }}>** Docente Responsable: {d.docenteNombre} **</p>
-            </div>
+            {/* 2. NECESIDADES */}
+            <div className="section-header">2. NECESIDADES</div>
+            <table className="full-width-table">
+                <tbody>
+                    <tr>
+                        <th>Equipamiento</th>
+                        <td colSpan={3}>
+                            {data.necesidades_equipamiento?.length 
+                                ? data.necesidades_equipamiento.join(', ') 
+                                : 'Sin requerimientos.'}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Bibliografía</th>
+                        <td colSpan={3}>
+                            {data.necesidades_bibliografia?.length 
+                                ? data.necesidades_bibliografia.join(', ') 
+                                : 'Sin requerimientos.'}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
 
-            {/* --- SECCIÓN 1: DATOS GENERALES --- */}
-            <div className="seccion-print">
-                <h2>1. Datos Generales y Matrícula</h2>
-                <table className="tabla-info">
-                    <tbody>
-                        <tr><th>Sede</th><td>{d.sede}</td><th>Comisiones Teóricas</th><td>{d.comTeo}</td></tr>
-                        <tr><th>Inscriptos</th><td>{d.inscriptos}</td><th>Comisiones Prácticas</th><td>{d.comPra}</td></tr>
-                    </tbody>
-                </table>
-            </div>
+            {/* 3. PORCENTAJES */}
+            <div className="section-header">3. PORCENTAJES DE DICTADO</div>
+            <table className="full-width-table">
+                <tbody>
+                    <tr>
+                        <th>% Teóricas</th>
+                        <td>{txt(data.porcentaje_teoricas)}%</td>
+                        <th>% Prácticas</th>
+                        <td>{txt(data.porcentaje_practicas)}%</td>
+                    </tr>
+                    <tr>
+                        <th>% Contenido Abordado</th>
+                        <td>{txt(data.porcentaje_contenido_abordado)}%</td>
+                        <th>Justificación</th>
+                        <td>{txt(data.justificacion_porcentaje)}</td>
+                    </tr>
+                </tbody>
+            </table>
 
-            {/* --- SECCIÓN 2: CARGA HORARIA Y CONTENIDO --- */}
-            <div className="seccion-print">
-                <h2>2. Carga Horaria y Contenido Abordado</h2>
-                <table className="tabla-info">
-                    <tbody>
-                        <tr><th>% Teóricas dictadas</th><td>{d.pctTeo}%</td><th>% Contenido total abordado</th><td>{d.pctContenido}%</td></tr>
-                        <tr><th>% Prácticas dictadas</th><td>{d.pctPra}%</td><th>Justificación de porcentajes bajos</th><td>{getTexto(d.justifPct)}</td></tr>
-                    </tbody>
-                </table>
-            </div>
-
-            {/* --- SECCIÓN 3: DESARROLLO DE LA CURSADA --- */}
-            <div className="seccion-print">
-                <h2>3. Desarrollo y Proceso de Aprendizaje</h2>
-                <table className="tabla-info">
-                    <tbody>
-                        <tr><th>Aspectos Positivos (Enseñanza)</th><td><div className="text-area-view">{getTexto(d.posEns)}</div></td></tr>
-                        <tr><th>Aspectos Positivos (Aprendizaje)</th><td><div className="text-area-view">{getTexto(d.posApr)}</div></td></tr>
-                        <tr><th>Obstáculos (Enseñanza)</th><td><div className="text-area-view">{getTexto(d.obsEns)}</div></td></tr>
-                        <tr><th>Obstáculos (Aprendizaje)</th><td><div className="text-area-view">{getTexto(d.obsApr)}</div></td></tr>
-                        <tr><th>Estrategias a Implementar</th><td><div className="text-area-view">{getTexto(d.estrategias)}</div></td></tr>
-                        <tr><th>Reflexión/Opinión Final</th><td><div className="text-area-view">{getTexto(d.reflexion)}</div></td></tr>
-                    </tbody>
-                </table>
-            </div>
-
-            {/* --- SECCIÓN 4: RESUMEN DE ENCUESTAS --- */}
-            {d.resumenSecciones.length > 0 && (
-                <div className="seccion-print">
-                    <h2>4. Resumen de Encuestas a Estudiantes</h2>
-                    {d.resumenSecciones.map((seccion: any, i: number) => (
-                        <div key={i} style={{ marginBottom: '15px', border: '1px solid #eee', padding: '10px' }}>
-                            <h4 style={{ margin: '0 0 5px 0', fontSize: '12pt', color: '#000', borderBottom: '1px solid #ddd' }}>{seccion.sigla} - {seccion.nombre}</h4>
-                            <ul style={{ listStyle: 'none', padding: 0, display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '10px' }}>
-                                {Object.entries(seccion.porcentajes_opciones || {}).map(([opcion, porcentaje], j) => (
-                                    <li key={j} style={{ fontWeight: '500' }}>
-                                        {opcion}: <span style={{ float: 'right', fontWeight: 'bold' }}>{porcentaje}%</span>
-                                    </li>
-                                ))}
-                            </ul>
+            {/* 4. RESUMEN ENCUESTAS (Gráficos CSS seguros) */}
+            <div className="section-header">4. RESUMEN VALORES DE ENCUESTA</div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '10px', pageBreakInside: 'avoid' }}>
+                {data.resumenSecciones?.map((seccion: any) => (
+                    <div key={seccion.id} style={{ border: '1px solid #ccc', padding: '10px', breakInside: 'avoid' }}>
+                        <div style={{ fontWeight: 'bold', borderBottom: '1px solid #eee', marginBottom: '5px', fontSize: '9pt' }}>
+                            {seccion.sigla} - {seccion.nombre}
                         </div>
-                    ))}
-                </div>
-            )}
-
-            {/* --- SECCIÓN 5: NECESIDADES (Corregido para no mostrar inputs) --- */}
-            {(d.necesidadesEq.length > 0 || d.necesidadesBib.length > 0) && (
-                <div className="seccion-print">
-                    <h2>5. Necesidades</h2>
-                    <table className="tabla-info">
-                        <tbody>
-                            <tr>
-                                <th>Equipamiento</th>
-                                <td>
-                                    {d.necesidadesEq.length > 0 ? (
-                                        <ul className="lista-recursos">
-                                            {d.necesidadesEq.map((item: string, i: number) => <li key={i}>{item}</li>)}
-                                        </ul>
-                                    ) : 'Ninguna requerida.'}
-                                </td>
-                            </tr>
-                            <tr>
-                                <th>Bibliografía</th>
-                                <td>
-                                    {d.necesidadesBib.length > 0 ? (
-                                        <ul className="lista-recursos">
-                                            {d.necesidadesBib.map((item: string, i: number) => <li key={i}>{item}</li>)}
-                                        </ul>
-                                    ) : 'Ninguna requerida.'}
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            )}
-
-            {/* --- SECCIÓN 6: VALORACIÓN AUXILIARES --- */}
-            {d.valoraciones.length > 0 && (
-                <div className="seccion-print">
-                    <h2>6. Valoración de Auxiliares</h2>
-                    <table className="tabla-info">
-                        <thead><tr><th>Nombre</th><th>Rol</th><th style={{ width: '15%' }} className="center">Calificación</th><th>Justificación</th></tr></thead>
-                        <tbody>
-                            {d.valoraciones.map((aux: any, i: number) => (
-                                <tr key={i}>
-                                    <td>{aux.nombre || '-'}</td>
-                                    <td>{aux.rol || '-'}</td>
-                                    <td className="center">{aux.calificacion || '-'}</td>
-                                    <td>{aux.justificacion || '-'}</td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-            )}
-
-             {/* --- SECCIÓN 7: CONSIGNACIÓN DE ACTIVIDADES --- */}
-            {d.actividades.length > 0 && (
-                <div className="seccion-print">
-                    <h2>7. Consignación de Actividades</h2>
-                    <table className="tabla-info">
-                        <thead>
-                            <tr>
-                                <th>Integrante</th>
-                                <th className="center">Cap.</th>
-                                <th className="center">Inv.</th>
-                                <th className="center">Ext.</th>
-                                <th className="center">Ges.</th>
-                                <th>Observaciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {d.actividades.map((act: any, i: number) => (
-                                <tr key={i}>
-                                    <td>{act.integranteCatedra || '-'}</td>
-                                    <td className="center">{act.capacitacion ? '✓' : '-'}</td>
-                                    <td className="center">{act.investigacion ? '✓' : '-'}</td>
-                                    <td className="center">{act.extension ? '✓' : '-'}</td>
-                                    <td className="center">{act.gestion ? '✓' : '-'}</td>
-                                    <td>{act.observacionComentarios || '-'}</td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                    <div className="referencia">
-                        <em>Referencias: Cap.=Capacitación, Inv.=Investigación, Ext.=Extensión, Ges.=Gestión</em>
+                        {Object.entries(seccion.porcentajes_opciones || {}).map(([opcion, valor]: any) => (
+                            <div key={opcion} className="bar-chart-row">
+                                <div className="bar-label">{opcion}</div>
+                                <div className="bar-track">
+                                    <div className="bar-fill" style={{ width: `${valor}%` }}></div>
+                                </div>
+                                <div className="bar-value">{Math.round(valor)}%</div>
+                            </div>
+                        ))}
                     </div>
-                </div>
-            )}
-
-            {/* --- SECCIÓN DE FIRMAS --- */}
-            <div style={{ marginTop: '50px', paddingTop: '20px', borderTop: '1px solid #ccc', pageBreakInside: 'avoid' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                    <tbody>
-                        <tr>
-                            <td style={{ width: '50%', textAlign: 'center', border: 'none', padding: '30px 10px 10px 10px' }}>
-                                <div style={{ borderTop: '1px solid #000', width: '80%', margin: '0 auto', paddingTop: '5px', fontSize: '10pt' }}>
-                                    Firma Docente Responsable
-                                </div>
-                            </td>
-                            <td style={{ width: '50%', textAlign: 'center', border: 'none', padding: '30px 10px 10px 10px' }}>
-                                <div style={{ borderTop: '1px solid #000', width: '80%', margin: '0 auto', paddingTop: '5px', fontSize: '10pt' }}>
-                                    Recibido en Departamento
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+                ))}
+            </div>
+            <div style={{ border: '1px solid #999', padding: '10px', fontSize: '10pt', backgroundColor: '#f9f9f9' }}>
+                <strong>Observaciones sobre valores:</strong> {txt(data.opinionSobreResumen)}
             </div>
 
+            {/* 5. PROCESO ENSEÑANZA */}
+            <div className="section-header">5. PROCESO DE ENSEÑANZA-APRENDIZAJE</div>
+            <table className="full-width-table">
+                <tbody>
+                    <tr><th>Asp. Positivos (Enseñanza)</th><td colSpan={3}>{txt(data.aspectos_positivos_enseñanza)}</td></tr>
+                    <tr><th>Asp. Positivos (Aprendizaje)</th><td colSpan={3}>{txt(data.aspectos_positivos_aprendizaje)}</td></tr>
+                    <tr><th>Obstáculos (Enseñanza)</th><td colSpan={3}>{txt(data.obstaculos_enseñanza)}</td></tr>
+                    <tr><th>Obstáculos (Aprendizaje)</th><td colSpan={3}>{txt(data.obstaculos_aprendizaje)}</td></tr>
+                    <tr><th>Estrategias</th><td colSpan={3}>{txt(data.estrategias_a_implementar)}</td></tr>
+                    <tr><th>Reflexión Final</th><td colSpan={3}>{txt(data.resumen_reflexion)}</td></tr>
+                </tbody>
+            </table>
+
+            {/* 6. ACTIVIDADES */}
+            <div className="section-header">6. ACTIVIDADES DE CÁTEDRA</div>
+            <table className="full-width-table">
+                <thead>
+                    <tr>
+                        <th style={{width:'25%'}}>Integrante</th>
+                        <th className="center-text" style={{width:'10%'}}>Cap.</th>
+                        <th className="center-text" style={{width:'10%'}}>Inv.</th>
+                        <th className="center-text" style={{width:'10%'}}>Ext.</th>
+                        <th className="center-text" style={{width:'10%'}}>Ges.</th>
+                        <th>Observaciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {data.actividades && data.actividades.map((act: any, i: number) => (
+                        <tr key={i}>
+                            <td>{txt(act.integranteCatedra)}</td>
+                            <td className="center-text">{act.capacitacion ? 'X' : ''}</td>
+                            <td className="center-text">{act.investigacion ? 'X' : ''}</td>
+                            <td className="center-text">{act.extension ? 'X' : ''}</td>
+                            <td className="center-text">{act.gestion ? 'X' : ''}</td>
+                            <td>{txt(act.observacionComentarios)}</td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+
+            {/* 7. VALORACIÓN AUXILIARES */}
+            <div className="section-header">7. VALORACIÓN DE AUXILIARES</div>
+            <table className="full-width-table">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th className="center-text" style={{width:'15%'}}>Calif.</th>
+                        <th>Justificación</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {data.valoracion_auxiliares && data.valoracion_auxiliares.map((val: any, i: number) => (
+                        <tr key={i}>
+                            <td>{txt(val.nombre_auxiliar)}</td>
+                            <td className="center-text">{txt(val.calificacion)}</td>
+                            <td>{txt(val.justificacion)}</td>
+                        </tr>
+                    ))}
+                    {(!data.valoracion_auxiliares || data.valoracion_auxiliares.length === 0) && <tr><td colSpan={3}>No hay auxiliares registrados.</td></tr>}
+                </tbody>
+            </table>
+
+            {/* FIRMAS */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '60px', pageBreakInside: 'avoid' }}>
+                <div style={{ width: '40%', borderTop: '1px solid #000', textAlign: 'center', paddingTop: '5px' }}>
+                    Firma Docente Responsable
+                </div>
+                <div style={{ width: '40%', borderTop: '1px solid #000', textAlign: 'center', paddingTop: '5px' }}>
+                    Recibido en Departamento
+                </div>
+            </div>
         </div>
     );
 });
