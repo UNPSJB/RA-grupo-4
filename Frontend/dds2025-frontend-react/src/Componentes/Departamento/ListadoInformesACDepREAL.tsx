@@ -10,6 +10,7 @@ interface InformeAC {
   materia: Materia;
   docente: Docente;
   ciclo_lectivo?: string | number;
+  cuatrimestre?: "Primer Cuatrimestre" | "Segundo Cuatrimestre";
   [key: string]: any;
 }
 
@@ -23,8 +24,19 @@ const ListadoInformesACDepREAL: React.FC = () => {
   const [informeSeleccionado, setInformeSeleccionado] = useState<InformeAC | null>(null);
 
   // --- ESTADOS DEL FILTRO (SEPARADOS) ---
-  const [filtrosDraft, setFiltrosDraft] = useState({ id_docente: "", id_materia: "", anio: "" });
-  const [filtrosAplicados, setFiltrosAplicados] = useState({ id_docente: "", id_materia: "", anio: "" });
+  const [filtrosDraft, setFiltrosDraft] = useState({
+    id_docente: "",
+    id_materia: "",
+    ciclo_lectivo: "",
+    cuatrimestre: ""
+  });
+
+  const [filtrosAplicados, setFiltrosAplicados] = useState({
+    id_docente: "",
+    id_materia: "",
+    ciclo_lectivo: "",
+    cuatrimestre: ""
+  });
 
   // --- CARGA INICIAL ---
   useEffect(() => {
@@ -55,20 +67,20 @@ const ListadoInformesACDepREAL: React.FC = () => {
   };
 
   const limpiarFiltros = () => {
-    const filtroVacio = { id_docente: "", id_materia: "", anio: "" };
+    const filtroVacio = { id_docente: "", id_materia: "", ciclo_lectivo: "", cuatrimestre: "" };
     setFiltrosDraft(filtroVacio);
     setFiltrosAplicados(filtroVacio);
   };
 
-  // --- LÓGICA DE FILTRADO  ---
+  // --- LÓGICA DE FILTRADO ---
   const informesFiltrados = informes.filter(inf => {
-      const { id_docente, id_materia, anio } = filtrosAplicados;
-      const cumpleDocente = !id_docente || (inf.docente && String(inf.docente.id_docente) === id_docente);
-      const cumpleMateria = !id_materia || (inf.materia && String(inf.materia.id_materia) === id_materia);
-      const anioInforme = String(inf.ciclo_lectivo ?? inf.materia?.anio ?? "").toLowerCase();
-      const cumpleAnio = !anio || anioInforme.includes(anio.trim().toLowerCase());
+    const { id_docente, id_materia, ciclo_lectivo, cuatrimestre } = filtrosAplicados;
+    const cumpleDocente = !id_docente || (inf.docente && String(inf.docente.id_docente) === id_docente);
+    const cumpleMateria = !id_materia || (inf.materia && String(inf.materia.id_materia) === id_materia);
+    const cumpleCiclo = !ciclo_lectivo || String(inf.ciclo_lectivo ?? "").includes(ciclo_lectivo.trim());
+    const cumpleCuatrimestre = !cuatrimestre || inf.cuatrimestre === cuatrimestre;
 
-      return cumpleDocente && cumpleMateria && cumpleAnio;
+    return cumpleDocente && cumpleMateria && cumpleCiclo && cumpleCuatrimestre;
   });
 
   if (informeSeleccionado) return <VisualizarInformeACDep informe={informeSeleccionado} onVolver={() => setInformeSeleccionado(null)} />;
@@ -193,11 +205,19 @@ const ListadoInformesACDepREAL: React.FC = () => {
             </div>
             <div className="input-group">
               <label className="input-label">Ciclo Lectivo</label>
-              <input type="text" name="anio" className="uni-input" placeholder="Ej: 2025" value={filtrosDraft.anio} onChange={handleInputChange} />
+              <input type="text" name="ciclo_lectivo" className="uni-input" placeholder="Ej: 2025" value={filtrosDraft.ciclo_lectivo} onChange={handleInputChange} />
+            </div>
+            <div className="input-group">
+              <label className="input-label">Cuatrimestre</label>
+              <select name="cuatrimestre" className="uni-input" value={filtrosDraft.cuatrimestre} onChange={handleInputChange}>
+                <option value="">Todos</option>
+                <option value="Primer Cuatrimestre">Primer Cuatrimestre</option>
+                <option value="Segundo Cuatrimestre">Segundo Cuatrimestre</option>
+              </select>
             </div>
             <div className="filter-actions">
-                <button className="btn-filter" onClick={aplicarFiltros}>🔍 Filtrar</button>
-                <button className="btn-clear" onClick={limpiarFiltros}>✖ Limpiar</button>
+              <button className="btn-filter" onClick={aplicarFiltros}>🔍 Filtrar</button>
+              <button className="btn-clear" onClick={limpiarFiltros}>✖ Limpiar</button>
             </div>
           </div>
         </div>
@@ -222,9 +242,7 @@ const ListadoInformesACDepREAL: React.FC = () => {
                     {informesFiltrados.map(inf => (
                       <tr key={inf.id_informesAC} className="uni-tr">
                         <td className="uni-td"><span className="badge">#{inf.id_informesAC}</span></td>
-                        <td className="uni-td" style={{fontWeight: '600', color: 'var(--dark-blue-text)'}}>
-                            {inf.materia?.nombre || 'N/A'}
-                        </td>
+                        <td className="uni-td" style={{fontWeight: '600', color: 'var(--dark-blue-text)'}}>{inf.materia?.nombre || 'N/A'}</td>
                         <td className="uni-td">{inf.docente?.nombre || '-'}</td>
                         <td className="uni-td" style={{textAlign: 'center'}}>{inf.ciclo_lectivo || inf.materia?.anio || '-'}</td>
                         <td className="uni-td" style={{textAlign: 'center'}}>

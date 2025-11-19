@@ -10,7 +10,7 @@ const USE_DEBUG_DATA = true;
 const MOCK_INFORME_DATA: InformeSinteticoDetalle = {
   id: 999,
   descripcion: "[MODO PRUEBA] Informe Anual de Departamento",
-  anio: 2025,
+  ciclo_lectivo: 2025,
   periodo: "Anual",
   sede: "Puerto Madryn",
   integrantes: "Lic. Ana Turing, Dr. Alan Kay",
@@ -64,7 +64,7 @@ interface ValoracionMiembroItem {
 interface InformeSinteticoDetalle {
   id: number;
   descripcion: string;
-  anio: number;
+  ciclo_lectivo: number;
   periodo: string;
   sede: string;
   integrantes: string | null;
@@ -270,7 +270,7 @@ const PrevisualizarInformeSinteticoSec: React.FC = () => {
           <h1 className="doc-title">Informe Sintetico de Departamento</h1>
           <div className="doc-meta">
             {informe.departamento_nombre && <div><strong>Departamento:</strong> {informe.departamento_nombre}</div>}
-            <div><strong>Sede:</strong> {informe.sede} | <strong>Período:</strong> {informe.periodo} - {informe.anio}</div>
+            <div><strong>Sede:</strong> {informe.sede} | <strong>Período:</strong> {informe.periodo} - {informe.ciclo_lectivo}</div>
             <div><strong>ID Documento:</strong> #{informe.id}</div>
           </div>
         </div>

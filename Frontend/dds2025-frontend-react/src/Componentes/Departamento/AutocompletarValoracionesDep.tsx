@@ -81,15 +81,17 @@ const DocenteValoracionCard: React.FC<DocenteCardProps> = ({
 // =====================================================================
 interface AutocompletarValoracionesProps {
   departamentoId: number | null;
+  periodoId?: number; //  OPCIONAL
 }
 
-const AutocompletarValoracionesDep: React.FC<AutocompletarValoracionesProps> = ({ departamentoId }) => {
+const AutocompletarValoracionesDep: React.FC<AutocompletarValoracionesProps> = ({ departamentoId, periodoId}) => {
   const [miembros, setMiembros] = useState<ValoracionMiembro[]>([]);
   const [cargando, setCargando] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [materiaExpandida, setMateriaExpandida] = useState<string | null>(null);
 
-  const ANIO_EVALUADO = 2025;
+  const PERIODO_ID_DEFAULT = 2;   // PERIODO HARDCODEADO
+  const periodoFinal = periodoId ?? PERIODO_ID_DEFAULT;
   const MODO_LECTURA = true; // CAMBIAR A false PARA PROBAR EDICIÓN
 
   const fetchMiembros = useCallback(async () => {
@@ -98,7 +100,7 @@ const AutocompletarValoracionesDep: React.FC<AutocompletarValoracionesProps> = (
     setError(null);
     try {
       const response = await fetch(
-        `${API_BASE}/informes-sinteticos/preview/valoraciones-miembros?departamento_id=${departamentoId}&anio=${ANIO_EVALUADO}`
+        `${API_BASE}/informes-sinteticos/preview/valoraciones-miembros?departamento_id=${departamentoId}&periodo_id=${periodoFinal}`
       );
       if (!response.ok) throw new Error(`Error ${response.status}`);
       const data = await response.json();
@@ -109,7 +111,7 @@ const AutocompletarValoracionesDep: React.FC<AutocompletarValoracionesProps> = (
     } finally {
       setCargando(false);
     }
-  }, [departamentoId]);
+  }, [departamentoId, periodoFinal]);
 
   useEffect(() => { fetchMiembros(); }, [fetchMiembros]);
 

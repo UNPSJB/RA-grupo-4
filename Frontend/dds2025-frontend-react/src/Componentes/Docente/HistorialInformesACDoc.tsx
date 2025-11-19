@@ -10,7 +10,8 @@ interface Docente {
 interface Materia {
   id_materia: number;
   nombre: string;
-  anio: number;
+  ciclo_lectivo: number
+  cuatrimestre: string
   codigoMateria?: string;
 }
 
@@ -32,7 +33,7 @@ const HistorialInformesACDoc: React.FC = () => {
   const [informes, setInformes] = useState<InformeAC[]>([]);
   const [cargando, setCargando] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const navigate = useNavigate(); // --- MODIFICADO (ya lo tenías) ---
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchInformesCompletados = async () => {
@@ -64,7 +65,7 @@ const HistorialInformesACDoc: React.FC = () => {
   const handleSeleccionar = (id_informe: number) => {
     navigate(`/home/visualizar-informe/${id_informe}`);
   };
- 
+
 
   const styles = {
     container: {
@@ -165,6 +166,7 @@ const HistorialInformesACDoc: React.FC = () => {
               <th style={styles.th}>Materia</th>
               <th style={styles.th}>Código</th>
               <th style={styles.th}>Ciclo</th>
+              <th style={styles.th}>Cuatrimestre</th>
               <th style={styles.th}>Acción</th>
             </tr>
           </thead>
@@ -178,6 +180,7 @@ const HistorialInformesACDoc: React.FC = () => {
                 <td style={styles.td}>{inf.materia.nombre}</td>
                 <td style={styles.td}>{inf.materia.codigoMateria ?? '—'}</td>
                 <td style={styles.td}>{inf.ciclo_lectivo}</td>
+                <td style={styles.td}>{inf.materia.cuatrimestre}</td>
                 <td style={styles.td}>
 
                   <button 

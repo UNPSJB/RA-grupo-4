@@ -19,8 +19,6 @@ class InformeSintetico(ModeloBase):
 
     periodo_id: Mapped[int] = mapped_column(ForeignKey("periodos.id"))
     periodo: Mapped["Periodo"] = relationship("Periodo")
-    #anio: Mapped[int] = mapped_column(Integer)  #futuro periodo
-    #periodo: Mapped[str] = mapped_column(String, nullable=False)
     
     sede: Mapped[SedeEnum] = mapped_column(Enum(SedeEnum), nullable=False)
     integrantes: Mapped[str] = mapped_column(String, nullable=True)

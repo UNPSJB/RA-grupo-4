@@ -136,7 +136,7 @@ const FloatingNotification: React.FC<{
       <div style={{...styles.floatingNotification, borderTop: `6px solid ${colorPrincipal}`}}>
           <div style={styles.notificationHeader}>
             <div style={{ width: '35px', height: '35px', backgroundColor: colorFondoIcono, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-               <span style={{ fontSize: '20px', color: colorPrincipal }}>{icono}</span>
+              <span style={{ fontSize: '20px', color: colorPrincipal }}>{icono}</span>
             </div>
             <h3 style={{...styles.notificationTitle, color: colorPrincipal}}>{titulo}</h3>
             <button onClick={onClose} style={styles.closeButton} title="Cerrar notificación">×</button>
@@ -317,17 +317,17 @@ const GenerarInformeSinteticoDep: React.FC = () => {
 
                         <div style={styles.divider}></div>
                         <section style={styles.section}>
-                            <PorcentajesInformeSintetico departamentoId={datosInforme.departamento_id} anio={2025} />
+                            <PorcentajesInformeSintetico departamentoId={datosInforme.departamento_id} periodoId={2} />
                         </section>
 
                         <div style={styles.divider}></div>
                         <section style={styles.section}>
-                            <AspecPosObstaculosInformeSintetico departamentoId={datosInforme.departamento_id} anio={2025} />
+                            <AspecPosObstaculosInformeSintetico departamentoId={datosInforme.departamento_id} periodoId={2} />
                         </section>
 
                         <div style={styles.divider}></div>
                         <section style={styles.section}>
-                            <ConsignarDesarrolloDeActividadesDep departamentoId={datosInforme.departamento_id}/>
+                            <ConsignarDesarrolloDeActividadesDep departamentoId={datosInforme.departamento_id} periodoId={2}/>
                         </section>
 
                         <div style={styles.divider}></div>

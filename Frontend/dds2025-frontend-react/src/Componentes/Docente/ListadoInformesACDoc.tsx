@@ -3,10 +3,16 @@ import { useNavigate } from "react-router-dom";
 
 // --- INTERFACES ---
 // Ajustamos la interfaz para que coincida con lo que devuelve tu backend en /materias/listar
+interface Periodo {
+  id: number;
+  ciclo_lectivo: number;
+  cuatrimestre: string;
+
+}
 interface Materia {
   id_materia: number;
-  nombre: string;
-  anio: number;
+  nombre: string; 
+  periodo: Periodo;
   codigoMateria?: string;
   id_docente: number; // Necesario para saber si le corresponde a este docente
 }
@@ -15,13 +21,15 @@ interface Materia {
 interface InformeRealizado {
   id_informesAC: number;
   ciclo_lectivo: number | string;
+  cuatrimestre: string;
   materia: { id_materia: number };
 }
 
 const ListadoInformesACDoc: React.FC = () => {
   // Constantes de entorno
   const ID_DOCENTE_ACTUAL = 1; // Hardcodeado por ahora
-  const CICLO_LECTIVO_ACTUAL = new Date().getFullYear();
+  const CICLO_LECTIVO_ACTUAL = new Date().getFullYear();  // cambiar seguramente
+  const CUATRIMESTRE_ACTUAL = "Segundo";
   const API_BASE = "http://localhost:8000";
 
   // Estados
@@ -46,7 +54,7 @@ const ListadoInformesACDoc: React.FC = () => {
         ]);
 
         if (!resMaterias.ok || !resInformes.ok) {
-           throw new Error("Error al consultar los datos al servidor.");
+          throw new Error("Error al consultar los datos al servidor.");
         }
 
         const dataMaterias: Materia[] = await resMaterias.json();
@@ -73,9 +81,10 @@ const ListadoInformesACDoc: React.FC = () => {
   const materiasPendientes = materias.filter(materia => {
       // a. Verificar si corresponde al docente y año
       const correspondeDocente = materia.id_docente === ID_DOCENTE_ACTUAL;
-      const esAnioActual = Number(materia.anio) === CICLO_LECTIVO_ACTUAL;
+      const esCicloLectivoActual = Number(materia.periodo.ciclo_lectivo) === CICLO_LECTIVO_ACTUAL
+                                    && materia.periodo.cuatrimestre === CUATRIMESTRE_ACTUAL; //Habria que comparar por periodo
 
-      if (!correspondeDocente || !esAnioActual) return false;
+      if (!correspondeDocente || !esCicloLectivoActual) return false;
 
       // b. Verificar si YA ESTÁ HECHO
       const yaEstaHecho = informesHechos.some(inf => 
@@ -152,7 +161,8 @@ const ListadoInformesACDoc: React.FC = () => {
                 <tr>
                   <th style={styles.th}>Materia</th>
                   <th style={styles.th}>Código</th>
-                  <th style={styles.th}>Año</th>
+                  <th style={styles.th}>Ciclo Lectivo</th>
+                  <th style={styles.th}>Cuatrimestre</th>
                   <th style={styles.th}>Acción</th>
                 </tr>
               </thead>
@@ -166,7 +176,8 @@ const ListadoInformesACDoc: React.FC = () => {
                   >
                     <td style={{...styles.td, fontWeight: 500}}>{materia.nombre}</td>
                     <td style={styles.td}>{materia.codigoMateria ?? '—'}</td>
-                    <td style={styles.td}>{materia.anio}</td>
+                    <td style={styles.td}>{materia.periodo.ciclo_lectivo}</td>
+                    <td style={styles.td}>{materia.periodo.cuatrimestre}</td>
                     <td style={styles.td}>
                       <button style={styles.completeButton} className="btn-generar">
                         Generar Informe

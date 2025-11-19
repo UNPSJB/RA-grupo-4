@@ -10,6 +10,8 @@ import {
   Legend,
 } from "recharts";
 
+import SinDatos from "../Otros/SinDatos";
+
 interface ResumenSeccion {
   id: number;
   sigla: string;
@@ -31,7 +33,7 @@ interface InformeAC {
 
 interface Props {
   departamentoId: number;
-  anio: number;
+  periodoId: number;
 }
 
 const colores = [
@@ -46,7 +48,7 @@ const colores = [
 
 const SECCIONES_PERMITIDAS = ["B", "C", "D", "E-Teoria", "E-Practica"];
 
-const PorcentajesInformeSintetico: React.FC<Props> = ({ departamentoId, anio }) => {
+const PorcentajesInformeSintetico: React.FC<Props> = ({ departamentoId, periodoId }) => {
   const [informes, setInformes] = useState<InformeAC[]>([]);
   const [loading, setLoading] = useState(true);
   const [materiaExpandida, setMateriaExpandida] = useState<number | null>(null);
@@ -54,16 +56,16 @@ const PorcentajesInformeSintetico: React.FC<Props> = ({ departamentoId, anio }) 
   const fetchInformes = useCallback(async () => {
     try {
       const response = await fetch(
-        `http://localhost:8000/informes-sinteticos/departamento/${departamentoId}/periodo/${anio}/informesAC/porcentajes`
+        `http://localhost:8000/informes-sinteticos/departamento/${departamentoId}/periodo/${periodoId}/informesAC/porcentajes`
       );
       const data = await response.json();
-      setInformes(data);
+      setInformes(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error("Error al cargar informes:", error);
     } finally {
       setLoading(false);
     }
-  }, [departamentoId, anio]);
+  }, [departamentoId, periodoId]);
 
   useEffect(() => {
     fetchInformes();
@@ -72,11 +74,16 @@ const PorcentajesInformeSintetico: React.FC<Props> = ({ departamentoId, anio }) 
   const toggleMateria = (id: number) =>
     setMateriaExpandida((prev) => (prev === id ? null : id));
 
-  if (loading)
-    return <p style={{ color: "#003366" }}>Cargando informes...</p>;
-
-  if (!informes || informes.length === 0)
-    return <p style={{ color: "#003366" }}>No hay informes disponibles.</p>;
+  if (loading) {
+    return (
+      <div className="uni-wrapper">
+        <h2 className="uni-title">
+          Porcentajes de los Informes de Actividad Curricular
+        </h2>
+        <p style={{ color: "#003366" }}>Cargando informes...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="uni-wrapper">
@@ -186,7 +193,13 @@ const PorcentajesInformeSintetico: React.FC<Props> = ({ departamentoId, anio }) 
         Porcentajes de los Informes de Actividad Curricular
       </h2>
 
-      {informes.map((info) => {
+      {(!informes || informes.length === 0) && (
+        <SinDatos
+          mensaje="Todavía no se cargaron Informes de Actividad Curricular asociados al departamento en este período."
+        />
+      )}
+
+      {(informes ?? []).map((info) => {
         const isExpanded = materiaExpandida === info.id_informeAC;
         const seccionesFiltradas = info.resumenSecciones.filter((s) =>
           SECCIONES_PERMITIDAS.includes(s.sigla)

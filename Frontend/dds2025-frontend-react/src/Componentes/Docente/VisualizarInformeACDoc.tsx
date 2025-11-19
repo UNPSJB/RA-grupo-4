@@ -11,7 +11,7 @@ interface Materia {
   id_materia: number;
   nombre: string;
   codigoMateria: string;
-  anio: number; 
+  ciclo_lectivo: number; 
 }
 interface Docente {
   id_docente: number;

@@ -17,6 +17,7 @@ interface ActividadParaInformeRow {
 // 2️⃣ Interfaz de Props para el componente
 interface Props {
   departamentoId: number | null;
+  periodoId: number | null;
 }
 
 // 3️⃣ Auxiliar
@@ -35,12 +36,12 @@ function agruparPorMateria(registros: ActividadParaInformeRow[]) {
 }
 
 // 5️⃣ Componente principal
-const ConsignarDesarrolloDeActividadesDep: React.FC<Props> = ({ departamentoId }) => {
+const ConsignarDesarrolloDeActividadesDep: React.FC<Props> = ({ departamentoId, periodoId }) => {
   const [registros, setRegistros] = useState<ActividadParaInformeRow[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [isExpanded, setIsExpanded] = useState(true); // Estado para acordeón
-  const ANIO_EVALUADO = 2025; // Define el año, o pásalo como prop también
+  const PERIODO_ID_EVALUADO = 2;
 
   useEffect(() => {
     const fetchInformeActividades = async () => {
@@ -79,7 +80,7 @@ const ConsignarDesarrolloDeActividadesDep: React.FC<Props> = ({ departamentoId }
     };
 
     fetchInformeActividades();
-  }, [departamentoId, ANIO_EVALUADO]); // Dependencias del useEffect
+  }, [departamentoId, PERIODO_ID_EVALUADO]); // Dependencias del useEffect
 
   const registrosAgrupados = agruparPorMateria(registros);
   const codigosMaterias = Object.keys(registrosAgrupados);
