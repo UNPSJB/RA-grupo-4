@@ -22,7 +22,7 @@ const AlumnoDashboard = ({ estudianteId }) => {
                 </aside>
 
                 <div className="estadisticas-box card-box">
-                    <h2 className="stats-title"><BarChart3 size={20} /> Tus encuestas</h2>
+                    {/* <h2 className="stats-title"><BarChart3 size={20} /> Tus encuestas</h2> */}
                     <MiniEstadisticasEst estudianteId={estudianteId} />
                 </div>
             </div>
