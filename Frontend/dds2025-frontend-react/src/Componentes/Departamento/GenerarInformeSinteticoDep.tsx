@@ -166,7 +166,7 @@ const GenerarInformeSinteticoDep: React.FC = () => {
 
     const [datosInforme, setDatosInforme] = useState({
         departamento_id: 0,
-        periodo: "",
+        periodo: 2,
         sede: "",
         integrantes: "",
         comentarios: "",
@@ -203,7 +203,7 @@ const GenerarInformeSinteticoDep: React.FC = () => {
         setDatosInforme((prev) => ({ ...prev, departamento_id: id }));
     };
 
-    const handleCabeceraChange = (data: { periodo: string; sede: string; integrantes: string }) => {
+    const handleCabeceraChange = (data: { periodo: number; sede: string; integrantes: string }) => {
         setDatosInforme((prev) => ({
             ...prev,
             periodo: data.periodo,
@@ -317,17 +317,17 @@ const GenerarInformeSinteticoDep: React.FC = () => {
 
                         <div style={styles.divider}></div>
                         <section style={styles.section}>
-                            <PorcentajesInformeSintetico departamentoId={datosInforme.departamento_id} periodoId={2} />
+                            <PorcentajesInformeSintetico departamentoId={datosInforme.departamento_id} periodoId={datosInforme.periodo} />
                         </section>
 
                         <div style={styles.divider}></div>
                         <section style={styles.section}>
-                            <AspecPosObstaculosInformeSintetico departamentoId={datosInforme.departamento_id} periodoId={2} />
+                            <AspecPosObstaculosInformeSintetico departamentoId={datosInforme.departamento_id} periodoId={datosInforme.periodo} />
                         </section>
 
                         <div style={styles.divider}></div>
                         <section style={styles.section}>
-                            <ConsignarDesarrolloDeActividadesDep departamentoId={datosInforme.departamento_id} periodoId={2}/>
+                            <ConsignarDesarrolloDeActividadesDep departamentoId={datosInforme.departamento_id} periodoId={datosInforme.periodo}/>
                         </section>
 
                         <div style={styles.divider}></div>
