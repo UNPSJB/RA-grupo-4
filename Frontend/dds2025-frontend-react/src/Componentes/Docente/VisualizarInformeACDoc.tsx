@@ -68,7 +68,6 @@ const DataList: React.FC<DataListProps> = ({ label, items }) => (
     </div>
 );
 
-// --- COMPONENTE PRINCIPAL ---
 const VisualizarInformeACDoc: React.FC = () => {
     const { id_informe } = useParams<{ id_informe: string }>();
     const navigate = useNavigate();
@@ -76,14 +75,14 @@ const VisualizarInformeACDoc: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-    // Referencia al DIV contenedor
     const printRef = useRef<HTMLDivElement>(null); 
     const [isReady, setIsReady] = useState(false);
 
+    // Habilitar botón cuando cargue
     useEffect(() => {
-        // Verificamos que el informe exista y la ref esté asignada
-        if (informe && printRef.current) {
-            setIsReady(true);
+        if (informe) {
+            const timer = setTimeout(() => setIsReady(true), 1000);
+            return () => clearTimeout(timer);
         }
     }, [informe]);
 
@@ -99,10 +98,8 @@ const VisualizarInformeACDoc: React.FC = () => {
                 setLoading(true);
                 setError(null);
                 const response = await fetch(`${BASE_URL}/informesAC/${id_informe}`);
-                if (!response.ok) {
-                    throw new Error('No se pudo cargar el informe.');
-                }
-                const data: InformeACCompleto = await response.json();
+                if (!response.ok) throw new Error('No se pudo cargar el informe.');
+                const data = await response.json();
                 setInforme(data);
             } catch (err: any) {
                 setError(err.message);
@@ -122,184 +119,189 @@ const VisualizarInformeACDoc: React.FC = () => {
     ) || [];
 
     return (
-        <div style={styles.page}>
-
-            {/* BARRA SUPERIOR */}
-            <div style={styles.topBar}>
-                <button onClick={() => navigate(-1)} style={styles.backButton}>
-                    ⬅ Volver al Historial
-                </button>
-
-                <div style={{ fontSize: '16px', fontWeight: 'bold', color: '#333' }}>
-                    Vista Previa (Diseño Web)
-                </div>
-
-                <button 
-                    onClick={() => handlePrintFn()}
-                    disabled={!isReady}
-                    style={{
-                        ...styles.printButton,
-                        backgroundColor: isReady ? '#2e7d32' : '#999',
-                        cursor: isReady ? 'pointer' : 'wait'
-                    }}
-                >
-                    🖨️ Imprimir / PDF
-                </button>
-            </div>
-
-            {/* === VISTA WEB (VISIBLE) === */}
-            <div style={styles.container}> 
-                <HeaderInstitucional/>
-                <h2 style={styles.title}>Informe de Actividad Curricular</h2>
-
-                <div style={styles.section}>
-                    <h3 style={styles.sectionTitle}>1. Datos Generales</h3>
-                    <div style={styles.grid}>
-                        <DataField label="Actividad Curricular" value={informe.materia.nombre} />
-                        <DataField label="Código" value={informe.materia.codigoMateria} />
-                        <DataField label="Ciclo Lectivo" value={informe.ciclo_lectivo} />
-                        <DataField label="Docente Responsable" value={informe.docente.nombre} />
-                        <DataField label="Sede" value={informe.sede} />
-                        <DataField label="Cantidad de Alumnos Inscriptos" value={informe.cantidad_alumnos_inscriptos} />
-                        <DataField label="Comisiones Teóricas" value={informe.cantidad_comisiones_teoricas} />
-                        <DataField label="Comisiones Prácticas" value={informe.cantidad_comisiones_practicas} />
-                    </div>
-                </div>
-
-                <div style={styles.section}>
-                    <h3 style={styles.sectionTitle}>2. Necesidades (Opcional)</h3>
-                    <div style={styles.grid}>
-                        <DataList label="Equipamiento e Insumos" items={informe.necesidades_equipamiento} />
-                        <DataList label="Bibliografía" items={informe.necesidades_bibliografia} />
-                    </div>
-                </div>
-
-                <div style={styles.section}>
-                    <h3 style={styles.sectionTitle}>3. Porcentajes</h3>
-                    <div style={styles.grid}>
-                        <DataField label="% Clases Teóricas" value={`${informe.porcentaje_teoricas}%`} />
-                        <DataField label="% Clases Prácticas" value={`${informe.porcentaje_practicas}%`} />
-                        <DataField label="Justificación (Opcional)" value={informe.justificacion_porcentaje} />
-                        <DataField label="% Contenido Abordado" value={`${informe.porcentaje_contenido_abordado}%`} />
-                    </div>
-                </div>
-
-                <div style={styles.section}>
-                    <h3 style={styles.sectionTitle}>4. Resumen Valores de Encuesta</h3>
-                    <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "1rem", margin: "1rem 0" }}>
-                        {seccionesFiltradas.map((seccion) => (
-                            <div key={seccion.id} style={styles.chartBox}>
-                                <h4 style={styles.chartTitle}>{seccion.sigla} - {seccion.nombre}</h4>
-                                <ResponsiveContainer width="100%" height={250}>
-                                    <BarChart
-                                        data={Object.entries(seccion.porcentajes_opciones).map(([opcion, porcentaje]) => ({ opcion, porcentaje }))}
-                                        margin={{ top: 20, right: 10, left: 0, bottom: 70 }}
-                                    >
-                                        <XAxis dataKey="opcion" interval={0} angle={-45} textAnchor="end" height={80} tick={{ fontSize: 13 }} />
-                                        <YAxis domain={[0, 100]} tick={{ fontSize: 12 }} />
-                                        <Tooltip formatter={(value: any) => `${value}%`} />
-                                        <Bar dataKey="porcentaje" fill="#4f46e5" barSize={25}>
-                                            <LabelList dataKey="porcentaje" position="top" formatter={(value: any) => `${value}%`} />
-                                        </Bar>
-                                    </BarChart>
-                                </ResponsiveContainer>
-                            </div>
-                        ))}
-                    </div>
-                    <DataField label="Observaciones sobre valores" value={informe.opinionSobreResumen} />
-                </div>
-
-                <div style={styles.section}>
-                    <h3 style={styles.sectionTitle}>5. Proceso de Enseñanza-Aprendizaje</h3>
-                    <div style={styles.gridFullWidth}>
-                        <DataField label="Aspectos Positivos (Enseñanza)" value={informe.aspectos_positivos_enseñanza} />
-                        <DataField label="Aspectos Positivos (Aprendizaje)" value={informe.aspectos_positivos_aprendizaje} />
-                        <DataField label="Obstáculos (Enseñanza)" value={informe.obstaculos_enseñanza} />
-                        <DataField label="Obstáculos (Aprendizaje)" value={informe.obstaculos_aprendizaje} />
-                        <DataField label="Estrategias a Implementar" value={informe.estrategias_a_implementar} />
-                        <DataField label="Resumen y Reflexión" value={informe.resumen_reflexion} />
-                    </div>
-                </div>
-
-                <div style={styles.section}>
-                    <h3 style={styles.sectionTitle}>6. Actividades de Cátedra</h3>
-                    <div style={{overflowX: 'auto'}}>
-                        <table style={styles.table}>
-                            <thead>
-                                <tr>
-                                    <th style={styles.th}>Integrante</th>
-                                    <th style={styles.th}>Capacitación</th>
-                                    <th style={styles.th}>Investigación</th>
-                                    <th style={styles.th}>Extensión</th>
-                                    <th style={styles.th}>Gestión</th>
-                                    <th style={styles.th}>Observaciones</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {informe.actividades.map((act, index) => (
-                                    <tr key={index} style={index % 2 === 0 ? styles.rowBase : styles.rowAlt}>
-                                        <td style={styles.td}>{act.integranteCatedra}</td>
-                                        <td style={styles.td}>{act.capacitacion}</td>
-                                        <td style={styles.td}>{act.investigacion}</td>
-                                        <td style={styles.td}>{act.extension}</td>
-                                        <td style={styles.td}>{act.gestion}</td>
-                                        <td style={styles.td}>{act.observacionComentarios}</td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <div style={styles.section}>
-                    <h3 style={styles.sectionTitle}>7. Valoración de Auxiliares</h3>
-                    <div style={{overflowX: 'auto'}}>
-                        <table style={styles.table}>
-                            <thead>
-                                <tr>
-                                    <th style={styles.th}>Nombre Auxiliar</th>
-                                    <th style={styles.th}>Calificación</th>
-                                    <th style={styles.th}>Justificación</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {informe.valoracion_auxiliares.map((val, index) => (
-                                    <tr key={index} style={index % 2 === 0 ? styles.rowBase : styles.rowAlt}>
-                                        <td style={styles.td}>{val.nombre_auxiliar}</td>
-                                        <td style={styles.td}>{val.calificacion}</td>
-                                        <td style={styles.td}>{val.justificacion}</td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
+        <div style={styles.mainWrapper}>
             
-            {/* === VISTA OCULTA DE IMPRESIÓN === 
-                Usamos display: none. Esto es lo estándar.
-                Al estar el componente ya renderizado y la ref asignada,
-                react-to-print clonará este nodo y lo imprimirá completo.
+            {/* === SOLUCIÓN DE IMPRESIÓN === 
+               Este contenedor está al principio del flujo.
+               Tiene altura 0 y overflow hidden para no verse,
+               pero NO tiene position: absolute/fixed para no perder sus coordenadas.
             */}
-            <div style={{ display: "none" }}>
+            <div style={{ overflow: 'hidden', height: 0 }}>
                 <div ref={printRef}>
                     <InformeImprimible data={informe} />
                 </div>
             </div>
 
+            {/* === PÁGINA WEB VISIBLE === */}
+            <div style={styles.page}>
+
+                {/* BARRA SUPERIOR */}
+                <div style={styles.topBar}>
+                    <button onClick={() => navigate(-1)} style={styles.backButton}>
+                        ⬅ Volver al Historial
+                    </button>
+
+                    <div style={{ fontSize: '16px', fontWeight: 'bold', color: '#333' }}>
+                        Vista Previa (Diseño Web)
+                    </div>
+
+                    <button 
+                        onClick={() => handlePrintFn()}
+                        disabled={!isReady}
+                        style={{
+                            ...styles.printButton,
+                            backgroundColor: isReady ? '#2e7d32' : '#999',
+                            cursor: isReady ? 'pointer' : 'wait'
+                        }}
+                    >
+                        🖨️ Imprimir / PDF
+                    </button>
+                </div>
+
+                {/* CONTENIDO VISUAL */}
+                <div style={styles.container}> 
+                    <HeaderInstitucional/>
+                    <h2 style={styles.title}>Informe de Actividad Curricular</h2>
+
+                    <div style={styles.section}>
+                        <h3 style={styles.sectionTitle}>1. Datos Generales</h3>
+                        <div style={styles.grid}>
+                            <DataField label="Actividad Curricular" value={informe.materia.nombre} />
+                            <DataField label="Código" value={informe.materia.codigoMateria} />
+                            <DataField label="Ciclo Lectivo" value={informe.ciclo_lectivo} />
+                            <DataField label="Docente Responsable" value={informe.docente.nombre} />
+                            <DataField label="Sede" value={informe.sede} />
+                            <DataField label="Cantidad de Alumnos Inscriptos" value={informe.cantidad_alumnos_inscriptos} />
+                            <DataField label="Comisiones Teóricas" value={informe.cantidad_comisiones_teoricas} />
+                            <DataField label="Comisiones Prácticas" value={informe.cantidad_comisiones_practicas} />
+                        </div>
+                    </div>
+
+                    <div style={styles.section}>
+                        <h3 style={styles.sectionTitle}>2. Necesidades (Opcional)</h3>
+                        <div style={styles.grid}>
+                            <DataList label="Equipamiento e Insumos" items={informe.necesidades_equipamiento} />
+                            <DataList label="Bibliografía" items={informe.necesidades_bibliografia} />
+                        </div>
+                    </div>
+
+                    <div style={styles.section}>
+                        <h3 style={styles.sectionTitle}>3. Porcentajes</h3>
+                        <div style={styles.grid}>
+                            <DataField label="% Clases Teóricas" value={`${informe.porcentaje_teoricas}%`} />
+                            <DataField label="% Clases Prácticas" value={`${informe.porcentaje_practicas}%`} />
+                            <DataField label="Justificación (Opcional)" value={informe.justificacion_porcentaje} />
+                            <DataField label="% Contenido Abordado" value={`${informe.porcentaje_contenido_abordado}%`} />
+                        </div>
+                    </div>
+
+                    <div style={styles.section}>
+                        <h3 style={styles.sectionTitle}>4. Resumen Valores de Encuesta</h3>
+                        <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "1rem", margin: "1rem 0" }}>
+                            {seccionesFiltradas.map((seccion) => (
+                                <div key={seccion.id} style={styles.chartBox}>
+                                    <h4 style={styles.chartTitle}>{seccion.sigla} - {seccion.nombre}</h4>
+                                    <ResponsiveContainer width="100%" height={250}>
+                                        <BarChart
+                                            data={Object.entries(seccion.porcentajes_opciones).map(([opcion, porcentaje]) => ({ opcion, porcentaje }))}
+                                            margin={{ top: 20, right: 10, left: 0, bottom: 70 }}
+                                        >
+                                            <XAxis dataKey="opcion" interval={0} angle={-45} textAnchor="end" height={80} tick={{ fontSize: 13 }} />
+                                            <YAxis domain={[0, 100]} tick={{ fontSize: 12 }} />
+                                            <Tooltip formatter={(value: any) => `${value}%`} />
+                                            <Bar dataKey="porcentaje" fill="#4f46e5" barSize={25}>
+                                                <LabelList dataKey="porcentaje" position="top" formatter={(value: any) => `${value}%`} />
+                                            </Bar>
+                                        </BarChart>
+                                    </ResponsiveContainer>
+                                </div>
+                            ))}
+                        </div>
+                        <DataField label="Observaciones sobre valores" value={informe.opinionSobreResumen} />
+                    </div>
+
+                    <div style={styles.section}>
+                        <h3 style={styles.sectionTitle}>5. Proceso de Enseñanza-Aprendizaje</h3>
+                        <div style={styles.gridFullWidth}>
+                            <DataField label="Aspectos Positivos (Enseñanza)" value={informe.aspectos_positivos_enseñanza} />
+                            <DataField label="Aspectos Positivos (Aprendizaje)" value={informe.aspectos_positivos_aprendizaje} />
+                            <DataField label="Obstáculos (Enseñanza)" value={informe.obstaculos_enseñanza} />
+                            <DataField label="Obstáculos (Aprendizaje)" value={informe.obstaculos_aprendizaje} />
+                            <DataField label="Estrategias a Implementar" value={informe.estrategias_a_implementar} />
+                            <DataField label="Resumen y Reflexión" value={informe.resumen_reflexion} />
+                        </div>
+                    </div>
+
+                    <div style={styles.section}>
+                        <h3 style={styles.sectionTitle}>6. Actividades de Cátedra</h3>
+                        <div style={{overflowX: 'auto'}}>
+                            <table style={styles.table}>
+                                <thead>
+                                    <tr>
+                                        <th style={styles.th}>Integrante</th>
+                                        <th style={styles.th}>Capacitación</th>
+                                        <th style={styles.th}>Investigación</th>
+                                        <th style={styles.th}>Extensión</th>
+                                        <th style={styles.th}>Gestión</th>
+                                        <th style={styles.th}>Observaciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {informe.actividades.map((act, index) => (
+                                        <tr key={index} style={index % 2 === 0 ? styles.rowBase : styles.rowAlt}>
+                                            <td style={styles.td}>{act.integranteCatedra}</td>
+                                            <td style={styles.td}>{act.capacitacion}</td>
+                                            <td style={styles.td}>{act.investigacion}</td>
+                                            <td style={styles.td}>{act.extension}</td>
+                                            <td style={styles.td}>{act.gestion}</td>
+                                            <td style={styles.td}>{act.observacionComentarios}</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div style={styles.section}>
+                        <h3 style={styles.sectionTitle}>7. Valoración de Auxiliares</h3>
+                        <div style={{overflowX: 'auto'}}>
+                            <table style={styles.table}>
+                                <thead>
+                                    <tr>
+                                        <th style={styles.th}>Nombre Auxiliar</th>
+                                        <th style={styles.th}>Calificación</th>
+                                        <th style={styles.th}>Justificación</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {informe.valoracion_auxiliares.map((val, index) => (
+                                        <tr key={index} style={index % 2 === 0 ? styles.rowBase : styles.rowAlt}>
+                                            <td style={styles.td}>{val.nombre_auxiliar}</td>
+                                            <td style={styles.td}>{val.calificacion}</td>
+                                            <td style={styles.td}>{val.justificacion}</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     );
 };
 
-// --- ESTILOS (Sin cambios) ---
+// --- ESTILOS ---
 const styles: { [key: string]: React.CSSProperties } = {
-    page: {
+    mainWrapper: {
+        width: '100%',
+        minHeight: '100vh',
         backgroundColor: '#f4f7f6',
+    },
+    page: {
         padding: '30px 20px',
         minHeight: '100vh',
         fontFamily: '"Segoe UI", "Roboto", sans-serif',
-        position: 'relative',
-        overflowX: 'hidden',
     },
     loadingContainer: {
         display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh',
