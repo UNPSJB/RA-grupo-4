@@ -105,17 +105,25 @@ def listar_docentes_estadisticas(db: Session):
                 int(x["periodo"].split("-")[1].replace("C", ""))         # cuatri
             )
         )
+        
+        # Redondear promedios por periodo
+        for vp in valoracion_periodos:
+            if vp["promedio"] is not None:
+                vp["promedio"] = round(vp["promedio"], 2)
 
+        primer_periodo_dictado = (
+            valoracion_periodos[0]["periodo"] if valoracion_periodos else None
+        )
+        
         ultimo_periodo_dictado = (
             valoracion_periodos[-1]["periodo"] if valoracion_periodos else None
         )
-
         promedio_ultimo_periodo = (
-            valoracion_periodos[-1]["promedio"] if valoracion_periodos else None
+            round(valoracion_periodos[-1]["promedio"], 2) if valoracion_periodos else None
         )
 
         promedio_general = (
-            sum(todos_los_valores) / len(todos_los_valores)
+            round(sum(todos_los_valores) / len(todos_los_valores), 2)
             if todos_los_valores else None
         )
 
@@ -124,6 +132,7 @@ def listar_docentes_estadisticas(db: Session):
             "nombre": docente.nombre,
             "nroLegajo": docente.nroLegajo,
             "cantidadMateriasDictadas": cantidad_materias,
+            "primerPeriodoDictado": primer_periodo_dictado,
             "ultimoPeriodoDictado": ultimo_periodo_dictado,
             "promedioUltimoPeriodo": promedio_ultimo_periodo,
             "promedioGeneral": promedio_general,

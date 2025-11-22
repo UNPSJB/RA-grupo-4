@@ -27,9 +27,12 @@ class DocenteEstadisticaPromedio(BaseModel):
     nroLegajo: int
 
     cantidadMateriasDictadas: int
+    
+    primerPeriodoDictado: Optional[str]
+    
     ultimoPeriodoDictado: Optional[str]
-
     promedioUltimoPeriodo: Optional[float]
+
     promedioGeneral: Optional[float]
 
     promedioPeriodos: List[PromedioPeriodo]
