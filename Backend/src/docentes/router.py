@@ -11,3 +11,6 @@ router = APIRouter(prefix="/docentes", tags=["Docentes"])
 def listar_docentes(db: Session = Depends(get_db)):
     return services.get_all_docentes(db=db)
 
+@router.get("/estadisticas", response_model=List[schemas.DocenteEstadisticaPromedio])
+def estadisticas_promedio_docentes(db: Session = Depends(get_db)):
+    return services.listar_docentes_estadisticas(db=db)

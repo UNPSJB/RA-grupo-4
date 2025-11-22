@@ -18,7 +18,7 @@ class Materias(ModeloBase):
     carrera: Mapped["Carreras"] = relationship("Carreras", back_populates="materias")
 
     id_docente: Mapped[int] = mapped_column(ForeignKey("docentes.id_docente"), nullable=False)
-    docente: Mapped["Docentes"] = relationship("Docentes", back_populates="Materias")
+    docente: Mapped["Docentes"] = relationship("Docentes", back_populates="materias")
 
     id_departamento: Mapped[int] = mapped_column(ForeignKey("departamentos.id"), nullable=False)
     departamento: Mapped["Departamento"] = relationship(

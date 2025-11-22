@@ -83,15 +83,6 @@ def preview_auxiliares(
     """Nuevo endpoint para recuperar auxiliares cargados por docentes."""
     return services.obtener_auxiliares_periodo(db, departamento_id, periodo_id)
 
-@router.get("/{informe_id}", response_model=schemas.InformeSinteticoDetail)
-def obtener_informe_sintetico(informe_id: int, db: Session = Depends(get_db)) -> Any:
-    informe = services.obtener_informe_sintetico(db, informe_id)
-    if not informe:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, 
-            detail=f"Informe Sintético con id {informe_id} no encontrado"
-        )
-    return informe
 # =========================================
 # === ENDPOINTS DE AUTOCOMPLETADO (POST) ===
 # Para guardar datos en un informe YA CREADO
