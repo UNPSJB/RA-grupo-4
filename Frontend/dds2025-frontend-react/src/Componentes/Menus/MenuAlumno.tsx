@@ -1,10 +1,12 @@
 import React from 'react';
 import { Routes, Route, NavLink, useNavigate } from 'react-router-dom';
-import { ArrowLeft, FileText, List, BookOpen, Clock, Hand, BarChart3 } from 'lucide-react'; 
+import { ArrowLeft, FileText, List, BookOpen, Clock, Hand } from 'lucide-react'; 
 import MiniEstadisticasEst from '../Estudiante/MiniEstadisticasEst';
 import SeleccionarEncuestas from '../Estudiante/SeleccionarEncuestas';
 import ResponderEncuesta from '../Estudiante/ResponderEncuesta';
 import SinDatos from '../Otros/SinDatos';
+import HistorialEncuestasRealizadasEstudiante from '../Estudiante/HistorialEncuestasRealizadasEstudiante';
+import MisMaterias from '../Estudiante/MisMaterias';
 import './MenuAlumno.css'; 
 
 // --- Componente Dashboard Principal ---
@@ -22,7 +24,6 @@ const AlumnoDashboard = ({ estudianteId }) => {
                 </aside>
 
                 <div className="estadisticas-box card-box">
-                    {/* <h2 className="stats-title"><BarChart3 size={20} /> Tus encuestas</h2> */}
                     <MiniEstadisticasEst estudianteId={estudianteId} />
                 </div>
             </div>
@@ -40,7 +41,7 @@ const AlumnoDashboard = ({ estudianteId }) => {
                     <div className="nav-card card-blue" onClick={() => navigate("mis-materias")}>
                         <BookOpen size={36} />
                         <h3>Mis Materias</h3>
-                        <p>Consulta el listado de asignaturas en las que estás inscrito.</p>
+                        <p>Consulta el listado de asignaturas.</p>
                     </div>
                     <div className="nav-card card-yellow" onClick={() => navigate("historial-encuestas")}>
                         <Clock size={36} />
@@ -59,7 +60,7 @@ const AlumnoDashboard = ({ estudianteId }) => {
 };
 
 const MenuAlumno = () => {
-    const estudianteId = 1;
+    const estudianteId = 1; 
 
     return (
         <div className="menu-alumno-layout-full">
@@ -79,8 +80,12 @@ const MenuAlumno = () => {
                     
                     <Route path="responder-encuesta/:inscripcionId" element={<ResponderEncuesta />} />
                     
-                    <Route path="historial-encuestas" element={<SinDatos titulo="Historial de Encuestas" />} />
-                    <Route path="mis-materias" element={<SinDatos titulo="Mis Materias" />} />
+                    {/* Historial de Encuestas (Mis Respuestas) */}
+                    <Route path="historial-encuestas" element={<HistorialEncuestasRealizadasEstudiante />} />
+                    
+                    {/* Mis Materias (Gráficos de Participación) */}
+                    <Route path="mis-materias" element={<MisMaterias />} />
+                    
                     <Route path="recursos-extra" element={<SinDatos titulo="Recursos Adicionales" />} />
                 </Routes>
             </main>
