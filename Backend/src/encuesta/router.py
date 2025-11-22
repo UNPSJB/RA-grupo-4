@@ -40,6 +40,13 @@ def agrega_seccion_a_encuesta(id_encuesta: int, seccion: SchemaSeccion, db: Sess
 def seleccionar_encuestas_disponibles(estudiante_id: int, db: Session = Depends(get_db)):
     return services.get_encuestas_disponibles_por_estudiante(db, estudiante_id)
 
+@router.get("/estudiantes/{estudiante_id}/historial")
+def get_historial_estudiante(estudiante_id: int, db: Session = Depends(get_db)):
+    return services.obtener_historial_materias_estudiante(db, estudiante_id)
+
+@router.get("/estudiantes/{estudiante_id}/respuestas/materia/{materia_id}", response_model=schemas.HistorialDetalle)
+def get_mis_respuestas(estudiante_id: int, materia_id: int, db: Session = Depends(get_db)):
+    return services.obtener_respuestas_alumno(db, estudiante_id, materia_id)
 
 @router.get("/estadisticas/materia/{materia_id}", response_model=schemas.MateriaEstadisticas)
 def get_estadisticas_docente(materia_id: int, db: Session = Depends(get_db)):
@@ -48,11 +55,3 @@ def get_estadisticas_docente(materia_id: int, db: Session = Depends(get_db)):
 @router.get("/estadisticas/materia/{materia_id}/publica", response_model=schemas.MateriaEstadisticas)
 def get_estadisticas_alumno(materia_id: int, db: Session = Depends(get_db)):
     return services.obtener_estadisticas_alumno(db, materia_id)
-
-@router.get("/estudiantes/{estudiante_id}/historial")
-def get_historial_estudiante(estudiante_id: int, db: Session = Depends(get_db)):
-    return services.obtener_historial_materias_estudiante(db, estudiante_id)
-
-@router.get("/estudiantes/{estudiante_id}/respuestas/materia/{materia_id}", response_model=schemas.HistorialDetalle)
-def get_mis_respuestas(estudiante_id: int, materia_id: int, db: Session = Depends(get_db)):
-    return services.obtener_respuestas_alumno(db, estudiante_id, materia_id)

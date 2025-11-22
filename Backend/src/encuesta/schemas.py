@@ -29,9 +29,9 @@ class EncuestaDisponible(BaseModel):
     disponible: bool
     materia_id: int
     materia_nombre: str 
+    inscripcion_id: int 
     model_config = {"from_attributes": True}
 
-# --- CLASES PARA ESTADÍSTICAS ---
 class OpcionRespuestaStat(BaseModel):
     descripcion: str
     cantidad: int
@@ -64,9 +64,9 @@ class PreguntaDetalle(BaseModel):
     id: int
     enunciado: str
     tipo_pregunta: str
-    opciones: List[OpcionRespuestaDetalle] = [] 
-    respuesta_seleccionada_id: Optional[int] = None 
-    respuesta_texto: Optional[str] = None # El texto que escribió
+    opciones: List[OpcionRespuestaDetalle] = []
+    respuesta_seleccionada_id: Optional[int] = None
+    respuesta_texto: Optional[str] = None
 
 class SeccionDetalle(BaseModel):
     id: int

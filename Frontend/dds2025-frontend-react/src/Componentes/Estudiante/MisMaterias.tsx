@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { BookOpen, AlertCircle } from "lucide-react";
-import EstadisticasAlumno from "./EstadisticasAlumno"; // Asegúrate de que este componente exista
+import EstadisticasAlumno from "./EstadisticasAlumno"; 
 
 type MateriaHistorial = {
     id: number;
@@ -50,11 +50,11 @@ const MisMaterias: React.FC = () => {
                             <div style={{ fontSize: "13px", color: "#666", marginTop: '5px' }}>Año: {materia.anio} • Cód: {materia.codigo}</div>
                         </div>
 
-                        {/* Cuerpo Tarjeta: GRÁFICO AQUÍ */}
+                        {/* Cuerpo Tarjeta */}
                         <div style={{ padding: "20px", flexGrow: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                             <div>
                                 <h4 style={{ margin: '0 0 10px 0', color: '#555', fontSize: '0.9rem', textAlign: 'center' }}>Participación General</h4>
-                                {/* El gráfico de torta */}
+                                {/* El gráfico */}
                                 <EstadisticasAlumno materiaId={materia.id} />
                             </div>
                             

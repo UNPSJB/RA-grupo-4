@@ -2,7 +2,6 @@ from typing import List, Dict, Any
 from sqlalchemy import delete, select, update, distinct
 from sqlalchemy.orm import Session
 from fastapi import HTTPException 
-
 from src.encuesta.models import Encuesta
 from src.encuesta import schemas, exceptions
 from src.preguntas.schemas import PreguntaCreate, Pregunta as PreguntaSchema 
@@ -82,7 +81,8 @@ def get_encuestas_disponibles_por_estudiante(db: Session, estudiante_id: int) ->
         })
     return resultados
 
-# --- ESTADÍSTICAS ---
+# --- ESTADÍSTICAS E HISTORIAL ---
+
 def obtener_estadisticas_materia(db: Session, materia_id: int, incluir_comentarios: bool) -> schemas.MateriaEstadisticas:
     materia = db.scalar(select(Materias).where(Materias.id_materia == materia_id))
     if not materia:
@@ -100,7 +100,7 @@ def obtener_estadisticas_materia(db: Session, materia_id: int, incluir_comentari
             for pregunta in seccion.preguntas:
                 stats = {"pregunta_id": pregunta.id, "enunciado": pregunta.enunciado, "opciones": [], "respuestas_abiertas": []}
                 
-                if incluir_comentarios: # Solo procesamos detalle si es necesario
+                if incluir_comentarios: 
                     if pregunta.opciones_respuestas:
                         total = db.query(Respuesta).join(Inscripciones).filter(Inscripciones.materia_id == materia_id, Respuesta.pregunta_id == pregunta.id, Respuesta.opcion_respuesta_id != None).count()
                         for op in pregunta.opciones_respuestas:
@@ -112,7 +112,15 @@ def obtener_estadisticas_materia(db: Session, materia_id: int, incluir_comentari
                     stats["respuestas_abiertas"] = [r.respuesta_abierta for r in txts if r.respuesta_abierta]
 
                 preguntas_stats.append(stats)
-            secciones_stats.append({"seccion_id": seccion.id, "sigla": "", "descripcion": seccion.enunciado or "Sección", "preguntas": preguntas_stats})
+            
+            descripcion_seccion = getattr(seccion, 'nombre', getattr(seccion, 'enunciado', 'Sección'))
+            
+            secciones_stats.append({
+                "seccion_id": seccion.id, 
+                "sigla": "", 
+                "descripcion": descripcion_seccion, 
+                "preguntas": preguntas_stats
+            })
 
     return schemas.MateriaEstadisticas(
         materia_id=materia.id_materia, nombre_materia=materia.nombre,
@@ -126,9 +134,7 @@ def obtener_estadisticas_alumno(db: Session, materia_id: int):
     return obtener_estadisticas_materia(db, materia_id, incluir_comentarios=False)
 
 def obtener_historial_materias_estudiante(db: Session, estudiante_id: int):
-    inscripciones = db.query(Inscripciones).filter(
-        Inscripciones.estudiante_id == estudiante_id
-    ).all()
+    inscripciones = db.query(Inscripciones).filter(Inscripciones.estudiante_id == estudiante_id).all()
     
     materias = []
     for insc in inscripciones:
@@ -145,7 +151,6 @@ def obtener_historial_materias_estudiante(db: Session, estudiante_id: int):
             })
     return materias
 
-# --- OBTENER ESTRUCTURA COMPLETA CON RESPUESTAS ---
 def obtener_respuestas_alumno(db: Session, estudiante_id: int, materia_id: int) -> schemas.HistorialDetalle:
     inscripcion = db.query(Inscripciones).filter(
         Inscripciones.estudiante_id == estudiante_id, Inscripciones.materia_id == materia_id
@@ -159,8 +164,6 @@ def obtener_respuestas_alumno(db: Session, estudiante_id: int, materia_id: int) 
          raise HTTPException(status_code=404, detail="Encuesta no encontrada")
     
     encuesta = materia.encuesta
-    
-    # Traemos las respuestas existentes
     respuestas_db = db.query(Respuesta).filter(Respuesta.inscripcion_id == inscripcion.id).all()
     respuestas_map = {r.pregunta_id: r for r in respuestas_db}
 
@@ -176,19 +179,23 @@ def obtener_respuestas_alumno(db: Session, estudiante_id: int, materia_id: int) 
             
             seleccionada_id = resp.opcion_respuesta_id if resp else None
             texto = resp.respuesta_abierta if resp else None
+            
+            tipo_str = str(pregunta.tipo.value) if hasattr(pregunta.tipo, 'value') else str(pregunta.tipo)
 
             preguntas_list.append({
                 "id": pregunta.id,
                 "enunciado": pregunta.enunciado,
-                "tipo_pregunta": str(pregunta.tipo.value) if hasattr(pregunta.tipo, 'value') else str(pregunta.tipo),
+                "tipo_pregunta": tipo_str,
                 "opciones": opciones_list,
                 "respuesta_seleccionada_id": seleccionada_id,
                 "respuesta_texto": texto
             })
 
+        titulo_seccion = getattr(seccion, 'nombre', getattr(seccion, 'enunciado', 'Sección'))
+
         secciones_list.append({
             "id": seccion.id,
-            "enunciado": seccion.enunciado,
+            "enunciado": titulo_seccion,
             "preguntas": preguntas_list
         })
 
