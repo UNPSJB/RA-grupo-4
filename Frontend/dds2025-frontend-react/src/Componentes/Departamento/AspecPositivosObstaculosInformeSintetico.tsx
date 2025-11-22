@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback, useMemo } from "react";
-
+import SinDatos from "../Otros/SinDatos"; 
 interface InformeACParaInformeSintetico {
   id_informeAC: number;
   codigoMateria: string;
@@ -13,22 +13,24 @@ interface InformeACParaInformeSintetico {
 
 interface Props {
   departamentoId: number;
-  anio: number;
+  periodoId: number;
 }
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
-const AspecPosObstaculosInformeSintetico: React.FC<Props> = ({ departamentoId, anio }) => {
+const AspecPosObstaculosInformeSintetico: React.FC<Props> = ({ departamentoId, periodoId }) => {
   const [informes, setInformes] = useState<InformeACParaInformeSintetico[]>([]);
   const [cargando, setCargando] = useState(false);
   const [materiaExpandida, setMateriaExpandida] = useState<string | null>(null);
 
   const fetchInformes = useCallback(async () => {
-    if (!departamentoId) return;
+
+    if (!departamentoId || !periodoId) return;
+    
     setCargando(true);
     try {
       const res = await fetch(
-        `${API_BASE}/informes-sinteticos/departamento/${departamentoId}/periodo/${anio}/informesAC/aspectosPositivosObstaculos`
+        `${API_BASE}/informes-sinteticos/departamento/${departamentoId}/periodo/${periodoId}/informesAC/aspectosPositivosObstaculos`
       );
       if (!res.ok) throw new Error("Error al obtener los informes.");
       const data = await res.json();
@@ -39,7 +41,7 @@ const AspecPosObstaculosInformeSintetico: React.FC<Props> = ({ departamentoId, a
     } finally {
       setCargando(false);
     }
-  }, [departamentoId, anio]);
+  }, [departamentoId, periodoId]); 
 
   useEffect(() => {
     fetchInformes();
@@ -193,19 +195,7 @@ const AspecPosObstaculosInformeSintetico: React.FC<Props> = ({ departamentoId, a
       {cargando ? (
         <div style={{ textAlign: "center", padding: "30px" }}>Cargando...</div>
       ) : materiasAgrupadas.length === 0 ? (
-        <div
-          style={{
-            padding: "40px",
-            textAlign: "center",
-            color: "#666",
-            backgroundColor: "#fff",
-            borderRadius: "12px",
-            border: "2px dashed #ccc",
-          }}
-        >
-          <div style={{ fontSize: "2rem", marginBottom: "10px" }}>📘</div>
-          <p>No hay informes disponibles para el año {anio}.</p>
-        </div>
+        <SinDatos mensaje={`No hay informes disponibles para el periodo.`} />
       ) : (
         <div>
           {materiasAgrupadas.map((materia) => {

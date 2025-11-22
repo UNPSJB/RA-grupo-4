@@ -18,6 +18,7 @@ def listar_todos_los_informes(db: Session = Depends(get_db)):
 def filtrado_informes_ac(
     id_docente: int | None = Query(None, description="ID del docente"),
     id_materia: int | None = Query(None, description="ID de la materia"),
+    id_periodo: int | None = Query(None, description="ID del periodo"),
     db: Session = Depends(get_db)
 ):
     
@@ -25,6 +26,7 @@ def filtrado_informes_ac(
         db=db,
         id_docente=id_docente,
         id_materia=id_materia,
+        id_periodo=id_periodo,
     )
     return informes
 
@@ -34,6 +36,7 @@ def listar_informes_por_docente(id_docente: int, db: Session = Depends(get_db)):
         db=db,
         id_docente=id_docente,
         id_materia=None,
+        id_periodo=None,
     )
     if not informes:
         return []

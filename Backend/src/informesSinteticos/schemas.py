@@ -2,6 +2,7 @@ from __future__ import annotations
 from pydantic import BaseModel, field_validator, ConfigDict
 from typing import Optional, List, Dict, Any
 from enum import Enum
+from src.periodos.schemas import Periodo as PeriodoSchema
 
 class SedeEnum(str, Enum):
     trelew = "Trelew"
@@ -11,8 +12,8 @@ class SedeEnum(str, Enum):
 
 class InformeSinteticoBase(BaseModel):
     descripcion: str
-    anio: int
-    periodo: str
+    periodo_id: int
+    periodo: PeriodoSchema
     sede: SedeEnum
     integrantes: Optional[str] = None
     departamento_id: int
@@ -21,7 +22,7 @@ class InformeSinteticoBase(BaseModel):
     resumen_general: Optional[List[Dict[str, Any]]] = None
     resumen_necesidades: Optional[List[Dict[str, Any]]] = None
     valoracion_miembros: Optional[List[Dict[str, Any]]] = None
-   #observaciones_actividades: Optional[List[Dict[str, Any]]] = None
+    #observaciones_actividades: Optional[List[Dict[str, Any]]] = None
 
 class InformeSinteticoCreate(InformeSinteticoBase):
     pass
@@ -33,7 +34,9 @@ class InformeSintetico(InformeSinteticoBase):
 #class InformeSintetico(BaseModel):
     id: int
     descripcion: str
-    periodo: str
+    periodo_id: int
+    periodo: PeriodoSchema
+    #periodo: str
     sede: SedeEnum
     integrantes: str
     departamento_id: int
@@ -81,17 +84,13 @@ class InformeSinteticoActividades(BaseModel):
     """
     registros: List[ActividadParaInformeRow]
 
-# --- CORRECCIÓN IMPORTACIÓN CIRCULAR ---
-from src.departamentos.schemas import Departamento 
-
-InformeSintetico.model_rebuild()
 
 #schema para previzualizacion
 class InformeSinteticoDetail(BaseModel):
     id: int
     descripcion: str
-    anio: int
-    periodo: str
+    periodo_id: int
+    periodo: PeriodoSchema
     sede: SedeEnum
     integrantes: Optional[str] = None
     departamento_id: int
@@ -105,3 +104,10 @@ class InformeSinteticoDetail(BaseModel):
     # Si tienes más campos JSON, agrégalos aquí
 
     model_config = ConfigDict(from_attributes=True)
+
+
+
+# --- CORRECCIÓN IMPORTACIÓN CIRCULAR ---
+from src.departamentos.schemas import Departamento 
+
+InformeSintetico.model_rebuild()

@@ -67,7 +67,8 @@ def obtener_resumen_departamento(db: Session, departamento_id: int):
         resumen.append({
             "codigo": materia.codigoMateria,
             "nombre": materia.nombre,
-            "anio": materia.anio,
+            "ciclo lectivo": materia.periodo.ciclo_lectivo,
+            "cuatrimestre": materia.periodo.cuatrimestre,
             "alumnos_inscriptos": informe_ac.cantidad_alumnos_inscriptos if informe_ac else 0,
             "comisiones_teoricas": informe_ac.cantidad_comisiones_teoricas if informe_ac else 0,
             "comisiones_practicas": informe_ac.cantidad_comisiones_practicas if informe_ac else 0,

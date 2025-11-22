@@ -1,3 +1,4 @@
+from __future__ import annotations
 from sqlalchemy import Integer, String, Boolean, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from src.models import ModeloBase
@@ -11,8 +12,8 @@ class Encuesta(ModeloBase):
     
     
     # materias que usan esta encuesta
-    materias: Mapped[Optional[List["src.materias.models.Materias"]]] = relationship(
-        "src.materias.models.Materias",
+    materias: Mapped[List["Materias"]] = relationship(
+        "Materias",
         back_populates="encuesta"
     )
 

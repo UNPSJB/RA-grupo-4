@@ -8,6 +8,7 @@ from src.informesSinteticos.models import InformeSintetico
 from src.docentes.models import Docentes
 from src.informesAC.schemas import InformeACParaInformeSintetico, InformeAC as informeACSchema
 from src.materias.models import Materias
+
 # --- FUNCIONES CRUD BÁSICAS ---
 def crear_informe_sintetico(db: Session, informe: schemas.InformeSinteticoCreate):
     nuevo_informe = models.InformeSintetico(**informe.dict())
@@ -83,7 +84,7 @@ def listar_actividades_para_informe(db: Session) -> schemas.InformeSinteticoActi
 # (Usadas para Previews y Autocompletado)
 # =========================================
 
-def _get_informes_ac_periodo(db: Session, departamento_id: int, anio: int):
+def _get_informes_ac_periodo(db: Session, departamento_id: int, periodo_id: int):
     """Helper privado para no repetir la misma query base."""
     return (
         db.query(InformesAC)
@@ -91,20 +92,24 @@ def _get_informes_ac_periodo(db: Session, departamento_id: int, anio: int):
         # Si necesitas datos del docente, asegúrate de hacer join o eager load
         .join(Docentes, InformesAC.id_docente == Docentes.id_docente) 
         .filter(Materias.id_departamento == departamento_id)
-        .filter(InformesAC.ciclo_lectivo == anio)
+        .filter(Materias.id_periodo == periodo_id)  
         .all()
     )
 
-def obtener_resumen_general_periodo(db: Session, departamento_id: int, anio: int) -> List[dict]:
+def obtener_resumen_general_periodo(db: Session, departamento_id: int, periodo_id: int) -> List[dict]:
     resumen = []
     # Nota: Para el resumen general a veces es mejor iterar Materias y buscar su InformeAC
-    materias = db.query(Materias).filter(Materias.id_departamento == departamento_id).all()
+    materias =  ( db.query(Materias)
+                    .filter(Materias.id_departamento == departamento_id)
+                    .filter(Materias.id_periodo == periodo_id)
+                    .all()
+                )
     
     for materia in materias:
         # Buscamos si esta materia tiene informe en este año
-        informe_ac = next((inf for inf in materia.informesAC if str(inf.ciclo_lectivo) == str(anio)), None)
+        informe_ac = materia.informesAC[0] if materia.informesAC else None
         if informe_ac:
-             resumen.append({
+            resumen.append({
                 "codigo": materia.codigoMateria,
                 "nombre": materia.nombre,
                 "alumnos_inscriptos": informe_ac.cantidad_alumnos_inscriptos or 0,
@@ -113,12 +118,17 @@ def obtener_resumen_general_periodo(db: Session, departamento_id: int, anio: int
             })
     return resumen
 
-def obtener_necesidades_periodo(db: Session, departamento_id: int, anio: int) -> List[dict]:
+def obtener_necesidades_periodo(db: Session, departamento_id: int, periodo_id: int) -> List[dict]:
     resumen = []
-    materias = db.query(Materias).filter(Materias.id_departamento == departamento_id).all()
 
+    materias =  ( db.query(Materias)
+                    .filter(Materias.id_departamento == departamento_id)
+                    .filter(Materias.id_periodo == periodo_id)
+                    .all()
+                )
+    
     for materia in materias:
-        informe_ac = next((inf for inf in materia.informesAC if str(inf.ciclo_lectivo) == str(anio)), None)
+        informe_ac = materia.informesAC[0] if materia.informesAC else None
         # Solo agregamos si existe informe Y tiene alguna necesidad cargada
         if informe_ac and (informe_ac.necesidades_equipamiento or informe_ac.necesidades_bibliografia):
             resumen.append({
@@ -129,7 +139,7 @@ def obtener_necesidades_periodo(db: Session, departamento_id: int, anio: int) ->
             })
     return resumen
 
-def obtener_miembros_periodo(db: Session, departamento_id: int, anio: int) -> List[dict]:
+def obtener_miembros_periodo(db: Session, departamento_id: int, periodo_id: int) -> List[dict]:
     """
     Recupera las valoraciones de auxiliares realizadas por los docentes
     en sus InformesAC para mostrarlas consolidadas al Departamento.
@@ -140,7 +150,7 @@ def obtener_miembros_periodo(db: Session, departamento_id: int, anio: int) -> Li
         db.query(InformesAC)
         .join(Materias, InformesAC.id_materia == Materias.id_materia)
         .filter(Materias.id_departamento == departamento_id)
-        .filter(InformesAC.ciclo_lectivo == anio)
+        .filter(Materias.id_periodo == periodo_id)
         .all()
     )
 
@@ -148,7 +158,7 @@ def obtener_miembros_periodo(db: Session, departamento_id: int, anio: int) -> Li
         # Verificamos si el docente cargó valoraciones de auxiliares
         if informe.valoracion_auxiliares:
             for val in informe.valoracion_auxiliares:
-                 valoraciones_consolidadas.append({
+                valoraciones_consolidadas.append({
                     # ID único temporal para el frontend (ya que el auxiliar no tiene ID propio en esta tabla)
                     "id_docente": f"{informe.id_informesAC}-{val.get('nombre_auxiliar')}",
                     "nombre_docente": val.get('nombre_auxiliar', 'Desconocido'),
@@ -160,12 +170,12 @@ def obtener_miembros_periodo(db: Session, departamento_id: int, anio: int) -> Li
 
     return valoraciones_consolidadas
 
-def obtener_auxiliares_periodo(db: Session, departamento_id: int, anio: int) -> List[dict]:
+def obtener_auxiliares_periodo(db: Session, departamento_id: int, periodo_id: int) -> List[dict]:
     """
     Recupera los auxiliares cargados en los InformesAC individuales.
     """
     lista_auxiliares = []
-    informes_ac = _get_informes_ac_periodo(db, departamento_id, anio)
+    informes_ac = _get_informes_ac_periodo(db, departamento_id, periodo_id)
 
     for informe in informes_ac:
         # Verificamos si este docente cargó auxiliares en su informe
@@ -190,16 +200,16 @@ def obtener_auxiliares_periodo(db: Session, departamento_id: int, anio: int) -> 
 # =========================================
 
 def generar_resumen_informe_general(db: Session, informe_sintetico: InformeSintetico) -> List[dict]:
-    return obtener_resumen_general_periodo(db, informe_sintetico.departamento_id, int(informe_sintetico.periodo))
+    return obtener_resumen_general_periodo(db, informe_sintetico.departamento_id, int(informe_sintetico.periodo_id))
 
 def generar_resumen_necesidades(db: Session, informe_sintetico: InformeSintetico) -> List[dict]:
-    return obtener_necesidades_periodo(db, informe_sintetico.departamento_id, int(informe_sintetico.periodo))
+    return obtener_necesidades_periodo(db, informe_sintetico.departamento_id, int(informe_sintetico.periodo_id))
 
 def generar_valoracion_miembros(db: Session, informe_sintetico: InformeSintetico) -> List[dict]:
     return obtener_valoraciones_miembros_periodo(
         db,
         informe_sintetico.departamento_id,
-        int(informe_sintetico.periodo)
+        int(informe_sintetico.periodo_id)
     )
 
 # (Opcional) Si quisieras guardar también los auxiliares en el informe sintético:
@@ -208,20 +218,20 @@ def generar_valoracion_miembros(db: Session, informe_sintetico: InformeSintetico
 
 
 
-def get_informesAC_asociados_a_informeSintetico(db: Session, departamento_id: int, anio: int):
+def get_informesAC_asociados_a_informeSintetico(db: Session, departamento_id: int, periodo_id: int):
     #Devuelve todos los informes AC asociados a las materias de un departamento en un periodo dado.
     informes = (
         db.query(InformesAC)
         .join(Materias)
         .filter(Materias.id_departamento == departamento_id)
-        .filter(Materias.anio == anio)
+        .filter(Materias.id_periodo == periodo_id)
         .all()
     )
     return informes
 
-def get_porcentajes_informeSintetico(db: Session, departamento_id: int, anio: int)-> List[InformeACParaInformeSintetico]:
+def get_porcentajes_informeSintetico(db: Session, departamento_id: int, periodo_id: int)-> List[InformeACParaInformeSintetico]:
     #Devuelve un JSON con los datos necesarios para mostrar los porcentajes en el informeSintetico. 
-    informesAC = get_informesAC_asociados_a_informeSintetico(db, departamento_id, anio)
+    informesAC = get_informesAC_asociados_a_informeSintetico(db, departamento_id, periodo_id)
 
     if not informesAC:
         return {"mensaje": "No hay informes AC disponibles para este departamento y periodo."}
@@ -248,9 +258,9 @@ def get_porcentajes_informeSintetico(db: Session, departamento_id: int, anio: in
 
 
 
-def get_aspectos_positivo_y_obstaculos__informeSintetico(db: Session, departamento_id: int, anio: int)-> List[InformeACParaInformeSintetico]:
+def get_aspectos_positivo_y_obstaculos__informeSintetico(db: Session, departamento_id: int, periodo_id: int)-> List[InformeACParaInformeSintetico]:
     #Devuelve un JSON con los datos necesarios para mostrar los aspectos positivos y obstaculos  en el informeSintetico. 
-    informesAC = get_informesAC_asociados_a_informeSintetico(db, departamento_id, anio)
+    informesAC = get_informesAC_asociados_a_informeSintetico(db, departamento_id, periodo_id)
 
     resultado = []
     for informe in informesAC:

@@ -139,9 +139,9 @@ interface MateriaParaAutocompletar {
     id_materia: number;
     nombre: string;
     codigoMateria: string;
-    anio: number;
+    ciclo_lectivo: number;
     id_docente: number;
-    id_sede: number; 
+    id_sede: number;
     cantidad_inscripciones: number;
 }
 interface Docente {
@@ -279,7 +279,7 @@ const GenerarInformeACDoc: React.FC = () => {
                 setFormData(prev => ({
                     ...prev,
                     sede: sedeNombre, 
-                    ciclo_lectivo: String(selectedMateria.anio || ''),
+                    ciclo_lectivo: String(selectedMateria.ciclo_lectivo || ''),
                     id_materia: String(selectedMateria.id_materia),
                     nombre_actividad_curricular: selectedMateria.nombre, 
                     codigoMateria: selectedMateria.codigoMateria || '',

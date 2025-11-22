@@ -53,35 +53,35 @@ def cantidad_informes_sinteticos(db: Session = Depends(get_db)):
 @router.get("/preview/general")
 def preview_informe_general(
     departamento_id: int = Query(...), 
-    anio: int = Query(...), 
+    periodo_id: int = Query(...), 
     db: Session = Depends(get_db)
 ):
-    return services.obtener_resumen_general_periodo(db, departamento_id, anio)
+    return services.obtener_resumen_general_periodo(db, departamento_id, periodo_id)
 
 @router.get("/preview/necesidades")
 def preview_necesidades(
     departamento_id: int = Query(...), 
-    anio: int = Query(...), 
+    periodo_id: int = Query(...), 
     db: Session = Depends(get_db)
 ):
-    return services.obtener_necesidades_periodo(db, departamento_id, anio)
+    return services.obtener_necesidades_periodo(db, departamento_id, periodo_id)
 
 @router.get("/preview/valoraciones-miembros")
 def preview_valoraciones_miembros(
     departamento_id: int = Query(...), 
-    anio: int = Query(...), 
+    periodo_id: int = Query(...), 
     db: Session = Depends(get_db)
 ):
-    return services.obtener_miembros_periodo(db, departamento_id, anio)
+    return services.obtener_miembros_periodo(db, departamento_id, periodo_id)
 
 @router.get("/preview/auxiliares")
 def preview_auxiliares(
     departamento_id: int = Query(...), 
-    anio: int = Query(...), 
+    periodo_id: int = Query(...), 
     db: Session = Depends(get_db)
 ):
     """Nuevo endpoint para recuperar auxiliares cargados por docentes."""
-    return services.obtener_auxiliares_periodo(db, departamento_id, anio)
+    return services.obtener_auxiliares_periodo(db, departamento_id, periodo_id)
 
 @router.get("/{informe_id}", response_model=schemas.InformeSinteticoDetail)
 def obtener_informe_sintetico(informe_id: int, db: Session = Depends(get_db)) -> Any:
@@ -103,7 +103,7 @@ def autocompletar_informe_general(id: int, db: Session = Depends(get_db)):
     if not informe: raise HTTPException(status_code=404, detail="Informe no encontrado")
     
     resumen = services.generar_resumen_informe_general(db, informe)
-    informe.resumen_general = resumen # Asegúrate que tu modelo soporte asignar JSON/dict directamente si usas un tipo JSON en SQLAlchemy, o usa json.dumps si es Text.
+    informe.resumen_general = resumen 
     db.commit()
     return {"mensaje": "Resumen general generado", "resumen": resumen}
 
@@ -127,6 +127,7 @@ def autocompletar_valoraciones_miembros(id: int, db: Session = Depends(get_db)):
     db.commit()
     return {"mensaje": "Lista de valoración de miembros generada", "valoraciones": valoraciones}
 
+#[TODO] ESTE ROUTER DEVUELVE TODAS LAS NECESITDADES DEL DEPARTAMENTO, NO LAS DE UN PERIODO
 @router.get("/departamentos/{departamento_id}/necesidades", response_model=List[NecesidadMateriaSchema])
 def obtener_necesidades_por_departamento(departamento_id: int, db: Session = Depends(get_db)):
     """
@@ -161,15 +162,15 @@ def obtener_necesidades_por_departamento(departamento_id: int, db: Session = Dep
     return resultado
 
 
-@router.get("/departamento/{departamento_id}/periodo/{anio}/informesAC")
-def obtener_informesAC_asociados_a_informeSintetico(departamento_id: int, anio: int, db: Session = Depends(get_db)):
-    return services.get_informesAC_asociados_a_informeSintetico(db, departamento_id, anio)
+@router.get("/departamento/{departamento_id}/periodo/{periodo_id}/informesAC")
+def obtener_informesAC_asociados_a_informeSintetico(departamento_id: int, periodo_id: int, db: Session = Depends(get_db)):
+    return services.get_informesAC_asociados_a_informeSintetico(db, departamento_id, periodo_id)
 
 
-@router.get("/departamento/{departamento_id}/periodo/{anio}/informesAC/porcentajes")
-def obtener_porcentajes_informesAC(departamento_id: int, anio: int, db: Session = Depends(get_db)):
-    return services.get_porcentajes_informeSintetico(db, departamento_id, anio)
+@router.get("/departamento/{departamento_id}/periodo/{periodo_id}/informesAC/porcentajes")
+def obtener_porcentajes_informesAC(departamento_id: int, periodo_id: int, db: Session = Depends(get_db)):
+    return services.get_porcentajes_informeSintetico(db, departamento_id, periodo_id)
 
-@router.get("/departamento/{departamento_id}/periodo/{anio}/informesAC/aspectosPositivosObstaculos")
-def obtener_aspectosPosObs_informesAC(departamento_id: int, anio: int, db: Session = Depends(get_db)):
-    return services.get_aspectos_positivo_y_obstaculos__informeSintetico(db, departamento_id, anio)
+@router.get("/departamento/{departamento_id}/periodo/{periodo_id}/informesAC/aspectosPositivosObstaculos")
+def obtener_aspectosPosObs_informesAC(departamento_id: int, periodo_id: int, db: Session = Depends(get_db)):
+    return services.get_aspectos_positivo_y_obstaculos__informeSintetico(db, departamento_id, periodo_id)

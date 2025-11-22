@@ -9,15 +9,21 @@ from src.inscripciones.models import Inscripciones
 from src.materias.models import Materias
 from src.preguntas.models import Pregunta
 from src.secciones.models import Seccion
+from src.periodos.services import get_periodo_encuestas_actual
 
 def listar_encuestas_disponibles(db: Session, estudiante_id: int) -> List[schemas.EncuestaDisponibleOut]:
     """
-    Lista las encuestas que un estudiante tiene PENDIENTES de responder.
+    Lista las encuestas que un estudiante tiene PENDIENTES de responder del periodo activo.
     """
+    periodo_activo = get_periodo_encuestas_actual(db)
+    print("PERIODO ACTIVO ID =", periodo_activo.id if periodo_activo else None)
+    if not periodo_activo:
+        return []
+    
     alumno = db.query(Estudiante).options(
         selectinload(Estudiante.inscripciones)
             .selectinload(Inscripciones.materia)
-            .selectinload(Materias.encuesta)
+            .selectinload(Materias.periodo)
     ).get(estudiante_id)
 
     if alumno is None:
@@ -25,6 +31,9 @@ def listar_encuestas_disponibles(db: Session, estudiante_id: int) -> List[schema
 
     encuestas_disponibles = []
     for inscripcion in alumno.inscripciones:
+        if inscripcion.materia.id_periodo != periodo_activo.id:
+            continue    #si la materia no es del periodo activo se saltea
+
         if not inscripcion.encuesta_procesada:
             if inscripcion.materia and inscripcion.materia.encuesta:
                 encuestas_disponibles.append(schemas.EncuestaDisponibleOut(

@@ -7,10 +7,11 @@ interface Docente {
 }
 
 interface Materia {
-    id_materia: number;
-    nombre: string;
-    anio: number;
-    codigoMateria?: string;
+  id_materia: number;
+  nombre: string;
+  ciclo_lectivo: number
+  cuatrimestre: string
+  codigoMateria?: string;
 }
 
 interface InformeAC {
@@ -31,7 +32,7 @@ const HistorialInformesACDoc: React.FC = () => {
     const [informes, setInformes] = useState<InformeAC[]>([]);
     const [cargando, setCargando] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
-    const navigate = useNavigate(); 
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchInformesCompletados = async () => {
@@ -163,6 +164,7 @@ const HistorialInformesACDoc: React.FC = () => {
                             <th style={styles.th}>Materia</th>
                             <th style={styles.th}>Código</th>
                             <th style={styles.th}>Ciclo</th>
+                            <th style={styles.th}>Cuatrimestre</th>
                             <th style={styles.th}>Acción</th>
                         </tr>
                     </thead>
@@ -176,6 +178,7 @@ const HistorialInformesACDoc: React.FC = () => {
                                 <td style={styles.td}>{inf.materia.nombre}</td>
                                 <td style={styles.td}>{inf.materia.codigoMateria ?? '—'}</td>
                                 <td style={styles.td}>{inf.ciclo_lectivo}</td>
+                                <td style={styles.td}>{inf.materia.cuatrimestre}</td>
                                 <td style={styles.td}>
                                     <button 
                                         style={styles.selectButton}
