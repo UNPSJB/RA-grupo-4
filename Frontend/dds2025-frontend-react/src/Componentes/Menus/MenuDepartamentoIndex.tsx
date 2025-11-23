@@ -110,12 +110,6 @@ const MenuDepartamentoIndex: React.FC = () => {
                         <h3>Estadísticas Globales</h3>
                         <p>Analiza métricas de todas las materias y carreras.</p>
                     </Link>
-                    
-                    <Link to="configuracion" className="nav-card card-purple">
-                        <Settings size={32} />
-                        <h3>Configuración</h3>
-                        <p>Ajustes de fechas, periodos y permisos.</p>
-                    </Link>
                 </div>
             </div>
 

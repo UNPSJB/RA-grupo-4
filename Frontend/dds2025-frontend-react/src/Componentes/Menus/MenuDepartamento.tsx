@@ -1,5 +1,5 @@
 import React from 'react';
-import { Routes, Route, Outlet, Link, useLocation } from 'react-router-dom'; // <--- Agregado useLocation
+import { Routes, Route, Outlet, Link, useLocation } from 'react-router-dom'; 
 import './MenuDepartamento.css'; 
 import { ArrowLeft } from 'lucide-react';
 import MenuDepartamentoIndex from './MenuDepartamentoIndex';
