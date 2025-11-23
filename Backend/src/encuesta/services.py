@@ -198,3 +198,10 @@ def obtener_respuestas_alumno(db: Session, estudiante_id: int, materia_id: int) 
         encuesta_nombre=encuesta.nombre,
         secciones=secciones_list
     )
+
+def obtener_todas_materias_con_encuesta(db: Session):
+    """
+    Devuelve todas las materias que tienen una encuesta asociada.
+    Se usa para el panel de Departamento.
+    """
+    return db.query(Materias).join(Encuesta).distinct().all()
