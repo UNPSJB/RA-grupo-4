@@ -1,5 +1,5 @@
 import React from 'react';
-import { Routes, Route, NavLink, useNavigate, useParams } from 'react-router-dom';
+import { Routes, Route, NavLink, useNavigate, useParams, useLocation } from 'react-router-dom';
 import { ArrowLeft, FileText, List, BookOpen, Clock, Hand } from 'lucide-react'; 
 import MiniEstadisticasEst from '../Estudiante/MiniEstadisticasEst';
 import SeleccionarEncuestas from '../Estudiante/SeleccionarEncuestas';
@@ -83,10 +83,18 @@ const AlumnoDashboard = ({ estudianteId }) => {
 
 const MenuAlumno = () => {
     const estudianteId = 1; 
+    const location = useLocation(); 
+
+    // Lógica para determinar la ruta de regreso
+    // Si la ruta actual es exactamente "/home/alumno" (el dashboard), volvemos al home general.
+    // Si es cualquier otra (submenú), volvemos al dashboard (/home/alumno).
+    const esDashboard = location.pathname === '/home/alumno' || location.pathname === '/home/alumno/';
+    const rutaDestino = esDashboard ? '/home' : '/home/alumno';
+
     return (
         <div className="menu-alumno-layout-full">
             <div className="back-button-bar">
-                <NavLink to="/home" className="back-button-link">
+                <NavLink to={rutaDestino} className="back-button-link">
                     <ArrowLeft size={18} /> Regresar al Inicio
                 </NavLink>
             </div>

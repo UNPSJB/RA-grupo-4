@@ -15,6 +15,26 @@ def create_encuesta(encuesta: schemas.EncuestaCreate, db: Session = Depends(get_
 def read_encuestas_disponibles(db: Session = Depends(get_db)):
     return services.listar_encuestas_disponibles(db)
 
+@router.get("/listado-materias-general")
+def get_todas_materias_con_encuesta(db: Session = Depends(get_db)):
+    """
+    Ruta para el panel de Departamento.
+    Devuelve todas las materias que tienen encuestas para poder ver sus estadísticas.
+    Se coloca aquí para evitar conflicto con la ruta /{id_encuesta}.
+    """
+    materias = services.obtener_todas_materias_con_encuesta(db)
+    
+    # Formateamos la respuesta
+    resultado = []
+    for mat in materias:
+        resultado.append({
+            "id": mat.id_materia,
+            "nombre": mat.nombre,
+            "anio": getattr(mat, 'anio', 2025), 
+            "cant_inscriptos": 0 
+        })
+    return resultado
+
 @router.get("/", response_model=list[schemas.Encuesta])
 def read_encuestas(db: Session = Depends(get_db)):
     return services.listar_encuestas(db)
