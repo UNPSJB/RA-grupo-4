@@ -45,9 +45,11 @@ class MateriaAutocompletar(BaseModel):
     id_materia: int
     nombre: str
     codigoMateria: str
+    id_periodo: int
     ciclo_lectivo: int
     cuatrimestre: str
     id_docente: int
+    informeACCompletado: bool
     cantidad_inscripciones: int
 
 

@@ -60,6 +60,8 @@ def get_historial_respuestas_filtrado(estudiante_id: int, db: Session = Depends(
                 "materia_id": materia["id"],
                 "materia_nombre": materia["nombre"],
                 "encuesta_nombre": materia["encuesta_nombre"],
+                "ciclo_lectivo": materia["ciclo_lectivo"],
+                "cuatrimestre": materia["cuatrimestre"],
                 "fecha_finalizacion": "Completada" 
             })
             

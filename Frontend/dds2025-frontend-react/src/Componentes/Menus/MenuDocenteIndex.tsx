@@ -3,30 +3,33 @@ import { Link, useNavigate } from 'react-router-dom';
 import './MenuDocente.css'; 
 import { FileText, BarChart2, History, User, CheckSquare, List, Send, BookOpen, AlertCircle } from 'lucide-react';
 
-// (Aquí irían tus interfaces y constantes de API que ya tienes)
+interface Periodo{
+    ciclo_lectivo: number;
+    cuatrimestre: string;
+}
 interface Materia {
- id_materia: number;
- nombre: string;
- anio: number;
- codigoMateria?: string;
- id_docente: number; 
+    id_materia: number;
+    nombre: string;
+    id_periodo: number;
+    periodo: Periodo;
+    ciclo_lectivo: number;
+    cuatrimestre: string;
+    codigoMateria?: string;
+    id_docente: number; 
+    informeACCompletado?: boolean;
 }
-interface InformeRealizado {
- id_informesAC: number;
- ciclo_lectivo: number | string;
- materia: { id_materia: number };
-}
-const ID_DOCENTE_ACTUAL = 1; 
-const CICLO_LECTIVO_ACTUAL = new Date().getFullYear();
 const API_BASE = "http://localhost:8000";
+const ID_DOCENTE_ACTUAL = 1;
+const ID_PERIODO_ACTUAL = 2;
+const CICLO_LECTIVO_ACTUAL = new Date().getFullYear();
 
-/* Componente de Estadísticas (sin cambios) */
 interface StatsDocenteProps {
     total: number;
     completados: number;
     pendientes: number;
     cargando: boolean;
 }
+
 const StatsDocente: React.FC<StatsDocenteProps> = ({ total, completados, pendientes, cargando }) => {
     const display = (num: number) => (cargando ? '...' : num);
     return (
@@ -49,15 +52,11 @@ const StatsDocente: React.FC<StatsDocenteProps> = ({ total, completados, pendien
     );
 };
 
-
-/* * Dashboard Principal del Docente
- */
 const MenuDocenteIndex: React.FC = () => {
-    
     const [materias, setMaterias] = useState<Materia[]>([]);
-    const [informesHechos, setInformesHechos] = useState<InformeRealizado[]>([]);
     const [cargando, setCargando] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
+    const [periodoActual, setPeriodoActual] = useState<Periodo | null>(null);
     const navigate = useNavigate(); 
 
     useEffect(() => {
@@ -65,19 +64,24 @@ const MenuDocenteIndex: React.FC = () => {
             try {
                 setCargando(true);
                 setError(null);
-                const [resMaterias, resInformes] = await Promise.all([
+
+                const [resMaterias, resPeriodo] = await Promise.all([
                     fetch(`${API_BASE}/materias/listar`),
-                    fetch(`${API_BASE}/informesAC/filtradoInformesAc?id_docente=${ID_DOCENTE_ACTUAL}`)
+                    fetch(`${API_BASE}/periodos/${ID_PERIODO_ACTUAL}`)
                 ]);
-                if (!resMaterias.ok || !resInformes.ok) {
+
+                if (!resMaterias.ok || !resPeriodo.ok) {
                     throw new Error("Error al consultar los datos al servidor.");
                 }
+
                 const dataMaterias: Materia[] = await resMaterias.json();
-                const dataInformes: InformeRealizado[] = await resInformes.json();
+                const dataPeriodo: Periodo = await resPeriodo.json();
+
                 setMaterias(dataMaterias);
-                setInformesHechos(dataInformes);
+                setPeriodoActual(dataPeriodo);
+
             } catch (err: any) {
-                setError(err.message || "Error desconocido al cargar listas.");
+                setError(err.message || "Error desconocido al cargar datos.");
             } finally {
                 setCargando(false);
             }
@@ -85,30 +89,27 @@ const MenuDocenteIndex: React.FC = () => {
         cargarDatos();
     }, []);
 
-    const materiasDelDocenteEsteAnio = materias.filter(materia => {
-        return materia.id_docente === ID_DOCENTE_ACTUAL && Number(materia.anio) === CICLO_LECTIVO_ACTUAL;
-    });
-    const materiasPendientes = materiasDelDocenteEsteAnio.filter(materia => {
-        const yaEstaHecho = informesHechos.some(inf => 
-            inf.materia.id_materia === materia.id_materia &&
-            Number(inf.ciclo_lectivo) === CICLO_LECTIVO_ACTUAL
-        );
-        return !yaEstaHecho;
-    });
+    // Todas las materias del docente
+    const materiasDelDocente = materias.filter(m => m.id_docente === ID_DOCENTE_ACTUAL);
+    const totalCount = materiasDelDocente.length;
+
+    // Materias completadas (tienen informeACCompletado = true)
+    const completadosCount = materiasDelDocente.filter(m => m.informeACCompletado === true).length;
+
+    // Materias pendientes: del periodo actual y sin informeAC completado
+    const materiasPendientes = materiasDelDocente.filter(
+        m => m.id_periodo === ID_PERIODO_ACTUAL && m.informeACCompletado !== true
+    );
     const pendientesCount = materiasPendientes.length;
-    const totalCount = materiasDelDocenteEsteAnio.length;
-    const completadosCount = totalCount - pendientesCount;
 
     const handleGenerarInforme = (id_materia: number) => {
-        navigate(`/home/docente/generar-informe/${id_materia}`); 
+        navigate(`/home/docente/generar-informe/${id_materia}`);
     };
 
     const roleStyle = { '--color-secundario': '#17a2b8' } as React.CSSProperties;
 
     return (
         <div className="dashboard-main-view" style={roleStyle}>
-            
-            {/* 1. SECCIÓN SUPERIOR */}
             <div className="dashboard-header-container">
                 <div className="bienvenida-box">
                     <h1 className="welcome-title">
@@ -116,13 +117,14 @@ const MenuDocenteIndex: React.FC = () => {
                         ¡Bienvenido, Docente!
                     </h1>
                     <p className="panel-subtitle">
+                        Periodo actual: {periodoActual?.ciclo_lectivo} {" "} {periodoActual?.cuatrimestre} <br/>
                         Gestión de Informes de Actividad Curricular y Estadísticas de Cátedra.
                     </p>
                 </div>
                 <div className="estadisticas-box">
                     <h2 className="stats-title">
                         <List size={20} />
-                        Resumen General ({CICLO_LECTIVO_ACTUAL})
+                        Resumen General
                     </h2>
                     <StatsDocente 
                         total={totalCount}
@@ -133,11 +135,11 @@ const MenuDocenteIndex: React.FC = () => {
                 </div>
             </div>
 
-            {/* 2. SECCIÓN PENDIENTES  */}
+            {/* SECCIÓN PENDIENTES */}
             <div className="seccion-box">
                 <h2 className="seccion-title">
                     <AlertCircle size={24} />
-                    Informes Pendientes (Ciclo {CICLO_LECTIVO_ACTUAL})
+                    Informes Pendientes ({periodoActual?.cuatrimestre} {periodoActual?.ciclo_lectivo})
                 </h2>
                 <div className="pending-list">
                     {cargando && <div className="empty-list-message">Cargando pendientes...</div>}
@@ -177,8 +179,8 @@ const MenuDocenteIndex: React.FC = () => {
                     )}
                 </div>
             </div>
-            
-            {/* 3. SECCIÓN ACCESO RÁPIDO  */}
+
+            {/* SECCIÓN ACCESO RÁPIDO */}
             <div className="seccion-box">
                 <h2 className="seccion-title">
                     <CheckSquare size={24} />

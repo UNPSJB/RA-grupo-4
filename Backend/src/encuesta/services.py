@@ -156,7 +156,7 @@ def obtener_respuestas_alumno(db: Session, estudiante_id: int, materia_id: int) 
 
     materia = db.query(Materias).filter(Materias.id_materia == materia_id).first()
     if not materia or not materia.encuesta:
-         raise HTTPException(status_code=404, detail="Encuesta no encontrada")
+        raise HTTPException(status_code=404, detail="Encuesta no encontrada")
     
     encuesta = materia.encuesta
     

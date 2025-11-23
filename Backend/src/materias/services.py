@@ -28,9 +28,11 @@ def get_materias_para_autocompletar(db: Session) -> List[dict]:
             "id_materia": m.id_materia,
             "nombre": m.nombre,
             "codigoMateria": m.codigoMateria,
+            "id_periodo": m.id_periodo,
             "ciclo_lectivo": m.periodo.ciclo_lectivo,
             "cuatrimestre": m.periodo.cuatrimestre,
             "id_docente": m.id_docente,
+            "informeACCompletado": m.informeACCompletado,
             "cantidad_inscripciones": len(m.inscripciones) if m.inscripciones else 0
         })
     return resultado

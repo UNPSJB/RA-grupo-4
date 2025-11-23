@@ -8,6 +8,8 @@ interface EncuestaResuelta {
     materia_nombre: string;
     encuesta_nombre: string;
     fecha_finalizacion?: string;
+    ciclo_lectivo: number;
+    cuatrimestre: string;
     materia_id: number; 
 }
 
@@ -208,13 +210,13 @@ const HistorialEncuestasRealizadasEstudiante = () => {
                                 <div style={styles.textContainer}>
                                     <h3 style={styles.materiaTitle}>{item.materia_nombre}</h3>
                                     <p style={styles.subTitle}>
-                                        {item.encuesta_nombre}
                                         {item.fecha_finalizacion && (
                                             <>
-                                                <span style={{margin: '0 4px'}}>•</span>
                                                 <Calendar size={12} /> {item.fecha_finalizacion}
                                             </>
                                         )}
+                                        <span style={{margin: '0 4px'}}>•</span>
+                                        {" "} {item.ciclo_lectivo} {" "} {item.cuatrimestre}
                                     </p>
                                 </div>
                             </div>
