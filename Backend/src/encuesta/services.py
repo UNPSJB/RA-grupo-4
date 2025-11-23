@@ -13,6 +13,7 @@ from src.inscripciones.models import Inscripciones
 from src.materias.models import Materias
 from src.respuestas.models import Respuesta, OpcionRespuesta
 
+# --- CRUD ---
 def crear_encuesta(db: Session, encuesta: schemas.EncuestaCreate) -> Encuesta:
     _encuesta = Encuesta(nombre=encuesta.nombre, disponible=encuesta.disponible)
     db.add(_encuesta)
@@ -81,8 +82,7 @@ def get_encuestas_disponibles_por_estudiante(db: Session, estudiante_id: int) ->
         })
     return resultados
 
-# --- ESTADÍSTICAS E HISTORIAL ---
-
+# --- ESTADÍSTICAS ---
 def obtener_estadisticas_materia(db: Session, materia_id: int, incluir_comentarios: bool) -> schemas.MateriaEstadisticas:
     materia = db.scalar(select(Materias).where(Materias.id_materia == materia_id))
     if not materia:
@@ -113,14 +113,8 @@ def obtener_estadisticas_materia(db: Session, materia_id: int, incluir_comentari
 
                 preguntas_stats.append(stats)
             
-            descripcion_seccion = getattr(seccion, 'nombre', getattr(seccion, 'enunciado', 'Sección'))
-            
-            secciones_stats.append({
-                "seccion_id": seccion.id, 
-                "sigla": "", 
-                "descripcion": descripcion_seccion, 
-                "preguntas": preguntas_stats
-            })
+            titulo_seccion = getattr(seccion, 'descripcion', getattr(seccion, 'nombre', getattr(seccion, 'enunciado', 'Sección')))
+            secciones_stats.append({"seccion_id": seccion.id, "sigla": "", "descripcion": titulo_seccion, "preguntas": preguntas_stats})
 
     return schemas.MateriaEstadisticas(
         materia_id=materia.id_materia, nombre_materia=materia.nombre,
@@ -135,7 +129,6 @@ def obtener_estadisticas_alumno(db: Session, materia_id: int):
 
 def obtener_historial_materias_estudiante(db: Session, estudiante_id: int):
     inscripciones = db.query(Inscripciones).filter(Inscripciones.estudiante_id == estudiante_id).all()
-    
     materias = []
     for insc in inscripciones:
         mat = db.query(Materias).filter(Materias.id_materia == insc.materia_id).first()
@@ -151,6 +144,7 @@ def obtener_historial_materias_estudiante(db: Session, estudiante_id: int):
             })
     return materias
 
+# --- FUNCIÓN CORREGIDA PARA EL TÍTULO DE SECCIÓN ---
 def obtener_respuestas_alumno(db: Session, estudiante_id: int, materia_id: int) -> schemas.HistorialDetalle:
     inscripcion = db.query(Inscripciones).filter(
         Inscripciones.estudiante_id == estudiante_id, Inscripciones.materia_id == materia_id
@@ -164,6 +158,7 @@ def obtener_respuestas_alumno(db: Session, estudiante_id: int, materia_id: int) 
          raise HTTPException(status_code=404, detail="Encuesta no encontrada")
     
     encuesta = materia.encuesta
+    
     respuestas_db = db.query(Respuesta).filter(Respuesta.inscripcion_id == inscripcion.id).all()
     respuestas_map = {r.pregunta_id: r for r in respuestas_db}
 
@@ -173,9 +168,7 @@ def obtener_respuestas_alumno(db: Session, estudiante_id: int, materia_id: int) 
         for pregunta in seccion.preguntas:
             resp = respuestas_map.get(pregunta.id)
             
-            opciones_list = []
-            if pregunta.opciones_respuestas:
-                opciones_list = [{"id": op.id, "descripcion": op.descripcion} for op in pregunta.opciones_respuestas]
+            opciones_list = [{"id": op.id, "descripcion": op.descripcion} for op in pregunta.opciones_respuestas] if pregunta.opciones_respuestas else []
             
             seleccionada_id = resp.opcion_respuesta_id if resp else None
             texto = resp.respuesta_abierta if resp else None
@@ -191,7 +184,7 @@ def obtener_respuestas_alumno(db: Session, estudiante_id: int, materia_id: int) 
                 "respuesta_texto": texto
             })
 
-        titulo_seccion = getattr(seccion, 'nombre', getattr(seccion, 'enunciado', 'Sección'))
+        titulo_seccion = getattr(seccion, 'descripcion', getattr(seccion, 'nombre', 'Sección'))
 
         secciones_list.append({
             "id": seccion.id,

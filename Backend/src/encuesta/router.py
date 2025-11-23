@@ -3,10 +3,9 @@ from sqlalchemy.orm import Session
 from src.database import get_db
 from src.encuesta import schemas, services
 from src.secciones.schemas import Seccion as SchemaSeccion
-from typing import List
+from typing import List, Dict, Any
 
 router = APIRouter(prefix="/encuestas", tags=["encuestas"])
-
 
 @router.post("/", response_model=schemas.Encuesta)
 def create_encuesta(encuesta: schemas.EncuestaCreate, db: Session = Depends(get_db)):
@@ -43,6 +42,28 @@ def seleccionar_encuestas_disponibles(estudiante_id: int, db: Session = Depends(
 @router.get("/estudiantes/{estudiante_id}/historial")
 def get_historial_estudiante(estudiante_id: int, db: Session = Depends(get_db)):
     return services.obtener_historial_materias_estudiante(db, estudiante_id)
+
+@router.get("/estudiantes/{estudiante_id}/respuestas")
+def get_historial_respuestas_filtrado(estudiante_id: int, db: Session = Depends(get_db)):
+    """
+    Ruta específica para el historial de encuestas completadas.
+    Filtra las materias y devuelve SOLO las que ya tienen 'encuesta_procesada' = True.
+    """
+    todas_las_materias = services.obtener_historial_materias_estudiante(db, estudiante_id)
+    
+    historial_filtrado = []
+
+    for materia in todas_las_materias:
+        if materia["encuesta_procesada"] is True:
+            historial_filtrado.append({
+                "id": materia["id"],
+                "materia_id": materia["id"],
+                "materia_nombre": materia["nombre"],
+                "encuesta_nombre": materia["encuesta_nombre"],
+                "fecha_finalizacion": "Completada" 
+            })
+            
+    return historial_filtrado
 
 @router.get("/estudiantes/{estudiante_id}/respuestas/materia/{materia_id}", response_model=schemas.HistorialDetalle)
 def get_mis_respuestas(estudiante_id: int, materia_id: int, db: Session = Depends(get_db)):
