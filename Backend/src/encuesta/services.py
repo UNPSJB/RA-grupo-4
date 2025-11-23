@@ -136,7 +136,8 @@ def obtener_historial_materias_estudiante(db: Session, estudiante_id: int):
             materias.append({
                 "id": mat.id_materia,
                 "nombre": mat.nombre,
-                "anio": mat.anio,
+                "ciclo_lectivo": mat.periodo.ciclo_lectivo,
+                "cuatrimestre": mat.periodo.cuatrimestre,
                 "codigo": mat.codigoMateria,
                 "encuesta_nombre": mat.encuesta.nombre if mat.encuesta else "Sin encuesta",
                 "encuesta_disponible": mat.encuesta.disponible if mat.encuesta else False,

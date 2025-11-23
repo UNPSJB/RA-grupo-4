@@ -5,7 +5,8 @@ import EstadisticasAlumno from "./EstadisticasAlumno";
 type MateriaHistorial = {
     id: number;
     nombre: string;
-    anio: number;
+    ciclo_lectivo: number;
+    cuatrimestre: string;
     codigo: string;
     encuesta_nombre?: string;
     encuesta_disponible: boolean;
@@ -47,7 +48,7 @@ const MisMaterias: React.FC = () => {
                         {/* Header Tarjeta */}
                         <div style={{ padding: "15px 20px", backgroundColor: "#f0f7ff", borderBottom: '1px solid #eee' }}>
                             <h3 style={{ margin: 0, fontSize: "18px", color: "#333" }}>{materia.nombre}</h3>
-                            <div style={{ fontSize: "13px", color: "#666", marginTop: '5px' }}>Año: {materia.anio} • Cód: {materia.codigo}</div>
+                            <div style={{ fontSize: "13px", color: "#666", marginTop: '5px' }}> Cód: <strong>{materia.codigo}</strong> • {materia.ciclo_lectivo} {materia.cuatrimestre}</div>
                         </div>
 
                         {/* Cuerpo Tarjeta */}
