@@ -3,14 +3,12 @@ import { Routes, Route, useNavigate, Outlet, Link } from 'react-router-dom';
 import './MenuDocente.css'; 
 import { ArrowLeft } from 'lucide-react';
 
-// --- Imports de las páginas ---
 import MenuDocenteIndex from './MenuDocenteIndex'; 
 import GenerarInformeAC from '../Docente/GenerarInformeAC';
 import ListadoInformesACDoc from '../Docente/ListadoInformesACDoc';
 import HistorialInformesACDoc from '../Docente/HistorialInformesACDoc';
 import PaginaEstadisticasDoc from '../Docente/PaginaEstadisticasDoc';
 import SinDatos from '../Otros/SinDatos'; 
-// --- 👇 1. IMPORTAMOS EL VISUALIZADOR ---
 import VisualizarInformeACDoc from '../Docente/VisualizarInformeACDoc';
 
 const DocenteLayout = () => {
@@ -40,9 +38,6 @@ const MenuDocente = () => {
                 <Route path="informes-pendientes" element={<ListadoInformesACDoc />} />
                 <Route path="historial-informes" element={<HistorialInformesACDoc />} />
                 <Route path="estadisticas" element={<PaginaEstadisticasDoc />} />
-                <Route path="mi-perfil" element={<SinDatos />} />
-
-                {/* --- 👇 2. AGREGAMOS LA RUTA QUE FALTABA 👇 --- */}
                 <Route path="visualizar-informe/:id_informe" element={<VisualizarInformeACDoc />} />
 
             </Route>

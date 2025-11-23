@@ -47,14 +47,9 @@ const AlumnoDashboard = ({ estudianteId }) => {
                         <h3>Historial de Encuestas</h3>
                         <p>Revisa las encuestas que ya completaste.</p>
                     </div>
-                    <div className="nav-card card-purple" onClick={() => navigate("recursos-extra")}>
-                        <List size={36} />
-                        <h3>Otros Recursos</h3>
-                        <p>Documentación y ayuda adicional.</p>
                     </div>
                 </div>
             </div>
-        </div>
     );
 };
 
@@ -82,7 +77,6 @@ const MenuAlumno = () => {
                     
                     <Route path="mis-materias" element={<MisMaterias />} />
                     
-                    <Route path="recursos-extra" element={<SinDatos titulo="Recursos Adicionales" />} />
                 </Routes>
             </main>
         </div>

@@ -1,7 +1,9 @@
-import React, { useState } from "react"; // Importamos useState para el menú
+import React, { useState } from "react";
 import { Routes, Route, Link, Outlet } from "react-router-dom";
 import "./App.css";
-import fotoPerfil from './assets/avatarOA.png';
+
+// Asumo que tienes tus imágenes aquí, si no, ajusta la ruta
+import fotoPerfil from './assets/avatarOA.png'; 
 import logoUnpsjb from './assets/logo_unpsjb.png';
 
 // Componentes Generales
@@ -10,17 +12,17 @@ import HomePage from "./Componentes/Otros/HomePage";
 import ErrorCargaDatos from "./Componentes/Otros/ErrorCargaDatos";
 import SinDatos from "./Componentes/Otros/SinDatos";
 
-// --- MENÚS DE SECCIÓN (ROUTERS ANIDADOS) ---
+//importaciones para el nabar
+import Calendario from "./Componentes/Otros/Calendario";
+import MostrarMiPerfil from "./Componentes/Otros/MostrarMiPerfil"; // Agrego el perfil que hicimos antes
+
+// --- MENÚS DE SECCIÓN ---
 import MenuAlumno from "./Componentes/Menus/MenuAlumno";
 import MenuDocente from "./Componentes/Menus/MenuDocente";
 import MenuDepartamento from "./Componentes/Menus/MenuDepartamento"; 
 import MenuSecretaria from "./Componentes/Menus/MenuSecretaria";
 
-/**
- * Layout principal con Navbar y Footer
- */
 const MainLayout = () => {
-  // Estado para controlar si el menú del perfil está visible o no
   const [mostrarMenu, setMostrarMenu] = useState(false);
 
   const toggleMenu = () => {
@@ -31,13 +33,11 @@ const MainLayout = () => {
     <>
       <nav className="navbar">
         <div className="navbar-left">
-          {/* Logo a la izquierda del título */}
           <img src={logoUnpsjb} alt="Logo UNPSJB" className="navbar-logo" />
           <Link to="/home" className="site-name">Sistema de Encuestas UNPSJB</Link>
         </div>
 
         <div className="navbar-right">
-          {/* Contenedor del Avatar y el Menú */}
           <div className="perfil-container">
             <img 
               src={fotoPerfil} 
@@ -46,14 +46,23 @@ const MainLayout = () => {
               onClick={toggleMenu}
             />
             
-            {/* Renderizado condicional del menú desplegable */}
             {mostrarMenu && (
               <div className="dropdown-menu">
                 <div className="dropdown-header">Hola, Usuario</div>
+                
                 <Link to="/home/perfil" className="dropdown-item" onClick={() => setMostrarMenu(false)}>
                   Mi Perfil
                 </Link>
+                
                 <div className="dropdown-divider"></div>
+                
+                {/* AQUÍ ESTABA EL ERROR: El texto debe ir DENTRO del Link */}
+                <Link to="/home/calendario" className="dropdown-item" onClick={() => setMostrarMenu(false)}>
+                  Calendario
+                </Link>
+
+                <div className="dropdown-divider"></div>
+                
                 <Link to="/" className="dropdown-item logout" onClick={() => setMostrarMenu(false)}>
                   Cerrar Sesión
                 </Link>
@@ -75,9 +84,16 @@ const MainLayout = () => {
 };
 
 function App() {
+  // Mock de usuario para el ejemplo de perfil
+  const usuarioMock = {
+    nombre: "Usuario Demo",
+    email: "demo@unp.edu.ar",
+    rol: "ALUMNO", 
+    legajo: "12345"
+  };
+
   return (
     <Routes>
-      {/* Ruta de login */}
       <Route path="/" element={<LoginPage />} />
 
       <Route path="/home" element={<MainLayout />}>
@@ -93,14 +109,15 @@ function App() {
         <Route path="error" element={<ErrorCargaDatos />} />
         <Route path="sin-datos" element={<SinDatos />} />
         
-        {/* Ruta placeholder para el perfil (opcional si aún no tienes el componente) */}
-        <Route path="perfil" element={<div><h1>Mi Perfil</h1></div>} />
+        {/* NUEVA RUTA: Calendario */}
+        <Route path="calendario" element={<Calendario />} />
 
-        {/* Fallback interno */}
+        {/* Ruta Perfil (Integrando el componente anterior si lo tienes) */}
+        <Route path="perfil" element={<MostrarMiPerfil usuario={usuarioMock} />} />
+
         <Route path="*" element={<HomePage />} />
       </Route>
 
-      {/* Fallback general */}
       <Route path="*" element={<LoginPage />} />
     </Routes>
   );

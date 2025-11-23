@@ -195,14 +195,8 @@ const MenuDocenteIndex: React.FC = () => {
                         <h3>Estadísticas de Cátedra</h3>
                         <p>Analiza la valoración de las respuestas de los alumnos.</p>
                     </Link>
-                    <Link to="mi-perfil" className="nav-card card-purple">
-                        <User size={32} />
-                        <h3>Mi Perfil</h3>
-                        <p>Gestiona tus datos personales y contraseña.</p>
-                    </Link>
                 </div>
             </div>
-
         </div>
     );
 };
