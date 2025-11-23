@@ -19,8 +19,7 @@ class DocenteOut(BaseModel):
 class MateriaOut(BaseModel):
     id_materia: int
     nombre: str
-    codigoMateria: str
-    anio: int 
+    codigoMateria: str 
 
     model_config = {
         "from_attributes": True  

@@ -207,7 +207,7 @@ def create_informe_ac(db: Session, informe: schemas.InformeACCreate):
     )
     
     # 4. Actualizar la bandera en la materia
-    #materia_db.informeACCompletado = True
+    materia_db.informeACCompletado = True
 
     # 5. Guardar ambos cambios en una transacción
     try:
@@ -218,5 +218,5 @@ def create_informe_ac(db: Session, informe: schemas.InformeACCreate):
     except Exception as e:
         db.rollback()
         raise HTTPException(status_code=500, detail=f"Error al guardar: {e}")
-        
+
     return db_informe
