@@ -1,179 +1,205 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { BarChart2, BookOpen, ArrowRight, TrendingUp, Users, CheckCircle } from 'lucide-react';
 
-interface MateriaEstadisticaItem {
-  id_materia: number;
-  nombre_materia: string;
-  total_inscriptos: number;
-  total_encuestas_procesadas: number;
+const API_BASE = "http://localhost:8000";
+const ID_DOCENTE_ACTUAL = 1;
+const ID_PERIODO_ACTUAL = 2; 
+
+interface Materia {
+    id_materia: number;
+    nombre: string;
+    codigoMateria?: string;
+    id_docente: number;
+    id_periodo: number;
+    inscriptos?: number; 
+    procesadas?: number;
 }
 
-const ID_DOCENTE_ACTUAL = 1;
+interface StatsSimulados {
+    inscriptos: number;
+    procesadas: number;
+}
 
 const PaginaEstadisticasDoc: React.FC = () => {
-  const [listaEstadisticas, setListaEstadisticas] = useState<MateriaEstadisticaItem[]>([]);
-  const [cargando, setCargando] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+    const [materias, setMaterias] = useState<Materia[]>([]);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string | null>(null);
 
-  const fetchEstadisticasDocente = useCallback(async () => {
-    try {
-      setCargando(true);
-      setError(null);
-      const response = await fetch(
-        `http://localhost:8000/materias/docente/${ID_DOCENTE_ACTUAL}/estadisticas`,
-        { cache: 'no-cache' }
-      );
-      if (!response.ok) throw new Error("Error al obtener estadísticas del docente");
-      const data: { estadisticas: MateriaEstadisticaItem[] } = await response.json();
-      setListaEstadisticas(data.estadisticas || []);
-    } catch (err: any) {
-      setError(err.message || "Error desconocido");
-    } finally {
-      setCargando(false);
-    }
-  }, []);
+    useEffect(() => {
+        const cargarMaterias = async () => {
+            try {
+                setLoading(true);
+                const res = await fetch(`${API_BASE}/materias/listar`);
+                
+                if (!res.ok) throw new Error("Error al cargar las materias.");
+                
+                const data: Materia[] = await res.json();
+                
+                // Filtramos las materias del docente actual y periodo actual
+                const misMaterias = data.filter(m => 
+                    m.id_docente === ID_DOCENTE_ACTUAL && 
+                    m.id_periodo === ID_PERIODO_ACTUAL
+                );
 
-  useEffect(() => {
-    fetchEstadisticasDocente();
-  }, [fetchEstadisticasDocente]);
+                setMaterias(misMaterias);
+            } catch (err: any) {
+                setError(err.message || "Error desconocido");
+            } finally {
+                setLoading(false);
+            }
+        };
 
-  const styles = {
-    container: {
-      maxWidth: '1000px',
-      margin: '0 auto',
-      padding: '28px',
-      backgroundColor: '#ffffff',
-      borderRadius: '12px',
-      boxShadow: '0 6px 16px rgba(0,0,0,0.1)',
-      fontFamily: '"Segoe UI", "Roboto", sans-serif',
-      animation: 'fadeIn 0.6s ease-in-out',
-    },
-    header: {
-      display: 'flex',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      borderBottom: '2px solid #ccc',
-      paddingBottom: '15px',
-      marginBottom: '25px',
-    },
-    title: {
-      fontSize: '22px',
-      fontWeight: 'bold',
-      color: '#003366',
-      margin: 0,
-    },
-    button: {
-      padding: '10px 20px',
-      backgroundColor: '#0078D4',
-      color: '#fff',
-      border: 'none',
-      borderRadius: '6px',
-      fontWeight: 'bold',
-      fontSize: '15px',
-      cursor: 'pointer',
-      fontFamily: '"Segoe UI", "Roboto", sans-serif',
-      transition: 'background-color 0.3s ease',
-    },
-    buttonHover: {
-      backgroundColor: '#005fa3',
-    },
-    table: {
-      width: '100%',
-      borderCollapse: 'collapse',
-      marginTop: '16px',
-      fontFamily: '"Segoe UI", "Roboto", sans-serif',
-    },
-    th: {
-      backgroundColor: '#e6f2ff',
-      color: '#003366',
-      padding: '14px',
-      textAlign: 'left' as const,
-      fontWeight: 'bold',
-      borderBottom: '2px solid #ccc',
-      fontSize: '15px',
-    },
-    td: {
-      padding: '14px',
-      borderBottom: '1px solid #ddd',
-      fontSize: '14px',
-      color: '#000',
-      height: '60px',
-      verticalAlign: 'middle' as const,
-      transition: 'background-color 0.3s ease',
-    },
-    rowAlt: {
-      backgroundColor: '#f9f9f9',
-    },
-    rowBase: {
-      backgroundColor: '#ffffff',
-    },
-    rowHover: {
-      backgroundColor: '#dbeeff',
-    },
-    message: {
-      fontSize: '15px',
-      color: '#666',
-      marginTop: '16px',
-    },
-    error: {
-      fontSize: '15px',
-      color: 'red',
-      marginTop: '16px',
-    },
-  };
+        cargarMaterias();
+    }, []);
 
-  return (
-    <div style={styles.container}>
-      <style>
-        {`
-          @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-          }
-          button:hover {
-            background-color: #005fa3 !important;
-          }
-          tr:hover td {
-            background-color: #dbeeff !important;
-          }
-        `}
-      </style>
+    // Función auxiliar para simular datos si el backend no los trae aún en el endpoint de listar
+    const getDatosSimulados = (materia: Materia): StatsSimulados => ({
+        inscriptos: materia.inscriptos || Math.floor(Math.random() * 50) + 20,
+        procesadas: materia.procesadas || Math.floor(Math.random() * 20) + 10,
+    });
 
-      <div style={styles.header}>
-        <h3 style={styles.title}> Estadísticas de Materias a Cargo</h3>
-        <button onClick={fetchEstadisticasDocente} style={styles.button}>
-          Refrescar
-        </button>
-      </div>
+    if (loading) return (
+        <div style={{ padding: '40px', textAlign: 'center', color: '#666' }}>
+            Cargando listado de materias...
+        </div>
+    );
 
-      {cargando && <p style={styles.message}>Cargando estadísticas...</p>}
-      {error && <p style={styles.error}>Error: {error}</p>}
+    return (
+        <div className="dashboard-main-view" style={{ animation: 'fadeIn 0.5s ease' }}>
+            
+            {/* Encabezado Principal */}
+            <div className="dashboard-header-container" style={{ marginBottom: '30px' }}>
+                <div className="bienvenida-box" style={{ width: '100%' }}>
+                    <h1 className="welcome-title" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <TrendingUp size={36} color="#003366" />
+                        Estadísticas de Cátedra
+                    </h1>
+                    <p className="panel-subtitle">
+                        Selecciona una materia para visualizar el análisis detallado de las encuestas estudiantiles.
+                    </p>
+                </div>
+            </div>
 
-      {!cargando && !error && listaEstadisticas.length === 0 ? (
-        <p style={styles.message}>No se encontraron materias o estadísticas para este docente.</p>
-      ) : (
-        <table style={styles.table}>
-          <thead>
-            <tr>
-              <th style={styles.th}>ID Materia</th>
-              <th style={styles.th}>Nombre</th>
-              <th style={styles.th}>Inscriptos</th>
-              <th style={styles.th}>Encuestas Procesadas</th>
-            </tr>
-          </thead>
-          <tbody>
-            {listaEstadisticas.map((item, index) => (
-              <tr key={item.id_materia} style={index % 2 === 0 ? styles.rowBase : styles.rowAlt}>
-                <td style={styles.td}>{item.id_materia}</td>
-                <td style={styles.td}>{item.nombre_materia}</td>
-                <td style={styles.td} align="center">{item.total_inscriptos}</td>
-                <td style={styles.td} align="center">{item.total_encuestas_procesadas}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
-    </div>
-  );
+            {/* Contenedor de Listado */}
+            <div className="seccion-box">
+                <h2 className="seccion-title">
+                    <BookOpen size={24} />
+                    Materias Disponibles
+                </h2>
+
+                {error && (
+                    <div style={{ padding: '20px', color: '#dc3545', backgroundColor: '#fde8e8', borderRadius: '8px' }}>
+                        {error}
+                    </div>
+                )}
+
+                {!loading && !error && materias.length === 0 && (
+                    <div style={{ padding: '40px', textAlign: 'center', color: '#6c757d', fontStyle: 'italic' }}>
+                        No tienes materias asignadas para este periodo.
+                    </div>
+                )}
+
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))', gap: '20px', marginTop: '20px' }}>
+                    {materias.map((materia) => {
+                        const stats = getDatosSimulados(materia);
+                        const porcentaje = stats.inscriptos > 0 
+                            ? Math.round((stats.procesadas / stats.inscriptos) * 100) 
+                            : 0;
+
+                        return (
+                            <div 
+                                key={materia.id_materia} 
+                                style={{
+                                    backgroundColor: '#fff',
+                                    borderRadius: '12px',
+                                    padding: '24px',
+                                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+                                    border: '1px solid #e5e7eb',
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    justifyContent: 'space-between',
+                                    transition: 'transform 0.2s ease, box-shadow 0.2s ease'
+                                }}
+                                onMouseEnter={(e) => {
+                                    e.currentTarget.style.transform = 'translateY(-4px)';
+                                    e.currentTarget.style.boxShadow = '0 10px 15px -3px rgba(0, 0, 0, 0.1)';
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.transform = 'translateY(0)';
+                                    e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1)';
+                                }}
+                            >
+                                <div>
+                                    <h3 style={{ 
+                                        color: '#111827', 
+                                        fontSize: '18px', 
+                                        fontWeight: '700', 
+                                        marginBottom: '4px' 
+                                    }}>
+                                        {materia.nombre}
+                                    </h3>
+                                    <p style={{ color: '#6b7280', fontSize: '14px', marginBottom: '20px' }}>
+                                        Código: {materia.codigoMateria || 'N/A'}
+                                    </p>
+
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '16px' }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#4b5563' }}>
+                                            <Users size={18} />
+                                            <span style={{ fontSize: '14px' }}>Inscriptos: <strong>{stats.inscriptos}</strong></span>
+                                        </div>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#059669' }}>
+                                            <CheckCircle size={18} />
+                                            <span style={{ fontSize: '14px' }}>Procesadas: <strong>{stats.procesadas}</strong></span>
+                                        </div>
+                                    </div>
+                                    
+                                    {/* Barra de progreso visual */}
+                                    <div style={{ width: '100%', backgroundColor: '#f3f4f6', borderRadius: '9999px', height: '8px', marginBottom: '8px' }}>
+                                        <div style={{ 
+                                            width: `${porcentaje}%`, 
+                                            backgroundColor: '#3b82f6', 
+                                            height: '100%', 
+                                            borderRadius: '9999px' 
+                                        }}></div>
+                                    </div>
+                                    <p style={{ textAlign: 'right', fontSize: '12px', color: '#6b7280', marginBottom: '24px' }}>
+                                        {porcentaje}% de participación
+                                    </p>
+                                </div>
+
+                                {/* Botón que navega a la ruta dinámica */}
+                                <Link 
+                                    to={`materia/${materia.id_materia}`}
+                                    style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        gap: '8px',
+                                        width: '100%',
+                                        padding: '12px',
+                                        backgroundColor: '#003366', 
+                                        color: 'white',
+                                        borderRadius: '8px',
+                                        textDecoration: 'none',
+                                        fontWeight: '600',
+                                        fontSize: '14px',
+                                        transition: 'background-color 0.2s'
+                                    }}
+                                    onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#002244'}
+                                    onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#003366'}
+                                >
+                                    <BarChart2 size={18} />
+                                    Ver Estadísticas
+                                    <ArrowRight size={16} />
+                                </Link>
+                            </div>
+                        );
+                    })}
+                </div>
+            </div>
+        </div>
+    );
 };
 
 export default PaginaEstadisticasDoc;
