@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
-import HeaderInstitucional from "../Otros/HeaderInstitucional.tsx";
+import { useLocation } from "react-router-dom";
 
+import HeaderInstitucional from "../Otros/HeaderInstitucional.tsx";
 // --- Importaciones de Componentes Hijos ---
 import CompletarDatosCabeceraDep from "../Departamento/CompletarDatosCabeceraDep";
 import AutocompletarInformacionGeneral from "../Departamento/AutoCompletarInformacionGeneral";
@@ -161,22 +162,78 @@ const FloatingNotification: React.FC<{
 };
 
 // ------------------- COMPONENTE PRINCIPAL -------------------
+interface Periodo {
+  id_periodo: number;
+  ciclo_lectivo: number;
+  cuatrimestre: string;
+  nombre: string;
+}
+interface Departamento {
+  id_departamento: number;
+  nombre: string;
+}
+
 const GenerarInformeSinteticoDep: React.FC = () => {
+    const location = useLocation();
+    const params = new URLSearchParams(location.search);
+
+    const periodoId = Number(params.get("periodoId"));
+    const departamentoId = Number(params.get("departamentoId"));
     const navigate = useNavigate();
 
     const [datosInforme, setDatosInforme] = useState({
-        departamento_id: 0,
-        periodo: 2,
-        sede: "",
-        integrantes: "",
-        comentarios: "",
-        descripcion: "Informe Sintético del Departamento",
-        anio: 2025,
+      departamento_id: departamentoId,
+      periodo_id: periodoId,
+      sede: "",
+      integrantes: "",
+      comentarios: "",
+      descripcion: "Informe Sintético del Departamento",
     });
+
+    const [periodo, setPeriodo] = useState<Periodo | null>(null);
+    const [departamento, setDepartamento] = useState<Departamento | null>(null);
+
     const [creando, setCreando] = useState(false);
     const [mensaje, setMensaje] = useState<{ tipo: "exito" | "error"; texto: string } | null>(null);
     const [informeGenerado, setInformeGenerado] = useState<any>(null); 
     const [segundosRestantes, setSegundosRestantes] = useState(5);
+
+    useEffect(() => {
+        if (!departamentoId || !periodoId) return;
+
+        setDatosInforme((prev) => ({
+            ...prev,
+            departamento_id: departamentoId,
+            periodo_id: periodoId,
+        }));
+    }, [departamentoId, periodoId]);
+
+    useEffect(() => {
+        const fetchDatos = async () => {
+            try {
+                // Obtener datos del periodo 
+                const resPeriodo = await fetch(`http://localhost:8000/periodos/${periodoId}`);
+                if (!resPeriodo.ok) throw new Error("Error obteniendo periodo");
+
+                const dataPeriodo = await resPeriodo.json();
+                setPeriodo(dataPeriodo);
+
+                // Obtener datos del departamento 
+                const resDepto = await fetch(`http://localhost:8000/departamentos/${departamentoId}`);
+                if (!resDepto.ok) throw new Error("Error obteniendo departamento");
+
+                const dataDepto = await resDepto.json();
+                setDepartamento(dataDepto);
+
+            } catch (error) {
+                console.error("Error cargando datos iniciales:", error);
+            }
+        };
+
+        fetchDatos();
+    }, [periodoId, departamentoId]);
+
+
 
     useEffect(() => {
         let timerRedirect: NodeJS.Timeout;
@@ -199,16 +256,12 @@ const GenerarInformeSinteticoDep: React.FC = () => {
     
   }, [informeGenerado]); 
 
-    const handleDepartamentoSeleccionado = (id: number) => {
-        setDatosInforme((prev) => ({ ...prev, departamento_id: id }));
-    };
 
-    const handleCabeceraChange = (data: { ciclo_lectivo: number; sede: string; integrantes: string }) => {
+    const handleCabeceraChange = (data: { sede: string; integrantes: string }) => {
         setDatosInforme((prev) => ({
             ...prev,
             sede: data.sede,
             integrantes: data.integrantes,
-            anio: Number(data.ciclo_lectivo) || 2025,
         }));
     };
 
@@ -234,7 +287,7 @@ const GenerarInformeSinteticoDep: React.FC = () => {
             // Preparamos el payload correcto
             const payload = {
                 descripcion: datosInforme.descripcion,
-                periodo_id: datosInforme.periodo, 
+                periodo_id: datosInforme.periodo_id, 
                 sede: datosInforme.sede,
                 integrantes: datosInforme.integrantes,
                 departamento_id: datosInforme.departamento_id,
@@ -307,7 +360,6 @@ const GenerarInformeSinteticoDep: React.FC = () => {
 
                 <section>
                     <CompletarDatosCabeceraDep
-                        onDepartamentoSeleccionado={handleDepartamentoSeleccionado}
                         onCabeceraChange={handleCabeceraChange}
                     />
                 </section>
@@ -316,32 +368,32 @@ const GenerarInformeSinteticoDep: React.FC = () => {
                     <>
                         <div style={styles.divider}></div>
                         <section style={styles.section}>
-                            <AutocompletarInformacionGeneral departamentoId={datosInforme.departamento_id} />
+                            <AutocompletarInformacionGeneral departamentoId={departamentoId} />
                         </section>
 
                         <div style={styles.divider}></div>
                         <section style={styles.section}>
-                            <AutocompletarNecesidadesDep departamentoId={datosInforme.departamento_id} />
+                            <AutocompletarNecesidadesDep departamentoId={departamentoId} />
                         </section>
 
                         <div style={styles.divider}></div>
                         <section style={styles.section}>
-                            <PorcentajesInformeSintetico departamentoId={datosInforme.departamento_id} periodoId={datosInforme.periodo} />
+                            <PorcentajesInformeSintetico departamentoId={departamentoId} periodoId={periodoId} />
                         </section>
 
                         <div style={styles.divider}></div>
                         <section style={styles.section}>
-                            <AspecPosObstaculosInformeSintetico departamentoId={datosInforme.departamento_id} periodoId={datosInforme.periodo} />
+                            <AspecPosObstaculosInformeSintetico departamentoId={departamentoId} periodoId={periodoId} />
                         </section>
 
                         <div style={styles.divider}></div>
                         <section style={styles.section}>
-                            <ConsignarDesarrolloDeActividadesDep departamentoId={datosInforme.departamento_id} periodoId={datosInforme.periodo}/>
+                            <ConsignarDesarrolloDeActividadesDep departamentoId={departamentoId} periodoId={periodoId}/>
                         </section>
 
                         <div style={styles.divider}></div>
                         <section style={styles.section}>
-                            <AutocompletarValoracionesDep departamentoId={datosInforme.departamento_id} />
+                            <AutocompletarValoracionesDep departamentoId={departamentoId} />
                         </section>
                     </>
                 )}

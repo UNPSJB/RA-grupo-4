@@ -74,7 +74,7 @@ const InformesSinteticosPendientes: React.FC<Props> = ({ departamentoId }) => {
 
                                 <td>
                                     <Link
-                                        to={`generar-informe-sintetico?periodoId=${p.id}`}
+                                        to={`generar-informe-sintetico?periodoId=${p.id}&departamentoId=${departamentoId}`}
                                         className="btn-action-table"
                                     >
                                         Generar Informe Sintetico <Send size={14} />

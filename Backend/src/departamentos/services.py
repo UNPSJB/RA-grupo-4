@@ -28,7 +28,7 @@ def listar_departamentos(db: Session):
 def leer_departamento(db: Session, departamento_id: int) -> schemas.Departamento:
     db_departamento = db.scalar(select(Departamento).where(Departamento.id == departamento_id))
     if db_departamento is None:
-        raise exceptions.DepartamentoNoEncontrada()
+        raise exceptions.DepartamentoNoEncontrado()
     return db_departamento
 
 
