@@ -19,7 +19,7 @@ class EstudianteBase(BaseModel):
 
 class Estudiante(EstudianteBase):
     id: int
-
+    usuario: str
     class Config:
         orm_mode = True
 

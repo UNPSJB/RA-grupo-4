@@ -69,14 +69,14 @@ const MiniEstadisticasEst: React.FC<{ estudianteId: number }> = ({ estudianteId 
             {/* Total (Azul Oscuro) */}
             <div className="mini-stat-box stat-total">
                 <span className="mini-stat-number">{stats.total}</span>
-                <span className="mini-stat-label">Total</span>
+                <span className="mini-stat-label">Inscripciones Totales</span>
             </div>
             
             {/* Respondidas (Celeste / Completados) */}
             <div className="mini-stat-box stat-done">
                 <span className="mini-stat-number">{stats.respondidas}</span>
                 <span className="mini-stat-label">
-                    Respondidas ({pctRespondidas}%)
+                    Encuestas Respondidas ({pctRespondidas}%)
                 </span>
             </div>
             
@@ -84,7 +84,7 @@ const MiniEstadisticasEst: React.FC<{ estudianteId: number }> = ({ estudianteId 
             <div className="mini-stat-box stat-pending">
                 <span className="mini-stat-number">{stats.pendientes}</span>
                 <span className="mini-stat-label">
-                    Pendientes ({pctPendientes}%)
+                    Encuestas Pendientes ({pctPendientes}%)
                 </span>
             </div>
 

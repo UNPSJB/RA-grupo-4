@@ -20,3 +20,8 @@ def read_periodos(db: Session = Depends(get_db)):
 @router.get("/{periodo_id}", response_model=schemas.Periodo)
 def read_periodo(periodo_id: int, db: Session = Depends(get_db)):
     return services.leer_periodo(db, periodo_id)
+
+@router.get("/actual/encuestas", response_model=schemas.Periodo)
+def get_periodo_encuesta_actual(db: Session = Depends(get_db)):
+    return services.get_periodo_encuestas_actual(db)
+

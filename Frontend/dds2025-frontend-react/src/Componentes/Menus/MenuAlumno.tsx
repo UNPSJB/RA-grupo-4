@@ -1,4 +1,5 @@
 import React from 'react';
+import { useEffect, useState } from 'react';
 import { Routes, Route, NavLink, useNavigate, useParams, useLocation, Outlet } from 'react-router-dom';
 import { ArrowLeft, FileText, List, BookOpen, Clock, Hand } from 'lucide-react'; 
 
@@ -48,9 +49,57 @@ const PaginaMisRespuestas = () => {
 // 2. Dashboard Principal (Vista Home del Alumno)
 // ---------------------------------------------------
 
+
 const AlumnoDashboard = ({ estudianteId }) => {
     const navigate = useNavigate();
     
+    const [periodoActual, setPeriodoActual] = useState(null);
+    const [estudianteInfo, setEstudianteInfo] = useState(null);
+    const [loading, setLoading] = useState(true);
+
+    // Fetch de periodo actual + datos del estudiante
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                // 1) Periodo actual de encuestas
+                const resPeriodo = await fetch(`http://localhost:8000/periodos/actual/encuestas`);
+                const periodo = await resPeriodo.json();
+                setPeriodoActual(periodo);
+
+                // 2) Datos del estudiante
+                const resEst = await fetch(`http://localhost:8000/estudiantes/${estudianteId}`);
+                const estudiante = await resEst.json();
+                console.log("ESTUDIANTE INFO:", estudiante);
+                setEstudianteInfo(estudiante);
+            } catch (error) {
+                console.error("Error cargando datos del dashboard del alumno:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchData();
+    }, [estudianteId]);
+
+    if (loading) {
+        return (
+            <div className="alumno-dashboard-wrapper">
+                <p>Cargando información...</p>
+            </div>
+        );
+    }
+
+    const hoy = new Date();
+
+    const fechaCierre = periodoActual?.fecha_cierre_encuestas
+        ? new Date(periodoActual.fecha_cierre_encuestas)
+        : null;
+
+    const diasRestantes = fechaCierre
+        ? Math.ceil((fechaCierre.getTime() - hoy.getTime()) / (1000 * 60 * 60 * 24))
+        : null;
+
+
     return (
         // Clase única para aislar estilos del alumno
         <div className="alumno-dashboard-wrapper">
@@ -59,9 +108,23 @@ const AlumnoDashboard = ({ estudianteId }) => {
             <div className="alumno-header-grid">
                 <aside className="alumno-welcome-card">
                     <h1 className="alumno-title">
-                        <Hand size={30} className="alumno-icon-hand" /> Hola, Alumno
+                        <Hand size={30} className="alumno-icon-hand" /> Hola, {estudianteInfo?.nombre}
+                        <br />
+                        
                     </h1>
-                    <p className="alumno-subtitle">Panel de gestión académica y encuestas.</p>
+                    <p className="alumno-subtitle">
+                        {periodoActual ? (
+                            <>
+                                Periodo Actual: {periodoActual.ciclo_lectivo} {periodoActual.cuatrimestre}
+                                <br />
+                                Quedan <strong>{diasRestantes}</strong> días para el cierre de las encuestas.
+                                <br />
+                                Recuerda responder las encuestas a tus inscripciones.
+                            </>
+                        ) : (
+                            <>No hay periodo activo.</>
+                        )}
+                    </p>
                 </aside>
                 
                 <div className="alumno-stats-card">
