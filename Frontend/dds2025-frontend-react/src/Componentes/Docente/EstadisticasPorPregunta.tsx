@@ -1,4 +1,5 @@
 import React, { useState, useEffect, memo } from "react";
+import { useParams } from "react-router-dom"; 
 import {
     BarChart,
     Bar,
@@ -37,7 +38,7 @@ type MateriaEstadisticasProps = {
     secciones: Seccion[];
 };
 
-/* --- Componente memoizado para gráficos --- */
+/* --- Componente memoizado para gráficos  */
 const PreguntaGrafico: React.FC<{ opciones: OpcionRespuesta[] }> = memo(({ opciones }) => (
     <ResponsiveContainer width="100%" height={40 * opciones.length}>
         <BarChart
@@ -73,7 +74,7 @@ const PreguntaGrafico: React.FC<{ opciones: OpcionRespuesta[] }> = memo(({ opcio
     </ResponsiveContainer>
 ));
 
-/* --- Componente principal --- */
+/* --- Componente de Acordeones --- */
 export const MateriaEstadisticasAcordeones: React.FC<{ data: MateriaEstadisticasProps }> = ({
     data,
 }) => {
@@ -109,18 +110,9 @@ export const MateriaEstadisticasAcordeones: React.FC<{ data: MateriaEstadisticas
                     from { opacity: 0; transform: translateY(10px); }
                     to { opacity: 1; transform: translateY(0); }
                 }
-
-                /* Scroll personalizado */
-                .scroll-area::-webkit-scrollbar {
-                    width: 8px;
-                }
-                .scroll-area::-webkit-scrollbar-thumb {
-                    background-color: #a5c7e6;
-                    border-radius: 8px;
-                }
-                .scroll-area::-webkit-scrollbar-thumb:hover {
-                    background-color: #7aaed6;
-                }
+                .scroll-area::-webkit-scrollbar { width: 8px; }
+                .scroll-area::-webkit-scrollbar-thumb { background-color: #a5c7e6; border-radius: 8px; }
+                .scroll-area::-webkit-scrollbar-thumb:hover { background-color: #7aaed6; }
                 `}
             </style>
 
@@ -132,21 +124,11 @@ export const MateriaEstadisticasAcordeones: React.FC<{ data: MateriaEstadisticas
                 <strong>{data.total_encuestas_procesadas}</strong>
             </p>
 
-            {/* Acordeones de secciones */}
             <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-                
-                {/* CORRECCIÓN AQUI: Añadido el '?' antes de .map */}
                 {data.secciones?.map((seccion) => {
                     const abierta = abiertas.includes(seccion.seccion_id);
                     return (
-                        <div
-                            key={seccion.seccion_id}
-                            style={{
-                                borderRadius: "10px",
-                                overflow: "hidden",
-                                boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
-                            }}
-                        >
+                        <div key={seccion.seccion_id} style={{ borderRadius: "10px", overflow: "hidden", boxShadow: "0 2px 8px rgba(0,0,0,0.05)" }}>
                             <button
                                 onClick={() => toggleSeccion(seccion.seccion_id)}
                                 style={{
@@ -165,175 +147,44 @@ export const MateriaEstadisticasAcordeones: React.FC<{ data: MateriaEstadisticas
                                 }}
                                 aria-expanded={abierta}
                             >
-                                <span>
-                                    {seccion.sigla} – {seccion.descripcion}
-                                </span>
+                                <span>{seccion.sigla} – {seccion.descripcion}</span>
                                 <span style={{ fontSize: "18px" }}>{abierta ? "▲" : "▼"}</span>
                             </button>
 
-                            <div
-                                style={{
-                                    maxHeight: abierta ? "5000px" : "0",
-                                    overflow: "hidden",
-                                    opacity: abierta ? 1 : 0,
-                                    transition: "all 0.5s ease",
-                                    backgroundColor: "#f9f9f9",
-                                }}
-                            >
-                                <fieldset
-                                    style={{
-                                        border: "2px solid #003366",
-                                        borderTop: "none",
-                                        borderRadius: "0 0 8px 8px",
-                                        padding: "20px",
-                                        display: "flex",
-                                        flexDirection: "column",
-                                        gap: "12px",
-                                    }}
-                                >
+                            <div style={{ maxHeight: abierta ? "5000px" : "0", overflow: "hidden", opacity: abierta ? 1 : 0, transition: "all 0.5s ease", backgroundColor: "#f9f9f9" }}>
+                                <fieldset style={{ border: "2px solid #003366", borderTop: "none", borderRadius: "0 0 8px 8px", padding: "20px", display: "flex", flexDirection: "column", gap: "12px" }}>
                                     <legend style={{ display: "none" }} />
-
-                                    {/* CORRECCIÓN AQUI: Añadido el '?' antes de .map */}
                                     {seccion.preguntas?.map((pregunta) => {
-                                        const esAbierta =
-                                            pregunta.respuestas_abiertas &&
-                                            pregunta.respuestas_abiertas.length > 0;
-                                        const preguntaAbierta =
-                                            preguntasAbiertas.includes(pregunta.pregunta_id);
+                                        const esAbierta = pregunta.respuestas_abiertas && pregunta.respuestas_abiertas.length > 0;
+                                        const preguntaAbierta = preguntasAbiertas.includes(pregunta.pregunta_id);
 
                                         return (
-                                            <div
-                                                key={pregunta.pregunta_id}
-                                                style={{
-                                                    backgroundColor: "#fff",
-                                                    border: "1px solid #e0e0e0",
-                                                    borderRadius: "8px",
-                                                    padding: "16px",
-                                                    display: "flex",
-                                                    flexDirection: "column",
-                                                    gap: "12px",
-                                                }}
-                                            >
-                                                {/* Encabezado */}
-                                                <div
-                                                    style={{
-                                                        display: "flex",
-                                                        justifyContent: "space-between",
-                                                        alignItems: "center",
-                                                    }}
-                                                >
-                                                    <h4
-                                                        style={{
-                                                            color: "#000",
-                                                            fontWeight: "bold",
-                                                            fontSize: "15px",
-                                                            margin: 0,
-                                                        }}
-                                                    >
-                                                        {pregunta.enunciado}
-                                                    </h4>
-
+                                            <div key={pregunta.pregunta_id} style={{ backgroundColor: "#fff", border: "1px solid #e0e0e0", borderRadius: "8px", padding: "16px", display: "flex", flexDirection: "column", gap: "12px" }}>
+                                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                                                    <h4 style={{ color: "#000", fontWeight: "bold", fontSize: "15px", margin: 0 }}>{pregunta.enunciado}</h4>
                                                     {esAbierta && (
                                                         <button
                                                             onClick={() => togglePregunta(pregunta.pregunta_id)}
-                                                            style={{
-                                                                backgroundColor: "#e6f2ff",
-                                                                border: "1px solid #a5c7e6",
-                                                                color: "#003366",
-                                                                borderRadius: "8px",
-                                                                cursor: "pointer",
-                                                                fontSize: "13px",
-                                                                fontWeight: "bold",
-                                                                width: "90px",
-                                                                height: "58px",
-                                                                lineHeight: "1.1",
-                                                                display: "flex",
-                                                                flexDirection: "column",
-                                                                justifyContent: "center",
-                                                                alignItems: "center",
-                                                                textAlign: "center",
-                                                                transition: "background-color 0.2s ease, transform 0.1s ease",
-                                                            }}
-                                                            onMouseEnter={(e) => {
-                                                                e.currentTarget.style.backgroundColor = "#d6e9ff";
-                                                                e.currentTarget.style.transform = "scale(1.03)";
-                                                            }}
-                                                            onMouseLeave={(e) => {
-                                                                e.currentTarget.style.backgroundColor = "#e6f2ff";
-                                                                e.currentTarget.style.transform = "scale(1)";
-                                                            }}
+                                                            style={{ backgroundColor: "#e6f2ff", border: "1px solid #a5c7e6", color: "#003366", borderRadius: "8px", cursor: "pointer", fontSize: "13px", fontWeight: "bold", width: "90px", height: "58px", lineHeight: "1.1", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", textAlign: "center", transition: "background-color 0.2s ease" }}
                                                         >
-                                                            {preguntaAbierta ? (
-                                                                <>
-                                                                    <span>Ocultar</span>
-                                                                    <span>Respuestas</span>
-                                                                    <span style={{ fontSize: "16px", lineHeight: "1" }}>▲</span>
-                                                                </>
-                                                            ) : (
-                                                                <>
-                                                                    <span>Ver</span>
-                                                                    <span>Respuestas</span>
-                                                                    <span style={{ fontSize: "16px", lineHeight: "1" }}>▼</span>
-                                                                </>
-                                                            )}
+                                                            {preguntaAbierta ? <><span>Ocultar</span><span>Respuestas</span><span>▲</span></> : <><span>Ver</span><span>Respuestas</span><span>▼</span></>}
                                                         </button>
                                                     )}
                                                 </div>
 
-                                                {/* Cerradas con Recharts */}
-                                                {pregunta.opciones &&
-                                                    pregunta.opciones.length > 0 && (
-                                                        <div
-                                                            style={{
-                                                                backgroundColor: "#f3f7fb",
-                                                                borderRadius: "6px",
-                                                                padding: "10px 20px",
-                                                            }}
-                                                        >
-                                                            <PreguntaGrafico
-                                                                opciones={pregunta.opciones}
-                                                            />
-                                                        </div>
-                                                    )}
+                                                {pregunta.opciones && pregunta.opciones.length > 0 && (
+                                                    <div style={{ backgroundColor: "#f3f7fb", borderRadius: "6px", padding: "10px 20px" }}>
+                                                        <PreguntaGrafico opciones={pregunta.opciones} />
+                                                    </div>
+                                                )}
 
-                                                {/* Abiertas con tarjetas */}
                                                 {esAbierta && preguntaAbierta && (
-                                                    <div
-                                                        className="scroll-area"
-                                                        style={{
-                                                            marginTop: "12px",
-                                                            backgroundColor: "#f3f7fb",
-                                                            borderRadius: "8px",
-                                                            padding: "12px",
-                                                            maxHeight: "350px",
-                                                            overflowY: "auto",
-                                                            display: "flex",
-                                                            flexDirection: "column",
-                                                            gap: "12px",
-                                                        }}
-                                                    >
-                                                        {pregunta.respuestas_abiertas?.map(
-                                                            (resp, idx) => (
-                                                                <div
-                                                                    key={idx}
-                                                                    style={{
-                                                                        backgroundColor: "#fff",
-                                                                        border: "1px solid #cce4f6",
-                                                                        borderRadius: "8px",
-                                                                        padding: "12px 14px",
-                                                                        fontSize: "14px",
-                                                                        color: "#000",
-                                                                        boxShadow:
-                                                                            "0 2px 4px rgba(0,0,0,0.05)",
-                                                                        whiteSpace: "pre-wrap",
-                                                                        wordBreak: "break-word",
-                                                                        lineHeight: 1.5,
-                                                                    }}
-                                                                >
-                                                                    {resp}
-                                                                </div>
-                                                            )
-                                                        )}
+                                                    <div className="scroll-area" style={{ marginTop: "12px", backgroundColor: "#f3f7fb", borderRadius: "8px", padding: "12px", maxHeight: "350px", overflowY: "auto", display: "flex", flexDirection: "column", gap: "12px" }}>
+                                                        {pregunta.respuestas_abiertas?.map((resp, idx) => (
+                                                            <div key={idx} style={{ backgroundColor: "#fff", border: "1px solid #cce4f6", borderRadius: "8px", padding: "12px 14px", fontSize: "14px", color: "#000", boxShadow: "0 2px 4px rgba(0,0,0,0.05)", whiteSpace: "pre-wrap", wordBreak: "break-word", lineHeight: 1.5 }}>
+                                                                {resp}
+                                                            </div>
+                                                        ))}
                                                     </div>
                                                 )}
                                             </div>
@@ -349,16 +200,18 @@ export const MateriaEstadisticasAcordeones: React.FC<{ data: MateriaEstadisticas
     );
 };
 
-/* --- Página principal --- */
-const EstadisticasPreguntasPage: React.FC = () => {
+/* --- Componente Principal --- */
+const EstadisticasPorPregunta: React.FC = () => {
+    const { materiaId } = useParams<{ materiaId: string }>(); 
+    
     const [data, setData] = useState<MateriaEstadisticasProps | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        // Aquí es donde deberías obtener la materia real dinámicamente
-        // Por ahora dejamos el ID 1 como ejemplo
-        fetch("http://localhost:8000/materias/1/estadisticas/preguntas")
+        if (!materiaId) return;
+
+        fetch(`http://localhost:8000/materias/${materiaId}/estadisticas/preguntas`)
             .then((res) => {
                 if (!res.ok) throw new Error("Error al cargar datos");
                 return res.json();
@@ -371,12 +224,12 @@ const EstadisticasPreguntasPage: React.FC = () => {
                 setError(err.message);
                 setLoading(false);
             });
-    }, []);
+    }, [materiaId]); 
 
     if (loading)
-        return <p style={{ fontFamily: '"Segoe UI", "Roboto", sans-serif' }}>Cargando estadísticas...</p>;
-    if (error) return <p style={{ color: "#dc3545", fontWeight: "bold" }}>Error: {error}</p>;
-    if (!data) return <p>No hay datos para mostrar.</p>;
+        return <p style={{ fontFamily: '"Segoe UI", "Roboto", sans-serif', padding: '20px' }}>Cargando estadísticas...</p>;
+    if (error) return <p style={{ color: "#dc3545", fontWeight: "bold", padding: '20px' }}>Error: {error}</p>;
+    if (!data) return <p style={{ padding: '20px' }}>No hay datos para mostrar.</p>;
 
     return (
         <div
@@ -394,4 +247,4 @@ const EstadisticasPreguntasPage: React.FC = () => {
     );
 };
 
-export default EstadisticasPreguntasPage;
+export default EstadisticasPorPregunta;

@@ -203,13 +203,12 @@ const GenerarInformeSinteticoDep: React.FC = () => {
         setDatosInforme((prev) => ({ ...prev, departamento_id: id }));
     };
 
-    const handleCabeceraChange = (data: { periodo: number; sede: string; integrantes: string }) => {
+    const handleCabeceraChange = (data: { ciclo_lectivo: number; sede: string; integrantes: string }) => {
         setDatosInforme((prev) => ({
             ...prev,
-            periodo: data.periodo,
             sede: data.sede,
             integrantes: data.integrantes,
-            anio: Number(data.periodo) || 2025,
+            anio: Number(data.ciclo_lectivo) || 2025,
         }));
     };
 
@@ -232,10 +231,21 @@ const GenerarInformeSinteticoDep: React.FC = () => {
         setInformeGenerado(null);
 
         try {
+            // Preparamos el payload correcto
+            const payload = {
+                descripcion: datosInforme.descripcion,
+                periodo_id: datosInforme.periodo, 
+                sede: datosInforme.sede,
+                integrantes: datosInforme.integrantes,
+                departamento_id: datosInforme.departamento_id,
+                comentarios: datosInforme.comentarios || "",
+                
+            };
+
             const response = await fetch(`${API_BASE}/informes-sinteticos/`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(datosInforme),
+                body: JSON.stringify(payload),
             });
 
             if (!response.ok) {
@@ -244,17 +254,16 @@ const GenerarInformeSinteticoDep: React.FC = () => {
             }
 
             const data = await response.json();
-            setInformeGenerado(data); 
+            setInformeGenerado(data);
             setMensaje({ tipo: "exito", texto: `El informe ha sido guardado correctamente. ID: ${data.id}` });
             window.scrollTo({ top: 0, behavior: 'smooth' });
         } catch (error: any) {
             setMensaje({ tipo: "error", texto: `Error: ${error.message || "desconocido"}` });
-            setInformeGenerado(null); 
+            setInformeGenerado(null);
         } finally {
             setCreando(false);
         }
     };
-
     return (
         <div>
             <HeaderInstitucional />
