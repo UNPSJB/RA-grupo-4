@@ -1,43 +1,58 @@
-/* --- Variables CSS (Paleta Limpia y Profesional) --- */
-:root {
-    --color-principal: #003366; /* Azul Oscuro Institucional */
-    --color-secundario: #0078D4; /* Celeste Brillante/Activo */
-    --color-terciario: #e8f4ff; /* Azul muy claro para fondos sutiles */
-    --color-alerta: #e76f51; /* Naranja para Alertas */
-    --color-fondo-base: #f0f4f8; /* Fondo claro general */
-    --color-fondo-tarjeta: #ffffff;
-    --color-texto-oscuro: #222;
-    --sombra-tarjeta: 0 8px 20px rgba(0, 0, 0, 0.08); /* Sombra suave */
-    --transicion-suave: 0.3s ease;
-    --borde-radio-lg: 12px;
+/* =========================================
+   MENU ALUMNO - HOJA DE ESTILOS AISLADA
+   ========================================= */
+
+/* --- Variables Locales (Scope) --- */
+/* Definimos las variables solo dentro del layout del alumno para evitar conflictos */
+.menu-alumno-layout-full {
+    --alumno-color-principal: #003366;      /* Azul Oscuro Institucional */
+    --alumno-color-secundario: #0078D4;     /* Celeste Brillante */
+    --alumno-color-terciario: #e8f4ff;      /* Fondo sutil */
+    --alumno-color-alerta: #e76f51;         /* Naranja Alerta */
+    --alumno-bg-base: #f0f4f8;              /* Fondo General */
+    --alumno-bg-card: #ffffff;              /* Fondo Tarjetas */
+    --alumno-text-dark: #222;
+    --alumno-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+    --alumno-radius: 12px;
+    --alumno-transition: 0.3s ease;
+
+    /* Colores para Mini Stats */
+    --stat-bg-total: var(--alumno-color-principal);
+    --stat-bg-done: #e8f4ff;
+    --stat-bg-pending: #fff0e8;
+    --stat-text-done: #38a3a5;
+    --stat-text-pending: #e76f51;
 }
 
-/* --- Colores de Tarjetas de Navegación --- */
-.card-blue { --card-color: #3d5a80; } 
-.card-yellow { --card-color: #e09f3e; } 
-.card-purple { --card-color: #70587c; } 
-
-
 /* -------------------------------------------
-   1. Estructura General y Márgenes
+   1. Estructura General (Layout)
    ------------------------------------------- */
 
 .menu-alumno-layout-full {
-    background-color: var(--color-fondo-base);
-    min-height: 100vh;
+    background-color: var(--alumno-bg-base);
+    min-height: 100vh; /* Ocupa al menos toda la pantalla */
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    color: var(--alumno-text-dark);
+    display: flex;
+    flex-direction: column;
 }
 
 .menu-alumno-content {
-    padding: 30px; 
-    max-width: 1400px; 
-    margin: 0 auto; 
-    color: var(--color-texto-oscuro);
-}
-
-.back-button-bar {
-    padding: 20px 30px 0 30px; 
+    padding: 30px;
     max-width: 1400px;
     margin: 0 auto;
+    width: 100%;
+    box-sizing: border-box;
+    flex: 1;
+}
+
+/* Barra de botón volver */
+.back-button-bar {
+    padding: 20px 30px 0 30px;
+    max-width: 1400px;
+    margin: 0 auto;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .back-button-link {
@@ -45,252 +60,197 @@
     align-items: center;
     gap: 8px;
     padding: 8px 15px;
-    background-color: var(--color-fondo-tarjeta);
-    border: 1px solid var(--color-terciario);
+    background-color: var(--alumno-bg-card);
+    border: 1px solid var(--alumno-color-terciario);
     border-radius: 8px;
     text-decoration: none;
-    color: var(--color-principal);
+    color: var(--alumno-color-principal);
     font-weight: 600;
     transition: all 0.2s ease-in-out;
+    cursor: pointer;
 }
 
 .back-button-link:hover {
-    background-color: var(--color-principal);
-    color: var(--color-fondo-tarjeta);
+    background-color: var(--alumno-color-principal);
+    color: #fff;
     box-shadow: 0 4px 10px rgba(0, 51, 102, 0.3);
 }
 
 /* -------------------------------------------
-   2. Dashboard Layout 
+   2. Dashboard Layout (Grid Principal)
    ------------------------------------------- */
 
-.dashboard-main-view {
+.alumno-dashboard-wrapper {
     display: flex;
     flex-direction: column;
-    gap: 35px; 
+    gap: 35px;
 }
 
-/* Contenedor Superior (Bienvenida + Stats) */
-.dashboard-header-container {
+/* Header Grid: Bienvenida (izq) + Stats (der) */
+.alumno-header-grid {
     display: grid;
-    grid-template-columns: 2fr 1fr;
+    grid-template-columns: 2fr 1fr; /* 2 partes bienvenida, 1 parte stats */
     gap: 30px;
     align-items: stretch;
 }
 
-
-.bienvenida-box {
-    background-color: var(--color-fondo-tarjeta);
-    background-image: linear-gradient(to right, #ffffff 90%, var(--color-terciario) 100%);
+/* --- Tarjeta de Bienvenida --- */
+.alumno-welcome-card {
+    background-color: var(--alumno-bg-card);
+    background-image: linear-gradient(to right, #ffffff 90%, var(--alumno-color-terciario) 100%);
     padding: 30px;
-    border-radius: var(--borde-radio-lg);
-    box-shadow: var(--sombra-tarjeta);
-    border-left: 6px solid var(--color-secundario); 
+    border-radius: var(--alumno-radius);
+    box-shadow: var(--alumno-shadow);
+    border-left: 6px solid var(--alumno-color-secundario);
     display: flex;
     flex-direction: column;
     justify-content: center;
 }
 
-.welcome-title {
+.alumno-title {
     font-size: 2rem;
-    color: var(--color-principal);
-    margin-bottom: 8px;
+    color: var(--alumno-color-principal);
+    margin: 0 0 8px 0;
     font-weight: 700;
     display: flex;
     align-items: center;
 }
 
-.welcome-title .hand-icon {
-    color: var(--color-secundario);
+.alumno-icon-hand {
+    color: var(--alumno-color-secundario);
     margin-right: 15px;
     animation: wave-hand 2.5s ease-in-out infinite;
 }
+
 @keyframes wave-hand {
     0%, 100% { transform: rotate(0deg); }
-    50% { transform: rotate(5deg); }
+    50% { transform: rotate(15deg); }
 }
 
-.panel-subtitle {
+.alumno-subtitle {
     font-size: 1.1rem;
     color: #555;
+    margin: 0;
 }
 
-/* === Caja de Estadísticas === */
-.estadisticas-box {
-    padding: 50px;
-    background-color: var(--color-fondo-tarjeta);
-    border-radius: var(--borde-radio-lg);
-    box-shadow: var(--sombra-tarjeta);
-    display: flex; /* Añadido para mejor alineación */
-    flex-direction: column;
-    justify-content: flex-start;
-}
-.stats-title {
-    font-size: 1.2rem;
-    color: var(--color-principal);
-    margin-bottom: 20px;
+/* --- Contenedor Wrapper de Stats --- */
+.alumno-stats-card {
+    background-color: var(--alumno-bg-card);
+    padding: 25px; 
+    border-radius: var(--alumno-radius);
+    box-shadow: var(--alumno-shadow);
     display: flex;
     align-items: center;
-    gap: 8px;
-    font-weight: 600;
+    justify-content: center;
 }
 
+/* -------------------------------------------
+   3. Secciones de Contenido (Encuestas, Navegación)
+   ------------------------------------------- */
 
-/* === Secciones de Contenido General === */
-
-.seccion-box {
-    background-color: var(--color-fondo-tarjeta);
+.alumno-section-container {
+    background-color: var(--alumno-bg-card);
     padding: 25px;
-    border-radius: var(--borde-radio-lg);
-    box-shadow: var(--sombra-tarjeta);
+    border-radius: var(--alumno-radius);
+    box-shadow: var(--alumno-shadow);
 }
 
-.seccion-title {
+/* Contenedor interno para darle espacio al componente importado */
+.alumno-content-box {
+    margin-top: 15px;
+}
+
+.alumno-section-title {
     font-size: 1.6rem;
-    color: var(--color-principal);
-    margin-bottom: 25px;
-    border-left: 5px solid var(--color-secundario);
+    color: var(--alumno-color-principal);
+    margin: 0 0 25px 0;
+    border-left: 5px solid var(--alumno-color-secundario);
     padding-left: 15px;
     display: flex;
     align-items: center;
     gap: 10px;
 }
-.seccion-title svg {
-    color: var(--color-secundario);
+
+.alumno-section-title svg {
+    color: var(--alumno-color-secundario);
 }
 
-
 /* -------------------------------------------
-   3. Tarjetas de Navegación
+   4. Tarjetas de Navegación (Mis Materias, Historial)
    ------------------------------------------- */
 
-.card-grid {
+.alumno-cards-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 30px;
 }
 
-.nav-card {
+.alumno-nav-card {
     position: relative;
     overflow: hidden;
     padding: 30px;
-    background-color: var(--color-fondo-tarjeta);
-    border-radius: var(--borde-radio-lg);
+    background-color: var(--alumno-bg-card);
+    border-radius: var(--alumno-radius);
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
     cursor: pointer;
-    transition: all var(--transicion-suave);
-    border-top: 5px solid var(--card-color);
+    transition: all var(--alumno-transition);
+    border-top: 5px solid transparent; 
 }
 
-.nav-card:hover {
+/* Variantes de color para las tarjetas */
+.card-variant-blue { 
+    border-top-color: #3d5a80; 
+}
+.card-variant-blue svg { color: #3d5a80; }
+
+.card-variant-yellow { 
+    border-top-color: #e09f3e; 
+}
+.card-variant-yellow svg { color: #e09f3e; }
+
+.alumno-nav-card:hover {
     transform: translateY(-5px);
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
 }
 
-.nav-card svg {
-    color: var(--card-color);
-    margin-bottom: 15px;
-}
-
-.nav-card h3 {
+.alumno-nav-card h3 {
     font-size: 1.4rem;
-    color: var(--color-principal);
-    margin-bottom: 8px;
+    color: var(--alumno-color-principal);
+    margin: 15px 0 8px 0;
 }
 
-.nav-card p {
+.alumno-nav-card p {
     font-size: 0.95rem;
     color: #666;
-}
-
-
-/* -------------------------------------------
-   4. Media Queries
-   ------------------------------------------- */
-
-@media (max-width: 992px) {
-    .dashboard-header-container {
-        grid-template-columns: 1fr; /* Apila bienvenida y stats */
-    }
-    .card-grid {
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    }
-}
-
-@media (max-width: 800px) {
-    .menu-alumno-content {
-        padding: 20px 15px;
-    }
-    .back-button-bar {
-        padding: 15px 15px 0 15px;
-    }
-    .dashboard-main-view {
-        gap: 25px;
-    }
-    .bienvenida-box {
-        padding: 20px;
-    }
-    .welcome-title {
-        font-size: 1.5rem;
-    }
-    .seccion-box {
-        padding: 20px;
-    }
-    .seccion-title {
-        font-size: 1.4rem;
-        padding-left: 10px;
-    }
-    .card-grid {
-        grid-template-columns: 1fr;
-        gap: 20px;
-    }
-}
-/* --- NUEVAS VARIABLES DE ESTADO --- */
-:root {
-    /* Variables de Paleta Institucional ya definidas */
-    --color-principal: #003366; 
-    --color-secundario: #0078D4; 
-    --color-fondo-tarjeta: #ffffff;
-    --sombra-tarjeta: 0 8px 20px rgba(0, 0, 0, 0.08);
-
-    /* Colores Específicos para las Stats */
-    --color-stat-bg-total: var(--color-principal); 
-    --color-stat-bg-done: #e8f4ff; 
-    --color-stat-bg-pending: #fff0e8; 
-    
-    --color-stat-text-done: #38a3a5; 
-    --color-stat-text-pending: #e76f51; 
+    margin: 0;
 }
 
 /* -------------------------------------------
-   5. MINI ESTADÍSTICAS (Diseño de Tarjeta Compacta Legible) - CLASES DE COMPONENTE
+   5. MINI ESTADÍSTICAS (Estilos Internos del Componente)
    ------------------------------------------- */
+/* Estos estilos aplican a los elementos dentro de MiniEstadisticasEst.jsx */
 
-/* Contenedor principal de las estadísticas */
 .mini-stats-est-container {
-    padding: 0; 
     width: 100%;
 }
 
 .mini-stats-grid {
     display: grid;
-    /* Divide el espacio del panel lateral en 3 columnas */
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px; 
-    padding: 0;
+    grid-template-columns: repeat(3, 1fr); /* 3 columnas exactas */
+    gap: 10px;
 }
 
 .mini-stat-box {
-    /* Estilo de tarjeta compacta */
     border-radius: 8px;
-    padding: 10px 5px; 
+    padding: 15px 5px;
     text-align: center;
     box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    transition: transform var(--transicion-suave), box-shadow var(--transicion-suave);
-    min-height: 70px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    min-height: 80px;
     display: flex;
     flex-direction: column;
     justify-content: center;
+    align-items: center;
 }
 
 .mini-stat-box:hover {
@@ -298,74 +258,111 @@
     box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
 
-/* --- Estilos de Texto y Número --- */
 .mini-stat-number {
-    font-size: 1.8rem; 
+    font-size: 1.8rem;
     font-weight: 700;
     line-height: 1.1;
-    margin-bottom: 3px;
+    margin-bottom: 5px;
 }
 
 .mini-stat-label {
-    font-size: 0.75rem; 
+    font-size: 0.75rem;
     color: #555;
-    font-weight: 500;
-}
-
-/* --- Colores Específicos --- */
-
-/* 1. Total (Fondo principal) */
-.mini-stat-box.stat-total { 
-    background-color: var(--color-stat-bg-total); 
-}
-.mini-stat-box.stat-total .mini-stat-number { 
-    color: var(--color-fondo-tarjeta); 
-}
-.mini-stat-box.stat-total .mini-stat-label { 
-    color: rgba(255, 255, 255, 0.8); 
-}
-
-/* 2. Respondidas (Fondo claro con color secundario) */
-.mini-stat-box.stat-done { 
-    background-color: var(--color-stat-bg-done); 
-}
-.mini-stat-box.stat-done .mini-stat-number { 
-    color: var(--color-stat-text-done); 
-}
-.mini-stat-box.stat-done .mini-stat-label { 
-    color: var(--color-principal); 
-}
-
-/* 3. Pendientes (Fondo claro de alerta con color de alerta) */
-.mini-stat-box.stat-pending { 
-    background-color: var(--color-stat-bg-pending); 
-    border: 1px solid rgba(231, 111, 81, 0.3); 
-}
-.mini-stat-box.stat-pending .mini-stat-number { 
-    color: var(--color-stat-text-pending); 
-}
-.mini-stat-box.stat-pending .mini-stat-label { 
-    color: var(--color-stat-text-pending);
     font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Variantes de Mini Stats */
+/* 1. Total */
+.mini-stat-box.stat-total {
+    background-color: var(--stat-bg-total);
+}
+.mini-stat-box.stat-total .mini-stat-number {
+    color: #fff;
+}
+.mini-stat-box.stat-total .mini-stat-label {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+/* 2. Respondidas */
+.mini-stat-box.stat-done {
+    background-color: var(--stat-bg-done);
+}
+.mini-stat-box.stat-done .mini-stat-number {
+    color: var(--stat-text-done);
+}
+.mini-stat-box.stat-done .mini-stat-label {
+    color: var(--alumno-color-principal);
+}
+
+/* 3. Pendientes */
+.mini-stat-box.stat-pending {
+    background-color: var(--stat-bg-pending);
+    border: 1px solid rgba(231, 111, 81, 0.3);
+}
+.mini-stat-box.stat-pending .mini-stat-number {
+    color: var(--stat-text-pending);
+}
+.mini-stat-box.stat-pending .mini-stat-label {
+    color: var(--stat-text-pending);
 }
 
 
 /* -------------------------------------------
-   6. AJUSTES RESPONSIVOS PARA STATS 
+   6. Media Queries (Responsividad)
    ------------------------------------------- */
+
+/* Tablets y pantallas medianas */
 @media (max-width: 992px) {
-    /* Cuando se apila el panel lateral, las estadísticas pueden ser más grandes */
-    .mini-stats-grid {
+    .alumno-header-grid {
+        grid-template-columns: 1fr; /* Apila bienvenida arriba, stats abajo */
         gap: 20px;
     }
-    .mini-stat-box {
-        padding: 15px 10px;
+
+    .alumno-stats-card {
+        padding: 20px;
+    }
+    
+    .mini-stats-grid {
+        /* Hacemos las stats más grandes si hay espacio al apilarse */
+        gap: 20px;
     }
 }
+
+/* Móviles */
 @media (max-width: 600px) {
+    .menu-alumno-content {
+        padding: 15px;
+    }
+    
+    .back-button-bar {
+        padding: 15px 15px 0 15px;
+    }
+
+    .alumno-title {
+        font-size: 1.5rem;
+    }
+
+    .alumno-cards-grid {
+        grid-template-columns: 1fr; /* Una tarjeta debajo de otra */
+    }
+
+    /* En móviles muy estrechos, apilamos las mini stats verticalmente o en 2 columnas */
     .mini-stats-grid {
-        /* En móvil, apilamos las estadísticas para que no sean demasiado estrechas */
         grid-template-columns: 1fr; 
-        gap: 15px;
+    }
+    
+    .mini-stat-box {
+        flex-direction: row; /* Número a la izq, texto a la der para ahorrar espacio vertical */
+        justify-content: space-between;
+        padding: 15px 20px;
+        align-items: center;
+        min-height: auto;
+    }
+    
+    .mini-stat-label {
+        margin-left: 10px;
+        text-align: right;
     }
 }

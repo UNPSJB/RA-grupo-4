@@ -1,6 +1,8 @@
 import React from 'react';
-import { Routes, Route, NavLink, useNavigate, useParams, useLocation } from 'react-router-dom';
+import { Routes, Route, NavLink, useNavigate, useParams, useLocation, Outlet } from 'react-router-dom';
 import { ArrowLeft, FileText, List, BookOpen, Clock, Hand } from 'lucide-react'; 
+
+// Componentes internos de ESTUDIANTE
 import MiniEstadisticasEst from '../Estudiante/MiniEstadisticasEst';
 import SeleccionarEncuestas from '../Estudiante/SeleccionarEncuestas';
 import ResponderEncuesta from '../Estudiante/ResponderEncuesta';
@@ -8,9 +10,15 @@ import SinDatos from '../Otros/SinDatos';
 import HistorialEncuestasRealizadasEstudiante from '../Estudiante/HistorialEncuestasRealizadasEstudiante';
 import MisMaterias from '../Estudiante/MisMaterias';
 import MisRespuestas from '../Estudiante/MisRespuestas'; 
+
+// Importante: CSS aislado
 import './MenuAlumno.css'; 
 
-// --- Componente Wrapper para la página de detalles ---
+// ---------------------------------------------------
+// 1. Componentes Auxiliares
+// ---------------------------------------------------
+
+// --- Wrapper para la página de detalles de respuestas ---
 const PaginaMisRespuestas = () => {
     const { materiaId } = useParams();
     const id = materiaId ? parseInt(materiaId) : 0;
@@ -18,23 +26,16 @@ const PaginaMisRespuestas = () => {
     if (!id) return (
         <div style={{ padding: '40px', textAlign: 'center', color: '#666' }}>
             <p>Error: No se pudo identificar la materia.</p>
-            <NavLink to="/home/alumno/historial-encuestas" style={{ color: '#0056b3', textDecoration: 'underline' }}>
+            <NavLink to="/home/alumno/historial-encuestas" className="back-button-link">
                 Volver al historial
             </NavLink>
         </div>
     );
 
     return (
-        <div style={{ maxWidth: '900px', margin: '0 auto', padding: '20px' }}>
+        <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
             <div style={{ marginBottom: '20px' }}>
-                <NavLink 
-                    to="/home/alumno/historial-encuestas" 
-                    style={{ 
-                        display: 'inline-flex', alignItems: 'center', gap: '8px', 
-                        color: '#0056b3', textDecoration: 'none', fontWeight: 600,
-                        padding: '8px 12px', borderRadius: '5px', backgroundColor: '#f0f7ff'
-                    }}
-                >
+                <NavLink to="/home/alumno/historial-encuestas" className="back-button-link">
                     <ArrowLeft size={18} /> Volver al Historial
                 </NavLink>
             </div>
@@ -43,48 +44,70 @@ const PaginaMisRespuestas = () => {
     );
 };
 
-// --- Dashboard Principal ---
+// ---------------------------------------------------
+// 2. Dashboard Principal (Vista Home del Alumno)
+// ---------------------------------------------------
+
 const AlumnoDashboard = ({ estudianteId }) => {
     const navigate = useNavigate();
+    
     return (
-        <div className="dashboard-main-view">
-            <div className="dashboard-header-container">
-                <aside className="bienvenida-box">
-                    <h1 className="welcome-title"><Hand size={30} className="hand-icon" /> ¡Bienvenido/a, Alumno!</h1>
-                    <p className="panel-subtitle">Accedé a tus encuestas, materias y recursos institucionales.</p>
+        // Clase única para aislar estilos del alumno
+        <div className="alumno-dashboard-wrapper">
+            
+            {/* 1. Cabecera del Alumno: Bienvenida y Estadísticas */}
+            <div className="alumno-header-grid">
+                <aside className="alumno-welcome-card">
+                    <h1 className="alumno-title">
+                        <Hand size={30} className="alumno-icon-hand" /> Hola, Alumno
+                    </h1>
+                    <p className="alumno-subtitle">Panel de gestión académica y encuestas.</p>
                 </aside>
-                <div className="estadisticas-box card-box">
+                
+                <div className="alumno-stats-card">
                     <MiniEstadisticasEst estudianteId={estudianteId} />
                 </div>
             </div>
 
-            <div className="seccion-box informes-principales">
-                <h2 className="seccion-title"><FileText size={20} /> Tus encuestas pendientes</h2>
-                <SeleccionarEncuestas/>
+            {/* 2. Sección Principal: Encuestas Pendientes */}
+            <div className="alumno-section-container">
+                <h2 className="alumno-section-title">
+                    <FileText size={20} /> Tus encuestas pendientes
+                </h2>
+                <div className="alumno-content-box">
+                    <SeleccionarEncuestas />
+                </div>
             </div>
 
-            <div className="seccion-box navegacion-secundaria">
-                <h2 className="seccion-title"><List size={20} /> Navegación y Acceso Rápido</h2>
-                <div className="card-grid">
-                    <div className="nav-card card-blue" onClick={() => navigate("mis-materias")}>
-                        <BookOpen size={36} /><h3>Mis Materias</h3><p>Consulta el listado de asignaturas.</p>
+            {/* 3. Navegación Rápida */}
+            <div className="alumno-section-container">
+                <h2 className="alumno-section-title">
+                    <List size={20} /> Acceso Rápido
+                </h2>
+                <div className="alumno-cards-grid">
+                    <div className="alumno-nav-card card-variant-blue" onClick={() => navigate("mis-materias")}>
+                        <BookOpen size={36} />
+                        <h3>Mis Materias</h3>
+                        <p>Consulta tus asignaturas actuales.</p>
                     </div>
-                    <div className="nav-card card-yellow" onClick={() => navigate("historial-encuestas")}>
-                        <Clock size={36} /><h3>Historial de Encuestas</h3><p>Revisa las encuestas que ya completaste.</p>
-                    </div>
+                    <div className="alumno-nav-card card-variant-yellow" onClick={() => navigate("historial-encuestas")}>
+                        <Clock size={36} />
+                        <h3>Historial</h3>
+                        <p>Revisa encuestas anteriores.</p>
                     </div>
                 </div>
             </div>
+        </div>
     );
 };
 
-const MenuAlumno = () => {
-    const estudianteId = 1; 
-    const location = useLocation(); 
+// ---------------------------------------------------
+// 3. Layout del Alumno (Estructura Base)
+// ---------------------------------------------------
 
-    // Lógica para determinar la ruta de regreso
-    // Si la ruta actual es exactamente "/home/alumno" (el dashboard), volvemos al home general.
-    // Si es cualquier otra (submenú), volvemos al dashboard (/home/alumno).
+const AlumnoLayout = () => {
+    const location = useLocation(); 
+    // Si estamos en la raíz del alumno, el botón vuelve al Home General, sino al Dashboard de Alumno
     const esDashboard = location.pathname === '/home/alumno' || location.pathname === '/home/alumno/';
     const rutaDestino = esDashboard ? '/home' : '/home/alumno';
 
@@ -92,24 +115,43 @@ const MenuAlumno = () => {
         <div className="menu-alumno-layout-full">
             <div className="back-button-bar">
                 <NavLink to={rutaDestino} className="back-button-link">
-                    <ArrowLeft size={18} /> Regresar al Inicio
+                    <ArrowLeft size={18} /> {esDashboard ? "Inicio General" : "Volver al Panel"}
                 </NavLink>
             </div>
             <main className="menu-alumno-content">
-                <Routes>
-                    <Route index element={<AlumnoDashboard estudianteId={estudianteId} />} />
-                    <Route path="seleccionar" element={<SeleccionarEncuestas />} />
-                    <Route path="responder-encuesta/:inscripcionId" element={<ResponderEncuesta />} />
-                    
-                    <Route path="historial-encuestas" element={<HistorialEncuestasRealizadasEstudiante />} />
-                    
-                    <Route path="respuestas-encuesta/:materiaId" element={<PaginaMisRespuestas />} />
-                    
-                    <Route path="mis-materias" element={<MisMaterias />} />
-                    
-                </Routes>
+                {/* Aquí se renderizan las sub-rutas */}
+                <Outlet />
             </main>
         </div>
+    );
+};
+
+// ---------------------------------------------------
+// 4. Router Principal del Módulo Alumno
+// ---------------------------------------------------
+
+const MenuAlumno = () => {
+    const estudianteId = 1; // Aquí podrías obtener el ID real desde un Contexto o Prop
+
+    return (
+        <Routes>
+            {/* Todas las rutas de alumno viven dentro de AlumnoLayout */}
+            <Route path="/" element={<AlumnoLayout />}>
+                
+                {/* Ruta index: El Dashboard */}
+                <Route index element={<AlumnoDashboard estudianteId={estudianteId} />} />
+                
+                {/* Sub-rutas funcionales */}
+                <Route path="seleccionar" element={<SeleccionarEncuestas />} />
+                <Route path="responder-encuesta/:inscripcionId" element={<ResponderEncuesta />} />
+                <Route path="historial-encuestas" element={<HistorialEncuestasRealizadasEstudiante />} />
+                <Route path="respuestas-encuesta/:materiaId" element={<PaginaMisRespuestas />} />
+                <Route path="mis-materias" element={<MisMaterias />} />
+                
+                {/* Rutas de utilidad */}
+                <Route path="sin-datos" element={<SinDatos />} />
+            </Route>
+        </Routes>
     );
 };
 

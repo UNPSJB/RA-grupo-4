@@ -4,33 +4,30 @@ import { BookOpen, Send, Loader2 } from "lucide-react";
 import ErrorCargaDatos from "../Otros/ErrorCargaDatos";
 import SinDatos from "../Otros/SinDatos";
 
-interface InformeSintetico {
-  id: number;
-  descripcion: string;
-  identificador?: string;
-}
-
 // Datos ajustados al contexto de "Informes Sintéticos"
-const informesHardcodeados: InformeSintetico[] = [
+const informesHardcodeados = [
   { id: 101, descripcion: "Informe Sintético: Programación I", identificador: "2024 - 1er Cuatrimestre" },
   { id: 102, descripcion: "Informe Sintético: Base de Datos", identificador: "2024 - Anual" },
   { id: 103, descripcion: "Informe Sintético: Ingeniería de Software", identificador: "2025 - Planificación" },
 ];
 
-const SeleccionarInformeSinteticoSEC: React.FC = () => {
-  const [informes, setInformes] = useState<InformeSintetico[]>([]);
-  const [cargando, setCargando] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+const SeleccionarInformeSinteticoSEC = () => {
+  const [informes, setInformes] = useState([]);
+  const [cargando, setCargando] = useState(true);
+  const [error, setError] = useState(null);
 
   const fetchInformesSinteticos = useCallback(async () => {
     try {
       setCargando(true);
       setError(null);
+      // URL de ejemplo - Ajustar según tu backend real
       const response = await fetch(`http://localhost:8000/informes-sinteticos/`);
+      
       if (!response.ok) throw new Error("Error de conexión");
-      const data: InformeSintetico[] = await response.json();
+      
+      const data = await response.json();
       setInformes(data.length === 0 ? informesHardcodeados : data);
-    } catch (err: any) {
+    } catch (err) {
       console.warn("Usando datos locales por error de backend:", err);
       setInformes(informesHardcodeados);
     } finally {
@@ -42,184 +39,200 @@ const SeleccionarInformeSinteticoSEC: React.FC = () => {
     fetchInformesSinteticos();
   }, [fetchInformesSinteticos]);
 
+  // --- ESTILOS EN LÍNEA (Integrados) ---
+  // Usamos variables CSS que coinciden con MenuSecretaria.css, con fallbacks por si se usa aislado.
+  const estilosSecretaria = `
+    .sec-informes-wrapper {
+        width: 100%;
+        font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        box-sizing: border-box;
+    }
+
+    /* Loading State */
+    .sec-loading-wrapper {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 40px;
+        color: var(--sec-color-principal, #2c3e50);
+    }
+
+    .sec-spinner {
+        animation: sec-spin 1s linear infinite;
+        margin-bottom: 15px;
+        color: var(--sec-color-secundario, #8e44ad);
+    }
+
+    @keyframes sec-spin { 
+        0% { transform: rotate(0deg); } 
+        100% { transform: rotate(360deg); } 
+    }
+
+    /* Contenedor de la lista */
+    .sec-lista-informes {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        width: 100%;
+    }
+
+    /* --- CÁPSULA (ITEM DE LISTA) --- */
+    .sec-capsula-informe {
+        background-color: #ffffff;
+        border: 1px solid #e0e0e0;
+        border-left: 4px solid var(--sec-color-secundario, #8e44ad); /* Borde violeta característico */
+        border-radius: 8px;
+        padding: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        transition: all 0.2s ease-in-out;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    }
+
+    .sec-capsula-informe:hover {
+        transform: translateX(5px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        border-color: #d0d0d0;
+        border-left-color: var(--sec-color-principal, #2c3e50);
+    }
+
+    /* Bloque de Información (Icono + Textos) */
+    .sec-info-bloque {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .sec-icono-materia {
+        color: var(--sec-color-principal, #2c3e50);
+        background-color: var(--sec-color-terciario, #f4ecf7);
+        padding: 10px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .sec-textos {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .sec-nombre-materia {
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: var(--sec-color-principal, #2c3e50);
+        margin: 0;
+        line-height: 1.2;
+    }
+
+    .sec-id-informe {
+        font-size: 0.85rem;
+        color: #7f8c8d;
+        font-weight: 500;
+    }
+
+    /* Botón de Acción */
+    .sec-boton-accion {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background-color: var(--sec-color-principal, #2c3e50);
+        color: #ffffff;
+        padding: 10px 16px;
+        border-radius: 6px;
+        text-decoration: none;
+        font-size: 0.9rem;
+        font-weight: 600;
+        transition: background-color 0.2s, box-shadow 0.2s;
+        white-space: nowrap;
+        border: none;
+        cursor: pointer;
+    }
+
+    .sec-boton-accion:hover {
+        background-color: var(--sec-color-secundario, #8e44ad);
+        box-shadow: 0 2px 8px rgba(142, 68, 173, 0.3);
+    }
+
+    /* Responsive */
+    @media (max-width: 650px) {
+        .sec-capsula-informe {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 15px;
+        }
+        
+        .sec-boton-accion {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+  `;
+
+  // --- Renderizado de Estados ---
+
   if (cargando) return (
-    <div className="loading-wrapper">
-      <Loader2 className="spinner" size={32} />
-      <p style={{fontSize: '0.9rem'}}>Cargando informes...</p>
-      <style>{`
-        .loading-wrapper { display: flex; flex-direction: column; align-items: center; padding: 30px; color: #0056b3; }
-        .spinner { animation: spin 1s linear infinite; margin-bottom: 10px; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-      `}</style>
+    <div className="sec-loading-wrapper">
+      <style>{estilosSecretaria}</style>
+      <Loader2 className="sec-spinner" size={32} />
+      <p style={{fontSize: '0.95rem', fontWeight: 500}}>Cargando informes...</p>
     </div>
   );
 
-  if (error) return <ErrorCargaDatos mensajeError={error} onReintentar={fetchInformesSinteticos} />;
-
-  return (
+  if (error) return (
     <>
-      <style>{`
-        :root {
-          --primary: #0056b3;
-          --primary-dark: #004494;
-          --bg-capsule: #ffffff;
-          --border-color: #dbeafe; /* Azul muy suave */
-          --border-hover: #0056b3;
-          --text-main: #0f172a;    /* Color oscuro para texto principal */
-          --text-sub: #64748b;     /* Gris para identificador */
-        }
-
-        .contenedor-principal {
-          width: 100%;
-          padding: 1rem 0; /* Menos padding vertical, pegado a los lados */
-          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-          box-sizing: border-box;
-        }
-
-        .lista-informes {
-          display: flex;
-          flex-direction: column;
-          gap: 0.8rem; /* Espacio más pequeño entre cápsulas */
-          width: 100%;
-        }
-
-        /* DISEÑO CÁPSULA COMPACTA */
-        .capsula-informe {
-          background: var(--bg-capsule);
-          border: 2px solid var(--border-color);
-          border-radius: 12px; /* Redondeado, pero no exagerado */
-          padding: 0.75rem 1.2rem; /* Relleno mucho más chico (compacto) */
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          transition: all 0.2s ease;
-          width: 100%;
-          box-sizing: border-box;
-        }
-
-        .capsula-informe:hover {
-          border-color: var(--border-hover);
-          background-color: #f8fafc;
-        }
-
-        .info-bloque {
-          display: flex;
-          align-items: center;
-          gap: 0.8rem; /* Icono más cerca del texto */
-        }
-
-        .icono-azul {
-          color: var(--primary);
-          display: flex; /* Asegura centrado del icono */
-        }
-
-        .textos {
-          display: flex;
-          flex-direction: row;
-          align-items: center; /* Centrado vertical con el texto */
-          gap: 0.8rem;
-          flex-wrap: wrap; /* Permite bajar si la pantalla es muy chica */
-        }
-
-        .nombre-materia {
-          font-size: 1rem; /* Tamaño controlado */
-          font-weight: 800; /* MUY NEGRITA */
-          color: var(--primary);
-          margin: 0;
-          line-height: 1.2;
-        }
-
-        .id-informe {
-          font-size: 0.85rem;
-          color: var(--text-sub);
-          font-weight: 400;
-          padding-left: 0.5rem;
-          border-left: 1px solid #cbd5e1; /* Pequeña línea divisoria visual */
-          line-height: 1;
-        }
-
-        .boton-accion {
-          display: flex;
-          align-items: center;
-          gap: 6px;
-          background-color: var(--primary);
-          color: #ffffff;
-          padding: 0.5rem 1rem; /* Botón más chico */
-          border-radius: 6px;
-          text-decoration: none;
-          font-size: 0.85rem;
-          font-weight: 600;
-          transition: background-color 0.2s;
-          white-space: nowrap;
-        }
-
-        .boton-accion:hover {
-          background-color: var(--primary-dark);
-        }
-
-        /* Ajustes responsive */
-        @media (max-width: 600px) {
-          .contenedor-principal { padding: 0.5rem; }
-          .capsula-informe {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 0.8rem;
-          }
-          .boton-accion {
-            width: 100%;
-            justify-content: center;
-          }
-          .textos {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 0.2rem;
-          }
-          .id-informe {
-            border-left: none;
-            padding-left: 0;
-          }
-        }
-      `}</style>
-
-      <div className="contenedor-principal">
-        {informes.length === 0 ? (
-          <SinDatos 
-            mensaje="No hay informes sintéticos pendientes." 
-            titulo="Sin Informes"
-          />
-        ) : (
-          <div className="lista-informes">
-            {informes.map((inf) => (
-              <div key={inf.id} className="capsula-informe">
-                <div className="info-bloque">
-                  <div className="icono-azul">
-                    {/* Icono un poco más chico para acompañar el diseño compacto */}
-                    <BookOpen size={20} strokeWidth={2.5} />
-                  </div>
-                  
-                  <div className="textos">
-                    {/* Nombre de la materia en negrita */}
-                    <span className="nombre-materia">{inf.descripcion}</span>
-                    
-                    {inf.identificador && (
-                      <span className="id-informe">{inf.identificador}</span>
-                    )}
-                  </div>
-                </div>
-
-                <Link
-                  to={`/home/secretaria/informe-sintetico/ver/${inf.id}`}
-                  className="boton-accion"
-                >
-                  Previsualizar
-                  <Send size={14} />
-                </Link>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
+      <style>{estilosSecretaria}</style>
+      <ErrorCargaDatos 
+        mensajeError={error} 
+        onReintentar={fetchInformesSinteticos} 
+      />
     </>
+  );
+
+  // --- Renderizado Principal ---
+  return (
+    <div className="sec-informes-wrapper">
+      {/* Inyectamos los estilos aquí */}
+      <style>{estilosSecretaria}</style>
+
+      {informes.length === 0 ? (
+        <SinDatos 
+          mensaje="No hay informes sintéticos pendientes." 
+          titulo="Sin Informes"
+        />
+      ) : (
+        <div className="sec-lista-informes">
+          {informes.map((inf) => (
+            <div key={inf.id} className="sec-capsula-informe">
+              
+              <div className="sec-info-bloque">
+                <div className="sec-icono-materia">
+                  <BookOpen size={20} />
+                </div>
+                
+                <div className="sec-textos">
+                  <span className="sec-nombre-materia">{inf.descripcion}</span>
+                  {inf.identificador && (
+                    <span className="sec-id-informe">{inf.identificador}</span>
+                  )}
+                </div>
+              </div>
+
+              <Link
+                to={`/home/secretaria/informe-sintetico/ver/${inf.id}`}
+                className="sec-boton-accion"
+              >
+                Previsualizar
+                <Send size={14} />
+              </Link>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
   );
 };
 

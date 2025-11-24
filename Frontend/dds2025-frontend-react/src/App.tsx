@@ -1,10 +1,11 @@
 import React, { useState } from "react";
-import { Routes, Route, Link, Outlet } from "react-router-dom";
+import { Routes, Route, Link, Outlet, Navigate } from "react-router-dom";
 import "./App.css";
 
-// Asumo que tienes tus imágenes aquí, si no, ajusta la ruta
+// Assets (Asegúrate que estas rutas existan o comenta las lineas si no tienes las imgs)
 import fotoPerfil from './assets/avatarOA.png'; 
 import logoUnpsjb from './assets/logo_unpsjb.png';
+
 
 // Componentes Generales
 import LoginPage from "./Componentes/Otros/LoginPage";
@@ -12,11 +13,12 @@ import HomePage from "./Componentes/Otros/HomePage";
 import ErrorCargaDatos from "./Componentes/Otros/ErrorCargaDatos";
 import SinDatos from "./Componentes/Otros/SinDatos";
 
-//importaciones para el nabar
+// Importaciones para el navbar
 import Calendario from "./Componentes/Otros/Calendario";
-import MostrarMiPerfil from "./Componentes/Otros/MostrarMiPerfil"; // Agrego el perfil que hicimos antes
+import MostrarMiPerfil from "./Componentes/Otros/MostrarMiPerfil";
 
-// --- MENÚS DE SECCIÓN ---
+// --- MENÚS DE SECCIÓN (RUTAS ANIDADAS) ---
+// Asegúrate de que MenuAlumno importe el archivo que arreglamos antes con las clases "alumno-*"
 import MenuAlumno from "./Componentes/Menus/MenuAlumno";
 import MenuDocente from "./Componentes/Menus/MenuDocente";
 import MenuDepartamento from "./Componentes/Menus/MenuDepartamento"; 
@@ -30,7 +32,8 @@ const MainLayout = () => {
   };
 
   return (
-    <>
+    <div className="app-container">
+      {/* --- NAVBAR GLOBAL --- */}
       <nav className="navbar">
         <div className="navbar-left">
           <img src={logoUnpsjb} alt="Logo UNPSJB" className="navbar-logo" />
@@ -39,12 +42,14 @@ const MainLayout = () => {
 
         <div className="navbar-right">
           <div className="perfil-container">
-            <img 
-              src={fotoPerfil} 
-              alt="Perfil" 
-              className="navbar-avatar" 
-              onClick={toggleMenu}
-            />
+            <div className="avatar-wrapper" onClick={toggleMenu}>
+                <img 
+                  src={fotoPerfil} 
+                  alt="Perfil" 
+                  className="navbar-avatar" 
+                />
+                <span className="avatar-arrow">▼</span>
+            </div>
             
             {mostrarMenu && (
               <div className="dropdown-menu">
@@ -56,7 +61,6 @@ const MainLayout = () => {
                 
                 <div className="dropdown-divider"></div>
                 
-                {/* AQUÍ ESTABA EL ERROR: El texto debe ir DENTRO del Link */}
                 <Link to="/home/calendario" className="dropdown-item" onClick={() => setMostrarMenu(false)}>
                   Calendario
                 </Link>
@@ -72,14 +76,16 @@ const MainLayout = () => {
         </div>
       </nav>
 
+      {/* --- CONTENIDO DE LAS PÁGINAS --- */}
       <div className="page-content">
         <Outlet />
       </div>
 
+      {/* --- FOOTER GLOBAL --- */}
       <footer className="footer">
         © 2025 HP TEAM — Sistema de encuestas UNPSJB
       </footer>
-    </>
+    </div>
   );
 };
 
@@ -94,31 +100,34 @@ function App() {
 
   return (
     <Routes>
+      {/* Ruta pública */}
       <Route path="/" element={<LoginPage />} />
 
+      {/* Rutas protegidas dentro del Layout */}
       <Route path="/home" element={<MainLayout />}>
         <Route index element={<HomePage />} />
 
-        {/* Secciones anidadas */}
+        {/* IMPORTANTE: 
+            El "*" al final es vital para que las sub-rutas dentro 
+            de MenuAlumno funcionen (ej: /home/alumno/mis-materias) 
+        */}
         <Route path="alumno/*" element={<MenuAlumno />} />
         <Route path="docente/*" element={<MenuDocente />} />
         <Route path="departamento/*" element={<MenuDepartamento />} />
         <Route path="secretaria/*" element={<MenuSecretaria />} />
 
-        {/* Rutas de error/info */}
+        {/* Rutas auxiliares */}
         <Route path="error" element={<ErrorCargaDatos />} />
         <Route path="sin-datos" element={<SinDatos />} />
-        
-        {/* NUEVA RUTA: Calendario */}
         <Route path="calendario" element={<Calendario />} />
-
-        {/* Ruta Perfil (Integrando el componente anterior si lo tienes) */}
         <Route path="perfil" element={<MostrarMiPerfil usuario={usuarioMock} />} />
 
-        <Route path="*" element={<HomePage />} />
+        {/* Fallback interno */}
+        <Route path="*" element={<Navigate to="/home" replace />} />
       </Route>
 
-      <Route path="*" element={<LoginPage />} />
+      {/* Fallback global */}
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }
