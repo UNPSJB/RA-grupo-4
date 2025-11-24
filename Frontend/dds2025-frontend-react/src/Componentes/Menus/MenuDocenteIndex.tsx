@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import './MenuDocente.css'; 
-import { FileText, BarChart2, History, User, CheckSquare, List, Send, BookOpen, AlertCircle } from 'lucide-react';
+import './MenuDocente.css';
+// 1. IMPORTAMOS EL NUEVO ICONO (GraduationCap)
+import { FileText, BarChart2, History, User, CheckSquare, List, Send, BookOpen, AlertCircle, GraduationCap } from 'lucide-react';
 
 interface Periodo{
     ciclo_lectivo: number;
@@ -15,13 +16,12 @@ interface Materia {
     ciclo_lectivo: number;
     cuatrimestre: string;
     codigoMateria?: string;
-    id_docente: number; 
+    id_docente: number;
     informeACCompletado?: boolean;
 }
 const API_BASE = "http://localhost:8000";
 const ID_DOCENTE_ACTUAL = 1;
 const ID_PERIODO_ACTUAL = 2;
-const CICLO_LECTIVO_ACTUAL = new Date().getFullYear();
 
 interface StatsDocenteProps {
     total: number;
@@ -32,6 +32,11 @@ interface StatsDocenteProps {
 
 const StatsDocente: React.FC<StatsDocenteProps> = ({ total, completados, pendientes, cargando }) => {
     const display = (num: number) => (cargando ? '...' : num);
+
+    // Cálculo de porcentajes
+    const pctCompletados = total > 0 ? Math.round((completados / total) * 100) : 0;
+    const pctPendientes = total > 0 ? Math.round((pendientes / total) * 100) : 0;
+
     return (
         <div className="mini-stats-est-container">
             <div className="mini-stats-grid">
@@ -41,11 +46,11 @@ const StatsDocente: React.FC<StatsDocenteProps> = ({ total, completados, pendien
                 </div>
                 <div className="mini-stat-box stat-done">
                     <span className="mini-stat-number">{display(completados)}</span>
-                    <span className="mini-stat-label">Completados</span>
+                    <span className="mini-stat-label">Completados ({pctCompletados}%)</span>
                 </div>
                 <div className="mini-stat-box stat-pending">
                     <span className="mini-stat-number">{display(pendientes)}</span>
-                    <span className="mini-stat-label">Pendientes</span>
+                    <span className="mini-stat-label">Pendientes ({pctPendientes}%)</span>
                 </div>
             </div>
         </div>
@@ -57,7 +62,7 @@ const MenuDocenteIndex: React.FC = () => {
     const [cargando, setCargando] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const [periodoActual, setPeriodoActual] = useState<Periodo | null>(null);
-    const navigate = useNavigate(); 
+    const navigate = useNavigate();
 
     useEffect(() => {
         const cargarDatos = async () => {
@@ -93,10 +98,10 @@ const MenuDocenteIndex: React.FC = () => {
     const materiasDelDocente = materias.filter(m => m.id_docente === ID_DOCENTE_ACTUAL);
     const totalCount = materiasDelDocente.length;
 
-    // Materias completadas (tienen informeACCompletado = true)
+    // Materias completadas
     const completadosCount = materiasDelDocente.filter(m => m.informeACCompletado === true).length;
 
-    // Materias pendientes: del periodo actual y sin informeAC completado
+    // Materias pendientes
     const materiasPendientes = materiasDelDocente.filter(
         m => m.id_periodo === ID_PERIODO_ACTUAL && m.informeACCompletado !== true
     );
@@ -112,8 +117,9 @@ const MenuDocenteIndex: React.FC = () => {
         <div className="dashboard-main-view" style={roleStyle}>
             <div className="dashboard-header-container">
                 <div className="bienvenida-box">
-                    <h1 className="welcome-title">
-                        <span className="hand-icon">👋</span>
+                    {/* 2. SECCIÓN DEL TÍTULO MODIFICADA */}
+                    <h1 className="welcome-title" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <GraduationCap size={36} style={{ color: 'var(--color-texto-principal, #1f2937)' }} />
                         ¡Bienvenido, Docente!
                     </h1>
                     <p className="panel-subtitle">
@@ -126,7 +132,7 @@ const MenuDocenteIndex: React.FC = () => {
                         <List size={20} />
                         Resumen General
                     </h2>
-                    <StatsDocente 
+                    <StatsDocente
                         total={totalCount}
                         completados={completadosCount}
                         pendientes={pendientesCount}
@@ -160,8 +166,8 @@ const MenuDocenteIndex: React.FC = () => {
                                             <p>Código: {materia.codigoMateria ?? 'N/A'} - Pendiente de generación.</p>
                                         </div>
                                     </div>
-                                    <button 
-                                        onClick={() => handleGenerarInforme(materia.id_materia)} 
+                                    <button
+                                        onClick={() => handleGenerarInforme(materia.id_materia)}
                                         className="btn-action"
                                     >
                                         Generar Informe <Send size={16} />
