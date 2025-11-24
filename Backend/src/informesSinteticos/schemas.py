@@ -13,7 +13,6 @@ class SedeEnum(str, Enum):
 class InformeSinteticoBase(BaseModel):
     descripcion: str
     periodo_id: int
-    periodo: PeriodoSchema
     sede: SedeEnum
     integrantes: Optional[str] = None
     departamento_id: int
