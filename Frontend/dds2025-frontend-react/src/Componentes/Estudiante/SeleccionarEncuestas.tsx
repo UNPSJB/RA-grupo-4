@@ -1,73 +1,76 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { Link } from "react-router-dom";
-import { Send, BookOpen } from "lucide-react";
+import { BookOpen, Send, Loader2 } from "lucide-react"; // Usamos los mismos iconos
 import ErrorCargaDatos from "../Otros/ErrorCargaDatos";
 import SinDatos from "../Otros/SinDatos";
 
-interface EncuestaDisponible {
-  inscripcion_id: number;
-  encuesta_id: number;
-  nombre_encuesta: string;
-  nombre_materia: string;
+interface InformeSintetico {
+  id: number;
+  descripcion: string;
+  identificador?: string;
 }
 
-const SeleccionarEncuestas: React.FC = () => {
-  const [encuestas, setEncuestas] = useState<EncuestaDisponible[]>([]);
-  const [loading, setLoading] = useState(true);
+const informesHardcodeados: InformeSintetico[] = [
+  { id: 101, descripcion: "Informe Sintético: Programación I", identificador: "2024 - 1er Cuatrimestre" },
+  { id: 102, descripcion: "Informe Sintético: Base de Datos", identificador: "2024 - Anual" },
+  { id: 103, descripcion: "Informe Sintético: Ingeniería de Software", identificador: "2025 - Planificación" },
+];
+
+const SeleccionarInformeSinteticoSEC: React.FC = () => {
+  const [informes, setInformes] = useState<InformeSintetico[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  const idAlumno = 1;
+  const fetchInformesSinteticos = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const response = await fetch(`http://localhost:8000/informes-sinteticos/`);
+      
+      if (!response.ok) throw new Error("Error de conexión");
+      
+      const data: InformeSintetico[] = await response.json();
+      setInformes(data.length === 0 ? informesHardcodeados : data);
+      
+    } catch (err: any) {
+      console.warn("Usando datos locales por error de backend:", err);
+      setInformes(informesHardcodeados);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 8000);
+    fetchInformesSinteticos();
+  }, [fetchInformesSinteticos]);
 
-    const obtenerEncuestas = async () => {
-      try {
-        setLoading(true);
-        setError(null);
+  if (loading) return (
+    <div className="loading-wrapper">
+      <Loader2 className="spinner" size={30} />
+      <p>Cargando informes...</p>
+      <style>{`
+        .loading-wrapper { display: flex; flex-direction: column; align-items: center; padding: 40px; color: #003366; }
+        .spinner { animation: spin 1s linear infinite; margin-bottom: 10px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+      `}</style>
+    </div>
+  );
 
-        const response = await fetch(
-          `http://localhost:8000/estudiantes/${idAlumno}/encuestas`,
-          { signal: controller.signal }
-        );
-
-        clearTimeout(timeoutId);
-
-        if (!response.ok) {
-          throw new Error("No se pudieron obtener las encuestas disponibles.");
-        }
-
-        const data: EncuestaDisponible[] = await response.json();
-        setEncuestas(data);
-      } catch (err: any) {
-        console.error("Error al obtener encuestas:", err);
-        if (err.name === "AbortError") {
-          setError("Tiempo de espera agotado. El servidor no respondió.");
-        } else {
-          setError(err.message || "Error inesperado al cargar las encuestas.");
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    obtenerEncuestas();
-
-    return () => clearTimeout(timeoutId);
-  }, [idAlumno]);
-
-  if (loading) return <p style={{ color: "#003366", padding: "20px" }}>Cargando encuestas...</p>;
-  if (error) return <ErrorCargaDatos mensaje={error} />;
+  if (error) return <ErrorCargaDatos mensajeError={error} onReintentar={fetchInformesSinteticos} />;
 
   return (
-    <div className="seleccionar-encuestas-container">
+    <div className="seleccionar-informes-container">
+      {/* Estilos copiados y adaptados de tu ejemplo de Encuestas */}
       <style>{`
-        .seleccionar-encuestas-container {
+        .seleccionar-informes-container {
           padding: 10px 0;
+          width: 100%;
+          max-width: 100%;
+          box-sizing: border-box;
         }
 
-        .lista-encuestas {
+        .lista-informes {
           list-style: none;
           padding: 0;
           margin: 0;
@@ -76,24 +79,24 @@ const SeleccionarEncuestas: React.FC = () => {
           gap: 16px;
         }
 
-        .tarjeta-encuesta {
+        .tarjeta-informe {
           display: flex;
           justify-content: space-between;
           align-items: center;
           background: #ffffff;
-          border: 1px solid #e8f4ff;
+          border: 1px solid #e8f4ff; /* Mismo borde sutil azul claro */
           border-radius: 12px;
           padding: 16px 20px;
           box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
           transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
 
-        .tarjeta-encuesta:hover {
+        .tarjeta-informe:hover {
           transform: translateY(-2px);
           box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
         }
 
-        .encuesta-info {
+        .informe-info {
           display: flex;
           align-items: center;
           gap: 12px;
@@ -101,19 +104,19 @@ const SeleccionarEncuestas: React.FC = () => {
           overflow: hidden;
         }
 
-        .icono-materia {
-          color: #0078D4;
+        .icono-informe {
+          color: #0078D4; /* Azul del ejemplo */
           flex-shrink: 0;
         }
 
-        .materia-nombre {
+        .informe-descripcion {
           font-weight: 700;
-          color: #003366;
+          color: #003366; /* Azul oscuro para el título */
           font-size: 1.05rem;
           white-space: nowrap;
         }
 
-        .encuesta-nombre {
+        .informe-identificador {
           color: #555;
           font-size: 0.95rem;
           overflow: hidden;
@@ -122,17 +125,26 @@ const SeleccionarEncuestas: React.FC = () => {
           flex-grow: 1;
         }
 
+        /* Separador visual opcional entre título e ID si la pantalla es ancha */
+        .separador {
+            display: inline-block;
+            margin: 0 8px;
+            color: #ccc;
+        }
+
         .boton-primario {
           display: inline-flex;
           align-items: center;
           gap: 8px;
-          background-color: #0078D4;
+          background-color: #0078D4; /* Azul sólido */
           color: white;
           padding: 10px 16px;
           border-radius: 8px;
           font-weight: 600;
           text-decoration: none;
           transition: background-color 0.2s ease, transform 0.1s ease;
+          font-size: 0.9rem;
+          white-space: nowrap;
         }
 
         .boton-primario:hover {
@@ -141,16 +153,23 @@ const SeleccionarEncuestas: React.FC = () => {
         }
 
         @media (max-width: 768px) {
-          .tarjeta-encuesta {
+          .tarjeta-informe {
             flex-direction: column;
             align-items: flex-start;
             gap: 12px;
           }
 
-          .encuesta-info {
+          .informe-info {
             flex-direction: column;
             align-items: flex-start;
             gap: 4px;
+            width: 100%;
+          }
+          
+          .separador { display: none; }
+
+          .informe-descripcion {
+            white-space: normal; /* Permitir salto de línea en móvil */
           }
 
           .boton-primario {
@@ -160,25 +179,37 @@ const SeleccionarEncuestas: React.FC = () => {
         }
       `}</style>
 
-      {encuestas.length === 0 ? (
+      {informes.length === 0 ? (
         <SinDatos 
-          mensaje="No hay encuestas disponibles para responder en este momento." 
-          titulo="Encuestas Pendientes"
+          mensaje="No hay informes sintéticos pendientes." 
+          titulo="Informes Sintéticos"
         />
       ) : (
-        <ul className="lista-encuestas">
-          {encuestas.map((encuesta) => (
-            <li key={encuesta.inscripcion_id} className="tarjeta-encuesta">
-              <div className="encuesta-info">
-                <BookOpen size={20} className="icono-materia" />
-                <span className="materia-nombre">{encuesta.nombre_materia}</span>
-                <span className="encuesta-nombre">{encuesta.nombre_encuesta}</span>
+        <ul className="lista-informes">
+          {informes.map((inf) => (
+            <li key={inf.id} className="tarjeta-informe">
+              <div className="informe-info">
+                {/* Icono a la izquierda */}
+                <BookOpen size={20} className="icono-informe" />
+                
+                {/* Nombre principal (Negrita, Azul Oscuro) */}
+                <span className="informe-descripcion">{inf.descripcion}</span>
+                
+                {/* Identificador (Gris) */}
+                {inf.identificador && (
+                    <>
+                        <span className="separador">|</span>
+                        <span className="informe-identificador">{inf.identificador}</span>
+                    </>
+                )}
               </div>
+
+              {/* Botón Sólido Azul */}
               <Link
-                to={`responder-encuesta/${encuesta.inscripcion_id}`} 
+                to={`/home/secretaria/informe-sintetico/ver/${inf.id}`} 
                 className="boton-primario"
               >
-                Responder <Send size={16} />
+                Previsualizar <Send size={16} />
               </Link>
             </li>
           ))}
@@ -188,4 +219,4 @@ const SeleccionarEncuestas: React.FC = () => {
   );
 };
 
-export default SeleccionarEncuestas;
+export default SeleccionarInformeSinteticoSEC;

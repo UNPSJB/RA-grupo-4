@@ -1,101 +1,142 @@
-import React, { useEffect, useState } from "react";
-import { Routes, Route, useNavigate, Outlet } from "react-router-dom";
+import React, { useEffect, useState, useCallback } from "react";
+import { Routes, Route, useNavigate, Outlet, NavLink, useLocation } from "react-router-dom";
+import { ArrowLeft, FileText, List, Hand, ChartBar, Table, AlertTriangle } from 'lucide-react'; 
 
 // Componentes que se usarán en las rutas
 import SeleccionarInformeSinteticoSEC from "../Secretaria/SeleccionarInformeSinteticoSEC";
 import PrevisualizarInformeSinteticoSec from "../Secretaria/PrevizualisarInformeSinteticoSec";
 import SinDatos from "../Otros/SinDatos";
 import ErrorCargaDatos from "../Otros/ErrorCargaDatos";
-import EstadisticasSecDeco from "../Otros/EstadisticasSecDeco";
+import EstadisticasPromedioDocentes from "../Secretaria/EstadisticasDocentes";
+import ListarInformesSinteticos from "../Secretaria/ListarInformesSinteticos"; 
+import MiniEstadisticasSec from "../Secretaria/MiniEstadisticasSec"; 
 
-// Importamos el CSS institucional
-import "./MenuSecretaria.css";
+import "./MenuSecretaria.css"; 
 
-const BienvenidaYPendientes = () => {
-  const navigate = useNavigate();
-  const [informesFaltantes, setInformesFaltantes] = useState<number>(0);
+// ---------------------------------------------------
+// 1. Componentes Requeridos para el Dashboard
+// ---------------------------------------------------
 
-  useEffect(() => {
-    const obtenerCantidad = async () => {
-      try {
-        const res = await fetch("http://localhost:8080/informes-sinteticos/cantidad");
-        if (!res.ok) throw new Error("Error al obtener datos");
-        const data = await res.json();
-        setInformesFaltantes(data);
-      } catch (error) {
-        console.error("No se pudo cargar la cantidad de informes:", error);
-        setInformesFaltantes(0);
-      }
-    };
-    obtenerCantidad();
-  }, []);
-
-  return (
-    <div className="dashboard-header-container">
-      <div className="bienvenida-box">
-        <h1 className="welcome-title">
-          <i className="fas fa-hand-sparkles"></i> Panel de Secretaría
-        </h1>
-        <p className="welcome-subtitle">
-          ¡Bienvenido/a! Gestiona y previsualiza los informes sintéticos de autoevaluación.
-        </p>
-      </div>
-
-      <div className="alerta-faltantes clickable-card" onClick={() => navigate("visualizar-ac")}>
-        <div className="alerta-icono">
-          <i className="fas fa-tasks"></i>
-        </div>
-        <div className="alerta-contenido">
-          <p className="alerta-numero">{informesFaltantes}</p>
-          <p className="alerta-texto">Seleccionar informe sintético</p>
-          <button className="alerta-btn">Ver Detalles</button>
-        </div>
-      </div>
-    </div>
-  );
+const Bienvenida = () => {
+    return (
+        <aside className="bienvenida-box">
+            <h1 className="welcome-title"><Hand size={30} className="hand-icon" /> Panel de Secretaría</h1>
+            <p className="panel-subtitle">Gestiona y administra los informes de autoevaluación docente.</p>
+        </aside>
+    );
 };
 
-const PlaceholderEstadisticas = () => {
-  return (
-    <div className="estadisticas-card">
-      <h2 className="card-title">
-        <i className="fas fa-chart-bar"></i> Remplazar por verdaderas estadisticas
-      </h2>
-      <EstadisticasSecDeco />
-    </div>
-  );
+const TarjetaSeleccionarInformes = () => {
+    // Simulación de datos exitosa para la demo visual
+    const hasInformes = true;
+    const isLoading = false;
+
+    if (isLoading) {
+        return (
+            <div className="estadisticas-box" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '150px' }}>
+                <i className="fas fa-spinner fa-spin" style={{ fontSize: '2rem', color: '#ccc' }}></i>
+            </div>
+        );
+    }
+    
+    if (hasInformes) {
+        // SeleccionarInformeSinteticoSEC ya implementa el diseño de lista de tarjetas
+        return (
+            <SeleccionarInformeSinteticoSEC /> 
+        );
+    } 
+    
+    return (
+        <SinDatos mensaje="No hay informes sintéticos pendientes de revisión." />
+    );
 };
+
+
+const SecretariaDashboard = ({ secretariaId }) => {
+    const navigate = useNavigate();
+    return (
+        <div className="dashboard-main-view">
+            {/* 1. CABECERA: BIENVENIDA Y MINI ESTADÍSTICAS */}
+            <div className="dashboard-header-container">
+                <Bienvenida />
+                {/* ➡️ Mini Estadísticas: Usa card-box como wrapper exterior para consistencia */}
+                <div className="estadisticas-box card-box">
+                    algo voy a poner
+                </div>
+            </div>
+
+            {/* 2. CONTENIDO PRINCIPAL: INFORMES PENDIENTES */}
+            <div className="seccion-box informes-principales"> 
+                <h2 className="seccion-title"><FileText size={20} /> Informes Pendientes de Revisión</h2>
+                <TarjetaSeleccionarInformes />
+            </div>
+
+            {/* 3. NAVEGACIÓN SECUNDARIA / ACCESO RÁPIDO */}
+            <div className="seccion-box navegacion-secundaria">
+                <h2 className="seccion-title"><List size={20} /> Navegación y Acceso Rápido</h2>
+                <div className="card-grid">
+                    
+                    {/* Tarjeta 1: Estadísticas Docentes */}
+                    <div className="nav-card card-purple" onClick={() => navigate("estadisticas-docentes")}>
+                        <ChartBar size={36} />
+                        <h3>Estadísticas Docentes</h3>
+                        <p>Ver promedios y métricas de desempeño general.</p>
+                    </div>
+                    
+                    {/* Tarjeta 2: Listar Informes */}
+                    <div className="nav-card card-blue" onClick={() => navigate("listar-informes")}>
+                        <Table size={36} />
+                        <h3>Listar Informes</h3>
+                        <p>Ver la tabla completa de informes sintéticos disponibles.</p>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// ---------------------------------------------------
+// 2. Layout y Rutas Principales
+// ---------------------------------------------------
 
 const SecretariaLayout = () => {
-  return (
-    <div className="secretaria-full-container">
-      <main className="secretaria-content">
-        <Outlet />
-      </main>
-    </div>
-  );
+    const location = useLocation(); 
+    const esDashboard = location.pathname === '/home/secretaria' || location.pathname === '/home/secretaria/';
+    const rutaDestino = esDashboard ? '/home' : '/home/secretaria';
+
+    return (
+        <div className="menu-alumno-layout-full"> 
+            <div className="back-button-bar"> 
+                <NavLink to={rutaDestino} className="back-button-link">
+                    <ArrowLeft size={18} /> Regresar al Inicio
+                </NavLink>
+            </div>
+            <main className="menu-alumno-content"> 
+                <Outlet />
+            </main>
+        </div>
+    );
 };
 
 const MenuSecretaria = () => {
-  return (
-    <Routes>
-      <Route path="/" element={<SecretariaLayout />}>
-        <Route
-          index
-          element={
-            <div className="dashboard-main-view">
-              <BienvenidaYPendientes />
-              <PlaceholderEstadisticas />
-            </div>
-          }
-        />
-        <Route path="visualizar-ac" element={<SeleccionarInformeSinteticoSEC />} />
-        <Route path="informe-sintetico/ver/:id" element={<PrevisualizarInformeSinteticoSec />} />
-        <Route path="sin-datos" element={<SinDatos />} />
-        <Route path="error" element={<ErrorCargaDatos />} />
-      </Route>
-    </Routes>
-  );
+    const secretariaId = 1; 
+
+    return (
+        <Routes>
+            <Route path="/" element={<SecretariaLayout />}>
+                <Route index element={<SecretariaDashboard secretariaId={secretariaId} />} />
+                
+                <Route path="listar-informes" element={<ListarInformesSinteticos />} /> 
+                <Route path="informe-sintetico/ver/:id" element={<PrevisualizarInformeSinteticoSec />} />
+                <Route path="estadisticas-docentes" element={<EstadisticasPromedioDocentes />} /> 
+                
+                <Route path="error" element={<ErrorCargaDatos />} />
+                <Route path="sin-datos" element={<SinDatos />} />
+                <Route path="visualizar-ac" element={<SeleccionarInformeSinteticoSEC />} />
+            </Route>
+        </Routes>
+    );
 };
 
 export default MenuSecretaria;
