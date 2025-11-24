@@ -88,3 +88,7 @@ def obtener_necesidades_departamento(departamento_id: int, db: Session = Depends
 @router.get("/{departamento_id}/informes-sinteticos/pendientes", response_model=list[PeriodoInformesSinteticosPendientesSchema])
 def periodos_pendientes(departamento_id: int, db: Session = Depends(get_db)):
     return services.listar_informes_sinteticos_pendientes_del_departamento(db, departamento_id)
+
+@router.get("/{departamento_id}/estadisticas")
+def estadisticas_departamento(departamento_id: int, db: Session = Depends(get_db)):
+    return services.estadisticas_resumen_departamento(db, departamento_id)

@@ -6,6 +6,8 @@ from src.departamentos import schemas, exceptions, models
 from src.materias.models import Materias
 from src.informesAC.models import InformesAC
 from src.periodos.models import Periodo
+from src.docentes.models import Docentes
+from src.inscripciones.models import Inscripciones
 from src.informesSinteticos.models import InformeSintetico
 from datetime import date
 # operaciones CRUD para Departamento
@@ -28,7 +30,7 @@ def listar_departamentos(db: Session):
 def leer_departamento(db: Session, departamento_id: int) -> schemas.Departamento:
     db_departamento = db.scalar(select(Departamento).where(Departamento.id == departamento_id))
     if db_departamento is None:
-        raise exceptions.DepartamentoNoEncontrada()
+        raise exceptions.DepartamentoNoEncontrado()
     return db_departamento
 
 
@@ -105,7 +107,8 @@ def listar_informes_sinteticos_pendientes_del_departamento(db: Session, departam
     .filter(Materias.id_departamento == departamento_id)
     .distinct()
     .subquery()
-)
+    )
+
     # Periodos cerrados que no están en periodos_con_informe
     periodos_pendientes = (
         periodos_cerrados
@@ -118,7 +121,7 @@ def listar_informes_sinteticos_pendientes_del_departamento(db: Session, departam
     resultados = []
 
     for periodo in periodos_pendientes:
-        # 1. Cantidad materias -> cantidad informesAC esperados
+        # Cantidad materias -> cantidad informesAC esperados
         cantidad_materias = (
             db.query(func.count(Materias.id_materia))
             .filter(
@@ -128,7 +131,7 @@ def listar_informes_sinteticos_pendientes_del_departamento(db: Session, departam
             .scalar()
         )
 
-        # 2. Cantidad recibida -> informesAC completados
+        # Cantidad recibida -> informesAC completados
         cantidad_recibidos = (
             db.query(func.count(InformesAC.id_informesAC))
             .join(Materias, InformesAC.id_materia == Materias.id_materia)
@@ -150,3 +153,34 @@ def listar_informes_sinteticos_pendientes_del_departamento(db: Session, departam
         })
 
     return resultados
+
+
+def estadisticas_resumen_departamento(db: Session, departamento_id: int):
+
+    # --- 1) Cantidad de docentes del departamento ---
+    cantidad_docentes = (
+        db.query(Docentes)
+        .join(Materias, Materias.id_docente == Docentes.id_docente)
+        .filter(Materias.id_departamento == departamento_id)
+        .distinct()
+        .count()
+    )
+
+    # --- 2) Cantidad de alumnos inscriptos en las materias ---
+    cantidad_alumnos = (
+        db.query(Inscripciones.estudiante_id)
+        .join(Materias, Materias.id_materia == Inscripciones.materia_id)
+        .filter(Materias.id_departamento == departamento_id)
+        .distinct()
+        .count()
+    )
+
+    # --- 3) Informes sintéticos pendientes ---
+    pendientes = listar_informes_sinteticos_pendientes_del_departamento(db, departamento_id)
+    cantidad_pendientes = len(pendientes)
+
+    return {
+        "docentes": cantidad_docentes,
+        "alumnos": cantidad_alumnos,
+        "informes_sinteticos_pendientes": cantidad_pendientes
+    }

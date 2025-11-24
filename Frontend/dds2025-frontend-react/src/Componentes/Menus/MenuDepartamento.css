@@ -144,8 +144,8 @@
     justify-content: center;
 }
 .mini-stat-box:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    transform: none !important; /* translateY(-3px); */ 
+    box-shadow: none !important;/* 0 4px 10px rgba(0,0,0,0.1); */
 }
 .mini-stat-number {
     font-size: 1.8rem; 
@@ -344,7 +344,7 @@
 }
 
 .tabla-pendientes tr:hover {
-    background-color: #f9fbfd;
+    background-color: none !important;
 }
 
 .btn-action-table {

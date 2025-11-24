@@ -3,36 +3,11 @@ import { Link } from 'react-router-dom';
 import './MenuDepartamento.css'; 
 import { FileText, BarChart2, History, Settings, CheckSquare, List, Send, FileBarChart, AlertCircle, Building } from 'lucide-react';
 import InformesSinteticosPendientes from '../Departamento/ListadoInformesSinteticosPendientes';
-
+import MiniEstadisticasDep from '../Departamento/MiniEstadisticasDep';
 const API_BASE = "http://localhost:8000";
 const ID_DEPARTAMENTO_ACTUAL = 1;
 const ID_PERIODO_ACTUAL = 2;
-/* * Componente de Estadísticas Rápidas
- */
-const StatsDepartamento: React.FC = () => {
-    return (
-        <div className="mini-stats-est-container">
-            <div className="mini-stats-grid">
-                
-                <div className="mini-stat-box stat-total">
-                    <span className="mini-stat-number">18</span>
-                    <span className="mini-stat-label">Docentes</span>
-                </div>
-                
-                <div className="mini-stat-box stat-done">
-                    <span className="mini-stat-number">42</span>
-                    <span className="mini-stat-label">Inf. AC Recib.</span>
-                </div>
-                
-                <div className="mini-stat-box stat-pending">
-                    <span className="mini-stat-number">1</span>
-                    <span className="mini-stat-label">Sintético Pend.</span>
-                </div>
 
-            </div>
-        </div>
-    );
-};
 
 
 /* * Dashboard Principal del Departamento
@@ -64,7 +39,7 @@ const MenuDepartamentoIndex: React.FC = () => {
                         <List size={20} />
                         Resumen General
                     </h2>
-                    <StatsDepartamento />
+                    <MiniEstadisticasDep departamentoId={ID_DEPARTAMENTO_ACTUAL} />
                 </div>
             </div>
 
