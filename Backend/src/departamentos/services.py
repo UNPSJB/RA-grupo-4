@@ -1,11 +1,13 @@
 from typing import List
-from sqlalchemy import delete, select, update
+from sqlalchemy import delete, select, update, func
 from sqlalchemy.orm import Session
 from src.departamentos.models import Departamento
 from src.departamentos import schemas, exceptions, models
 from src.materias.models import Materias
 from src.informesAC.models import InformesAC
-
+from src.periodos.models import Periodo
+from src.informesSinteticos.models import InformeSintetico
+from datetime import date
 # operaciones CRUD para Departamento
 
 
@@ -75,3 +77,76 @@ def obtener_resumen_departamento(db: Session, departamento_id: int):
         })
 
     return resumen
+
+
+
+def listar_informes_sinteticos_pendientes_del_departamento(db: Session, departamento_id: int):
+
+    hoy = date.today()
+
+    # Periodos cuyo cierre de informes AC ya pasó
+    periodos_cerrados = (
+        db.query(Periodo)
+        .filter(Periodo.fecha_cierre_informesAC < hoy)
+    )
+
+    # Periodos que ya tienen un informe sintetico del departamento
+    periodos_con_informe = (
+        db.query(InformeSintetico.periodo_id)
+        .filter(InformeSintetico.departamento_id == departamento_id)
+        .subquery()
+    )
+
+    # Verifica que el periodo tenga un informeAC hecho para el departamento
+    periodos_con_informesAC_del_departamento = (
+    db.query(Periodo.id)
+    .join(Materias, Materias.id_periodo == Periodo.id)
+    .join(InformesAC, InformesAC.id_materia == Materias.id_materia)
+    .filter(Materias.id_departamento == departamento_id)
+    .distinct()
+    .subquery()
+)
+    # Periodos cerrados que no están en periodos_con_informe
+    periodos_pendientes = (
+        periodos_cerrados
+        .filter(Periodo.id.not_in(periodos_con_informe))
+        #.filter(Periodo.id.in_(periodos_con_informesAC_del_departamento))      #descomentar para validar que haya informesAC en el periodo
+        .order_by(Periodo.ciclo_lectivo.desc(), Periodo.cuatrimestre.desc())
+        .all()
+    )
+
+    resultados = []
+
+    for periodo in periodos_pendientes:
+        # 1. Cantidad materias -> cantidad informesAC esperados
+        cantidad_materias = (
+            db.query(func.count(Materias.id_materia))
+            .filter(
+                Materias.id_periodo == periodo.id,
+                Materias.id_departamento == departamento_id
+            )
+            .scalar()
+        )
+
+        # 2. Cantidad recibida -> informesAC completados
+        cantidad_recibidos = (
+            db.query(func.count(InformesAC.id_informesAC))
+            .join(Materias, InformesAC.id_materia == Materias.id_materia)
+            .filter(
+                Materias.id_periodo == periodo.id,
+                Materias.id_departamento == departamento_id,
+                Materias.informeACCompletado == True
+            )
+            .scalar()
+        )
+
+        resultados.append({
+            "id": periodo.id,
+            "ciclo_lectivo": periodo.ciclo_lectivo,
+            "cuatrimestre": periodo.cuatrimestre,
+            "fecha_cierre_informesAC": periodo.fecha_cierre_informesAC,
+            "cantidad_informes_esperados": cantidad_materias,
+            "cantidad_informes_recibidos": cantidad_recibidos
+        })
+
+    return resultados

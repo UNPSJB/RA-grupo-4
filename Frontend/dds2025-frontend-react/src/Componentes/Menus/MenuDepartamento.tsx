@@ -50,7 +50,7 @@ const MenuDepartamento = () => {
                 {/* Gestión de Informes */}
                 <Route path="generar-informe-sintetico" element={<GenerarInformeSinteticoDep />} />
                 <Route path="historial-informes" element={<ListadoInformesACDepREAL />} />
-               
+
                 {/* Estadisticas */}
                 <Route path="estadisticas" element={<SeleccionarMateriaEstadisticasDep />} />
                 <Route path="estadisticas/materia/:asignaturaId" element={<EstadisticasPorPreguntaDep />} />

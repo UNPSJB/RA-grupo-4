@@ -40,3 +40,11 @@ class Periodo(PeriodoBase):
     model_config = {"from_attributes": True}
 
 
+class PeriodoInformesSinteticosPendientes(BaseModel):
+    id: int
+    ciclo_lectivo: int
+    cuatrimestre: str
+    fecha_cierre_informesAC: date
+    cantidad_informes_esperados: int
+    cantidad_informes_recibidos: int
+    

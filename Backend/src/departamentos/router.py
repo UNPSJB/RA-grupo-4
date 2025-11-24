@@ -8,6 +8,7 @@ from src.departamentos import schemas, services
 from src.materias.models import Materias
 # Asegúrate de que la carpeta sea exactamente 'informesAC' o 'informes_ac' según tu proyecto
 from src.informesAC.models import InformesAC 
+from src.periodos.schemas import PeriodoInformesSinteticosPendientes as PeriodoInformesSinteticosPendientesSchema
 
 router = APIRouter(prefix="/departamentos", tags=["departamentos"])
 
@@ -81,3 +82,9 @@ def obtener_necesidades_departamento(departamento_id: int, db: Session = Depends
             })
 
     return resumen
+
+
+
+@router.get("/{departamento_id}/informes-sinteticos/pendientes", response_model=list[PeriodoInformesSinteticosPendientesSchema])
+def periodos_pendientes(departamento_id: int, db: Session = Depends(get_db)):
+    return services.listar_informes_sinteticos_pendientes_del_departamento(db, departamento_id)

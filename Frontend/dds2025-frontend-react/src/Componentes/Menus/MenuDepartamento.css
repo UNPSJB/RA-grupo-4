@@ -303,3 +303,67 @@
 @media (max-width: 600px) {
     .mini-stats-grid { grid-template-columns: 1fr; gap: 15px; }
 }
+
+
+
+
+/* --- Tabla de Pendientes de Informe Sintético --- */
+
+.tabla-pendientes-container {
+    width: 100%;
+    margin-top: 15px;
+}
+
+.tabla-pendientes {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: var(--color-fondo-tarjeta);
+    border-radius: var(--borde-radio-lg);
+    overflow: hidden;
+    box-shadow: var(--sombra-tarjeta);
+}
+
+.tabla-pendientes thead {
+    background-color: var(--color-terciario);
+}
+
+.tabla-pendientes th {
+    padding: 14px 16px;
+    text-align: left;
+    font-weight: 600;
+    color: var(--color-principal);
+    border-bottom: 2px solid #d9e6f2;
+    font-size: 0.95rem;
+}
+
+.tabla-pendientes td {
+    padding: 14px 16px;
+    border-bottom: 1px solid #eef2f6;
+    font-size: 0.92rem;
+    color: var(--color-texto-oscuro);
+}
+
+.tabla-pendientes tr:hover {
+    background-color: #f9fbfd;
+}
+
+.btn-action-table {
+    background-color: var(--color-secundario);
+    color: white;
+    border: none;
+    padding: 6px 14px;
+    border-radius: 18px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    transition: transform 0.2s, box-shadow 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-action-table:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}

@@ -2,7 +2,11 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import './MenuDepartamento.css'; 
 import { FileText, BarChart2, History, Settings, CheckSquare, List, Send, FileBarChart, AlertCircle, Building } from 'lucide-react';
+import InformesSinteticosPendientes from '../Departamento/ListadoInformesSinteticosPendientes';
 
+const API_BASE = "http://localhost:8000";
+const ID_DEPARTAMENTO_ACTUAL = 1;
+const ID_PERIODO_ACTUAL = 2;
 /* * Componente de Estadísticas Rápidas
  */
 const StatsDepartamento: React.FC = () => {
@@ -35,7 +39,7 @@ const StatsDepartamento: React.FC = () => {
  */
 const MenuDepartamentoIndex: React.FC = () => {
     
-    const roleStyle = { '--color-secundario': '#e76f51' } as React.CSSProperties;
+    const roleStyle = { '--color-secundario': '#e56849ff' } as React.CSSProperties;
 
     return (
         <div className="dashboard-main-view" style={roleStyle}>
@@ -68,27 +72,10 @@ const MenuDepartamentoIndex: React.FC = () => {
             <div className="seccion-box">
                 <h2 className="seccion-title">
                     <AlertCircle size={24} />
-                    Tareas Pendientes
+                    Informes Sinteticos Pendientes
                 </h2>
-                
-                <div className="pending-list">
-                    <div className="pending-item">
-                        <div className="pending-info">
-                            <FileBarChart size={24} className="pending-icon" />
-                            <div className="pending-text">
-                                <h4>Informe Sintético 2025</h4>
-                                <p>El ciclo lectivo ha cerrado. Generar informe sintético global.</p>
-                            </div>
-                        </div>
-                        <Link to="generar-informe-sintetico" className="btn-action">
-                            Generar Sintético <Send size={16} />
-                        </Link>
-                    </div>
 
-                    <div className="empty-list-message">
-                        No hay más tareas pendientes para el departamento.
-                    </div>
-                </div>
+                <InformesSinteticosPendientes departamentoId={ID_DEPARTAMENTO_ACTUAL} />
             </div>
             
             {/* 3. SECCIÓN ACCESO RÁPIDO */}
