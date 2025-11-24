@@ -1,6 +1,7 @@
 import React from 'react';
 import { Routes, Route, NavLink, useNavigate, useParams, useLocation } from 'react-router-dom';
 import { ArrowLeft, FileText, List, BookOpen, Clock, Hand } from 'lucide-react'; 
+import { useAuth } from '../../hooks/useAuth'; 
 import MiniEstadisticasEst from '../Estudiante/MiniEstadisticasEst';
 import SeleccionarEncuestas from '../Estudiante/SeleccionarEncuestas';
 import ResponderEncuesta from '../Estudiante/ResponderEncuesta';
@@ -12,6 +13,7 @@ import './MenuAlumno.css';
 
 // --- Componente Wrapper para la página de detalles ---
 const PaginaMisRespuestas = () => {
+    // ... (El resto del componente PaginaMisRespuestas es igual)
     const { materiaId } = useParams();
     const id = materiaId ? parseInt(materiaId) : 0;
 
@@ -44,23 +46,29 @@ const PaginaMisRespuestas = () => {
 };
 
 // --- Dashboard Principal ---
-const AlumnoDashboard = ({ estudianteId }) => {
+// Aceptamos el estudianteId del componente padre
+const AlumnoDashboard = ({ estudianteId }) => { 
     const navigate = useNavigate();
+    // Reemplazamos el título estático "Alumno" por el nombre de usuario
+    const { currentUser } = useAuth(); 
+    const userName = currentUser?.username || 'Alumno'; 
+    
     return (
         <div className="dashboard-main-view">
             <div className="dashboard-header-container">
                 <aside className="bienvenida-box">
-                    <h1 className="welcome-title"><Hand size={30} className="hand-icon" /> ¡Bienvenido/a, Alumno!</h1>
+                    <h1 className="welcome-title"><Hand size={30} className="hand-icon" /> ¡Bienvenido/a, {userName}!</h1>
                     <p className="panel-subtitle">Accedé a tus encuestas, materias y recursos institucionales.</p>
                 </aside>
                 <div className="estadisticas-box card-box">
-                    <MiniEstadisticasEst estudianteId={estudianteId} />
+                    {/* ENVIAMOS EL ID DINÁMICO */}
+                    <MiniEstadisticasEst estudianteId={estudianteId} /> 
                 </div>
             </div>
 
             <div className="seccion-box informes-principales">
                 <h2 className="seccion-title"><FileText size={20} /> Tus encuestas pendientes</h2>
-                <SeleccionarEncuestas/>
+                <SeleccionarEncuestas estudianteId={estudianteId} /> 
             </div>
 
             <div className="seccion-box navegacion-secundaria">
@@ -72,21 +80,28 @@ const AlumnoDashboard = ({ estudianteId }) => {
                     <div className="nav-card card-yellow" onClick={() => navigate("historial-encuestas")}>
                         <Clock size={36} /><h3>Historial de Encuestas</h3><p>Revisa las encuestas que ya completaste.</p>
                     </div>
-                    </div>
                 </div>
             </div>
+        </div>
     );
 };
 
 const MenuAlumno = () => {
-    const estudianteId = 1; 
+    const { currentUser } = useAuth(); // <--- OBTENEMOS EL USUARIO REAL
+    
+    // ⚠️ ID DINÁMICA: Si el ID en la DB es un entero, lo parseamos. Si no existe, usamos 0.
+    const estudianteId = currentUser?.id ?? 0; 
+    
     const location = useLocation(); 
 
     // Lógica para determinar la ruta de regreso
-    // Si la ruta actual es exactamente "/home/alumno" (el dashboard), volvemos al home general.
-    // Si es cualquier otra (submenú), volvemos al dashboard (/home/alumno).
     const esDashboard = location.pathname === '/home/alumno' || location.pathname === '/home/alumno/';
     const rutaDestino = esDashboard ? '/home' : '/home/alumno';
+
+    // Bloqueo de seguridad: Si no hay ID, no renderizamos el menú
+    if (estudianteId === 0) {
+        return <div style={{padding: '20px'}}>Cargando o usuario no válido.</div>;
+    }
 
     return (
         <div className="menu-alumno-layout-full">
@@ -97,15 +112,17 @@ const MenuAlumno = () => {
             </div>
             <main className="menu-alumno-content">
                 <Routes>
-                    <Route index element={<AlumnoDashboard estudianteId={estudianteId} />} />
-                    <Route path="seleccionar" element={<SeleccionarEncuestas />} />
-                    <Route path="responder-encuesta/:inscripcionId" element={<ResponderEncuesta />} />
+                    {/* ENVIAMOS EL ID AL DASHBOARD */}
+                    <Route index element={<AlumnoDashboard estudianteId={estudianteId} />} /> 
                     
-                    <Route path="historial-encuestas" element={<HistorialEncuestasRealizadasEstudiante />} />
+                    <Route path="seleccionar" element={<SeleccionarEncuestas estudianteId={estudianteId} />} />
+                    <Route path="responder-encuesta/:inscripcionId" element={<ResponderEncuesta estudianteId={estudianteId} />} />
+                    
+                    <Route path="historial-encuestas" element={<HistorialEncuestasRealizadasEstudiante estudianteId={estudianteId} />} />
                     
                     <Route path="respuestas-encuesta/:materiaId" element={<PaginaMisRespuestas />} />
                     
-                    <Route path="mis-materias" element={<MisMaterias />} />
+                    <Route path="mis-materias" element={<MisMaterias estudianteId={estudianteId} />} />
                     
                 </Routes>
             </main>

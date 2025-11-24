@@ -1,33 +1,55 @@
 import React, { useState } from "react";
-import { Routes, Route, Link, Outlet } from "react-router-dom";
+import { Routes, Route, Link, Outlet, useNavigate } from "react-router-dom";
 import "./App.css";
 
-// Asumo que tienes tus imágenes aquí, si no, ajusta la ruta
-import fotoPerfil from './assets/avatarOA.png'; 
-import logoUnpsjb from './assets/logo_unpsjb.png';
+// --- IMPORTS DEL SISTEMA DE AUTENTICACIÓN ---
+import { useAuth } from "./hooks/useAuth";
+import { AuthLayout } from "./layouts/AuthLayout";
+import Login from "./features/auth/Login"; // Asume que features/auth/Login.tsx existe
+// --- FIN IMPORTS AUTH ---
 
 // Componentes Generales
-import LoginPage from "./Componentes/Otros/LoginPage";
 import HomePage from "./Componentes/Otros/HomePage";
 import ErrorCargaDatos from "./Componentes/Otros/ErrorCargaDatos";
 import SinDatos from "./Componentes/Otros/SinDatos";
 
-//importaciones para el nabar
+// Importaciones para el nabar
 import Calendario from "./Componentes/Otros/Calendario";
-import MostrarMiPerfil from "./Componentes/Otros/MostrarMiPerfil"; // Agrego el perfil que hicimos antes
+import MostrarMiPerfil from "./Componentes/Otros/MostrarMiPerfil";
 
 // --- MENÚS DE SECCIÓN ---
 import MenuAlumno from "./Componentes/Menus/MenuAlumno";
 import MenuDocente from "./Componentes/Menus/MenuDocente";
-import MenuDepartamento from "./Componentes/Menus/MenuDepartamento"; 
+import MenuDepartamento from "./Componentes/Menus/MenuDepartamento";
 import MenuSecretaria from "./Componentes/Menus/MenuSecretaria";
 
+// Assets
+import fotoPerfil from './assets/avatarOA.png';
+import logoUnpsjb from './assets/logo_unpsjb.png';
+
+// =========================================================================
+// 1. LAYOUT PRINCIPAL (NAVBAR DINÁMICO)
+// =========================================================================
 const MainLayout = () => {
   const [mostrarMenu, setMostrarMenu] = useState(false);
+  const { currentUser, isAuthenticated, logout } = useAuth(); // <--- USA useAuth() AHORA
+  const navigate = useNavigate();
 
   const toggleMenu = () => {
     setMostrarMenu(!mostrarMenu);
   };
+
+  const handleLogout = async () => {
+    await logout();
+    setMostrarMenu(false);
+    navigate("/"); // Redirige a la raíz (que ahora es el Login)
+  }
+
+  // Si no está autenticado, no debería renderizar nada (será atrapado por AuthLayout)
+  if (!isAuthenticated || !currentUser) return null; 
+  
+  // Lógica del rol (se usa en el menú o en los botones)
+  const roleName = currentUser.role_name || "Usuario";
 
   return (
     <>
@@ -48,7 +70,8 @@ const MainLayout = () => {
             
             {mostrarMenu && (
               <div className="dropdown-menu">
-                <div className="dropdown-header">Hola, Usuario</div>
+                {/* MOSTRAR DATOS REALES DEL USUARIO */}
+                <div className="dropdown-header">Hola, {roleName}</div>
                 
                 <Link to="/home/perfil" className="dropdown-item" onClick={() => setMostrarMenu(false)}>
                   Mi Perfil
@@ -56,16 +79,16 @@ const MainLayout = () => {
                 
                 <div className="dropdown-divider"></div>
                 
-                {/* AQUÍ ESTABA EL ERROR: El texto debe ir DENTRO del Link */}
                 <Link to="/home/calendario" className="dropdown-item" onClick={() => setMostrarMenu(false)}>
                   Calendario
                 </Link>
 
                 <div className="dropdown-divider"></div>
                 
-                <Link to="/" className="dropdown-item logout" onClick={() => setMostrarMenu(false)}>
+                {/* BOTÓN DE CERRAR SESIÓN QUE EJECUTA EL LOGOUT REAL */}
+                <div className="dropdown-item logout" onClick={handleLogout}> 
                   Cerrar Sesión
-                </Link>
+                </div>
               </div>
             )}
           </div>
@@ -83,42 +106,50 @@ const MainLayout = () => {
   );
 };
 
+// =========================================================================
+// 2. FUNCIÓN PRINCIPAL DE LA APLICACIÓN (RUTAS)
+// =========================================================================
 function App() {
-  // Mock de usuario para el ejemplo de perfil
-  const usuarioMock = {
-    nombre: "Usuario Demo",
-    email: "demo@unp.edu.ar",
-    rol: "ALUMNO", 
-    legajo: "12345"
-  };
+
+  // Usuario Mock ELIMINADO. Los datos vienen de useAuth.
 
   return (
     <Routes>
-      <Route path="/" element={<LoginPage />} />
+      {/* RUTA PÚBLICA: / (Raíz) ahora apunta al Login */}
+      <Route path="/" element={<Login />} />
+      <Route path="/login" element={<Login />} /> {/* Ruta alternativa por si acaso */}
 
-      <Route path="/home" element={<MainLayout />}>
-        <Route index element={<HomePage />} />
 
-        {/* Secciones anidadas */}
-        <Route path="alumno/*" element={<MenuAlumno />} />
-        <Route path="docente/*" element={<MenuDocente />} />
-        <Route path="departamento/*" element={<MenuDepartamento />} />
-        <Route path="secretaria/*" element={<MenuSecretaria />} />
-
-        {/* Rutas de error/info */}
-        <Route path="error" element={<ErrorCargaDatos />} />
-        <Route path="sin-datos" element={<SinDatos />} />
+      {/* ---------------------------------------------------- */}
+      {/* RUTAS PROTEGIDAS: Todo lo que requiere LOGIN va aquí */}
+      {/* ---------------------------------------------------- */}
+      
+      {/* AuthLayout verifica la sesión, si falla, redirige a /login */}
+      <Route path="/home" element={<AuthLayout />}>
         
-        {/* NUEVA RUTA: Calendario */}
-        <Route path="calendario" element={<Calendario />} />
+        {/* Usamos el MainLayout (Nav y Footer) para las sub-rutas protegidas */}
+        <Route element={<MainLayout />}> 
+            <Route index element={<HomePage />} />
 
-        {/* Ruta Perfil (Integrando el componente anterior si lo tienes) */}
-        <Route path="perfil" element={<MostrarMiPerfil usuario={usuarioMock} />} />
+            {/* Rutas de Usuario (Necesitan ser dinámicas: Docente/Alumno) */}
+            <Route path="alumno/*" element={<MenuAlumno />} />
+            <Route path="docente/*" element={<MenuDocente />} />
+            <Route path="departamento/*" element={<MenuDepartamento />} />
+            <Route path="secretaria/*" element={<MenuSecretaria />} />
 
-        <Route path="*" element={<HomePage />} />
+            {/* Rutas de error/info */}
+            <Route path="error" element={<ErrorCargaDatos />} />
+            <Route path="sin-datos" element={<SinDatos />} />
+            
+            {/* Rutas de Perfil/Herramientas */}
+            <Route path="calendario" element={<Calendario />} />
+            {/* TODO: Pasar datos de currentUser al componente MostrarMiPerfil */}
+            <Route path="perfil" element={<MostrarMiPerfil />} /> 
+        </Route>
       </Route>
 
-      <Route path="*" element={<LoginPage />} />
+      {/* RUTA COMODÍN (Catch-all) */}
+      <Route path="*" element={<Login />} />
     </Routes>
   );
 }
