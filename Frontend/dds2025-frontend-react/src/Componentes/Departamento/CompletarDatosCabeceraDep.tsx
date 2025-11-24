@@ -62,17 +62,19 @@ const CompletarDatosCabeceraDep: React.FC<Props> = ({
     <div className="header-form-wrapper">
       <style>{`
         :root {
-          /* Aplicando la nueva paleta */
-          --hf-primary: #003366;    /* Azul Marino Institucional */
-          --hf-highlight: #0078D4;  /* Azul de Acción (Focus/Botones) */
-          --hf-bg-input: #cce4f6;   /* Fondo celeste para inputs */
-          --hf-border: #ccc;        /* Borde gris neutro */
-          --hf-text: #111;          /* Texto principal casi negro */
+          /* Paleta Institucional */
+          --hf-primary: #003366;    /* Azul Marino Institucional */
+          --hf-highlight: #0078D4;  /* Azul de Acción (Focus) */
+          /* Colores para el nuevo diseño */
+          --hf-header-light: #5bc0de; /* Azul/Celeste más claro (Nuevo) */
+          --hf-header-accent: #9edcff; /* Azul aún más claro para el degradado (Nuevo) */
+          --hf-bg-input: #cce4f6;   /* Fondo celeste suave para inputs */
+          --hf-border: #ccc;        /* Borde gris neutro */
         }
 
         .header-form-wrapper {
           font-family: "Segoe UI", "Roboto", sans-serif;
-          max-width: 900px;
+          max-width: 1150px; /* <--- MODIFICADO: Aumentado el ancho */
           margin: 0 auto 30px;
           animation: slideDown 0.5s ease-out;
         }
@@ -85,30 +87,37 @@ const CompletarDatosCabeceraDep: React.FC<Props> = ({
           overflow: hidden;
         }
 
-        /* Header Visual del Formulario con gradiente de la paleta */
+        /* Header Visual del Formulario con AZUL CLARO y TEXTO NEGRO */
         .form-header-strip {
-          background: linear-gradient(135deg, var(--hf-primary), var(--hf-highlight));
+          /* Aplicando azul más claro con degradado */
+          background: linear-gradient(135deg, var(--hf-header-light), var(--hf-header-accent));
           padding: 15px 25px;
-          color: white;
+          /* Texto en negro */
+          color: #000000; 
           display: flex;
           align-items: center;
           gap: 12px;
+          border-bottom: 2px solid var(--hf-primary);
         }
         .form-icon {
           font-size: 1.8rem;
           opacity: 0.9;
         }
-        /* Icono de documento simple con CSS para no depender de emojis si no quieres */
+        /* Icono de documento simple (ELIMINADO el emoji) */
         .form-icon::before {
-            content: '📄';
-            filter: brightness(0) invert(1); /* Lo vuelve blanco */
+            content: '📋'; /* Reemplazo por un icono simple */
+            font-size: 1.8rem;
+            color: var(--hf-primary); /* Icono en color principal */
+            filter: none;
         }
         
         .form-title {
           margin: 0;
           font-size: 1.25rem;
-          font-weight: 600;
+          font-weight: 700;
           letter-spacing: 0.5px;
+          /* Texto del título en negro */
+          color: #000000; 
         }
 
         .form-body {
@@ -141,18 +150,32 @@ const CompletarDatosCabeceraDep: React.FC<Props> = ({
           border-radius: 8px;
           border: 1px solid var(--hf-border);
           background-color: var(--hf-bg-input);
-          color: var(--hf-text);
+          color: var(--hf-primary); /* Texto de inputs en color principal */
           font-size: 1rem;
           transition: all 0.2s ease;
           font-family: inherit;
-          box-sizing: border-box; /* Asegura que el padding no rompa el ancho */
+          box-sizing: border-box;
+          font-weight: 500;
         }
+
+        /* Solucionando color de select al seleccionar */
+        .form-select option {
+            color: var(--hf-primary); /* Asegura que las opciones sean azules */
+        }
+        /* Mantiene el color del texto del select claro antes de seleccionar */
+        .form-select:not([value=""]):required {
+            color: var(--hf-primary);
+        }
+        
+        /* 💡 ESTILO MODIFICADO PARA MANTENER EL FONDO CELESTE EN FOCUS */
         .form-input:focus, .form-select:focus, .form-textarea:focus {
           outline: none;
           border-color: var(--hf-highlight);
-          background-color: #fff;
-          box-shadow: 0 0 0 4px rgba(0, 120, 212, 0.15); /* Usando el color highlight con transparencia */
+          background-color: #e0f0ff; /* <-- Cambiado de #fff a un celeste muy claro */
+          box-shadow: 0 0 0 4px rgba(0, 120, 212, 0.15);
         }
+        /* ---------------------------------------------------------------------- */
+
         .form-textarea {
           resize: vertical;
           min-height: 80px;
@@ -167,16 +190,11 @@ const CompletarDatosCabeceraDep: React.FC<Props> = ({
       `}</style>
 
       <div className="form-card">
-        <div className="form-header-strip">
-          <div className="form-icon"></div>
-          <h2 className="form-title">Informe Sintetico</h2>
-        </div>
-
         <div className="form-body">
           {/* Fila 1: Departamento */}
           <div className="form-group full-width">
             <label className="form-label" htmlFor="departamento_id">
-              Departamento / Comision Asesora <span className="required-mark">*</span>
+              Departamento / Comisión Asesora <span className="required-mark">*</span>
             </label>
             <select
               id="departamento_id"
@@ -185,7 +203,7 @@ const CompletarDatosCabeceraDep: React.FC<Props> = ({
               value={departamentoSeleccionado}
               onChange={handleChange}
               required
-              style={{ fontWeight: '600', color: departamentoSeleccionado ? 'var(--hf-primary)' : '#555' }}
+              style={{ fontWeight: '600' }} 
             >
               <option value={0}> Seleccione Departamento Academico </option>
               {departamentos.map((d) => (
@@ -222,6 +240,7 @@ const CompletarDatosCabeceraDep: React.FC<Props> = ({
               className="form-select"
               value={formData.sede}
               onChange={handleChange}
+              required 
             >
               <option value=""> Seleccione Sede </option>
               <option value="Trelew">Trelew</option>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
@@ -20,8 +20,11 @@ const ComentariosFinalesDep: React.FC<Props> = ({
   const [mensaje, setMensaje] = useState<{ tipo: 'exito' | 'error', texto: string } | null>(null);
   const [isExpanded, setIsExpanded] = useState(true); 
 
+  // Sincronizar el estado local con la prop inicial
   useEffect(() => {
-    if (comentariosIniciales) setComentarios(comentariosIniciales);
+    if (comentariosIniciales !== undefined && comentariosIniciales !== null) {
+      setComentarios(comentariosIniciales);
+    }
   }, [comentariosIniciales]);
 
   const handleChangeLocal = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -30,7 +33,7 @@ const ComentariosFinalesDep: React.FC<Props> = ({
       if (onChange) onChange(nuevoValor);
   };
 
-  const handleGuardarIndividual = async () => {
+  const handleGuardarIndividual = useCallback(async () => {
     if (!informeId) return;
     setGuardando(true);
     setMensaje(null);
@@ -48,11 +51,11 @@ const ComentariosFinalesDep: React.FC<Props> = ({
     } finally {
       setGuardando(false);
     }
-  };
+  }, [informeId, comentarios]);
 
   return (
     <div className="comment-wrapper">
-       <style>{`
+        <style>{`
         :root {
           --uni-primary: #003366;
           --uni-secondary: #007bff;
@@ -78,11 +81,12 @@ const ComentariosFinalesDep: React.FC<Props> = ({
             transition: all 0.3s ease;
         }
         .comment-card.expanded {
-            box-shadow: 0 8px 24px rgba(51, 102, 0, 0.15);
+            /* Sombra diferente al expandir para indicar foco */
+            box-shadow: 0 8px 24px rgba(0, 51, 102, 0.15); 
             border-color: var(--uni-primary);
         }
 
-        /* ENCABEZADO (CLICKABLE) */
+        /* ENCABEZADO (CLICKABLE) - MODIFICADO */
         .comment-header {
             padding: 20px 25px;
             cursor: pointer;
@@ -90,10 +94,12 @@ const ComentariosFinalesDep: React.FC<Props> = ({
             justify-content: space-between;
             align-items: center;
             background: linear-gradient(135deg, var(--uni-primary), #004e92);
-            color: white;
+            /* Aseguramos color blanco para el texto del header */
+            color: white !important; 
             transition: background 0.3s ease;
         }
         .comment-header:hover {
+            /* Oscurecemos ligeramente el fondo en hover */
             background: linear-gradient(135deg, #002a55, var(--uni-primary));
         }
 
@@ -111,6 +117,8 @@ const ComentariosFinalesDep: React.FC<Props> = ({
             font-size: 1.2rem;
             transition: transform 0.3s ease;
             opacity: 0.8;
+            /* Aseguramos color blanco para el chevron */
+            color: white !important; 
         }
         .chevron.rotated {
             transform: rotate(180deg);
@@ -124,20 +132,20 @@ const ComentariosFinalesDep: React.FC<Props> = ({
             animation: slideDown 0.3s ease-out;
         }
 
-        /* ÁREA DE TEXTO (con el nuevo color y ancho ajustado) */
+        /* ÁREA DE TEXTO (con el color y ancho ajustado) */
         .comment-textarea {
-            width: 96%; /* Un poco más angosto que el 100% */
-            margin: 0 auto; /* Centrado */
+            width: 96%; 
+            margin: 0 auto; 
             display: block;
             min-height: 300px;
             padding: 20px;
-            border: 2px solid #c1d1e0; /* Borde un poco más oscuro que el fondo para contraste */
+            border: 2px solid #c1d1e0; 
             border-radius: 10px;
             font-family: 'Segoe UI', Roboto, sans-serif;
             font-size: 1rem;
             line-height: 1.6;
-            color: var(--uni-primary); /* Texto azul oscuro para buen contraste con el fondo azul claro */
-            background-color: var(--uni-input-bg); /* EL COLOR SOLICITADO: #d0dff0 */
+            color: var(--uni-primary); 
+            background-color: var(--uni-input-bg); 
             resize: vertical;
             box-sizing: border-box;
             transition: all 0.2s ease-in-out;
@@ -145,11 +153,11 @@ const ComentariosFinalesDep: React.FC<Props> = ({
         .comment-textarea:focus {
             outline: none;
             border-color: var(--uni-secondary);
-            background-color: #e8f0fe; /* Ligeramente más claro al enfocar para feedback */
+            background-color: #e8f0fe; 
             box-shadow: 0 0 0 4px rgba(0, 123, 255, 0.2);
         }
         .comment-textarea::placeholder {
-            color: #6b7c93; /* Color de placeholder que contraste bien con #d0dff0 */
+            color: #6b7c93; 
             opacity: 0.8;
         }
         .comment-textarea:disabled {
@@ -165,7 +173,7 @@ const ComentariosFinalesDep: React.FC<Props> = ({
             justify-content: flex-end;
             align-items: center;
             margin-top: 20px;
-            width: 96%; /* Alineado con el textarea */
+            width: 96%; 
             margin-left: auto;
             margin-right: auto;
             gap: 15px;
@@ -200,10 +208,10 @@ const ComentariosFinalesDep: React.FC<Props> = ({
       `}</style>
 
       <div className={`comment-card ${isExpanded ? 'expanded' : ''}`}>
-        {/* HEADER CLICKABLE */}
+        {/* HEADER CLICKABLE - Emoji eliminado */}
         <div className="comment-header" onClick={() => setIsExpanded(!isExpanded)}>
           <h3 className="comment-title">
-             <span>📝</span> Comentarios y Conclusiones Finales
+            Comentarios y Conclusiones Finales
           </h3>
           <span className={`chevron ${isExpanded ? 'rotated' : ''}`}>▼</span>
         </div>
@@ -232,7 +240,7 @@ const ComentariosFinalesDep: React.FC<Props> = ({
                       onClick={handleGuardarIndividual} 
                       disabled={guardando || !informeId}
                    >
-                      {guardando ? 'Guardando...' : ' Guardar Comentarios'}
+                     {guardando ? 'Guardando...' : ' Guardar Comentarios'}
                    </button>
                 </div>
             )}
