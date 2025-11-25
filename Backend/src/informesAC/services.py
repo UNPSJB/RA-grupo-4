@@ -40,8 +40,8 @@ def filtrar_informes(
     id_periodo: int | None = None,
 ):
     query = db.query(InformesAC).options(
-        joinedload(InformesAC.materia),
-        joinedload(InformesAC.docente)
+        joinedload(InformesAC.docente),
+        joinedload(InformesAC.materia).joinedload(Materias.periodo)
     )
 
     # --- Filtrar por docente ---

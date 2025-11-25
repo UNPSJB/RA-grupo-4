@@ -19,7 +19,7 @@ class DocenteOut(BaseModel):
 class MateriaOut(BaseModel):
     id_materia: int
     nombre: str
-    codigoMateria: str 
+    codigoMateria: str
 
     model_config = {
         "from_attributes": True  
@@ -146,3 +146,16 @@ class InformeACParaInformeSintetico(BaseModel):
     estrategias_a_implementar: Optional[str]
     class Config:
         orm_mode = True  # Muy importante para poder usar objetos SQLAlchemy
+
+
+from src.materias.schemas import Materia
+class InformeACListado(BaseModel):
+    id_informesAC: int
+    sede: SedeEnum
+    ciclo_lectivo: int
+
+    docente: DocenteOut
+    materia: Materia
+    
+    model_config = {"from_attributes": True}
+
