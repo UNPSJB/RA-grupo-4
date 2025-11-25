@@ -23,7 +23,7 @@ import MenuDepartamento from "./Componentes/Menus/MenuDepartamento";
 import MenuSecretaria from "./Componentes/Menus/MenuSecretaria";
 
 // --- NUEVO IMPORT ---
-import MenuInstitucional from "./Componentes/Menus/MenuInstitucional";
+import MenuInstitucional from "./Componentes/Menus/Menuinstitucional";
 
 // =========================================================
 // LAYOUT PRINCIPAL

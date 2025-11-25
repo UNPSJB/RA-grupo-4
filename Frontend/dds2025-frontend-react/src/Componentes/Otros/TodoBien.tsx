@@ -1,86 +1,99 @@
 import React from 'react';
-// Asegúrate de que la ruta sea correcta según tu proyecto
-import imgSinDatosDefault from '../../assets/sinDatos.png';
+import { useNavigate } from 'react-router-dom';
+import todoBienImg from '../../assets/TodoBien.png'; 
 
-interface SinDatosProps {
-  /** Ruta de la imagen a mostrar. Si no se provee, usa la imagen por defecto. */
-  imagenSrc?: string;
-  /** Título principal (ej: "No hay resultados") */
-  titulo?: string;
-  /** Mensaje descriptivo adicional */
-  mensaje?: string;
-}
+const TodoBien: React.FC = () => {
+    const navigate = useNavigate();
 
-const TodoBien: React.FC<SinDatosProps> = ({
-  // Aquí asignamos tu imagen importada como valor por defecto
-  imagenSrc = imgSinDatosDefault,
-  titulo = "Ups, parece que no hay nada por aqui..",
-  mensaje = "Aun no hay datos cargados"
-}) => {
-  return (
-    <div className="no-data-wrapper">
-      <style>{`
-        .no-data-wrapper {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          padding: 40px 20px;
-          background-color: #f8fafc;
-          border-radius: 12px;
-          border: 2px dashed #e0e0e0;
-          text-align: center;
-          font-family: "Segoe UI", "Roboto", sans-serif;
-          animation: fadeIn 0.8s ease-out;
-          color: #64748b;
-          min-height: 200px;
-        }
+    const handleVolver = () => {
+        navigate('/panel');
+    };
 
-        .no-data-image-container {
-          margin-bottom: 20px;
-          opacity: 0.8;
-          transition: transform 0.3s ease;
-        }
-        .no-data-wrapper:hover .no-data-image-container {
-           transform: scale(1.05);
-           opacity: 1;
-        }
+    return (
+        <div style={styles.container}>
+            <div style={styles.card}>
+                
+                {/* Aquí está la imagen solicitada */}
+                <img 
+                    src={todoBienImg} 
+                    alt="Todo salió bien" 
+                    style={styles.imagen} 
+                />
 
-        .no-data-img {
-          max-width: 150px;
-          height: auto;
-          display: block;
-        }
+                <h2 style={styles.titulo}>¡Respuesta Enviada Correctamente!</h2>
+                
+                <p style={styles.mensaje}>
+                    Se ha enviado correctamente tu respuesta a la encuesta.
+                    <br />
+                    Gracias por tu participación.
+                </p>
 
-        .no-data-title {
-          font-size: 1.50rem;
-          font-weight: 700;
-          color: #003366;
-          margin: 0 0 10px 0;
-        }
+                <button 
+                    onClick={handleVolver}
+                    style={styles.boton}
+                    onMouseOver={(e) => e.currentTarget.style.backgroundColor = styles.botonHover.backgroundColor}
+                    onMouseOut={(e) => e.currentTarget.style.backgroundColor = styles.boton.backgroundColor}
+                >
+                    Volver al panel
+                </button>
+            </div>
+        </div>
+    );
+};
 
-        .no-data-text {
-          font-size: 0.95rem;
-          color: #666;
-          max-width: 300px;
-          margin: 0;
-          line-height: 1.5;
-        }
-
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(10px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-      `}</style>
-
-      <div className="no-data-image-container">
-        <img src={imagenSrc} alt="Sin datos" className="no-data-img" />
-      </div>
-
-      <h3 className="no-data-title">{titulo}</h3>
-      <p className="no-data-text">{mensaje}</p> 
-    </div>
-  );
+// Estilos encapsulados
+const styles = {
+    container: {
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: '40px 20px',
+        animation: 'fadeIn 0.5s ease-out',
+    },
+    card: {
+        backgroundColor: '#ffffff',
+        padding: '50px 40px',
+        borderRadius: '15px',
+        boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
+        textAlign: 'center' as const,
+        maxWidth: '500px',
+        width: '100%',
+        borderTop: '6px solid #28a745', // Borde verde superior
+    },
+    imagen: {
+        width: '150px', // Ajusta este tamaño según lo grande que quieras la imagen
+        height: 'auto',
+        marginBottom: '20px',
+        display: 'inline-block', // Ayuda a que el text-align: center del padre funcione bien
+    },
+    titulo: {
+        color: '#003366',
+        fontSize: '2rem',
+        fontWeight: 700,
+        marginBottom: '15px',
+        margin: '0 0 15px 0',
+    },
+    mensaje: {
+        color: '#555',
+        fontSize: '1.1rem',
+        marginBottom: '35px',
+        lineHeight: '1.6',
+    },
+    boton: {
+        backgroundColor: '#003366',
+        color: 'white',
+        border: 'none',
+        padding: '12px 30px',
+        fontSize: '1rem',
+        fontWeight: 600,
+        borderRadius: '8px',
+        cursor: 'pointer',
+        transition: 'background-color 0.3s ease, transform 0.2s',
+        boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+    },
+    botonHover: {
+        backgroundColor: '#005bb5',
+    }
 };
 
 export default TodoBien;
