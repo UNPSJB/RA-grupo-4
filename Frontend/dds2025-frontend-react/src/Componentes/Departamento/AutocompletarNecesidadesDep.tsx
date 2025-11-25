@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from "react";
+import SinDatos from "../Otros/SinDatos";
+import ErrorCargaDatos from "../Otros/ErrorCargaDatos";
 
 const API_BASE = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_URL) || "http://localhost:8000";
 
@@ -21,7 +23,7 @@ const AutocompletarNecesidadesDep: React.FC<AutocompletarNecesidadesDepProps> = 
 
   useEffect(() => {
     const obtenerResumen = async () => {
-      if (!departamentoId ) {
+      if (!departamentoId) {
         setResumen([]); // Limpiar datos si no hay ID
         setError(null);
         return;
@@ -44,20 +46,7 @@ const AutocompletarNecesidadesDep: React.FC<AutocompletarNecesidadesDepProps> = 
     obtenerResumen();
   }, [departamentoId, periodoId]);
 
-  // --- Renderizado ---
-
-  if (!departamentoId) {
-    return <div style={{ padding: '30px', textAlign: 'center', color: '#666' }}>
-      🏛️ Seleccione un departamento para ver sus requerimientos.
-    </div>;
-  }
-
-  if (error) {
-    return <div style={{ padding: '20px', color: '#dc3545', backgroundColor: '#f8d7da', borderRadius: '8px', border: '1px solid #f5c6cb' }}>
-      ⚠️ {error}
-    </div>;
-  }
-
+  // Renderizado principal
   return (
     <div className="uni-wrapper">
       {/* Estilos unificados del diseño guardado */}
@@ -87,6 +76,13 @@ const AutocompletarNecesidadesDep: React.FC<AutocompletarNecesidadesDepProps> = 
           color: var(--uni-text-primary);
           max-width: 1200px;
           margin: 0 auto;
+        }
+
+        /* Contenedor para estados vacíos y errores */
+        .uni-content-container {
+            padding: 20px 30px;
+            background-color: #ffffff;
+            border-radius: 12px;
         }
 
         /* HEADER PRINCIPAL (Diseño guardado) */
@@ -221,28 +217,12 @@ const AutocompletarNecesidadesDep: React.FC<AutocompletarNecesidadesDepProps> = 
           border-color: #cce4f6; /* Borde sutil */
         }
         .uni-empty-state {
-           font-style: italic;
-           color: var(--uni-text-secondary);
-           font-size: 0.9rem;
-           padding: 6px 0;
+            font-style: italic;
+            color: var(--uni-text-secondary);
+            font-size: 0.9rem;
+            padding: 6px 0;
         }
         
-        /* ESTADO VACÍO GLOBAL (Diseño guardado) */
-        .global-empty-state {
-          padding: 40px; 
-          text-align: center; 
-          color: var(--uni-text-secondary); 
-          background-color: var(--uni-card-bg); 
-          border-radius: 12px; 
-          border: 2px dashed var(--uni-border);
-        }
-        .global-empty-icon {
-          font-size: 2.5rem; 
-          margin-bottom: 15px;
-          color: var(--uni-primary);
-          opacity: 0.7;
-        }
-
         /* SKELETON (Diseño guardado) */
         .skeleton-card {
           height: 300px; /* Altura fija para el skeleton */
@@ -273,80 +253,105 @@ const AutocompletarNecesidadesDep: React.FC<AutocompletarNecesidadesDepProps> = 
           100% { background-color: #e9ecef; } 
         }
       `}</style>
+      
+      {/* Lógica de control de estados */}
+      {(() => {
+        // 1. Caso: No se ha seleccionado departamento
+        if (!departamentoId) {
+            return (
+                <div className="uni-content-container">
+                    <SinDatos mensaje="Seleccione un departamento para ver sus requerimientos." />
+                </div>
+            );
+        }
 
-      <div className="uni-header">
-        <h2 className="uni-title">Resumen de Necesidades</h2>
-        {!cargando && resumen.length > 0 && (
-          <span className="uni-badge">{resumen.length} Materias</span>
-        )}
-      </div>
+        // 2. Caso: Error en la carga
+        if (error) {
+            return (
+                <div className="uni-content-container">
+                    <ErrorCargaDatos error={error} />
+                </div>
+            );
+        }
 
-      {cargando ? (
-        <div className="uni-grid">
-          {[1, 2].map((i) => (
-            <div key={i} className="skeleton-card">
-              <div className="skeleton-line" style={{ width: '25%', height: '24px', marginBottom: '12px', background: '#e0e0e0' }}></div>
-              <div className="skeleton-line" style={{ width: '70%', height: '32px', marginBottom: '30px', background: '#e0e0e0' }}></div>
-              <div className="skeleton-line" style={{ width: '40%', height: '20px', marginBottom: '12px' }}></div>
-              <div className="skeleton-line" style={{ width: '100%', height: '40px', marginBottom: '30px' }}></div>
-              <div className="skeleton-line" style={{ width: '40%', height: '20px', marginBottom: '12px' }}></div>
-              <div className="skeleton-line" style={{ width: '100%', height: '40px' }}></div>
-            </div>
-          ))}
-        </div>
-      ) : resumen.length === 0 ? (
-        <div className="global-empty-state">
-          <div className="global-empty-icon">✨</div>
-          <p style={{fontSize: '1.1rem', fontWeight: 500}}>No hay necesidades registradas para este departamento actualmente.</p>
-        </div>
-      ) : (
-        <div className="uni-grid">
-          {resumen.map((item, index) => (
-            <div
-              key={index}
-              className="uni-card"
-              style={{ animationDelay: `${index * 0.05}s` }}
-            >
-              <div className="uni-card-header">
-                <span className="uni-materia-code">{item.codigo_materia}</span>
-                <h3 className="uni-materia-title" title={item.nombre_materia}>{item.nombre_materia}</h3>
-              </div>
-              
-              <div className="uni-card-body">
-                <div>
-                  <div className="uni-section-title">
-                    <span>🛠️</span> Equipamiento
-                  </div>
-                  <div className="uni-tags-container">
-                    {item.necesidades_equipamiento?.length > 0 ? (
-                      item.necesidades_equipamiento.map((req, idx) => (
-                        <span key={idx} className="uni-tag tag-equip">{req}</span>
-                      ))
-                    ) : (
-                      <span className="uni-empty-state">— Ninguno —</span>
+        // 3. Renderizado Normal
+        return (
+            <>
+                <div className="uni-header">
+                    <h2 className="uni-title">Resumen de Necesidades</h2>
+                    {!cargando && resumen.length > 0 && (
+                        <span className="uni-badge">{resumen.length} Materias</span>
                     )}
-                  </div>
                 </div>
 
-                <div style={{ marginTop: 'auto' }}>
-                  <div className="uni-section-title">
-                    <span>📚</span> Bibliografía
-                  </div>
-                  <div className="uni-tags-container">
-                    {item.necesidades_bibliografia?.length > 0 ? (
-                      item.necesidades_bibliografia.map((bib, idx) => (
-                        <span key={idx} className="uni-tag tag-biblio">{bib}</span>
-                      ))
-                    ) : (
-                      <span className="uni-empty-state">— Ninguna —</span>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+                {cargando ? (
+                    <div className="uni-grid">
+                        {[1, 2].map((i) => (
+                            <div key={i} className="skeleton-card">
+                                <div className="skeleton-line" style={{ width: '25%', height: '24px', marginBottom: '12px', background: '#e0e0e0' }}></div>
+                                <div className="skeleton-line" style={{ width: '70%', height: '32px', marginBottom: '30px', background: '#e0e0e0' }}></div>
+                                <div className="skeleton-line" style={{ width: '40%', height: '20px', marginBottom: '12px' }}></div>
+                                <div className="skeleton-line" style={{ width: '100%', height: '40px', marginBottom: '30px' }}></div>
+                                <div className="skeleton-line" style={{ width: '40%', height: '20px', marginBottom: '12px' }}></div>
+                                <div className="skeleton-line" style={{ width: '100%', height: '40px' }}></div>
+                            </div>
+                        ))}
+                    </div>
+                ) : resumen.length === 0 ? (
+                    <div className="uni-content-container">
+                        <SinDatos mensaje="No hay necesidades registradas para este departamento actualmente." />
+                    </div>
+                ) : (
+                    <div className="uni-grid">
+                        {resumen.map((item, index) => (
+                            <div
+                                key={index}
+                                className="uni-card"
+                                style={{ animationDelay: `${index * 0.05}s` }}
+                            >
+                                <div className="uni-card-header">
+                                    <span className="uni-materia-code">{item.codigo_materia}</span>
+                                    <h3 className="uni-materia-title" title={item.nombre_materia}>{item.nombre_materia}</h3>
+                                </div>
+                                
+                                <div className="uni-card-body">
+                                    <div>
+                                        <div className="uni-section-title">
+                                            <span>🛠️</span> Equipamiento
+                                        </div>
+                                        <div className="uni-tags-container">
+                                            {item.necesidades_equipamiento?.length > 0 ? (
+                                                item.necesidades_equipamiento.map((req, idx) => (
+                                                    <span key={idx} className="uni-tag tag-equip">{req}</span>
+                                                ))
+                                            ) : (
+                                                <span className="uni-empty-state">— Ninguno —</span>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    <div style={{ marginTop: 'auto' }}>
+                                        <div className="uni-section-title">
+                                            <span>📚</span> Bibliografía
+                                        </div>
+                                        <div className="uni-tags-container">
+                                            {item.necesidades_bibliografia?.length > 0 ? (
+                                                item.necesidades_bibliografia.map((bib, idx) => (
+                                                    <span key={idx} className="uni-tag tag-biblio">{bib}</span>
+                                                ))
+                                            ) : (
+                                                <span className="uni-empty-state">— Ninguna —</span>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </>
+        );
+      })()}
     </div>
   );
 };

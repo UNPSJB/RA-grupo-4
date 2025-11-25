@@ -9,13 +9,11 @@ import {
   CartesianGrid,
   Legend,
 } from "recharts";
+import SinDatos from "../Otros/SinDatos";
+import ErrorCargaDatos from "../Otros/ErrorCargaDatos";
 
-// Componente Placeholder que simula SinDatos (asumiendo que está definido en el entorno)
-const SinDatos = ({ mensaje }: { mensaje: string }) => (
-  <div style={{ padding: '20px', textAlign: 'center', backgroundColor: '#f0f0f0', borderRadius: '8px', border: '1px solid #ccc' }}>
-    <p style={{ color: '#666', fontWeight: 'bold' }}>{mensaje}</p>
-  </div>
-);
+// Ajuste de API_BASE para consistencia con los otros archivos
+const API_BASE = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_URL) || "http://localhost:8000";
 
 interface ResumenSeccion {
   id: number;
@@ -37,17 +35,17 @@ interface InformeAC {
 }
 
 interface Props {
-  departamentoId: number;
-  periodoId: number;
+  departamentoId: number | null;
+  periodoId: number | null;
 }
 
-// Paleta de colores para el gráfico (evitando azules, se puede extender según el número de opciones)
+// Paleta de colores para el gráfico
 const colores = [
-  "#1ABC9C", // Turquesa (Idealmente 'Excelente' o 'Bueno')
+  "#1ABC9C", // Turquesa
   "#8E44AD", // Morado 
   "#E67E22", // Naranja
-  "#E74C3C", // Rojo (Idealmente 'Malo' o 'Necesita Mejorar')
-  "#3498DB", // Azul (Reserva)
+  "#E74C3C", // Rojo
+  "#3498DB", // Azul
   "#2C3E50", // Gris oscuro
   "#F1C40F", // Amarillo
   "#27AE60", // Esmeralda
@@ -71,7 +69,7 @@ const StatBox: React.FC<{ title: string; value: number; description: string; col
     </div>
 );
 
-// Nuevo Componente para el diccionario de secciones
+// Componente para el diccionario de secciones
 const SectionDictionary: React.FC<{ dictionary: Record<string, string>, isOpen: boolean, toggle: () => void }> = ({ dictionary, isOpen, toggle }) => (
     <div className="dictionary-container">
         <div className="dictionary-header" onClick={toggle}>
@@ -115,24 +113,33 @@ const ChevronIcon: React.FC<{ isRotated: boolean }> = ({ isRotated }) => (
 
 const PorcentajesInformeSintetico: React.FC<Props> = ({ departamentoId, periodoId }) => {
   const [informes, setInformes] = useState<InformeAC[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [materiaExpandida, setMateriaExpandida] = useState<number | null>(null);
-  const [isDictOpen, setIsDictOpen] = useState(false); // Estado para el diccionario
-
-  // NOTA: La URL base de la API debe ser accesible. En un entorno real, usaría una variable de entorno.
-  const API_BASE = "http://localhost:8000";
+  const [isDictOpen, setIsDictOpen] = useState(false);
 
   const fetchInformes = useCallback(async () => {
+    if (!departamentoId || !periodoId) {
+        setInformes([]);
+        return;
+    }
+
+    setLoading(true);
+    setError(null);
     try {
-      // Simulación de espera para mejor UX
-      await new Promise(resolve => setTimeout(resolve, 500)); 
+      // Simulación de espera mínima para UX
+      await new Promise(resolve => setTimeout(resolve, 300)); 
       
       const response = await fetch(
         `${API_BASE}/informes-sinteticos/departamento/${departamentoId}/periodo/${periodoId}/informesAC/porcentajes`
       );
+      
+      if (!response.ok) throw new Error("Error al cargar los informes sintéticos");
+      
       const data = await response.json();
       setInformes(Array.isArray(data) ? data : []);
-    } catch (error) {
+    } catch (error: any) {
+      setError(error.message || "Error desconocido");
       console.error("Error al cargar informes:", error);
     } finally {
       setLoading(false);
@@ -146,16 +153,11 @@ const PorcentajesInformeSintetico: React.FC<Props> = ({ departamentoId, periodoI
   const toggleMateria = (id: number) =>
     setMateriaExpandida((prev) => (prev === id ? null : id));
   
-  /**
-   * Genera los datos, la lista de opciones y el diccionario de secciones para un gráfico de barras agrupadas vertical.
-   * La clave de la categoría (X-Axis) es la sigla de la sección.
-   */
   const getChartData = (resumenSecciones: ResumenSeccion[]) => {
     const seccionesFiltradas = resumenSecciones.filter((s) =>
       SECCIONES_PERMITIDAS.includes(s.sigla)
     );
 
-    // 1. Determinar todas las opciones únicas y crear el diccionario
     const allOptions = new Set<string>();
     const sectionDictionary: Record<string, string> = {};
 
@@ -166,48 +168,25 @@ const PorcentajesInformeSintetico: React.FC<Props> = ({ departamentoId, periodoI
       );
     });
     
-    // Se recomienda ordenar las opciones (e.g., de positivo a negativo o alfabéticamente)
     const optionOrder = Array.from(allOptions).sort(); 
 
-    // 2. Crear la estructura de datos para el gráfico vertical (categoría: sigla)
     const chartData = seccionesFiltradas.map((sec) => {
       const dataItem: any = {
-        // Clave de la categoría del Eje X: SOLO LA SIGLA
         seccion: sec.sigla, 
       };
       
-      // Agregar los porcentajes para cada opción como claves
       Object.entries(sec.porcentajes_opciones).forEach(([opcion, valor]) => {
         dataItem[opcion] = valor;
       });
       
-      // *** MODIFICACIÓN PARA ORDENAMIENTO DINÁMICO POR MAYOR VALOR (OPCIÓN MÁS POSITIVA) ***
-      // Usamos el valor de la opción más positiva (primera en optionOrder) como criterio
-      // para que las secciones con mejores resultados aparezcan primero.
       dataItem._sortValue = dataItem[optionOrder[0]] || 0; 
-      // Si quieres ordenar por el *mayor valor* de cualquier opción para esa sección, usa:
-      // dataItem._sortValue = Math.max(...Object.values(sec.porcentajes_opciones));
-
       return dataItem;
     });
 
-    // 3. Ordenar las barras (secciones) por el valor de la opción principal de forma descendente
     chartData.sort((a, b) => b._sortValue - a._sortValue);
 
     return { chartData, optionOrder, sectionDictionary }; 
   };
-
-
-  if (loading) {
-    return (
-      <div className="uni-wrapper">
-        <h2 className="uni-title">
-          Porcentajes de los Informes de Actividad Curricular
-        </h2>
-        <p style={{ color: "#003366" }}>Cargando informes...</p>
-      </div>
-    );
-  }
 
   return (
     <div className="uni-wrapper">
@@ -238,6 +217,15 @@ const PorcentajesInformeSintetico: React.FC<Props> = ({ departamentoId, periodoI
           padding: 20px 0;
           color: #333; 
           animation: fadeIn 0.5s ease-out;
+          max-width: 1200px;
+          margin: 0 auto;
+        }
+
+        /* Contenedor para estados vacíos y errores */
+        .uni-content-container {
+            padding: 20px 30px;
+            background-color: #ffffff;
+            border-radius: 12px;
         }
 
         .uni-title {
@@ -265,36 +253,30 @@ const PorcentajesInformeSintetico: React.FC<Props> = ({ departamentoId, periodoI
           box-shadow: 0 8px 20px var(--uni-shadow-hover);
         }
 
-        /* ---------------------------------- */
-        /* --- ENCABEZADO MEJORADO (HEADER) --- */
-        /* ---------------------------------- */
+        /* --- HEADER MEJORADO --- */
         .materia-header {
           padding: 18px 25px;
           cursor: pointer;
           display: flex;
           justify-content: space-between;
           align-items: center;
-          /* Degradado de fondo más moderno */
           background: linear-gradient(135deg, var(--header-start) 0%, var(--header-end) 100%); 
           color: white;
           transition: all 0.3s ease;
-          /* Sombra interior sutil para un aspecto elevado */
           box-shadow: inset 0 -3px 0 rgba(0,0,0,0.1); 
         }
 
         .materia-header:hover {
-          /* Cambio de color al pasar el ratón */
           background: linear-gradient(135deg, var(--header-hover-start) 0%, var(--header-hover-end) 100%); 
         }
 
         .materia-title {
-          font-size: 1.35rem; /* Un poco más grande */
+          font-size: 1.35rem; 
           font-weight: 700;
           margin: 0;
           display: flex;
           align-items: center;
           gap: 15px;
-          /* Sombra de texto sutil para contraste */
           text-shadow: 1px 1px 2px rgba(0,0,0,0.2); 
         }
 
@@ -302,25 +284,21 @@ const PorcentajesInformeSintetico: React.FC<Props> = ({ departamentoId, periodoI
           background: white; 
           color: var(--uni-primary);
           padding: 5px 12px;
-          border-radius: 20px; /* Más redondeado (Pill shape) */
+          border-radius: 20px; 
           font-size: 0.9rem;
-          font-weight: 800; /* Más audaz */
-          /* Sombra de caja para el badge */
+          font-weight: 800; 
           box-shadow: 0 2px 5px rgba(0,0,0,0.2); 
         }
 
-        /* Icono Chevron */
         .chevron-icon {
             transition: transform 0.3s ease;
             color: white;
-            flex-shrink: 0; /* Asegura que no se reduzca */
+            flex-shrink: 0; 
         }
 
         .chevron-icon.rotated {
             transform: rotate(180deg);
         }
-        /* ---------------------------------- */
-
 
         /* --- CUERPO --- */
         .materia-body {
@@ -330,7 +308,6 @@ const PorcentajesInformeSintetico: React.FC<Props> = ({ departamentoId, periodoI
           animation: slideDown 0.4s ease-out forwards;
         }
         
-        /* Contenedor de Porcentajes (3 Columnas) */
         .percentages-grid-4 {
           display: grid;
           grid-template-columns: repeat(3, 1fr); 
@@ -338,7 +315,6 @@ const PorcentajesInformeSintetico: React.FC<Props> = ({ departamentoId, periodoI
           margin-bottom: 30px;
         }
         
-        /* Contenedor de Justificaciones (2 Columnas) */
         .text-info-grid-2 {
           display: grid;
           grid-template-columns: repeat(2, 1fr);
@@ -346,7 +322,6 @@ const PorcentajesInformeSintetico: React.FC<Props> = ({ departamentoId, periodoI
           margin-bottom: 30px;
         }
 
-        /* Caja de Estadística */
         .stat-box {
             background-color: var(--uni-card-bg);
             border: 1px solid var(--uni-border);
@@ -376,7 +351,6 @@ const PorcentajesInformeSintetico: React.FC<Props> = ({ departamentoId, periodoI
             margin-top: 5px;
         }
         
-        /* Bloques de Justificación y Opinión */
         .text-block {
             background-color: var(--uni-card-bg);
             border: 1px solid var(--uni-border);
@@ -409,19 +383,16 @@ const PorcentajesInformeSintetico: React.FC<Props> = ({ departamentoId, periodoI
           color: #343a40;
           background-color: #f8fbfc; 
           line-height: 1.5;
-          
-          /* CORRECCIÓN PARA EVITAR EL DESBORDE DE TEXTO LARGO */
           overflow-wrap: break-word; 
           word-break: break-all;
         }
         
-        /* Bloque de Gráfico */
         .chart-block {
           background-color: var(--uni-card-bg);
           border-radius: 8px;
           padding: 20px;
           box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-          margin-bottom: 30px; /* Asegura espacio debajo del gráfico */
+          margin-bottom: 30px; 
         }
 
         .chart-title {
@@ -437,7 +408,6 @@ const PorcentajesInformeSintetico: React.FC<Props> = ({ departamentoId, periodoI
           margin-bottom: 15px;
         }
         
-        /* Estilos del Diccionario de Secciones */
         .dictionary-container {
             padding: 10px 15px;
             border: 1px solid var(--uni-border);
@@ -471,7 +441,7 @@ const PorcentajesInformeSintetico: React.FC<Props> = ({ departamentoId, periodoI
             margin: 0;
             display: flex;
             flex-wrap: wrap;
-            gap: 8px 20px; /* gap vertical y horizontal */
+            gap: 8px 20px; 
             border-top: 1px solid #c2d4ea;
             margin-top: 10px;
             font-size: 0.9rem;
@@ -488,20 +458,31 @@ const PorcentajesInformeSintetico: React.FC<Props> = ({ departamentoId, periodoI
             font-weight: 700;
             color: var(--uni-primary);
         }
-        /* Fin Estilos del Diccionario */
 
+        /* SKELETON LOADER */
+        .skeleton-header {
+          height: 60px;
+          background: #e9ecef;
+          border-radius: 12px;
+          margin-bottom: 15px;
+          animation: pulse 1.5s ease-in-out infinite;
+        }
+        
+        @keyframes pulse { 
+          0% { background-color: #e9ecef; } 
+          50% { background-color: #f8f9fa; } 
+          100% { background-color: #e9ecef; } 
+        }
 
-        /* Responsive para dispositivos pequeños */
         @media (max-width: 768px) {
             .percentages-grid-4, .text-info-grid-2 {
                 grid-template-columns: 1fr;
             }
             .materia-title {
-                font-size: 1.15rem; /* Ajuste para móviles */
+                font-size: 1.15rem; 
             }
         }
 
-        /* Animaciones */
         @keyframes slideDown {
           from { opacity: 0; transform: translateY(-10px); }
           to { opacity: 1; transform: translateY(0); }
@@ -513,173 +494,183 @@ const PorcentajesInformeSintetico: React.FC<Props> = ({ departamentoId, periodoI
         }
       `}</style>
 
-      <h2 className="uni-title">
-        Porcentajes de los Informes de Actividad Curricular
-      </h2>
-
-      {(!informes || informes.length === 0) && (
-        <SinDatos
-          mensaje="Todavía no se cargaron Informes de Actividad Curricular asociados al departamento en este período."
-        />
+      {/* Título siempre visible (salvo que sea sin selección o error fatal) */}
+      {(departamentoId && !error) && (
+        <h2 className="uni-title">
+          Porcentajes de los Informes de Actividad Curricular
+        </h2>
       )}
 
-      {(informes ?? []).map((info) => {
-        const isExpanded = materiaExpandida === info.id_informeAC;
-        // Obtenemos los datos en el nuevo formato vertical y el orden de las opciones
-        const { chartData, optionOrder, sectionDictionary } = getChartData(info.resumenSecciones);
+      {(() => {
+        // 1. Caso: No se ha seleccionado departamento
+        if (!departamentoId) {
+            return (
+                <div className="uni-content-container">
+                    <SinDatos mensaje="Seleccione un departamento para ver los porcentajes de los informes." />
+                </div>
+            );
+        }
 
-        return (
-          <div
-            key={info.id_informeAC}
-            className={`materia-card ${isExpanded ? "expanded" : ""}`}
-          >
+        // 2. Caso: Error
+        if (error) {
+            return (
+                <div className="uni-content-container">
+                    <ErrorCargaDatos error={error} />
+                </div>
+            );
+        }
+
+        // 3. Caso: Cargando (Skeletons)
+        if (loading) {
+            return (
+                <div>
+                   {[1, 2, 3].map(i => (
+                       <div key={i} className="skeleton-header"></div>
+                   ))}
+                </div>
+            );
+        }
+
+        // 4. Caso: Vacio
+        if (!informes || informes.length === 0) {
+            return (
+                <div className="uni-content-container">
+                    <SinDatos mensaje="Todavía no se cargaron Informes de Actividad Curricular asociados al departamento en este período." />
+                </div>
+            );
+        }
+
+        // 5. Caso: Datos OK
+        return informes.map((info) => {
+            const isExpanded = materiaExpandida === info.id_informeAC;
+            const { chartData, optionOrder, sectionDictionary } = getChartData(info.resumenSecciones);
+
+            return (
             <div
-              className="materia-header"
-              onClick={() => toggleMateria(info.id_informeAC)}
+                key={info.id_informeAC}
+                className={`materia-card ${isExpanded ? "expanded" : ""}`}
             >
-              <div className="materia-title">
-                <span className="materia-code-badge">{info.codigoMateria}</span>
-                {info.nombreMateria}
-              </div>
-              
-              {/* COMPONENTE DE ICONO SVG MEJORADO */}
-              <ChevronIcon isRotated={isExpanded} />
-            </div>
-
-            {isExpanded && (
-              <div className="materia-body">
-                
-                {/* 1. ARRIBA: PORCENTAJES CLAVE */}
-                <div className="percentages-grid-4">
-                  
-                  {/* Contenido Abordado */}
-                  <StatBox 
-                      title="Contenido Abordado"
-                      value={info.porcentaje_contenido_abordado}
-                      description={`Se cubrió el ${info.porcentaje_contenido_abordado}% de los contenidos del plan.`}
-                      color="var(--color-content)"
-                  />
-
-                  {/* Clases Teóricas */}
-                  <StatBox 
-                      title="Clases Teóricas"
-                      value={info.porcentaje_teoricas}
-                      description={`Se dictó el ${info.porcentaje_teoricas}% de las clases programadas.`}
-                      color="var(--color-teoricas)"
-                  />
-
-                  {/* Clases Prácticas */}
-                  <StatBox 
-                      title="Clases Prácticas"
-                      value={info.porcentaje_practicas}
-                      description={`Se realizaron el ${info.porcentaje_practicas}% de las actividades previstas.`}
-                      color="var(--color-practicas)"
-                  />
+                <div
+                className="materia-header"
+                onClick={() => toggleMateria(info.id_informeAC)}
+                >
+                <div className="materia-title">
+                    <span className="materia-code-badge">{info.codigoMateria}</span>
+                    {info.nombreMateria}
                 </div>
                 
-                {/* 2. MEDIO: JUSTIFICACIÓN Y OPINIÓN */}
-                <div className="text-info-grid-2">
-                  
-                  {/* Justificación */}
-                  <div className="text-block">
-                    <label className="text-block-title">Justificación de Clases Dictadas:</label>
-                    <textarea
-                      value={
-                        info.justificacion_porcentaje ||
-                        "No se registró una justificación para las clases dictadas."
-                      }
-                      readOnly
-                      className="text-area-display"
-                    />
-                  </div>
-                  
-                  {/* Opinión General */}
-                  <div className="text-block">
-                    <label className="text-block-title">Opinión del Resumen General:</label>
-                    <textarea
-                      value={
-                        info.opinionSobreResumen ||
-                        "No se registró una opinión específica sobre el resumen."
-                      }
-                      readOnly
-                      className="text-area-display"
-                    />
-                  </div>
+                <ChevronIcon isRotated={isExpanded} />
                 </div>
 
-                {/* 3. GRÁFICO (ESTADÍSTICAS) */}
-                <div className="chart-block">
-                  <h3 className="chart-title">Distribución de Opciones por Sección (Encuestas)</h3>
-                  <p className="chart-context">
-                    Porcentaje de respuestas para cada opción, agrupadas por Sección. Las secciones están ordenadas por el porcentaje más alto en la primera opción de respuesta (la más positiva). Eje X solo muestra la sigla (letra) de la sección.
-                  </p>
-
-                  <ResponsiveContainer width="100%" height={350}>
-                    <BarChart
-                      data={chartData}
-                      margin={{ top: 10, right: 30, left: 20, bottom: 5 }}
-                      barCategoryGap="20%" // Espacio entre grupos de barras (secciones)
-                      barGap={2} // Espacio entre barras dentro del grupo (opciones)
-                    >
-                      <CartesianGrid strokeDasharray="3 3" /> 
-                      
-                      {/* Eje X: Secciones (Solo Sigla) */}
-                      <XAxis
-                        dataKey="seccion" 
-                        type="category"
-                        tick={{ fontSize: 13, fill: '#333' }}
-                        height={40} // Suficiente para una sola letra
-                        stroke="#666" 
-                      />
-
-                      {/* Eje Y: Porcentaje */}
-                      <YAxis
-                        type="number" 
-                        domain={[0, 100]} 
-                        tickFormatter={(value) => `${value}%`} 
-                        stroke="#666" 
-                        width={60} 
-                      />
-                      
-                      <Tooltip
-                        // Muestra el nombre de la opción (segmento) y su valor en porcentaje
-                        formatter={(value: number, name: string) => [`${value.toFixed(1)}%`, name]}
-                        // Muestra el nombre de la sección (barra)
-                        labelFormatter={(label) => `Sección (Sigla): ${label}`}
-                        contentStyle={{ 
-                            borderRadius: '6px', 
-                            border: '1px solid #ccc', 
-                            backgroundColor: 'rgba(255,255,255,0.9)' 
-                        }}
-                      />
-                      <Legend iconType="circle" wrapperStyle={{ paddingTop: '10px' }} />
-                      
-                      {/* BARRAS AGRUPADAS: Iteramos sobre las opciones de respuesta */}
-                      {optionOrder.map((opcion, i) => (
-                        <Bar
-                          key={opcion}
-                          dataKey={opcion} // La clave es la opción (e.g., "Bueno", "Malo")
-                          fill={colores[i % colores.length]}
-                          name={opcion} // Nombre que aparece en la leyenda
-                          barSize={18} // Tamaño de cada barra dentro del grupo
-                          radius={[8, 8, 0, 0]} // Añade borde redondeado en la parte superior
+                {isExpanded && (
+                <div className="materia-body">
+                    
+                    {/* PORCENTAJES CLAVE */}
+                    <div className="percentages-grid-4">
+                    <StatBox 
+                        title="Contenido Abordado"
+                        value={info.porcentaje_contenido_abordado}
+                        description={`Se cubrió el ${info.porcentaje_contenido_abordado}% de los contenidos del plan.`}
+                        color="var(--color-content)"
+                    />
+                    <StatBox 
+                        title="Clases Teóricas"
+                        value={info.porcentaje_teoricas}
+                        description={`Se dictó el ${info.porcentaje_teoricas}% de las clases programadas.`}
+                        color="var(--color-teoricas)"
+                    />
+                    <StatBox 
+                        title="Clases Prácticas"
+                        value={info.porcentaje_practicas}
+                        description={`Se realizaron el ${info.porcentaje_practicas}% de las actividades previstas.`}
+                        color="var(--color-practicas)"
+                    />
+                    </div>
+                    
+                    {/* TEXTOS */}
+                    <div className="text-info-grid-2">
+                    <div className="text-block">
+                        <label className="text-block-title">Justificación de Clases Dictadas:</label>
+                        <textarea
+                        value={info.justificacion_porcentaje || "No se registró una justificación."}
+                        readOnly
+                        className="text-area-display"
                         />
-                      ))}
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
-                
-                <SectionDictionary
-                    dictionary={sectionDictionary}
-                    isOpen={isDictOpen}
-                    toggle={() => setIsDictOpen(prev => !prev)}
-                />
+                    </div>
+                    <div className="text-block">
+                        <label className="text-block-title">Opinión del Resumen General:</label>
+                        <textarea
+                        value={info.opinionSobreResumen || "No se registró una opinión."}
+                        readOnly
+                        className="text-area-display"
+                        />
+                    </div>
+                    </div>
 
-              </div>
-            )}
-          </div>
-        );
-      })}
+                    {/* GRÁFICO */}
+                    <div className="chart-block">
+                    <h3 className="chart-title">Distribución de Opciones por Sección</h3>
+                    <p className="chart-context">
+                        Porcentaje de respuestas agrupadas por Sección. Eje X muestra siglas.
+                    </p>
+
+                    <ResponsiveContainer width="100%" height={350}>
+                        <BarChart
+                        data={chartData}
+                        margin={{ top: 10, right: 30, left: 20, bottom: 5 }}
+                        barCategoryGap="20%" 
+                        barGap={2}
+                        >
+                        <CartesianGrid strokeDasharray="3 3" /> 
+                        <XAxis
+                            dataKey="seccion" 
+                            type="category"
+                            tick={{ fontSize: 13, fill: '#333' }}
+                            height={40} 
+                            stroke="#666" 
+                        />
+                        <YAxis
+                            type="number" 
+                            domain={[0, 100]} 
+                            tickFormatter={(value) => `${value}%`} 
+                            stroke="#666" 
+                            width={60} 
+                        />
+                        <Tooltip
+                            formatter={(value: number, name: string) => [`${value.toFixed(1)}%`, name]}
+                            labelFormatter={(label) => `Sección (Sigla): ${label}`}
+                            contentStyle={{ 
+                                borderRadius: '6px', 
+                                border: '1px solid #ccc', 
+                                backgroundColor: 'rgba(255,255,255,0.9)' 
+                            }}
+                        />
+                        <Legend iconType="circle" wrapperStyle={{ paddingTop: '10px' }} />
+                        {optionOrder.map((opcion, i) => (
+                            <Bar
+                            key={opcion}
+                            dataKey={opcion}
+                            fill={colores[i % colores.length]}
+                            name={opcion}
+                            barSize={18} 
+                            radius={[8, 8, 0, 0]}
+                            />
+                        ))}
+                        </BarChart>
+                    </ResponsiveContainer>
+                    </div>
+                    
+                    <SectionDictionary
+                        dictionary={sectionDictionary}
+                        isOpen={isDictOpen}
+                        toggle={() => setIsDictOpen(prev => !prev)}
+                    />
+                </div>
+                )}
+            </div>
+            );
+        });
+      })()}
     </div>
   );
 };

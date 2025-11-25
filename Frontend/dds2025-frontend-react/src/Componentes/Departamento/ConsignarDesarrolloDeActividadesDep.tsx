@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
+import SinDatos from "../Otros/SinDatos";
+import ErrorCargaDatos from "../Otros/ErrorCargaDatos";
 
-const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:8000"; // Define API_BASE
+const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
 // 1️⃣ Interfaz de datos
 interface ActividadParaInformeRow {
@@ -38,16 +40,17 @@ function agruparPorMateria(registros: ActividadParaInformeRow[]) {
 // 5️⃣ Componente principal
 const ConsignarDesarrolloDeActividadesDep: React.FC<Props> = ({ departamentoId, periodoId }) => {
   const [registros, setRegistros] = useState<ActividadParaInformeRow[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [isExpanded, setIsExpanded] = useState(true); // Estado para acordeón
-  const PERIODO_ID_EVALUADO = 2;
+  const [isExpanded, setIsExpanded] = useState(true); 
+  const PERIODO_ID_EVALUADO = periodoId || 2; // Usar prop o fallback
 
   useEffect(() => {
     const fetchInformeActividades = async () => {
       if (!departamentoId) {
+        setRegistros([]); 
         setLoading(false);
-        setRegistros([]); // Limpiar registros si no hay departamento
+        setError(null);
         return;
       }
 
@@ -56,7 +59,7 @@ const ConsignarDesarrolloDeActividadesDep: React.FC<Props> = ({ departamentoId, 
 
       try {
         const response = await fetch(
-          `${API_BASE}/informes-sinteticos/actividades?departamento_id=${departamentoId}&periodo_id=${periodoId}`
+          `${API_BASE}/informes-sinteticos/actividades?departamento_id=${departamentoId}&periodo_id=${PERIODO_ID_EVALUADO}`
         );
 
         if (!response.ok) {
@@ -64,33 +67,142 @@ const ConsignarDesarrolloDeActividadesDep: React.FC<Props> = ({ departamentoId, 
         }
 
         const result = await response.json();
-        // Asumiendo que `result` es directamente el array de registros
+        
         if (Array.isArray(result)) {
           setRegistros(result);
         } else if (result.registros && Array.isArray(result.registros)) {
           setRegistros(result.registros);
         } else {
-          throw new Error("Formato de datos incorrecto.");
+          setRegistros([]); // Fallback seguro
         }
-      } catch (err) {
-        if (err instanceof Error) setError(err.message);
-        else setError("Ocurrió un error desconocido.");
-        setRegistros([]); // Limpiar registros en caso de error
+      } catch (err: any) {
+        setError(err.message || "Ocurrió un error desconocido.");
+        setRegistros([]);
       } finally {
         setLoading(false);
       }
     };
 
     fetchInformeActividades();
-  }, [departamentoId, PERIODO_ID_EVALUADO]); // Dependencias del useEffect
+  }, [departamentoId, PERIODO_ID_EVALUADO]); 
 
   const registrosAgrupados = agruparPorMateria(registros);
   const codigosMaterias = Object.keys(registrosAgrupados);
 
+  // Renderizado Condicional Global (Fuera de la tarjeta)
+  const renderContent = () => {
+    // 1. Sin Departamento Seleccionado
+    if (!departamentoId) {
+        return (
+            <div className="uni-content-container">
+                <SinDatos mensaje="Seleccione un departamento para ver el desarrollo de actividades." />
+            </div>
+        );
+    }
+
+    // 2. Error de Carga Global
+    if (error) {
+        return (
+            <div className="uni-content-container">
+                <ErrorCargaDatos error={error} />
+            </div>
+        );
+    }
+
+    // 3. Estructura Principal (Tarjeta)
+    return (
+        <div className={`actividades-card ${isExpanded ? 'expanded' : ''}`}>
+            {/* HEADER CLICKABLE */}
+            <div className="actividades-header" onClick={() => setIsExpanded(!isExpanded)}>
+              <h3 className="actividades-title">
+                Desarrollo de Actividades
+              </h3>
+              <span className={`chevron ${isExpanded ? 'rotated' : ''}`}>▼</span>
+            </div>
+    
+            {/* CUERPO DESPLEGABLE */}
+            {isExpanded && (
+              <div className="actividades-body">
+                {/* Lógica Interna del Body */}
+                {loading ? (
+                    // Skeleton Loader para Tabla
+                    <div className="skeleton-table">
+                        <div className="skeleton-header"></div>
+                        {[1, 2, 3, 4].map(i => (
+                            <div key={i} className="skeleton-row"></div>
+                        ))}
+                    </div>
+                ) : registros.length === 0 ? (
+                     // Sin Datos Específico
+                     <SinDatos mensaje="No hay actividades registradas para las materias de este departamento." />
+                ) : (
+                  <table className="actividades-table">
+                    <thead>
+                      <tr>
+                        <th>Espacio Curricular</th>
+                        <th>Responsable / Profesor / Auxiliar</th>
+                        <th>Capacitación</th>
+                        <th>Investigación</th>
+                        <th>Extensión</th>
+                        <th>Gestión</th>
+                        <th>Observaciones / Comentarios</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {codigosMaterias.map((codigo, materiaIndex) => {
+                        const grupo = registrosAgrupados[codigo];
+                        return (
+                          <React.Fragment key={codigo}>
+                            {grupo.map((item, index) => (
+                              <tr key={`${codigo}-${index}`}>
+                                {index === 0 ? (
+                                  <td className="td-materia" rowSpan={grupo.length}>
+                                    {item.codigoMateria} - {item.nombreMateria}
+                                  </td>
+                                ) : null}
+    
+                                <td>{item.integranteCatedra}</td>
+    
+                                {["capacitacion", "investigacion", "extension", "gestion"].map((campo) => {
+                                  const valor = item[campo as keyof ActividadParaInformeRow] as string | null;
+                                  const hayContenido = tieneContenido(valor);
+                                  return (
+                                    <td
+                                      key={campo}
+                                      className={`td-center ${hayContenido ? 'td-content-x' : ''}`}
+                                    >
+                                      {hayContenido ? "X" : "-"}
+                                    </td>
+                                  );
+                                })}
+    
+                                <td className="td-obs">{item.observacionComentarios || ""}</td>
+                              </tr>
+                            ))}
+                            {/* Línea divisoria entre materias */}
+                            {materiaIndex < codigosMaterias.length - 1 && (
+                              <tr className="separador-materia-row">
+                                <td colSpan={7}>
+                                  <div className="separador-materia"></div>
+                                </td>
+                              </tr>
+                            )}
+                          </React.Fragment>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                )}
+              </div>
+            )}
+          </div>
+    );
+  };
+
   return (
     <div className="actividades-wrapper">
       <style>{`
-        /* Definición de variables de color (consistente con el padre) */
+        /* Definición de variables */
         :root {
           --uni-primary: #003366;
           --uni-secondary: #007bff;
@@ -104,9 +216,18 @@ const ConsignarDesarrolloDeActividadesDep: React.FC<Props> = ({ departamentoId, 
         .actividades-wrapper {
           padding: 10px 0;
           animation: fadeIn 0.6s ease-out;
+          font-family: "Inter", "Segoe UI", Roboto, sans-serif;
         }
 
-        /* ESTILOS DE LA TARJETA (CLONADOS DEL COMPONENTE DE COMENTARIOS) */
+        /* Contenedor para estados vacíos y errores */
+        .uni-content-container {
+            padding: 20px 30px;
+            background-color: #ffffff;
+            border-radius: 12px;
+            /* box-shadow: 0 4px 12px rgba(0,0,0,0.08); Opcional si quieres sombra en el error */
+        }
+
+        /* ESTILOS DE LA TARJETA */
         .actividades-card {
             background: var(--uni-card-bg);
             border-radius: 12px;
@@ -116,7 +237,7 @@ const ConsignarDesarrolloDeActividadesDep: React.FC<Props> = ({ departamentoId, 
             transition: all 0.3s ease;
         }
         .actividades-card.expanded {
-            box-shadow: 0 8px 24px rgba(51, 102, 0, 0.15); /* Sombra al expandir */
+            box-shadow: 0 8px 24px rgba(51, 102, 0, 0.15); 
             border-color: var(--uni-primary);
         }
 
@@ -145,11 +266,6 @@ const ConsignarDesarrolloDeActividadesDep: React.FC<Props> = ({ departamentoId, 
             letter-spacing: 0.5px;
             color: #fff;
         }
-        .actividades-icon {
-            width: 24px;
-            height: 24px;
-            fill: currentColor; /* Para que el SVG use el color del texto */
-        }
 
         .chevron {
             font-size: 1.2rem;
@@ -168,7 +284,7 @@ const ConsignarDesarrolloDeActividadesDep: React.FC<Props> = ({ departamentoId, 
             animation: slideDown 0.3s ease-out;
         }
 
-        /* INSTRUCCIONES DENTRO DE LA TARJETA */
+        /* INSTRUCCIONES */
         .actividades-instruccion {
             font-size: 14px;
             color: #333;
@@ -177,20 +293,20 @@ const ConsignarDesarrolloDeActividadesDep: React.FC<Props> = ({ departamentoId, 
             border-radius: 8px;
             margin-bottom: 25px;
             line-height: 1.5;
-            borderLeft: 4px solid #0078D4;
+            border-left: 4px solid #0078D4;
         }
 
-        /* TABLA DE ACTIVIDADES (AJUSTES PARA LA TARJETA) */
+        /* TABLA DE ACTIVIDADES */
         .actividades-table {
             width: 100%;
             border-collapse: collapse;
             border-radius: 10px;
-            overflow: hidden; /* Importante para los bordes redondeados */
-            box-shadow: 0 3px 10px rgba(0,0,0,0.05); /* Sombra más suave */
+            overflow: hidden; 
+            box-shadow: 0 3px 10px rgba(0,0,0,0.05); 
             margin-top: 20px;
         }
         .actividades-table th {
-            background-color: #0078D4; /* Azul oscuro */
+            background-color: #0078D4; 
             color: white;
             padding: 12px 15px;
             font-size: 12px;
@@ -200,7 +316,7 @@ const ConsignarDesarrolloDeActividadesDep: React.FC<Props> = ({ departamentoId, 
             font-weight: 600;
         }
         .actividades-table td {
-            border: 1px solid #e9f0f8; /* Borde más suave */
+            border: 1px solid #e9f0f8; 
             padding: 12px 15px;
             font-size: 13px;
             color: #333;
@@ -208,7 +324,7 @@ const ConsignarDesarrolloDeActividadesDep: React.FC<Props> = ({ departamentoId, 
         .actividades-table .td-materia {
             font-weight: 600;
             color: var(--uni-primary);
-            background-color: #eaf3ff; /* Fondo ligeramente azulado */
+            background-color: #eaf3ff; 
         }
         .actividades-table .td-center {
             text-align: center;
@@ -222,13 +338,12 @@ const ConsignarDesarrolloDeActividadesDep: React.FC<Props> = ({ departamentoId, 
             font-style: italic;
             background-color: #fcfdff;
         }
-        /* Color de la 'X' cuando hay contenido */
         .actividades-table .td-content-x {
-            background-color: #d8ecff; /* Fondo azul claro para la "X" */
+            background-color: #d8ecff; 
             color: var(--uni-primary);
         }
 
-        /* SEPARADOR ENTRE MATERIAS */
+        /* SEPARADOR */
         .separador-materia-row td {
             padding: 0 !important;
             border: none !important;
@@ -240,21 +355,25 @@ const ConsignarDesarrolloDeActividadesDep: React.FC<Props> = ({ departamentoId, 
             margin: 5px 0;
         }
 
-        /* MENSAJES DE ESTADO */
-        .actividades-loading, .actividades-error, .actividades-no-data {
-            text-align: center;
-            padding: 20px;
-            font-size: 1rem;
-            color: #555;
+        /* SKELETON LOADER (Estilo Tabla) */
+        .skeleton-table {
+            width: 100%;
+            border: 1px solid #e0e0e0;
             border-radius: 8px;
-            margin-top: 20px;
-            background-color: #f0f8ff; /* Azul claro */
-            border: 1px solid #d4e8f7;
+            overflow: hidden;
         }
-        .actividades-error {
-            color: #b00020;
-            background-color: #fff2f2;
-            border: 1px solid #ffcdd2;
+        .skeleton-header {
+            height: 40px;
+            background-color: #e0e0e0;
+            margin-bottom: 1px;
+            animation: pulse 1.5s infinite ease-in-out;
+        }
+        .skeleton-row {
+            height: 60px;
+            background-color: #f5f5f5;
+            margin-bottom: 1px;
+            animation: pulse 1.5s infinite ease-in-out;
+            animation-delay: 0.2s;
         }
 
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
@@ -262,101 +381,14 @@ const ConsignarDesarrolloDeActividadesDep: React.FC<Props> = ({ departamentoId, 
             from { opacity: 0; transform: translateY(-15px); } 
             to { opacity: 1; transform: translateY(0); } 
         }
+        @keyframes pulse {
+            0% { opacity: 0.6; }
+            50% { opacity: 1; }
+            100% { opacity: 0.6; }
+        }
       `}</style>
 
-      {/* TARJETA PRINCIPAL */}
-      <div className={`actividades-card ${isExpanded ? 'expanded' : ''}`}>
-        {/* HEADER CLICKABLE */}
-        <div className="actividades-header" onClick={() => setIsExpanded(!isExpanded)}>
-          <h3 className="actividades-title">
-            Desarrollo de Actividades
-             {/* Icono de lista/actividad */}
-             {/* <svg className="actividades-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                <path d="M12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm-1 15h2v-6h-2v6zm0-8h2V7h-2v2z"/>
-             </svg>
-              */}
-          </h3>
-          <span className={`chevron ${isExpanded ? 'rotated' : ''}`}>▼</span>
-        </div>
-
-        {/* CUERPO DESPLEGABLE */}
-        {isExpanded && (
-          <div className="actividades-body">
-            <p className="actividades-instruccion">
-              Señale con una cruz si ha desarrollado actividades de <strong>Capacitación, Investigación,
-              Extensión y Gestión</strong> en el ámbito de la Facultad de Ingeniería por cada uno de los
-              integrantes de la cátedra (Profesor Responsable, Profesores, JTP y Auxiliares) en el periodo
-              evaluado. Explicite las observaciones y comentarios que considere pertinentes.
-            </p>
-
-            {/* Renderizado condicional de la tabla o mensajes de estado */}
-            {loading && <div className="actividades-loading">Cargando datos de actividades...</div>}
-            {error && <div className="actividades-error">Error: {error}</div>}
-            {!loading && !error && registros.length === 0 && (
-              <div className="actividades-no-data">No hay datos de actividades para mostrar para este departamento.</div>
-            )}
-            
-            {!loading && !error && registros.length > 0 && (
-              <table className="actividades-table">
-                <thead>
-                  <tr>
-                    <th>Espacio Curricular</th>
-                    <th>Responsable / Profesor / Auxiliar</th>
-                    <th>Capacitación</th>
-                    <th>Investigación</th>
-                    <th>Extensión</th>
-                    <th>Gestión</th>
-                    <th>Observaciones / Comentarios</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {codigosMaterias.map((codigo, materiaIndex) => {
-                    const grupo = registrosAgrupados[codigo];
-                    return (
-                      <React.Fragment key={codigo}>
-                        {grupo.map((item, index) => (
-                          <tr key={`${codigo}-${index}`}>
-                            {index === 0 ? (
-                              <td className="td-materia" rowSpan={grupo.length}>
-                                {item.codigoMateria} - {item.nombreMateria}
-                              </td>
-                            ) : null}
-
-                            <td>{item.integranteCatedra}</td>
-
-                            {["capacitacion", "investigacion", "extension", "gestion"].map((campo) => {
-                              const valor = item[campo as keyof ActividadParaInformeRow] as string | null;
-                              const hayContenido = tieneContenido(valor);
-                              return (
-                                <td
-                                  key={campo}
-                                  className={`td-center ${hayContenido ? 'td-content-x' : ''}`}
-                                >
-                                  {hayContenido ? "X" : "-"}
-                                </td>
-                              );
-                            })}
-
-                            <td className="td-obs">{item.observacionComentarios || ""}</td>
-                          </tr>
-                        ))}
-                        {/* Línea divisoria entre materias, excepto después de la última */}
-                        {materiaIndex < codigosMaterias.length - 1 && (
-                          <tr className="separador-materia-row">
-                            <td colSpan={7}>
-                              <div className="separador-materia"></div>
-                            </td>
-                          </tr>
-                        )}
-                      </React.Fragment>
-                    );
-                  })}
-                </tbody>
-              </table>
-            )}
-          </div>
-        )}
-      </div>
+      {renderContent()}
     </div>
   );
 };

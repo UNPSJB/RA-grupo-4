@@ -1,4 +1,6 @@
 import React, { useEffect, useState, useMemo } from "react";
+import SinDatos from "../Otros/SinDatos";
+import ErrorCargaDatos from "../Otros/ErrorCargaDatos";
 
 interface FilaResumen {
   codigo: string;
@@ -15,7 +17,7 @@ interface Props {
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
-const AutocompletarInformacionGeneral: React.FC<Props> = ({ departamentoId, periodoId}) => {
+const AutocompletarInformacionGeneral: React.FC<Props> = ({ departamentoId, periodoId }) => {
   const [resumen, setResumen] = useState<FilaResumen[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -28,6 +30,7 @@ const AutocompletarInformacionGeneral: React.FC<Props> = ({ departamentoId, peri
 
     const fetchResumen = async () => {
       setLoading(true);
+      setError(null); // Limpiamos errores previos al cambiar de dpto
       try {
         const res = await fetch(
           `${API_BASE}/departamentos/${departamentoId}/resumen?periodoId=${periodoId}`
@@ -67,16 +70,26 @@ const AutocompletarInformacionGeneral: React.FC<Props> = ({ departamentoId, peri
     );
   };
 
+  // 1. Caso: No se ha seleccionado departamento
   if (!departamentoId) {
-    return <div style={{ padding: '30px', textAlign: 'center', color: '#666' }}>
-      **Seleccione un departamento** para ver la información general.
-    </div>;
+    return (
+      <div className="uni-wrapper">
+         <div className="uni-content-container">
+            <SinDatos mensaje="Seleccione un departamento para ver la información general." />
+         </div>
+      </div>
+    );
   }
 
+  // 2. Caso: Error en la carga
   if (error) {
-    return <div style={{ padding: '20px', color: '#dc3545', backgroundColor: '#f8d7da', borderRadius: '8px', border: '1px solid #f5c6cb' }}>
-      **Error**: {error}
-    </div>;
+    return (
+      <div className="uni-wrapper">
+        <div className="uni-content-container">
+            <ErrorCargaDatos error={error} />
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -140,11 +153,6 @@ const AutocompletarInformacionGeneral: React.FC<Props> = ({ departamentoId, peri
     color: var(--uni-primary);
     text-transform: uppercase; 
     letter-spacing: 0.5px; /* Menos espaciado para parecerse más al texto normal */
-    
-    /* 💡 SOLUCIÓN PARA LA LÍNEA INFERIOR DE LA IMAGEN:
-       La imagen tiene una línea corta debajo del título y otra completa.
-       Para un diseño limpio, solo mantendremos el título sin líneas.
-    */
   }
 
   .uni-badge {
@@ -331,19 +339,13 @@ const AutocompletarInformacionGeneral: React.FC<Props> = ({ departamentoId, peri
       {loading ? (
         <div className="uni-grid">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="uni-card" style={{ opacity: 0.6 }}></div>
+            <div key={i} className="uni-card" style={{ opacity: 0.6, height: '200px' }}></div>
           ))}
         </div>
       ) : resumenFiltrado.length === 0 ? (
-        <div
-          style={{
-            textAlign: "center",
-            padding: "40px",
-            color: "#666",
-          }}
-        >
-          No hay materias con carga académica registrada para este
-          departamento.
+        <div className="uni-content-container">
+            {/* 3. Caso: Departamento seleccionado pero sin datos */}
+            <SinDatos mensaje="No hay materias con carga académica registrada para este departamento." />
         </div>
       ) : (
         <div className="uni-grid">
