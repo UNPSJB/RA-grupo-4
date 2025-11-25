@@ -69,7 +69,6 @@ const AlumnoDashboard = ({ estudianteId }) => {
                 // 2) Datos del estudiante
                 const resEst = await fetch(`http://localhost:8000/estudiantes/${estudianteId}`);
                 const estudiante = await resEst.json();
-                console.log("ESTUDIANTE INFO:", estudiante);
                 setEstudianteInfo(estudiante);
             } catch (error) {
                 console.error("Error cargando datos del dashboard del alumno:", error);
@@ -119,7 +118,7 @@ const AlumnoDashboard = ({ estudianteId }) => {
                                 <br />
                                 Quedan <strong>{diasRestantes}</strong> días para el cierre de las encuestas.
                                 <br />
-                                Recuerda responder las encuestas a tus inscripciones.
+                                Recuerda responder a las encuestas de tus materias.
                             </>
                         ) : (
                             <>No hay periodo activo.</>
@@ -151,12 +150,12 @@ const AlumnoDashboard = ({ estudianteId }) => {
                     <div className="alumno-nav-card card-variant-blue" onClick={() => navigate("mis-materias")}>
                         <BookOpen size={36} />
                         <h3>Mis Materias</h3>
-                        <p>Consulta tus asignaturas actuales.</p>
+                        <p>Consulta informacion de tus asignaturas.</p>
                     </div>
                     <div className="alumno-nav-card card-variant-yellow" onClick={() => navigate("historial-encuestas")}>
                         <Clock size={36} />
-                        <h3>Historial</h3>
-                        <p>Revisa encuestas anteriores.</p>
+                        <h3>Historial de encuestas</h3>
+                        <p>Revisa las respuestas de las encuestas que completaste.</p>
                     </div>
                 </div>
             </div>
