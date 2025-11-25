@@ -224,9 +224,9 @@ const GenerarInformeSinteticoDep: React.FC = () => {
                 departamento_id: datosInforme.departamento_id,
                 comentarios: datosInforme.comentarios || "",
                 
-                resumen_general: resumenGeneral,
-                resumen_necesidades: resumenNecesidades,
-                valoracion_miembros: valoracionMiembros,
+                // resumen_general: resumenGeneral,
+                // resumen_necesidades: resumenNecesidades,
+                // valoracion_miembros: valoracionMiembros,
             };
 
             const response = await fetch(`${API_BASE}/informes-sinteticos/`, {
