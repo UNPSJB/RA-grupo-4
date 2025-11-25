@@ -8,6 +8,11 @@ interface Periodo{
     ciclo_lectivo: number;
     cuatrimestre: string;
 }
+interface Docente{
+    id_docente: number;
+    nombre: string;
+    nroLegajo: number;
+}
 interface Materia {
     id_materia: number;
     nombre: string;
@@ -62,6 +67,8 @@ const MenuDocenteIndex: React.FC = () => {
     const [cargando, setCargando] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const [periodoActual, setPeriodoActual] = useState<Periodo | null>(null);
+    const [docenteInfo, setDocente] = useState<Docente | null>(null);
+    
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -70,20 +77,22 @@ const MenuDocenteIndex: React.FC = () => {
                 setCargando(true);
                 setError(null);
 
-                const [resMaterias, resPeriodo] = await Promise.all([
+                const [resMaterias, resPeriodo, resDocente] = await Promise.all([
                     fetch(`${API_BASE}/materias/listar`),
-                    fetch(`${API_BASE}/periodos/${ID_PERIODO_ACTUAL}`)
+                    fetch(`${API_BASE}/periodos/${ID_PERIODO_ACTUAL}`),
+                    fetch(`${API_BASE}/docentes/${ID_DOCENTE_ACTUAL}`)
                 ]);
 
-                if (!resMaterias.ok || !resPeriodo.ok) {
+                if (!resMaterias.ok || !resPeriodo.ok || !resDocente.ok) {
                     throw new Error("Error al consultar los datos al servidor.");
                 }
-
                 const dataMaterias: Materia[] = await resMaterias.json();
                 const dataPeriodo: Periodo = await resPeriodo.json();
+                const dataDocente: Docente = await resDocente.json();
 
                 setMaterias(dataMaterias);
                 setPeriodoActual(dataPeriodo);
+                setDocente(dataDocente);
 
             } catch (err: any) {
                 setError(err.message || "Error desconocido al cargar datos.");
@@ -120,7 +129,7 @@ const MenuDocenteIndex: React.FC = () => {
                     {/* 2. SECCIÓN DEL TÍTULO MODIFICADA */}
                     <h1 className="welcome-title" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                         <GraduationCap size={36} style={{ color: 'var(--color-texto-principal, #1f2937)' }} />
-                        ¡Bienvenido, Docente!
+                        ¡Bienvenido, {docenteInfo?.nombre}!
                     </h1>
                     <p className="panel-subtitle">
                         Periodo actual: {periodoActual?.ciclo_lectivo} {" "} {periodoActual?.cuatrimestre} <br/>
@@ -196,12 +205,12 @@ const MenuDocenteIndex: React.FC = () => {
                     <Link to="historial-informes" className="nav-card card-blue">
                         <History size={32} />
                         <h3>Historial de Informes</h3>
-                        <p>Consulta todos los informes que ya has generado previamente.</p>
+                        <p>Consulta todos los informes de actividad curricular que has generado previamente.</p>
                     </Link>
                     <Link to="estadisticas" className="nav-card card-yellow">
                         <BarChart2 size={32} />
-                        <h3>Estadísticas de Cátedra</h3>
-                        <p>Analiza la valoración de las respuestas de los alumnos.</p>
+                        <h3>Estadísticas de Catedra</h3>
+                        <p>Analiza la valoración de las respuestas de los alumnos en las encuestas.</p>
                     </Link>
                 </div>
             </div>

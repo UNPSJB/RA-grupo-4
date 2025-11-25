@@ -1,5 +1,6 @@
 from typing import List
 from sqlalchemy.orm import Session, joinedload, selectinload
+from sqlalchemy import select
 from fastapi import HTTPException
 from src.estudiantes.models import Estudiante
 from src.estudiantes import schemas, exceptions
@@ -11,12 +12,22 @@ from src.preguntas.models import Pregunta
 from src.secciones.models import Seccion
 from src.periodos.services import get_periodo_encuestas_actual
 
+
+
+
+def leer_estudiante(db: Session, estudiante_id: int) -> schemas.Estudiante:
+    db_estudiante = db.scalar(select(Estudiante).where(Estudiante.id == estudiante_id))
+    if db_estudiante is None:
+        raise exceptions.UsuarioNoEncontrado()
+    return db_estudiante
+
+
 def listar_encuestas_disponibles(db: Session, estudiante_id: int) -> List[schemas.EncuestaDisponibleOut]:
     """
     Lista las encuestas que un estudiante tiene PENDIENTES de responder del periodo activo.
     """
     periodo_activo = get_periodo_encuestas_actual(db)
-    print("PERIODO ACTIVO ID =", periodo_activo.id if periodo_activo else None)
+    
     if not periodo_activo:
         return []
     

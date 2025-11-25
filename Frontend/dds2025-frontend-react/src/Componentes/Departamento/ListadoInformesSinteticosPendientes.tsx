@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Send } from "lucide-react";
 
+import TodoBien from "../Otros/TodoBien";
+
 interface PendienteSintetico {
     id: number;
     ciclo_lectivo: number;
@@ -48,7 +50,9 @@ const InformesSinteticosPendientes: React.FC<Props> = ({ departamentoId }) => {
 
             {pendientes.length === 0 ? (
                 <div className="empty-list-message">
-                    No hay tareas pendientes para el departamento.
+                <TodoBien
+                    mensaje="No tienes informes sinteticos pendientes."
+                />
                 </div>
             ) : (
                 <table className="tabla-pendientes">

@@ -146,6 +146,14 @@ const GenerarInformeSinteticoDep: React.FC = () => {
         }
     }, [periodoId, departamentoId]);
 
+    useEffect(() => {
+        if (periodo && departamento) {
+            setDatosInforme((prev) => ({
+                ...prev,
+                descripcion: `Informe Sintetico ${periodo.ciclo_lectivo} ${periodo.cuatrimestre} ${departamento.nombre}`
+            }));
+        }
+    }, [periodo, departamento]);
 
     useEffect(() => {
         let timerRedirect: NodeJS.Timeout | undefined;
