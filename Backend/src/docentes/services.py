@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session, joinedload
+from sqlalchemy import select
 from typing import List
 from . import models
 from src.docentes.models import Docentes
@@ -7,7 +8,7 @@ from src.inscripciones.models import Inscripciones
 from src.periodos.models import Periodo
 from src.respuestas.models import Respuesta, OpcionRespuesta
 from src.preguntas.models import TipoPregunta
-
+from src.docentes import schemas, exceptions
 # usados para calcular el promedio en una escala de 1-4
 VALOR_OPCIONES = {
     "Malo, No Satisfactorio": 1,
@@ -19,6 +20,16 @@ VALOR_CUATRIMESTRES = {
     "Primer Cuatrimestre": "1C",
     "Segundo Cuatrimestre": "2C"
 }
+
+
+
+
+def leer_docente(db: Session, docente_id: int) -> schemas.Docente:
+    db_docente = db.scalar(select(Docentes).where(Docentes.id_docente == docente_id))
+    if db_docente is None:
+        raise exceptions.DocenteNoEncontrado()
+    return db_docente
+
 
 def get_all_docentes(db: Session) -> List[models.Docentes]:
     return db.query(models.Docentes).all()
