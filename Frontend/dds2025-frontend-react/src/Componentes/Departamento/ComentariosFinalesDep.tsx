@@ -104,6 +104,7 @@ const ComentariosFinalesDep: React.FC<Props> = ({
         }
 
         .comment-title {
+            color: white;
             font-size: 1.3rem;
             font-weight: 700;
             margin: 0;

@@ -5,16 +5,16 @@ import HeaderInstitucional from "../Otros/HeaderInstitucional";
 import SinDatos from "../Otros/SinDatos";
 
 //Para ver datos hardcodeados
-const USE_DEBUG_DATA = false;
+const USE_DEBUG_DATA = true;
 
 const MOCK_INFORME_DATA: InformeSinteticoDetalle = {
   id: 999,
-  descripcion: "[MODO PRUEBA] Informe Anual de Departamento",
+  descripcion: "Informe del Departamento de informatica",
   ciclo_lectivo: 2025,
-  periodo: "Anual",
-  sede: "Puerto Madryn",
+  periodo: "Segundo Cuatrimestre",
+  sede: "Trelew",
   integrantes: "Lic. Ana Turing, Dr. Alan Kay",
-  departamento_nombre: "Departamento de Informática Experimental",
+  departamento_nombre: "Departamento de Informática ",
   comentarios: "Este es un comentario de prueba para verificar cómo se visualizan los textos largos en el documento final. Se espera que ocupe varias líneas y mantenga un formato legible.",
   resumen_general: [
     { codigo: "INF101", nombre: "Algoritmos I", alumnos_inscriptos: 150, comisiones_teoricas: 2, comisiones_practicas: 6 },
@@ -259,11 +259,11 @@ const PrevisualizarInformeSinteticoSec: React.FC = () => {
           }
         `}</style>
 
-        {USE_DEBUG_DATA && (
+        {/* {USE_DEBUG_DATA && (
           <div style={{background: '#fff3cd', color: '#856404', padding: '10px', textAlign: 'center', marginBottom: '20px', border: '1px solid #ffeeba', borderRadius: '4px'}}>
             ⚠️ <strong>MODO PREVISUALIZACIÓN:</strong> Se están mostrando datos de prueba hardcodeados.
           </div>
-        )}
+        )} */}
 
         {/* --- ENCABEZADO DEL DOCUMENTO --- */}
         <div className="doc-header">

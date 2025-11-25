@@ -24,13 +24,14 @@ def listar_informesSinteticos(db: Session) -> List[models.InformeSintetico]:
 def obtener_informe_sintetico(db: Session, informe_id: int):
     return db.query(models.InformeSintetico).filter(models.InformeSintetico.id == informe_id).first()
 
-def listar_actividades_para_informe(db: Session) -> schemas.InformeSinteticoActividades:
+def listar_actividades_para_informe(db: Session, departamento_id: int, periodo_id: int) -> schemas.InformeSinteticoActividades:
     """
     Obtiene cada registro de actividad individual junto con los datos
     de la materia a la que pertenece (Código y Nombre).
     Marca con 'X' las actividades completadas.
     """
     try:
+
         resultados_tuplas = (
             db.query(
                 Materias.codigoMateria,
@@ -44,10 +45,9 @@ def listar_actividades_para_informe(db: Session) -> schemas.InformeSinteticoActi
             )
             .join(InformesAC, Actividades.id_informeAC == InformesAC.id_informesAC)
             .join(Materias, InformesAC.id_materia == Materias.id_materia)
-            .order_by(
-                Materias.codigoMateria,
-                Actividades.integranteCatedra
-            )
+            .filter(Materias.id_departamento == departamento_id)
+            .filter(Materias.id_periodo == periodo_id)
+            .order_by(Materias.codigoMateria, Actividades.integranteCatedra)
             .all()
         )
     except Exception as e:

@@ -10,19 +10,16 @@ router = APIRouter(prefix="/informes-sinteticos", tags=["Informes Sintéticos"])
 
 
 @router.get(
-    "/actividades", 
+    "/actividades",
     response_model=schemas.InformeSinteticoActividades,
-    summary="Genera el Informe Sintético listando las actividades de la cátedra."
+    summary="Genera el Informe Sintético listando las actividades de la cátedra filtrado por departamento y periodo."
 )
-def get_informe_sintetico_actividades(db: Session = Depends(get_db)):
-    """
-    Obtiene CADA registro de actividad individual, junto con los datos
-    de la materia a la que pertenece (Código y Nombre).
-    NO se agrupan ni consolidan los datos.
-    """
-    # Llama a la nueva función de servicio
-    return services.listar_actividades_para_informe(db=db)
-
+def get_informe_sintetico_actividades(
+    departamento_id: int = Query(...),
+    periodo_id: int = Query(...),
+    db: Session = Depends(get_db)
+):
+    return services.listar_actividades_para_informe(db, departamento_id, periodo_id)
 
 @router.post("/", response_model=schemas.InformeSintetico)
 def crear_informe_sintetico(informe: schemas.InformeSinteticoCreate, db: Session = Depends(get_db)): 

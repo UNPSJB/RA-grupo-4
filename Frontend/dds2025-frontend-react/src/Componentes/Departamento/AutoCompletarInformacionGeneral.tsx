@@ -10,38 +10,42 @@ interface FilaResumen {
 
 interface Props {
   departamentoId: number | null;
+  periodoId: number | null;
 }
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
-const AutocompletarInformacionGeneral: React.FC<Props> = ({ departamentoId }) => {
+const AutocompletarInformacionGeneral: React.FC<Props> = ({ departamentoId, periodoId}) => {
   const [resumen, setResumen] = useState<FilaResumen[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!departamentoId) {
+    if (!departamentoId || !periodoId) {
       setResumen([]);
-      setError(null);
-      setLoading(false);
       return;
     }
+
     const fetchResumen = async () => {
       setLoading(true);
-      setError(null);
       try {
-        const res = await fetch(`${API_BASE}/departamentos/${departamentoId}/resumen`);
+        const res = await fetch(
+          `${API_BASE}/departamentos/${departamentoId}/resumen?periodoId=${periodoId}`
+        );
+
         if (!res.ok) throw new Error("Error al obtener resumen general");
-        const data = await res.json();
-        setResumen(data);
+
+        setResumen(await res.json());
+        
       } catch (err: any) {
         setError(err.message);
       } finally {
         setLoading(false);
       }
     };
+
     fetchResumen();
-  }, [departamentoId]);
+  }, [departamentoId, periodoId]);
 
   const resumenFiltrado = useMemo(() => {
     return resumen.filter(

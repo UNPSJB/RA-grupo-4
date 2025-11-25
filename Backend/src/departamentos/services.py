@@ -52,26 +52,39 @@ def eliminar_departamento(db: Session, departamento_id: int) -> schemas.Departam
     db.commit()
     return db_departamento
 
-def obtener_resumen_departamento(db: Session, departamento_id: int):
+def obtener_resumen_departamento(db: Session, departamento_id: int, periodo_id: int):
     """
-    Devuelve un resumen general del departamento:
-    materias, cantidad de alumnos inscriptos, comisiones teóricas y prácticas.
+    Devuelve un resumen general del departamento para un periodo específico.
+    Cada materia pertenece a un periodo y tiene solo un InformeAC.
     """
-    materias = db.query(Materias).filter(Materias.id_departamento == departamento_id).all()
+
+    # 1. Buscar materias del departamento filtradas por periodo
+    materias = (
+        db.query(Materias)
+        .filter(
+            Materias.id_departamento == departamento_id,
+            Materias.id_periodo == periodo_id
+        )
+        .all()
+    )
+
+    if not materias:
+        return []
 
     resumen = []
+
     for materia in materias:
-        # buscar el último informe asociado a la materia (si hay varios)
+        # 2. Obtener el único informeAC asociado (si existe)
         informe_ac = (
             db.query(InformesAC)
             .filter(InformesAC.id_materia == materia.id_materia)
-            .order_by(InformesAC.ciclo_lectivo.desc())
             .first()
         )
+
         resumen.append({
             "codigo": materia.codigoMateria,
             "nombre": materia.nombre,
-            "ciclo lectivo": materia.periodo.ciclo_lectivo,
+            "ciclo_lectivo": materia.periodo.ciclo_lectivo,
             "cuatrimestre": materia.periodo.cuatrimestre,
             "alumnos_inscriptos": informe_ac.cantidad_alumnos_inscriptos if informe_ac else 0,
             "comisiones_teoricas": informe_ac.cantidad_comisiones_teoricas if informe_ac else 0,

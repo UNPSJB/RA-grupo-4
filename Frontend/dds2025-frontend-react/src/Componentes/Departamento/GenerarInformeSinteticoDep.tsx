@@ -15,7 +15,6 @@ import AspecPosObstaculosInformeSintetico from "../Departamento/AspecPositivosOb
 
 import { createPortal } from "react-dom";
 
-// Usamos el valor por defecto ya que import.meta.env no está disponible en este entorno
 const API_BASE = "http://localhost:8000"; 
 
 // ------------------- NOTIFICACIÓN FLOTANTE -------------------
@@ -106,8 +105,11 @@ const GenerarInformeSinteticoDep: React.FC = () => {
 
     const [creando, setCreando] = useState(false);
     const [mensaje, setMensaje] = useState<{ tipo: "exito" | "error"; texto: string } | null>(null);
-    const [informeGenerado, setInformeGenerado] = useState<any>(null); 
-    // const [segundosRestantes, setSegundosRestantes] = useState(5); // Eliminado: no se usa directamente
+    const [informeGenerado, setInformeGenerado] = useState<any>(null);
+
+    const [resumenGeneral, setResumenGeneral] = useState([]);
+    const [resumenNecesidades, setResumenNecesidades] = useState([]);
+    const [valoracionMiembros, setValoracionMiembros] = useState([]);
 
     useEffect(() => {
         if (!departamentoId || !periodoId) return;
@@ -154,6 +156,10 @@ const GenerarInformeSinteticoDep: React.FC = () => {
             }));
         }
     }, [periodo, departamento]);
+    
+    const nombreDepartamento = departamento?.nombre || "";
+    const textoPeriodo = periodo ? `${periodo.ciclo_lectivo} - ${periodo.cuatrimestre}` : "";
+
 
     useEffect(() => {
         let timerRedirect: NodeJS.Timeout | undefined;
@@ -181,22 +187,27 @@ const GenerarInformeSinteticoDep: React.FC = () => {
     const handleComentariosChange = (texto: string) => {
         setDatosInforme((prev) => ({ ...prev, comentarios: texto }));
     };
-    
-    // ✨ FUNCIÓN AGREGADA/CORREGIDA: Esta era la función que faltaba en el código original ✨
-    const handleDepartamentoSeleccionado = (id: number) => {
-        // En este componente, el ID del departamento se obtiene de la URL. 
-        // Si el componente hijo permite cambiarlo, esta función actualizaría el estado.
-        console.log(`Departamento seleccionado en Cabecera: ${id}`);
-        setDatosInforme((prev) => ({ ...prev, departamento_id: id }));
+
+    const handleResumenGeneralChange = (data: any[]) => {
+        setResumenGeneral(data);
     };
+
+    const handleResumenNecesidadesChange = (data: any[]) => {
+        setResumenNecesidades(data);
+    };
+
+    const handleValoracionMiembrosChange = (data: any[]) => {
+        setValoracionMiembros(data);
+    };
+
 
     const handleCrearInformeFinal = useCallback(async () => {
         if (!datosInforme.departamento_id || datosInforme.departamento_id <= 0) {
-            setMensaje({ tipo: "error", texto: "Por favor seleccione un Departamento válido antes de continuar." });
+            setMensaje({ tipo: "error", texto: "El Departamento no es válido." });
             return;
         }
         if (!datosInforme.sede || datosInforme.sede === "") {
-            setMensaje({ tipo: "error", texto: "Por favor complete los datos de Cabecera (Sede/Ciclo Lectivo) antes de continuar." });
+            setMensaje({ tipo: "error", texto: "Por favor complete los datos de Cabecera (Sede/Integrantes) antes de continuar." });
             return;
         }
 
@@ -212,6 +223,10 @@ const GenerarInformeSinteticoDep: React.FC = () => {
                 integrantes: datosInforme.integrantes,
                 departamento_id: datosInforme.departamento_id,
                 comentarios: datosInforme.comentarios || "",
+                
+                resumen_general: resumenGeneral,
+                resumen_necesidades: resumenNecesidades,
+                valoracion_miembros: valoracionMiembros,
             };
 
             const response = await fetch(`${API_BASE}/informes-sinteticos/`, {
@@ -237,7 +252,8 @@ const GenerarInformeSinteticoDep: React.FC = () => {
             setCreando(false);
         }
     }, [datosInforme]);
-    
+
+
     const handleCloseNotification = useCallback(() => {
         setMensaje(null);
         if (informeGenerado && mensaje?.tipo === 'exito') {
@@ -442,8 +458,9 @@ const GenerarInformeSinteticoDep: React.FC = () => {
                     <section>
                         {/* 1. CABECERA Y SELECCIÓN DE DEPARTAMENTO */}
                         <CompletarDatosCabeceraDep
-                            onDepartamentoSeleccionado={handleDepartamentoSeleccionado}
                             onCabeceraChange={handleCabeceraChange}
+                            nombreDepartamento={nombreDepartamento}
+                            textoPeriodo={textoPeriodo}
                         />
                     </section>
 
@@ -462,7 +479,11 @@ const GenerarInformeSinteticoDep: React.FC = () => {
 
                             {/* 2. INFORMACIÓN GENERAL (Componente) */}
                             <section className="section-spacing">
-                                <AutocompletarInformacionGeneral departamentoId={datosInforme.departamento_id} />
+                                <AutocompletarInformacionGeneral 
+                                departamentoId={datosInforme.departamento_id} 
+                                periodoId={periodoId}
+                                // onChange={handleResumenGeneralChange}
+                                />
                             </section>
 
                             {/* 3. NECESIDADES Y REQUERIMIENTOS (Introducción) */}
@@ -478,14 +499,18 @@ const GenerarInformeSinteticoDep: React.FC = () => {
 
                             {/* 3. NECESIDADES Y REQUERIMIENTOS (Componente) */}
                             <section className="section-spacing">
-                                <AutocompletarNecesidadesDep departamentoId={datosInforme.departamento_id} />
+                                <AutocompletarNecesidadesDep 
+                                departamentoId={datosInforme.departamento_id} 
+                                periodoId={datosInforme.periodo_id}
+                                // onChange={handleResumenNecesidadesChange}
+                                />
                             </section>
 
                             {/* 4. PORCENTAJES (Introducción) */}
                             <div className="section-divider"></div>
                             <div className="section-intro-text">
                                 <p>
-                                    <strong>2.A. Consigne el porcentaje de contenidos planificados alcanzados por cada espacio curricular.</strong> Mencione en caso de corresponder, las estrategias propuestas por el equipo de cátedra para el próximo dictado a fin de ajustar el cronograma.
+                                    <strong>2. Consigne el porcentaje de contenidos planificados alcanzados por cada espacio curricular.</strong> Mencione en caso de corresponder, las estrategias propuestas por el equipo de cátedra para el próximo dictado a fin de ajustar el cronograma.
                                 </p>
                             </div>
                             
@@ -539,7 +564,11 @@ const GenerarInformeSinteticoDep: React.FC = () => {
 
                             {/* 7. VALORACIONES FINALES (Componente) */}
                             <section className="section-spacing">
-                                <AutocompletarValoracionesDep departamentoId={datosInforme.departamento_id} />
+                                <AutocompletarValoracionesDep 
+                                departamentoId={datosInforme.departamento_id} 
+                                periodoId={datosInforme.periodo_id} 
+                                // onChange={handleValoracionMiembrosChange}
+                                />
                             </section>
                         </>
                     )}

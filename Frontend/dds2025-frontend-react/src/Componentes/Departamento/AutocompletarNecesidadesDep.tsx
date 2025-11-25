@@ -4,6 +4,7 @@ const API_BASE = (typeof import.meta !== 'undefined' && import.meta.env && impor
 
 interface AutocompletarNecesidadesDepProps {
   departamentoId: number | null;
+  periodoId: number | null;
 }
 
 interface NecesidadMateria {
@@ -13,14 +14,14 @@ interface NecesidadMateria {
   necesidades_bibliografia: string[];
 }
 
-const AutocompletarNecesidadesDep: React.FC<AutocompletarNecesidadesDepProps> = ({ departamentoId }) => {
+const AutocompletarNecesidadesDep: React.FC<AutocompletarNecesidadesDepProps> = ({ departamentoId, periodoId }) => {
   const [resumen, setResumen] = useState<NecesidadMateria[]>([]);
   const [cargando, setCargando] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const obtenerResumen = async () => {
-      if (!departamentoId) {
+      if (!departamentoId ) {
         setResumen([]); // Limpiar datos si no hay ID
         setError(null);
         return;
@@ -28,7 +29,9 @@ const AutocompletarNecesidadesDep: React.FC<AutocompletarNecesidadesDepProps> = 
       setCargando(true);
       setError(null);
       try {
-        const response = await fetch(`${API_BASE}/departamentos/${departamentoId}/necesidades`);
+        const response = await fetch(
+          `${API_BASE}/departamentos/${departamentoId}/necesidades?periodo_id=${periodoId}`
+        );
         if (!response.ok) throw new Error("Error al obtener datos institucionales");
         const data = await response.json();
         setResumen(data);
@@ -39,7 +42,7 @@ const AutocompletarNecesidadesDep: React.FC<AutocompletarNecesidadesDepProps> = 
       }
     };
     obtenerResumen();
-  }, [departamentoId]);
+  }, [departamentoId, periodoId]);
 
   // --- Renderizado ---
 
