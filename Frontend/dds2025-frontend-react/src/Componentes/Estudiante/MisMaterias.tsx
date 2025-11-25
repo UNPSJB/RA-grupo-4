@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { BookOpen, AlertCircle } from "lucide-react";
+import { BookOpen, AlertCircle, Calendar, Hash, LayoutGrid, CheckCircle2, Clock, XCircle } from "lucide-react";
 import EstadisticasAlumno from "./EstadisticasAlumno"; 
 
 type MateriaHistorial = {
@@ -19,6 +19,24 @@ const MisMaterias: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
     const estudianteId = 1; 
 
+    // --- PALETA INSTITUCIONAL ---
+    const theme = {
+        primary: '#1e40af',       // Navy Blue
+        primaryHover: '#1e3a8a',
+        primarySoft: '#eff6ff',   // Fondo muy claro azul
+        textMain: '#0f172a',      // Slate Dark
+        textSecondary: '#64748b', // Slate
+        border: '#e2e8f0',
+        white: '#ffffff',
+        bgPage: '#f8fafc',        // Fondo página
+        successBg: '#dcfce7',     // Fondo verde claro
+        successText: '#166534',   // Texto verde oscuro
+        warningBg: '#fef3c7',     // Fondo amarillo/naranja claro
+        warningText: '#920e0eff',   // Texto naranja oscuro
+        neutralBg: '#f1f5f9',     // Fondo gris
+        neutralText: '#475569'    // Texto gris
+    };
+
     useEffect(() => {
         setLoading(true);
         fetch(`http://localhost:8000/encuestas/estudiantes/${estudianteId}/historial`)
@@ -30,48 +48,258 @@ const MisMaterias: React.FC = () => {
             .catch(err => { setError(err.message); setLoading(false); });
     }, []);
 
-    if (loading) return <div style={{ padding: 40, textAlign: 'center' }}>Cargando tus materias...</div>;
-    if (error) return <div style={{ padding: 20, color: '#dc3545', textAlign: 'center' }}><AlertCircle style={{display:'inline'}}/> {error}</div>;
+    // --- CSS INYECTADO ---
+    const cssInyectado = `
+        .fade-in { animation: fadeIn 0.5s ease-out; }
+        
+        .materia-card {
+            background-color: ${theme.white};
+            border: 1px solid ${theme.border};
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .materia-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px -10px rgba(30, 64, 175, 0.15);
+            border-color: ${theme.primary}40;
+        }
+
+        /* Estilo para el gráfico contenedor para asegurar que no rompa el diseño */
+        .chart-container {
+            background: #ffffff;
+            border-radius: 8px;
+            padding: 10px 0;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    `;
+
+    // --- ESTILOS EN LÍNEA ---
+    const styles = {
+        pageWrapper: {
+            padding: '40px 20px',
+            backgroundColor: theme.bgPage,
+            minHeight: '100vh',
+            fontFamily: "'Inter', sans-serif",
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'flex-start',
+        },
+        mainContainer: {
+            backgroundColor: theme.white,
+            width: '100%',
+            maxWidth: '1100px', // Un poco más ancho para el grid
+            borderRadius: '20px',
+            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 10px 15px -3px rgba(0, 0, 0, 0.05)',
+            overflow: 'hidden',
+            border: `1px solid ${theme.border}`,
+            padding: '30px',
+        },
+        header: {
+            marginBottom: '30px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '16px',
+            paddingBottom: '20px',
+            borderBottom: `1px solid ${theme.border}`,
+        },
+        headerIcon: {
+            backgroundColor: theme.primary,
+            color: theme.white,
+            padding: '12px',
+            borderRadius: '12px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+        },
+        headerTitle: {
+            margin: 0,
+            fontSize: '1.8rem',
+            fontWeight: 800,
+            color: theme.textMain,
+            letterSpacing: '-0.5px',
+        },
+        grid: {
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fill, minmax(340px, 1fr))",
+            gap: "24px",
+        },
+        // Tarjeta Individual
+        cardHeader: {
+            padding: "16px 20px",
+            backgroundColor: theme.primarySoft,
+            borderBottom: `1px solid ${theme.border}`,
+        },
+        materiaName: {
+            margin: 0,
+            fontSize: "1.1rem",
+            fontWeight: 700,
+            color: theme.primary,
+            lineHeight: 1.4,
+        },
+        materiaMeta: {
+            fontSize: "0.85rem",
+            color: theme.textSecondary,
+            marginTop: '8px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            flexWrap: 'wrap' as const,
+        },
+        metaItem: {
+            display: 'flex',
+            alignItems: 'center',
+            gap: '4px',
+        },
+        cardBody: {
+            padding: "20px",
+            flexGrow: 1,
+            display: 'flex',
+            flexDirection: 'column' as const,
+            justifyContent: 'space-between',
+        },
+        sectionTitle: {
+            margin: '0 0 12px 0',
+            color: theme.textSecondary,
+            fontSize: '0.8rem',
+            fontWeight: 600,
+            textTransform: 'uppercase' as const,
+            letterSpacing: '0.5px',
+            textAlign: 'center' as const,
+        },
+        footer: {
+            marginTop: '20px',
+            paddingTop: '16px',
+            borderTop: `1px solid ${theme.border}`,
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+        },
+        statusLabel: {
+            fontSize: '0.85rem',
+            fontWeight: 600,
+            color: theme.textSecondary,
+        },
+        badge: {
+            padding: '6px 12px',
+            borderRadius: '20px',
+            fontSize: '0.8rem',
+            fontWeight: 600,
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+        },
+        loadingState: { padding: '80px', textAlign: 'center' as const, color: theme.textSecondary },
+        errorState: { padding: '40px', color: '#ef4444', textAlign: 'center' as const, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '10px' },
+        emptyState: { padding: '60px', textAlign: 'center' as const, backgroundColor: theme.primarySoft, borderRadius: '12px', color: theme.textSecondary }
+    };
+
+    // Helper para renderizar el badge
+    const renderBadge = (materia: MateriaHistorial) => {
+        if (materia.encuesta_procesada) {
+            return (
+                <span style={{ ...styles.badge, backgroundColor: theme.successBg, color: theme.successText }}>
+                    <CheckCircle2 size={14} /> Respondida
+                </span>
+            );
+        } else if (materia.encuesta_disponible) {
+            return (
+                <span style={{ ...styles.badge, backgroundColor: theme.warningBg, color: theme.warningText }}>
+                    <Clock size={14} /> Pendiente
+                </span>
+            );
+        } else {
+            return (
+                <span style={{ ...styles.badge, backgroundColor: theme.neutralBg, color: theme.neutralText }}>
+                    <XCircle size={14} /> No Disponible
+                </span>
+            );
+        }
+    };
+
+    if (loading) return (
+        <div style={styles.pageWrapper}>
+             <div style={styles.mainContainer}>
+                <div style={styles.loadingState}>Cargando tus materias...</div>
+             </div>
+        </div>
+    );
+
+    if (error) return (
+        <div style={styles.pageWrapper}>
+             <div style={styles.mainContainer}>
+                <div style={styles.errorState}><AlertCircle /> {error}</div>
+             </div>
+        </div>
+    );
 
     return (
-        <div style={{ maxWidth: "1000px", margin: "0 auto", padding: "30px", fontFamily: "'Segoe UI', sans-serif" }}>
-            <h2 style={{ color: "#0056b3", borderBottom: "2px solid #eee", paddingBottom: "15px", marginBottom: "30px", display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <BookOpen size={28} /> Mis Materias
-            </h2>
+        <div style={styles.pageWrapper}>
+            <style>{cssInyectado}</style>
 
-            {materias.length === 0 && <div style={{ padding: 40, textAlign: 'center', background: '#f8f9fa' }}>No estás inscripto en materias.</div>}
-
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(380px, 1fr))", gap: "25px" }}>
-                {materias.map((materia) => (
-                    <div key={materia.id} style={{ border: "1px solid #e0e0e0", borderRadius: "12px", overflow: "hidden", backgroundColor: "#fff", boxShadow: "0 4px 10px rgba(0,0,0,0.05)", display: 'flex', flexDirection: 'column' }}>
-                        
-                        {/* Header Tarjeta */}
-                        <div style={{ padding: "15px 20px", backgroundColor: "#f0f7ff", borderBottom: '1px solid #eee' }}>
-                            <h3 style={{ margin: 0, fontSize: "18px", color: "#333" }}>{materia.nombre}</h3>
-                            <div style={{ fontSize: "13px", color: "#666", marginTop: '5px' }}> Cód: <strong>{materia.codigo}</strong> • {materia.ciclo_lectivo} {materia.cuatrimestre}</div>
-                        </div>
-
-                        {/* Cuerpo Tarjeta */}
-                        <div style={{ padding: "20px", flexGrow: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-                            <div>
-                                <h4 style={{ margin: '0 0 10px 0', color: '#555', fontSize: '0.9rem', textAlign: 'center' }}>Participación General</h4>
-                                {/* El gráfico */}
-                                <EstadisticasAlumno materiaId={materia.id} />
-                            </div>
-                            
-                            <div style={{ marginTop: '15px', paddingTop: '15px', borderTop: '1px solid #eee', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                <span style={{ fontWeight: 600, color: '#555', fontSize: '0.85rem' }}>Estado:</span>
-                                {materia.encuesta_procesada ? 
-                                    <span style={{ background: '#d4edda', color: '#155724', padding: '4px 10px', borderRadius: '15px', fontSize: '0.8rem', fontWeight: 600 }}>Respondida</span> :
-                                    (materia.encuesta_disponible ? 
-                                        <span style={{ background: '#fff3cd', color: '#856404', padding: '4px 10px', borderRadius: '15px', fontSize: '0.8rem', fontWeight: 600 }}>Pendiente</span> :
-                                        <span style={{ background: '#e9ecef', color: '#495057', padding: '4px 10px', borderRadius: '15px', fontSize: '0.8rem', fontWeight: 600 }}>No Disponible</span>
-                                    )
-                                }
-                            </div>
-                        </div>
+            <div style={styles.mainContainer} className="fade-in">
+                
+                {/* Header Principal */}
+                <div style={styles.header}>
+                    <div style={styles.headerIcon}>
+                        <LayoutGrid size={32} />
                     </div>
-                ))}
+                    <div>
+                        <h2 style={styles.headerTitle}>Mis Materias</h2>
+                        <span style={{color: theme.textSecondary}}>Resumen de cursada y participación</span>
+                    </div>
+                </div>
+
+                {/* Contenido */}
+                {materias.length === 0 ? (
+                    <div style={styles.emptyState}>
+                        <BookOpen size={40} style={{ marginBottom: 10, opacity: 0.5 }} />
+                        <p>No estás inscripto en materias actualmente.</p>
+                    </div>
+                ) : (
+                    <div style={styles.grid}>
+                        {materias.map((materia) => (
+                            <div key={materia.id} className="materia-card">
+                                
+                                {/* Header de la Tarjeta */}
+                                <div style={styles.cardHeader}>
+                                    <h3 style={styles.materiaName}>{materia.nombre}</h3>
+                                    <div style={styles.materiaMeta}>
+                                        <div style={styles.metaItem}>
+                                            <Hash size={12} /> {materia.codigo}
+                                        </div>
+                                        <div style={styles.metaItem}>
+                                            <Calendar size={12} /> {materia.ciclo_lectivo} ({materia.cuatrimestre})
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Cuerpo de la Tarjeta */}
+                                <div style={styles.cardBody}>
+                                    <div>
+                                        <h4 style={styles.sectionTitle}>Participación General</h4>
+                                        <div className="chart-container">
+                                            {/* Importante: Asegúrate de que este componente sea responsive */}
+                                            <EstadisticasAlumno materiaId={materia.id} />
+                                        </div>
+                                    </div>
+                                    
+                                    <div style={styles.footer}>
+                                        <span style={styles.statusLabel}>Estado Encuesta:</span>
+                                        {renderBadge(materia)}
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                )}
             </div>
         </div>
     );

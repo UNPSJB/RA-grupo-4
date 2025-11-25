@@ -70,7 +70,7 @@ const HomePage = () => {
 
     return (
         <div className="home-container">
-            <h1 className="home-title">Bienvenido al Sistema</h1>
+            <h1 className="home-title">Bienvenido al Sistema de Pruebas del HP Team</h1>
             <p className="home-subtitle">Desliza para navegar entre las secciones</p>
             <div className="carousel-3d-container">
                 <Slider {...settings}>

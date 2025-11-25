@@ -30,7 +30,7 @@ def filtrado_informes_ac(
     )
     return informes
 
-@router.get("/docente/{id_docente}", response_model=List[schemas.InformeAC])
+@router.get("/docente/{id_docente}", response_model=List[schemas.InformeACListado])
 def listar_informes_por_docente(id_docente: int, db: Session = Depends(get_db)):
     informes = services.filtrar_informes(
         db=db,

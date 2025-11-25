@@ -6,9 +6,15 @@ interface Docente {
     nombre: string;
 }
 
+interface Periodo{
+    id: number;
+    ciclo_lectivo: number;
+    cuatrimestre: string;
+}
 interface Materia {
   id_materia: number;
   nombre: string;
+  periodo: Periodo;
   ciclo_lectivo: number
   cuatrimestre: string
   codigoMateria?: string;
@@ -178,14 +184,14 @@ const HistorialInformesACDoc: React.FC = () => {
                                 <td style={styles.td}>{inf.materia.nombre}</td>
                                 <td style={styles.td}>{inf.materia.codigoMateria ?? '—'}</td>
                                 <td style={styles.td}>{inf.ciclo_lectivo}</td>
-                                <td style={styles.td}>{inf.materia.cuatrimestre}</td>
+                                <td style={styles.td}>{inf.materia.periodo.cuatrimestre}</td>
                                 <td style={styles.td}>
                                     <button 
                                         style={styles.selectButton}
                                         className="btn-seleccionar"
                                         onClick={() => handleSeleccionar(inf.id_informesAC)}
                                     >
-                                        Ver Reporte
+                                        Ver Informe
                                     </button>
                                 </td>
                             </tr>

@@ -27,7 +27,7 @@ const EstadisticasAlumno: React.FC<{ materiaId?: number }> = ({ materiaId }) => 
     const respondieron = data.total_encuestas_procesadas;
     const noRespondieron = Math.max(0, data.total_inscriptos - respondieron);
     const chartData = [{ name: 'Si', value: respondieron }, { name: 'No', value: noRespondieron }];
-    const COLORS = ['#28a745', '#e9ecef'];
+    const COLORS = ['#3856d8ff', '#e9ecef'];
 
     return (
         <div style={{ textAlign: 'center' }}>
