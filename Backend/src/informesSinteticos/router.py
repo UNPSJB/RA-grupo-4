@@ -5,8 +5,40 @@ from src.database import get_db
 from src.informesSinteticos import schemas, services
 from src.informesSinteticos.models import InformeSintetico
 from src.materias.schemas import NecesidadMateriaSchema
+# --- IMPORTACIÓN DE NUEVOS SCHEMAS PARA HISTORIAL ---
+from src.informesSinteticos.schemas import GenerarSnapshotRequest, HistorialInformeSinteticoOut, HistorialInformeSinteticoDetalle
 
 router = APIRouter(prefix="/informes-sinteticos", tags=["Informes Sintéticos"])
+
+# =========================================
+# === ENDPOINTS HISTORIAL ===
+# =========================================
+
+@router.post("/historial/generar", response_model=HistorialInformeSinteticoOut)
+def generar_historial_snapshot(request: GenerarSnapshotRequest, db: Session = Depends(get_db)):
+    """
+    Genera una copia estática (Snapshot) de los datos actuales del departamento y periodo.
+    Guarda el JSON en la base de datos para consulta futura.
+    """
+    return services.crear_snapshot_historico(
+        db, 
+        request.departamento_id, 
+        request.periodo_id, 
+        request.usuario
+    )
+
+@router.get("/historial/listar", response_model=List[HistorialInformeSinteticoOut])
+def listar_historial_informes(db: Session = Depends(get_db)):
+    """Devuelve la lista de informes guardados (sin el JSON pesado)."""
+    return services.listar_historial(db)
+
+@router.get("/historial/{id}", response_model=HistorialInformeSinteticoDetalle)
+def ver_detalle_historial(id: int, db: Session = Depends(get_db)):
+    """Devuelve el detalle completo de un informe histórico, incluyendo el JSON."""
+    historial = services.obtener_historial_por_id(db, id)
+    if not historial:
+        raise HTTPException(status_code=404, detail="Informe histórico no encontrado")
+    return historial
 
 
 @router.get(
@@ -31,7 +63,6 @@ def leer_informesSinteticos(db: Session = Depends(get_db)):
 
 @router.get("/{informe_id}", response_model=schemas.InformeSintetico)
 def obtener_informe_sintetico(informe_id: int, db: Session = Depends(get_db)):
-    # Esta ruta ahora se comprueba DESPUÉS de /actividades
     informe = services.obtener_informe_sintetico(db, informe_id)
     if not informe:
         raise HTTPException(status_code=404, detail="Informe Sintético no encontrado")
@@ -41,11 +72,6 @@ def obtener_informe_sintetico(informe_id: int, db: Session = Depends(get_db)):
 def cantidad_informes_sinteticos(db: Session = Depends(get_db)):
     return db.query(InformeSintetico).filter(InformeSintetico.estado == "pendiente").count()
 
-
-# =========================================
-# === ENDPOINTS DE PREVIEW (GET) ===
-# Para usar en el formulario ANTES de crear el informe
-# =========================================
 
 @router.get("/preview/general")
 def preview_informe_general(
@@ -77,13 +103,8 @@ def preview_auxiliares(
     periodo_id: int = Query(...), 
     db: Session = Depends(get_db)
 ):
-    """Nuevo endpoint para recuperar auxiliares cargados por docentes."""
     return services.obtener_auxiliares_periodo(db, departamento_id, periodo_id)
 
-# =========================================
-# === ENDPOINTS DE AUTOCOMPLETADO (POST) ===
-# Para guardar datos en un informe YA CREADO
-# =========================================
 
 @router.post("/{id}/autocompletar-general")
 def autocompletar_informe_general(id: int, db: Session = Depends(get_db)):
@@ -115,14 +136,11 @@ def autocompletar_valoraciones_miembros(id: int, db: Session = Depends(get_db)):
     db.commit()
     return {"mensaje": "Lista de valoración de miembros generada", "valoraciones": valoraciones}
 
-#[TODO] ESTE ROUTER DEVUELVE TODAS LAS NECESITDADES DEL DEPARTAMENTO, NO LAS DE UN PERIODO
 @router.get("/departamentos/{departamento_id}/necesidades", response_model=List[NecesidadMateriaSchema])
 def obtener_necesidades_por_departamento(departamento_id: int, db: Session = Depends(get_db)):
-    """
-    Obtiene las necesidades de equipamiento y bibliografía de todas las materias
-    de un departamento específico, basándose en los InformesAC.
-    """
-    # 1. Consultamos los informes AC de las materias del departamento
+    from src.informesAC.models import InformesAC 
+    from src.materias.models import Materias 
+
     informes = (
         db.query(InformesAC)
         .join(Materias, InformesAC.id_materia == Materias.id_materia)
@@ -130,13 +148,9 @@ def obtener_necesidades_por_departamento(departamento_id: int, db: Session = Dep
         .all()
     )
 
-    # 2. Formateamos la respuesta como espera el frontend
     resultado = []
     for informe in informes:
-        # Solo agregamos si tiene alguna necesidad registrada para no llenar de datos vacíos
-        # (Opcional: si quieres mostrar todas las materias aunque no tengan necesidades, quita este if)
         if informe.necesidades_equipamiento or informe.necesidades_bibliografia:
-            # Aseguramos que sean listas (depende de cómo lo guardes en BD)
             equip = informe.necesidades_equipamiento if isinstance(informe.necesidades_equipamiento, list) else []
             biblio = informe.necesidades_bibliografia if isinstance(informe.necesidades_bibliografia, list) else []
 

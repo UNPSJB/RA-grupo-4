@@ -8,6 +8,7 @@ import ListadoInformesACDepREAL from '../Departamento/ListadoInformesACDepREAL';
 import SinDatos from '../Otros/SinDatos'; 
 import SeleccionarMateriaEstadisticasDep from '../Departamento/SeleccionarMateriaEstadisticasDep';
 import EstadisticasPorPreguntaDep from '../Departamento/EstadisticasPorPreguntaDep';
+import HistorialInformesSinteticos from '../Departamento/HistorialInformesSinteticos'; // <--- IMPORTADO
 
 /* * Layout del Departamento: 
  * Muestra el fondo de la página y el botón de regresar con lógica dinámica.
@@ -50,6 +51,9 @@ const MenuDepartamento = () => {
                 {/* Gestión de Informes */}
                 <Route path="generar-informe-sintetico" element={<GenerarInformeSinteticoDep />} />
                 <Route path="historial-informes" element={<ListadoInformesACDepREAL />} />
+                
+                {/* --- NUEVA RUTA PARA HISTORIAL SINTÉTICO --- */}
+                <Route path="historial-sinteticos" element={<HistorialInformesSinteticos />} />
 
                 {/* Estadisticas */}
                 <Route path="estadisticas" element={<SeleccionarMateriaEstadisticasDep />} />
