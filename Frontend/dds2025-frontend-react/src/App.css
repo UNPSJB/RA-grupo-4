@@ -1,5 +1,5 @@
 /* --- ========================================= --- */
-/* --- ESTILOS BASE Y VARIABLES (DEBES TENERLOS) --- */
+/* --- 1. VARIABLES Y ESTILOS BASE               --- */
 /* --- ========================================= --- */
 :root {
     --primary-color: #0056b3;
@@ -7,10 +7,11 @@
     --secondary-color: #f8f9fa;
     --text-color: #333;
     --text-color-light: #666;
-    --bg-color: #f4f7f6;
+    --bg-color: #ffffff;
     --card-bg: #ffffff;
     --border-radius: 12px;
 
+    /* Colores de Roles */
     --color-alumno: #28a745;
     --color-docente: #17a2b8;
     --color-departamento: #ffc107;
@@ -31,7 +32,7 @@ body {
 }
 
 /* --- ========================================= --- */
-/* --- ESTILOS NAVBAR Y FOOTER (ACTUALIZADO)     --- */
+/* --- 2. NAVBAR Y FOOTER                        --- */
 /* --- ========================================= --- */
 .navbar {
     display: flex;
@@ -43,18 +44,18 @@ body {
     position: sticky;
     top: 0;
     z-index: 1000;
-    height: 60px; /* Altura fija para consistencia */
+    height: 60px;
 }
 
-/* --- Lado Izquierdo (Logo + Texto) --- */
+/* Lado Izquierdo */
 .navbar-left {
     display: flex;
     align-items: center;
-    gap: 15px; /* Espacio entre el logo y el texto */
+    gap: 15px;
 }
 
 .navbar-logo {
-    height: 45px; /* Ajusta el tamaño del logo */
+    height: 45px;
     width: auto;
     object-fit: contain;
 }
@@ -67,15 +68,23 @@ body {
     font-weight: 600; 
 }
 
-/* --- Lado Derecho (Perfil + Dropdown) --- */
+/* Lado Derecho */
 .navbar-right { display: flex; align-items: center; }
 
-.perfil-container {
+/* Avatar en Navbar */
+.navbar-avatar-container {
     position: relative;
+    cursor: pointer;
     display: flex;
     align-items: center;
-    cursor: pointer;
-    padding-left: 10px;
+    gap: 8px;
+    padding: 5px 10px;
+    border-radius: 8px;
+    transition: background 0.2s;
+}
+
+.navbar-avatar-container:hover {
+    background-color: rgba(0, 0, 0, 0.05);
 }
 
 .navbar-avatar {
@@ -83,7 +92,7 @@ body {
     height: 42px;
     border-radius: 50%;
     object-fit: cover;
-    border: 2px solid var(--secondary-color); /* Un borde sutil */
+    border: 2px solid var(--secondary-color);
     transition: all 0.2s ease;
 }
 
@@ -91,61 +100,6 @@ body {
     transform: scale(1.08);
     box-shadow: 0 0 10px rgba(0,0,0,0.15);
     border-color: var(--primary-color);
-}
-
-/* --- Menú Desplegable --- */
-.dropdown-menu {
-    position: absolute;
-    top: 125%; /* Lo empuja debajo del avatar */
-    right: 0;
-    background-color: #fff;
-    width: 180px;
-    border-radius: 8px;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-    border: 1px solid #f0f0f0;
-    display: flex;
-    flex-direction: column;
-    z-index: 1001;
-    overflow: hidden;
-    animation: fadeInDown 0.2s ease-out; /* Reusamos tu animación */
-}
-
-.dropdown-header {
-    padding: 12px 15px;
-    font-weight: 600;
-    font-size: 0.9rem;
-    background-color: var(--bg-color);
-    color: var(--primary-color);
-    border-bottom: 1px solid #eee;
-}
-
-.dropdown-item {
-    padding: 12px 15px;
-    text-decoration: none;
-    color: var(--text-color);
-    font-size: 0.95rem;
-    transition: background 0.2s;
-    display: block;
-}
-
-.dropdown-item:hover {
-    background-color: #f8f9fa;
-    color: var(--primary-color);
-}
-
-.dropdown-divider {
-    height: 1px;
-    background-color: #eee;
-    margin: 0;
-}
-
-.dropdown-item.logout {
-    color: var(--color-secretaria); /* Usa el rojo de tus variables */
-}
-
-.dropdown-item.logout:hover {
-    background-color: #fff5f5;
-    color: #bd2130;
 }
 
 /* Footer */
@@ -159,7 +113,7 @@ body {
 }
 
 /* --- ========================================= --- */
-/* --- ESTILOS CARRUSEL (HOMEPAGE)               --- */
+/* --- 3. ESTILOS CARRUSEL (HOMEPAGE)            --- */
 /* --- ========================================= --- */
 .home-container {
     padding: 4vh 2vw;
@@ -196,6 +150,7 @@ body {
     pointer-events: none;
     transform-origin: center center;
 }
+
 .slick-center .carousel-card {
     opacity: 1;
     transform: scale(1.1);
@@ -203,11 +158,47 @@ body {
     box-shadow: 0 25px 50px rgba(0,0,0,0.2);
     pointer-events: all;
 }
-.card-header { padding: 20px; color: white; min-height: 110px; }
+
+/* Estilo BASE del Header del Carrusel (Sin color de fondo fijo aquí) */
+.carousel-card .card-header { 
+    padding: 20px; 
+    color: white; 
+    min-height: 110px; 
+}
+
 .card-icon { font-size: 3.5rem; margin-bottom: 10px; line-height: 1; }
 .card-header h3 { margin: 0; font-size: 1.5rem; font-weight: 600; }
 .card-body { padding: 20px 25px; flex-grow: 1; background-color: #fff; }
 
+/* --- COLORES ESPECÍFICOS POR ROL (CARRUSEL) --- */
+
+/* Alumno (Verde) */
+.carousel-card.type-alumno .card-header {
+    background: var(--color-alumno);
+    background: linear-gradient(135deg, var(--color-alumno) 0%, #1e7e34 100%);
+}
+
+/* Docente (Cyan/Teal) */
+.carousel-card.type-docente .card-header {
+    background: var(--color-docente);
+    background: linear-gradient(135deg, var(--color-docente) 0%, #138496 100%);
+}
+
+/* Departamento (Amarillo - Texto oscuro) */
+.carousel-card.type-departamento .card-header {
+    background: var(--color-departamento);
+    background: linear-gradient(135deg, var(--color-departamento) 0%, #d39e00 100%);
+    color: #333;
+}
+.carousel-card.type-departamento .card-icon { color: #333; }
+
+/* Secretaria (Rojo) */
+.carousel-card.type-secretaria .card-header {
+    background: var(--color-secretaria);
+    background: linear-gradient(135deg, var(--color-secretaria) 0%, #bd2130 100%);
+}
+
+/* Interacción de Enlaces */
 .carousel-card-link { 
     text-decoration: none; 
     display: block; 
@@ -242,7 +233,7 @@ body {
 .slick-prev:before, .slick-next:before { color: var(--primary-color) !important; }
 
 /* --- ========================================= --- */
-/* --- ESTILOS MENÚS SIMPLES (DOCENTE, DEPTO)    --- */
+/* --- 4. MENÚS SIMPLES (DOCENTE, DEPTO)         --- */
 /* --- ========================================= --- */
 .menu-page-container {
     max-width: 900px;
@@ -262,6 +253,7 @@ body {
 }
 .menu-header h1 { font-size: 2.5rem; margin: 0 0 10px 0; color: var(--menu-color, var(--primary-color)); }
 .menu-header p { font-size: 1.1rem; color: var(--text-color-light); margin: 0; }
+
 .menu-link-list { display: flex; flex-direction: column; gap: 15px; }
 .menu-link {
     display: block; padding: 18px 25px; background-color: var(--secondary-color);
@@ -288,7 +280,76 @@ body {
     box-shadow: 0 4px 10px rgba(0,0,0,0.1); transform: translateY(-2px);
 }
 
-/* Keyframes para animación de entrada */
+/* --- ========================================= --- */
+/* --- 5. TARJETA DE PERFIL FLOTANTE (AZUL)      --- */
+/* --- ========================================= --- */
+.profile-card {
+    position: absolute;
+    top: 60px;
+    right: 20px;
+    width: 320px;
+    background-color: white;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    border: 1px solid #e2e8f0;
+    overflow: hidden;
+    z-index: 1000;
+    animation: slideDown 0.2s ease-out;
+}
+
+/* Header Específico para Perfil (Azul) */
+.profile-card .card-header {
+    background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+    padding: 20px;
+    color: white;
+    text-align: center;
+}
+
+.card-avatar-large {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    border: 3px solid white;
+    object-fit: cover;
+    margin-bottom: 10px;
+    background-color: #cbd5e1;
+}
+
+.card-user-name { font-size: 1.1rem; font-weight: 700; margin: 0; }
+.card-user-role {
+    font-size: 0.85rem; opacity: 0.9; background-color: rgba(255,255,255,0.2);
+    padding: 2px 10px; border-radius: 12px; display: inline-block; margin-top: 5px;
+}
+
+/* Cuerpo de Tarjeta de Perfil */
+.profile-card .card-body { padding: 20px; color: #334155; }
+
+.info-row {
+    display: flex; justify-content: space-between; margin-bottom: 12px;
+    font-size: 0.9rem; border-bottom: 1px solid #f1f5f9; padding-bottom: 8px;
+}
+.info-label { color: #64748b; font-weight: 500; }
+.info-value { font-weight: 600; text-align: right; }
+
+.card-actions {
+    padding: 10px 20px 20px 20px; display: flex; flex-direction: column; gap: 8px;
+}
+
+.action-btn {
+    display: flex; align-items: center; gap: 10px; padding: 10px;
+    border-radius: 8px; text-decoration: none; color: #334155;
+    font-size: 0.9rem; font-weight: 500; transition: background 0.2s;
+}
+.action-btn:hover { background-color: #f1f5f9; color: #1e40af; }
+
+.action-btn.logout { color: #ef4444; margin-top: 5px; border-top: 1px solid #f1f5f9; padding-top: 15px; }
+.action-btn.logout:hover { background-color: #fef2f2; color: #dc2626; }
+
+/* --- ANIMACIONES --- */
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
 @keyframes fadeInDown {
     from { opacity: 0; transform: translateY(-10px); }
     to { opacity: 1; transform: translateY(0); }
