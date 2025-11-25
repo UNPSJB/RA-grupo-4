@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Routes, Route, Link, Outlet, Navigate } from "react-router-dom";
-import { User, LogOut, Calendar, Settings, ChevronDown, BookOpen } from "lucide-react";
+// Importamos los iconos
+import { User, LogOut, Calendar, ChevronDown, Menu } from "lucide-react"; // Ya no necesitamos X aquí
 import "./App.css";
 
-// Assets (Si no tienes las imágenes, comenta estas líneas y el src de la img)
+// Assets
 import fotoPerfil from './assets/avatarOA.png'; 
 import logoUnpsjb from './assets/logo_unpsjb.png';
 
@@ -12,40 +13,40 @@ import LoginPage from "./Componentes/Otros/LoginPage";
 import HomePage from "./Componentes/Otros/HomePage";
 import ErrorCargaDatos from "./Componentes/Otros/ErrorCargaDatos";
 import SinDatos from "./Componentes/Otros/SinDatos";
-
-// Importaciones para el navbar
 import Calendario from "./Componentes/Otros/Calendario";
 import MostrarMiPerfil from "./Componentes/Otros/MostrarMiPerfil";
 
-// --- MENÚS DE SECCIÓN ---
+// Menús
 import MenuAlumno from "./Componentes/Menus/MenuAlumno";
 import MenuDocente from "./Componentes/Menus/MenuDocente";
 import MenuDepartamento from "./Componentes/Menus/MenuDepartamento"; 
 import MenuSecretaria from "./Componentes/Menus/MenuSecretaria";
 
-const MainLayout = () => {
-  const [mostrarMenu, setMostrarMenu] = useState(false);
-  const menuRef = useRef(null);
+// --- NUEVO IMPORT ---
+import MenuInstitucional from "./Componentes/Menus/MenuInstitucional";
 
-  //Admin
+// =========================================================
+// LAYOUT PRINCIPAL
+// =========================================================
+const MainLayout = () => {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [mostrarMenuPerfil, setMostrarMenuPerfil] = useState(false);
+  const menuPerfilRef = useRef(null);
+
   const datosUsuario = {
     nombre: "Admin",
-    email: "Admin@unpsjb.edu.ar",
+    email: "admin@unpsjb.edu.ar",
     rol: "Administrador",
     legajo: "0000",
     carrera: "Licenciatura en Sistemas",
     sede: "Sede Trelew"
   };
 
-  const toggleMenu = () => {
-    setMostrarMenu(!mostrarMenu);
-  };
-
-  // Cierra el menú si se hace clic fuera de él
+  // Cerrar menú perfil al hacer clic fuera
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (menuRef.current && !menuRef.current.contains(event.target)) {
-        setMostrarMenu(false);
+      if (menuPerfilRef.current && !menuPerfilRef.current.contains(event.target)) {
+        setMostrarMenuPerfil(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -55,15 +56,65 @@ const MainLayout = () => {
   return (
     <div className="app-container">
       
-      {/* --- NAVBAR GLOBAL --- */}
+      {/* Mantén tus estilos CSS incrustados aquí o muévelos a App.css */}
+      <style>{`
+        .sidebar-overlay {
+          position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+          background: rgba(0,0,0,0.5); z-index: 1040;
+          opacity: 0; visibility: hidden; transition: all 0.3s;
+          backdrop-filter: blur(2px);
+        }
+        .sidebar-overlay.active { opacity: 1; visibility: visible; }
+
+        .sidebar-menu {
+          position: fixed; top: 0; left: -300px; 
+          width: 280px; height: 100vh; background: #fff; z-index: 1050;
+          box-shadow: 4px 0 15px rgba(0,0,0,0.1);
+          transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          display: flex; flex-direction: column;
+        }
+        .sidebar-menu.open { left: 0; } 
+
+        .sidebar-header {
+          padding: 20px; background: #f8f9fa; border-bottom: 1px solid #eee;
+          display: flex; justify-content: space-between; align-items: center;
+        }
+        .sidebar-header h2 { margin: 0; font-size: 1.2rem; color: #0056b3; font-weight: 700; }
+        .close-btn { background: none; border: none; cursor: pointer; color: #666; }
+        
+        .sidebar-list { list-style: none; padding: 0; margin: 0; overflow-y: auto; }
+        .sidebar-list li a {
+          display: block; padding: 15px 20px; text-decoration: none; color: #333;
+          border-bottom: 1px solid #f0f0f0; font-weight: 500; transition: 0.2s;
+        }
+        .sidebar-list li a:hover { background: #eef2f6; color: #0056b3; padding-left: 25px; }
+
+        .hamburger-btn {
+          background: none; border: none; cursor: pointer; padding: 5px;
+          margin-right: 15px; display: flex; align-items: center;
+        }
+        .hamburger-btn:hover { background: #f0f0f0; border-radius: 5px; }
+      `}</style>
+      
+      {/* --- USO DEL NUEVO COMPONENTE --- */}
+      <MenuInstitucional 
+        isOpen={sidebarOpen} 
+        onClose={() => setSidebarOpen(false)} 
+      />
+
+      {/* --- NAVBAR SUPERIOR --- */}
       <nav className="navbar">
         <div className="navbar-left">
-          <img src={logoUnpsjb} alt="Logo UNPSJB" className="navbar-logo" />
+          <button className="hamburger-btn" onClick={() => setSidebarOpen(true)}>
+            <Menu size={28} color="#0056b3" />
+          </button>
+
+          <img src={logoUnpsjb} alt="Logo" className="navbar-logo" />
           <Link to="/home" className="site-name">Sistema de Encuestas UNPSJB</Link>
         </div>
 
-        <div className="navbar-right" ref={menuRef}>
-          <div className="navbar-avatar-container" onClick={toggleMenu}>
+        <div className="navbar-right" ref={menuPerfilRef}>
+          <div className="navbar-avatar-container" onClick={() => setMostrarMenuPerfil(!mostrarMenuPerfil)}>
             <div style={{textAlign: 'right', marginRight: '5px', display: 'flex', flexDirection: 'column'}}>
                  <span style={{fontSize: '0.85rem', fontWeight: 'bold', color: '#1e293b'}}>Hola, {datosUsuario.nombre.split(" ")[0]}</span>
                  <span style={{fontSize: '0.7rem', color: '#64748b'}}>{datosUsuario.rol}</span>
@@ -77,9 +128,8 @@ const MainLayout = () => {
             <ChevronDown size={16} color="#64748b" />
           </div>
           
-          {mostrarMenu && (
+          {mostrarMenuPerfil && (
             <div className="profile-card">
-              {/* Cabecera Azul */}
               <div className="card-header">
                 <img src={fotoPerfil} alt="User" className="card-avatar-large" />
                 <h3 className="card-user-name">{datosUsuario.nombre}</h3>
@@ -87,7 +137,6 @@ const MainLayout = () => {
                 <div style={{fontSize: '0.8rem', marginTop: '5px', opacity: 0.8}}>{datosUsuario.email}</div>
               </div>
 
-              {/* Cuerpo con Datos */}
               <div className="card-body">
                 <div className="info-row">
                   <span className="info-label">Legajo</span>
@@ -103,17 +152,14 @@ const MainLayout = () => {
                 </div>
               </div>
 
-              {/* Botones de Acción */}
               <div className="card-actions">
-                <Link to="/home/perfil" className="action-btn" onClick={() => setMostrarMenu(false)}>
+                <Link to="/home/perfil" className="action-btn" onClick={() => setMostrarMenuPerfil(false)}>
                   <User size={18} /> Mi Perfil Completo
                 </Link>
-                <Link to="/home/calendario" className="action-btn" onClick={() => setMostrarMenu(false)}>
+                <Link to="/home/calendario" className="action-btn" onClick={() => setMostrarMenuPerfil(false)}>
                   <Calendar size={18} /> Mi Calendario
                 </Link>
-      
-                
-                <Link to="/" className="action-btn logout" onClick={() => setMostrarMenu(false)}>
+                <Link to="/" className="action-btn logout" onClick={() => setMostrarMenuPerfil(false)}>
                   <LogOut size={18} /> Cerrar Sesión
                 </Link>
               </div>
@@ -122,12 +168,11 @@ const MainLayout = () => {
         </div>
       </nav>
 
-      {/* --- CONTENIDO DE LAS PÁGINAS --- */}
+      {/* --- CONTENIDO PRINCIPAL --- */}
       <div className="page-content">
         <Outlet />
       </div>
 
-      {/* --- FOOTER GLOBAL --- */}
       <footer className="footer">
         © 2025 HP TEAM — Sistema de encuestas UNPSJB
       </footer>
@@ -136,39 +181,21 @@ const MainLayout = () => {
 };
 
 function App() {
-  // Mock de usuario para el ejemplo de perfil
-  const usuarioMock = {
-    nombre: "Juan Pérez",
-    email: "juan.perez@unpsjb.edu.ar",
-    rol: "ALUMNO", 
-    legajo: "24.561"
-  };
-
   return (
     <Routes>
-      {/* Ruta pública */}
       <Route path="/" element={<LoginPage />} />
-
-      {/* Rutas protegidas dentro del Layout */}
       <Route path="/home" element={<MainLayout />}>
         <Route index element={<HomePage />} />
-
         <Route path="alumno/*" element={<MenuAlumno />} />
         <Route path="docente/*" element={<MenuDocente />} />
         <Route path="departamento/*" element={<MenuDepartamento />} />
         <Route path="secretaria/*" element={<MenuSecretaria />} />
-
-        {/* Rutas auxiliares */}
         <Route path="error" element={<ErrorCargaDatos />} />
         <Route path="sin-datos" element={<SinDatos />} />
         <Route path="calendario" element={<Calendario />} />
         <Route path="perfil" element={<MostrarMiPerfil/>} />
-
-        {/* Fallback interno */}
         <Route path="*" element={<Navigate to="/home" replace />} />
       </Route>
-
-      {/* Fallback global */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
