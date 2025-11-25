@@ -215,11 +215,6 @@ const MenuDocenteIndex: React.FC = () => {
                         <h3>Historial de Informes</h3>
                         <p>Consulta todos los informes de actividad curricular que has generado previamente.</p>
                     </Link>
-                    <Link to="informes-pendientes" className="nav-card card-cyan">
-                        <FileText size={32} />
-                        <h3>Informes Pendientes</h3>
-                        <p>Accede al listado detallado de todas las asignaturas que requieren tu informe.</p>
-                    </Link>
                     <Link to="estadisticas" className="nav-card card-yellow">
                         <BarChart2 size={32} />
                         <h3>Estadísticas de Catedra</h3>
