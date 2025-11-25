@@ -1,16 +1,16 @@
 import React from 'react';
-import { Routes, Route, useNavigate, Outlet, Link, useLocation } from 'react-router-dom'; 
-import './MenuDocente.css'; 
+import { Routes, Route, useLocation, Outlet, Link } from 'react-router-dom';
+import './MenuDocente.css';
 import { ArrowLeft } from 'lucide-react';
 
-import MenuDocenteIndex from './MenuDocenteIndex'; 
+import MenuDocenteIndex from './MenuDocenteIndex';
 import GenerarInformeAC from '../Docente/GenerarInformeAC';
 import ListadoInformesACDoc from '../Docente/ListadoInformesACDoc';
 import HistorialInformesACDoc from '../Docente/HistorialInformesACDoc';
 import PaginaEstadisticasDoc from '../Docente/PaginaEstadisticasDoc';
-import SinDatos from '../Otros/SinDatos'; 
+import SinDatos from '../Otros/SinDatos';
 import VisualizarInformeACDoc from '../Docente/VisualizarInformeACDoc';
-import EstadisticasPorPregunta from '../Docente/EstadisticasPorPregunta'; 
+import EstadisticasPorPregunta from '../Docente/EstadisticasPorPregunta';
 
 const DocenteLayout = () => {
     const location = useLocation();
@@ -26,7 +26,7 @@ const DocenteLayout = () => {
                 </Link>
             </div>
             <div className="dashboard-content">
-                <Outlet /> 
+                <Outlet />
             </div>
         </div>
     );
@@ -36,14 +36,12 @@ const MenuDocente = () => {
     return (
         <Routes>
             <Route path="/" element={<DocenteLayout />}>
-                <Route index element={<MenuDocenteIndex />} /> 
+                <Route index element={<MenuDocenteIndex />} />
                 <Route path="generar-informe/:idMateria" element={<GenerarInformeAC />} />
                 <Route path="informes-pendientes" element={<ListadoInformesACDoc />} />
                 <Route path="historial-informes" element={<HistorialInformesACDoc />} />
-                
                 <Route path="estadisticas" element={<PaginaEstadisticasDoc />} />
                 <Route path="estadisticas/materia/:materiaId" element={<EstadisticasPorPregunta />} />
-
                 <Route path="mi-perfil" element={<SinDatos />} />
                 <Route path="visualizar-informe/:id_informe" element={<VisualizarInformeACDoc />} />
             </Route>

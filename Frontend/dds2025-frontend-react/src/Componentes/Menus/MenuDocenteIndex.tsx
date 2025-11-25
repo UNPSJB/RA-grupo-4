@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import './MenuDocente.css';
-// 1. IMPORTAMOS EL NUEVO ICONO (GraduationCap)
-import { FileText, BarChart2, History, User, CheckSquare, List, Send, BookOpen, AlertCircle, GraduationCap } from 'lucide-react';
+import { FileText, BarChart2, History, CheckSquare, List, Send, BookOpen, AlertCircle, GraduationCap, ChevronRight, ChevronDown } from 'lucide-react';
 
 interface Periodo{
     ciclo_lectivo: number;
@@ -38,7 +37,6 @@ interface StatsDocenteProps {
 const StatsDocente: React.FC<StatsDocenteProps> = ({ total, completados, pendientes, cargando }) => {
     const display = (num: number) => (cargando ? '...' : num);
 
-    // Cálculo de porcentajes
     const pctCompletados = total > 0 ? Math.round((completados / total) * 100) : 0;
     const pctPendientes = total > 0 ? Math.round((pendientes / total) * 100) : 0;
 
@@ -68,7 +66,10 @@ const MenuDocenteIndex: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
     const [periodoActual, setPeriodoActual] = useState<Periodo | null>(null);
     const [docenteInfo, setDocente] = useState<Docente | null>(null);
-    
+
+    const ITEMS_PER_PAGE = 3;
+    const [mostrarCantidad, setMostrarCantidad] = useState<number>(ITEMS_PER_PAGE);
+
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -103,18 +104,21 @@ const MenuDocenteIndex: React.FC = () => {
         cargarDatos();
     }, []);
 
-    // Todas las materias del docente
     const materiasDelDocente = materias.filter(m => m.id_docente === ID_DOCENTE_ACTUAL);
     const totalCount = materiasDelDocente.length;
 
-    // Materias completadas
     const completadosCount = materiasDelDocente.filter(m => m.informeACCompletado === true).length;
 
-    // Materias pendientes
     const materiasPendientes = materiasDelDocente.filter(
         m => m.id_periodo === ID_PERIODO_ACTUAL && m.informeACCompletado !== true
     );
     const pendientesCount = materiasPendientes.length;
+
+    const materiasPendientesVisibles = materiasPendientes.slice(0, mostrarCantidad);
+
+    const handleVerMas = () => {
+        setMostrarCantidad(prev => prev + ITEMS_PER_PAGE);
+    };
 
     const handleGenerarInforme = (id_materia: number) => {
         navigate(`/home/docente/generar-informe/${id_materia}`);
@@ -126,7 +130,6 @@ const MenuDocenteIndex: React.FC = () => {
         <div className="dashboard-main-view" style={roleStyle}>
             <div className="dashboard-header-container">
                 <div className="bienvenida-box">
-                    {/* 2. SECCIÓN DEL TÍTULO MODIFICADA */}
                     <h1 className="welcome-title" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                         <GraduationCap size={36} style={{ color: 'var(--color-texto-principal, #1f2937)' }} />
                         ¡Bienvenido, {docenteInfo?.nombre}!
@@ -150,7 +153,6 @@ const MenuDocenteIndex: React.FC = () => {
                 </div>
             </div>
 
-            {/* SECCIÓN PENDIENTES */}
             <div className="seccion-box">
                 <h2 className="seccion-title">
                     <AlertCircle size={24} />
@@ -166,7 +168,7 @@ const MenuDocenteIndex: React.FC = () => {
                     )}
                     {!cargando && !error && materiasPendientes.length > 0 && (
                         <>
-                            {materiasPendientes.slice(0, 3).map((materia) => (
+                            {materiasPendientesVisibles.map((materia) => (
                                 <div className="pending-item" key={materia.id_materia}>
                                     <div className="pending-info">
                                         <BookOpen size={24} className="pending-icon" />
@@ -183,19 +185,25 @@ const MenuDocenteIndex: React.FC = () => {
                                     </button>
                                 </div>
                             ))}
-                            {materiasPendientes.length > 3 && (
+
+                            {materiasPendientesVisibles.length < materiasPendientes.length && (
                                 <div style={{padding: '20px 15px 0', textAlign: 'center'}}>
-                                    <Link to="informes-pendientes" className="btn-action" style={{backgroundColor: '#6c757d'}}>
-                                        Ver los {materiasPendientes.length} informes pendientes...
-                                    </Link>
+                                    <button 
+                                        className="btn-action"
+                                        style={{backgroundColor: '#4caf50', display: 'inline-flex', alignItems: 'center', gap: '6px'}}
+                                        onClick={handleVerMas}
+                                    >
+                                        Ver Más ({materiasPendientes.length - materiasPendientesVisibles.length} restantes)
+                                        <ChevronDown size={18} />
+                                    </button>
                                 </div>
                             )}
+
                         </>
                     )}
                 </div>
             </div>
 
-            {/* SECCIÓN ACCESO RÁPIDO */}
             <div className="seccion-box">
                 <h2 className="seccion-title">
                     <CheckSquare size={24} />
@@ -206,6 +214,11 @@ const MenuDocenteIndex: React.FC = () => {
                         <History size={32} />
                         <h3>Historial de Informes</h3>
                         <p>Consulta todos los informes de actividad curricular que has generado previamente.</p>
+                    </Link>
+                    <Link to="informes-pendientes" className="nav-card card-cyan">
+                        <FileText size={32} />
+                        <h3>Informes Pendientes</h3>
+                        <p>Accede al listado detallado de todas las asignaturas que requieren tu informe.</p>
                     </Link>
                     <Link to="estadisticas" className="nav-card card-yellow">
                         <BarChart2 size={32} />
