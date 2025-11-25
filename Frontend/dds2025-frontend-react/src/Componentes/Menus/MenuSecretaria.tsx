@@ -180,7 +180,7 @@ const SecretariaDashboard = ({ secretariaId }) => {
             {/* 2. Sección Principal */}
             <div className="secretaria-section">
                 <h2 className="secretaria-section-title">
-                    <FileText size={22} /> Informes Pendientes de Revisión
+                    <FileText size={22} /> Informes Sintéticos más recientes
                 </h2>
                 <TarjetaSeleccionarInformes />
             </div>

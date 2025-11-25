@@ -5,7 +5,7 @@ import HeaderInstitucional from "../Otros/HeaderInstitucional";
 import SinDatos from "../Otros/SinDatos";
 
 //Para ver datos hardcodeados
-const USE_DEBUG_DATA = false;
+const USE_DEBUG_DATA =true;
 
 const MOCK_INFORME_DATA: InformeSinteticoDetalle = {
   id: 999,
