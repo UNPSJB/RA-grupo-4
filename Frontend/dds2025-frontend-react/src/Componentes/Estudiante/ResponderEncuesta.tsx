@@ -5,6 +5,7 @@ import { Send, ArrowRight, ArrowLeft, AlertTriangle } from "lucide-react";
 // --- IMPORTACIONES DE COMPONENTES DE CONTROL ---
 import FaltanCamposObligatorios from "../Otros/FaltanCamposObligatorios"; 
 import TodoBien from "../Otros/TodoBien"; 
+import logo from '../../assets/logo-unpsjb.png';
 
 // Interfaces (Mantenidas)
 interface OpcionRespuesta { id: number; descripcion: string; pregunta_id: number; }
@@ -20,7 +21,7 @@ const styles = {
     colorSecundario: '#0078D4', 
     colorExito: '#28a745', 
     colorAlerta: '#dc3545', 
-    colorFondoClaro: '#f0f4f8', 
+    colorFondoClaro: '#fff', 
     colorFondoTarjeta: '#ffffff', 
     sombraTarjeta: '0 8px 20px rgba(0,0,0,0.1)',
     transicionSuave: '0.3s ease',
@@ -393,6 +394,7 @@ const ResponderEncuesta: React.FC = () => {
             `}</style>
 
             <div className="form-header">
+             
                 <h1 className="form-title">{encuesta.nombre}</h1>
                 <p className="form-subtitle">Completa las {totalSections} secciones. Tu progreso se guardará al final.</p>
             </div>
