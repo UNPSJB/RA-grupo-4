@@ -105,15 +105,15 @@ const Calendario = () => {
           transform: scale(1.05);
         }
         td.bg-today {
-          background-color: #fff9c4;
+          background-color: #b3d9f2;
           font-weight: bold;
-          border: 2px solid #fbc02d;
+          border: 2px solid #0078D4;
         }
         td.bg-selected {
-          background-color: #FFD700; /* amarillo institucional al seleccionar */
+          background-color: #69a4e0ff; /* amarillo institucional al seleccionar */
           color: #000;
           font-weight: bold;
-          box-shadow: 0 0 10px rgba(255,215,0,0.6);
+          box-shadow: 0 0 10px rgba(37, 82, 231, 0.6);
         }
 
         .selected-date {
