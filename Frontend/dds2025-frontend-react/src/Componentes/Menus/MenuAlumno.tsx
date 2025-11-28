@@ -2,8 +2,6 @@ import React from 'react';
 import { useEffect, useState } from 'react';
 import { Routes, Route, NavLink, useNavigate, useParams, useLocation, Outlet } from 'react-router-dom';
 import { ArrowLeft, FileText, List, BookOpen, Clock, Hand } from 'lucide-react'; 
-
-// Componentes internos de ESTUDIANTE
 import MiniEstadisticasEst from '../Estudiante/MiniEstadisticasEst';
 import SeleccionarEncuestas from '../Estudiante/SeleccionarEncuestas';
 import ResponderEncuesta from '../Estudiante/ResponderEncuesta';
@@ -11,15 +9,8 @@ import SinDatos from '../Otros/SinDatos';
 import HistorialEncuestasRealizadasEstudiante from '../Estudiante/HistorialEncuestasRealizadasEstudiante';
 import MisMaterias from '../Estudiante/MisMaterias';
 import MisRespuestas from '../Estudiante/MisRespuestas'; 
-
-// Importante: CSS aislado
 import './MenuAlumno.css'; 
 
-// ---------------------------------------------------
-// 1. Componentes Auxiliares
-// ---------------------------------------------------
-
-// --- Wrapper para la página de detalles de respuestas ---
 const PaginaMisRespuestas = () => {
     const { materiaId } = useParams();
     const id = materiaId ? parseInt(materiaId) : 0;
@@ -44,12 +35,6 @@ const PaginaMisRespuestas = () => {
         </div>
     );
 };
-
-// ---------------------------------------------------
-// 2. Dashboard Principal (Vista Home del Alumno)
-// ---------------------------------------------------
-
-
 const AlumnoDashboard = ({ estudianteId }) => {
     const navigate = useNavigate();
     
@@ -100,10 +85,9 @@ const AlumnoDashboard = ({ estudianteId }) => {
 
 
     return (
-        // Clase única para aislar estilos del alumno
         <div className="alumno-dashboard-wrapper">
             
-            {/* 1. Cabecera del Alumno: Bienvenida y Estadísticas */}
+            {/* 1. Cabecera del Alumno: Bienvenida y Estadisticas */}
             <div className="alumno-header-grid">
                 <aside className="alumno-welcome-card">
                     <h1 className="alumno-title">
@@ -165,7 +149,7 @@ const AlumnoDashboard = ({ estudianteId }) => {
 
 const AlumnoLayout = () => {
     const location = useLocation(); 
-    // Si estamos en la raíz del alumno, el botón vuelve al Home General, sino al Dashboard de Alumno
+    // Si estamos en la raíz del alumno, el boton vuelve al Home General, sino al Dashboard de Alumno
     const esDashboard = location.pathname === '/home/alumno' || location.pathname === '/home/alumno/';
     const rutaDestino = esDashboard ? '/home' : '/home/alumno';
 
@@ -177,31 +161,24 @@ const AlumnoLayout = () => {
                 </NavLink>
             </div>
             <main className="menu-alumno-content">
-                {/* Aquí se renderizan las sub-rutas */}
+    
                 <Outlet />
             </main>
         </div>
     );
 };
 const MenuAlumno = () => {
-    const estudianteId = 1; // Aquí podrías obtener el ID real desde un Contexto o Prop
+    const estudianteId = 1;
 
     return (
         <Routes>
-            {/* Todas las rutas de alumno viven dentro de AlumnoLayout */}
             <Route path="/" element={<AlumnoLayout />}>
-                
-                {/* Ruta index: El Dashboard */}
                 <Route index element={<AlumnoDashboard estudianteId={estudianteId} />} />
-                
-                {/* Sub-rutas funcionales */}
                 <Route path="seleccionar" element={<SeleccionarEncuestas />} />
                 <Route path="responder-encuesta/:inscripcionId" element={<ResponderEncuesta />} />
                 <Route path="historial-encuestas" element={<HistorialEncuestasRealizadasEstudiante />} />
                 <Route path="respuestas-encuesta/:materiaId" element={<PaginaMisRespuestas />} />
                 <Route path="mis-materias" element={<MisMaterias />} />
-                
-                {/* Rutas de utilidad */}
                 <Route path="sin-datos" element={<SinDatos />} />
             </Route>
         </Routes>

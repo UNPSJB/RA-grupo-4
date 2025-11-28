@@ -1,247 +1,97 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState } from "react";
+import { BookOpen, Send, AlertCircle, ChevronDown } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { Send, ChevronDown, FileText } from 'lucide-react'; 
+import SinDatos from "../Otros/SinDatos";
 
-// --- INTERFACES ---
 interface Periodo {
-    id: number;
     ciclo_lectivo: number;
     cuatrimestre: string;
+    fecha_cierre_informesAC?: string;
 }
+
 interface Materia {
     id_materia: number;
     nombre: string;
-    periodo: Periodo;
+    id_periodo: number;
+    ciclo_lectivo: number;
+    cuatrimestre: string;
     codigoMateria?: string;
     id_docente: number;
+    informeACCompletado?: boolean;
 }
 
-// Interfaz para los informes que ya existen
-interface InformeRealizado {
-    id_informesAC: number;
-    ciclo_lectivo: number | string;
-    cuatrimestre: string;
-    materia: { id_materia: number };
-}
-
-const ITEMS_PER_PAGE = 3; // Constante para definir cuántos items mostrar por vez
-const PRIMARY_ORANGE = "#e76f51"; // Naranja principal
-const DARK_BLUE = "#003366"; // Azul oscuro para texto principal
+const API_BASE = "http://localhost:8000";
+const ID_DOCENTE_ACTUAL = 1;
+const ID_PERIODO_ACTUAL = 2;
 
 const ListadoInformesACDoc: React.FC = () => {
-    const ID_DOCENTE_ACTUAL = 1;
-    const CICLO_LECTIVO_ACTUAL = new Date().getFullYear();
-    const CUATRIMESTRE_ACTUAL = "Segundo";
-    const API_BASE = "http://localhost:8000";
-
-    // Estados
     const [materias, setMaterias] = useState<Materia[]>([]);
-    const [informesHechos, setInformesHechos] = useState<InformeRealizado[]>([]);
-    const [cargando, setCargando] = useState<boolean>(true);
+    const [periodoActual, setPeriodoActual] = useState<Periodo | null>(null);
+    const [cargando, setCargando] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    
-    // Estado para controlar cuántos elementos se muestran
-    const [mostrarCantidad, setMostrarCantidad] = useState<number>(ITEMS_PER_PAGE); 
-    
     const navigate = useNavigate();
 
-    // --- EFECTO DE CARGA DE DATOS ---
+    const ITEMS_PER_PAGE = 3;
+    const [mostrarCantidad, setMostrarCantidad] = useState(ITEMS_PER_PAGE);
+
+    const COLOR_ACCION_PRINCIPAL = "#17a2b8"; 
+    const COLOR_VER_MAS = "#17a2b8"; 
+    const COLOR_TEXTO_PRINCIPAL = "#343a40"; 
+    const COLOR_TEXTO_SECUNDARIO = "#6c757d"; 
+    const COLOR_BORDE_ITEM = "#e9ecef";
+
     useEffect(() => {
         const cargarDatos = async () => {
             try {
                 setCargando(true);
                 setError(null);
 
-                const [resMaterias, resInformes] = await Promise.all([
+                const [resMaterias, resPeriodo] = await Promise.all([
                     fetch(`${API_BASE}/materias/listar`),
-                    fetch(`${API_BASE}/informesAC/filtradoInformesAc?id_docente=${ID_DOCENTE_ACTUAL}`)
+                    fetch(`${API_BASE}/periodos/${ID_PERIODO_ACTUAL}`)
                 ]);
 
-                if (!resMaterias.ok || !resInformes.ok) {
-                    throw new Error("Error al consultar los datos al servidor.");
+                if (!resMaterias.ok || !resPeriodo.ok) {
+                    throw new Error("Error al obtener datos del servidor.");
                 }
 
                 const dataMaterias: Materia[] = await resMaterias.json();
-                const dataInformes: InformeRealizado[] = await resInformes.json();
+                const dataPeriodo: Periodo = await resPeriodo.json();
 
                 setMaterias(dataMaterias);
-                setInformesHechos(dataInformes);
-
+                setPeriodoActual(dataPeriodo);
             } catch (err: any) {
-                setError(err.message || "Error desconocido al cargar listas.");
+                setError(err.message || "Error desconocido al cargar datos.");
             } finally {
                 setCargando(false);
             }
         };
+
         cargarDatos();
-    }, [CICLO_LECTIVO_ACTUAL]);
+    }, []);
 
-    const materiasPendientes = useMemo(() => {
-        return materias.filter(materia => {
-            const correspondeDocente = materia.id_docente === ID_DOCENTE_ACTUAL;
-            const esCicloLectivoActual = Number(materia.periodo.ciclo_lectivo) === CICLO_LECTIVO_ACTUAL
-                                         && materia.periodo.cuatrimestre === CUATRIMESTRE_ACTUAL;
+    const materiasPendientes = materias.filter(
+        (m) =>
+            m.id_docente === ID_DOCENTE_ACTUAL &&
+            m.id_periodo === ID_PERIODO_ACTUAL &&
+            m.informeACCompletado !== true
+    );
 
-            if (!correspondeDocente || !esCicloLectivoActual) return false;
-
-            const yaEstaHecho = informesHechos.some(inf => 
-                inf.materia.id_materia === materia.id_materia &&
-                Number(inf.ciclo_lectivo) === CICLO_LECTIVO_ACTUAL
-            );
-
-            return !yaEstaHecho;
-        });
-    }, [materias, informesHechos, ID_DOCENTE_ACTUAL, CICLO_LECTIVO_ACTUAL, CUATRIMESTRE_ACTUAL]);
-    
     const materiasVisibles = materiasPendientes.slice(0, mostrarCantidad);
-    const tieneMasElementos = materiasPendientes.length > materiasVisibles.length;
 
     const handleVerMas = () => {
-        setMostrarCantidad(prev => prev + ITEMS_PER_PAGE);
+        setMostrarCantidad((prev) => prev + ITEMS_PER_PAGE);
     };
 
-    const handleSeleccionarMateria = (id_materia: number) => {
-        navigate(`/home/generar-informe/${id_materia}`);
+    const handleGenerarInforme = (id: number) => {
+        navigate(`/home/docente/generar-informe/${id}`);
     };
-
-    if (cargando) {
-        return <div className="loading-message-container">Cargando informes...</div>;
-    }
-    
-    if (error) {
-        return <div className="error-message-container">Error: {error}</div>;
-    }
 
     return (
-        <div className="informes-ac-doc-page">
-            <div className="card-container">
-                
-                <h3 className="section-title">
-                    <span className="title-icon">
-                        <FileText size={24} color={PRIMARY_ORANGE} />
-                    </span> 
-                    Informes AC Pendientes ({CUATRIMESTRE_ACTUAL} Cuatrimestre {CICLO_LECTIVO_ACTUAL})
-                </h3>
-                
-                {/* Lista de Items */}
-                <div className="list-container">
-                    {materiasPendientes.length === 0 ? (
-                        <div className="todo-bien-message">
-                            <h4>¡Todo al día!</h4>
-                            <p>No tienes informes pendientes para el ciclo lectivo {CICLO_LECTIVO_ACTUAL}.</p>
-                        </div>
-                    ) : (
-                        <>
-                            <ul className="lista-informes-capsula">
-                                {materiasVisibles.map((materia) => (
-                                    <li 
-                                        key={materia.id_materia} 
-                                        className="tarjeta-informe-capsula"
-                                        onClick={() => handleSeleccionarMateria(materia.id_materia)}
-                                    >
-                                        <div className="informe-info">
-                                            <FileText size={24} className="icono-informe-capsula" />
-                                            <div className="informe-texto">
-                                                <div className="informe-titulo">
-                                                    {materia.nombre}
-                                                </div>
-                                                <div className="informe-subtitulo">
-                                                    Código: {materia.codigoMateria ?? '—'} - Pendiente de generación.
-                                                </div>
-                                            </div>
-                                        </div>
-                                      
-                                        <button 
-                                            className="boton-accion-capsula"
-                                            onClick={(e) => {
-                                                e.stopPropagation(); 
-                                                handleSeleccionarMateria(materia.id_materia);
-                                            }}
-                                        >
-                                            Generar <Send size={16} />
-                                        </button>
-                                    </li>
-                                ))}
-                            </ul>
-                            
-                            {/* Botón "Ver Más" si hay elementos restantes */}
-                            {tieneMasElementos && (
-                                <div className="ver-mas-container">
-                                    <button
-                                        className="boton-ver-mas"
-                                        onClick={handleVerMas}
-                                    >
-                                        Ver Mas 
-                                    </button>
-                                </div>
-                            )}
-                        </>
-                    )}
-                </div>
-            </div>
-            
+        <div className="seccion-box">
             <style>{`
-                .loading-message-container, .error-message-container {
-                    padding: 28px; 
-                    text-align: center; 
-                    font-weight: bold;
-                    color: ${PRIMARY_ORANGE};
-                }
-                .error-message-container {
-                    color: #d32f2f; /* Rojo para error */
-                }
-
-                .informes-ac-doc-page {
-                    padding: 28px;
-                }
-
-                .card-container {
-                    background-color: #ffffff; 
-                    border-radius: 12px;
-                    box-shadow: 0 6px 16px rgba(0,0,0,0.1); 
-                    font-family: '"Segoe UI", "Roboto", sans-serif';
-                    max-width: 1000px; 
-                    margin: 0 auto; 
-                }
-
-                .section-title { 
-                    font-size: 22px; 
-                    font-weight: bold; 
-                    color: ${DARK_BLUE};
-                    display: flex; 
-                    align-items: center; 
-                    gap: 10px; 
-                    padding: 28px 28px 20px 28px; /* Ajuste para separar del listado */
-                    border-bottom: 1px solid #eee;
-                    margin: 0;
-                }
-                
-                .title-icon {
-                    display: flex;
-                    align-items: center;
-                    color: ${PRIMARY_ORANGE};
-                }
-
-                .list-container {
-                    padding: 20px 28px 28px 28px;
-                }
-
-                .todo-bien-message {
-                    padding: 30px; 
-                    text-align: center; 
-                    background-color: #fffaf0; /* Fondo muy claro naranja */
-                    border-radius: 8px; 
-                    border: 1px solid #f9d8b7; /* Borde naranja claro */
-                    color: ${PRIMARY_ORANGE}; 
-                    margin-top: 10px;
-                }
-                .todo-bien-message h4 { margin: 0 0 10px 0; }
-                .todo-bien-message p { margin: 0; }
-
-
-                /* --- Estilos de Cápsula --- */
-
-                .lista-informes-capsula {
+     
+                .pending-list {
                     list-style: none;
                     padding: 0;
                     margin: 0;
@@ -250,69 +100,66 @@ const ListadoInformesACDoc: React.FC = () => {
                     gap: 16px;
                 }
 
-                .tarjeta-informe-capsula {
+                .pending-item {
                     display: flex;
                     justify-content: space-between;
                     align-items: center;
-                    background: #ffffff;
-                    border: 1px solid #f9d8b7; /* Borde naranja claro */
-                    border-left: 5px solid ${PRIMARY_ORANGE}; /* Banda lateral naranja */
+                    background: transparent; /* MODIFICADO: Cambiado a transparente */
+                    border: 1px solid ${COLOR_BORDE_ITEM}; /* MODIFICADO: Cambiado a un borde de color para definir mejor el ítem */
                     border-radius: 12px;
                     padding: 16px 20px;
-                    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-                    transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
-                    cursor: pointer;
+                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); 
+                    transition: transform 0.2s ease, box-shadow 0.2s ease;
                 }
 
-                .tarjeta-informe-capsula:hover {
+                .pending-item:hover {
                     transform: translateY(-2px);
-                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-                    background-color: #fffbf5; /* Color sutil en hover */
+                    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
                 }
 
-                .informe-info {
+                .pending-info {
                     display: flex;
                     align-items: center;
-                    gap: 15px;
+                    gap: 12px;
                     flex-grow: 1;
                     overflow: hidden;
                 }
 
-                .icono-informe-capsula {
-                    color: ${PRIMARY_ORANGE}; 
+                .pending-icon {
+                    color: ${COLOR_ACCION_PRINCIPAL}; 
                     flex-shrink: 0;
                 }
 
-                .informe-texto {
-                    min-width: 0; 
+                .pending-text {
+                    overflow: hidden;
+                    white-space: nowrap;
+                    flex-grow: 1;
                 }
 
-                .informe-titulo {
+                .pending-text h4 {
                     font-weight: 700;
-                    color: ${DARK_BLUE}; 
+                    color: ${COLOR_TEXTO_PRINCIPAL};
                     font-size: 1.05rem;
-                    white-space: nowrap;
+                    margin: 0;
                     overflow: hidden;
                     text-overflow: ellipsis;
                 }
-                
-                .informe-subtitulo {
-                    color: #555;
+
+                .pending-text p {
+                    color: ${COLOR_TEXTO_SECUNDARIO};
                     font-size: 0.9rem;
-                    margin-top: 4px;
-                    white-space: nowrap;
+                    margin: 0;
                     overflow: hidden;
                     text-overflow: ellipsis;
                 }
-                
-                /* Estilo del botón "Generar" */
-                .boton-accion-capsula {
+
+                .btn-action {
                     display: inline-flex;
                     align-items: center;
                     gap: 8px;
-                    background-color: ${PRIMARY_ORANGE}; 
-                    color: white; 
-                    padding: 10px 18px;
+                    background-color: ${COLOR_ACCION_PRINCIPAL}; 
+                    color: white;
+                    padding: 10px 16px;
                     border-radius: 8px;
                     font-weight: 600;
                     text-decoration: none;
@@ -320,69 +167,94 @@ const ListadoInformesACDoc: React.FC = () => {
                     cursor: pointer;
                     transition: background-color 0.2s ease, transform 0.1s ease;
                     flex-shrink: 0;
-                    margin-left: 20px;
                 }
 
-                .boton-accion-capsula:hover {
-                    background-color: #f48c6b; 
+                .btn-action:hover {
+                    background-color: #17a2b8;
                     transform: translateY(-1px);
                     color: white; 
                 }
-                
-                /* Estilos del botón "Ver Más" */
-                .ver-mas-container {
-                    text-align: center;
-                    margin-top: 25px;
-                }
-                
-                .boton-ver-mas {
-                    background: none;
-                    color: ${PRIMARY_ORANGE}; 
-                    border: 1px solid ${PRIMARY_ORANGE};
-                    padding: 8px 15px;
-                    border-radius: 6px;
-                    font-weight: 600;
-                    cursor: pointer;
-                    transition: background-color 0.2s ease, color 0.2s ease;
-                    display: inline-flex;
-                    align-items: center;
-                    gap: 5px;
-                }
-                
-                .boton-ver-mas:hover {
-                    background-color: #fff0d9; 
+
+                .btn-ver-mas {
+                    background-color: ${COLOR_VER_MAS} !important;
                 }
 
-                /* Media Queries para adaptabilidad */
+                .btn-ver-mas:hover {
+                    background-color: #138496 !important; 
+                }
+
+                .empty-list-message {
+                    padding: 20px;
+                    text-align: center;
+                    color: ${COLOR_TEXTO_SECUNDARIO};
+                    background: #ffff;
+                    border-radius: 8px;
+                }
+                
                 @media (max-width: 768px) {
-                    .tarjeta-informe-capsula {
+                    .pending-item {
                         flex-direction: column;
                         align-items: flex-start;
                         gap: 12px;
-                        border-left: none; 
-                        border: 1px solid ${PRIMARY_ORANGE};
-                    }
-                    
-                    .informe-info {
-                        width: 100%;
-                        gap: 10px;
-                        align-items: flex-start;
                     }
 
-                    .boton-accion-capsula {
+                    .pending-info {
+                        align-items: flex-start;
+                        gap: 8px;
                         width: 100%;
-                        justify-content: center;
-                        margin-left: 0;
-                    }
-                    .section-title {
-                        font-size: 20px;
-                        padding: 20px 20px 15px 20px;
-                    }
-                    .list-container {
-                        padding: 15px 20px 20px 20px;
                     }
                 }
             `}</style>
+            
+            <h2 className="seccion-title">
+                <AlertCircle size={24} />
+                Informes Pendientes ({periodoActual?.cuatrimestre} {periodoActual?.ciclo_lectivo})
+            </h2>
+
+            <div className="pending-list">
+                {cargando && <div className="empty-list-message">Cargando pendientes...</div>}
+                {error && <div className="empty-list-message" style={{ color: COLOR_ACCION_PRINCIPAL }}>Error: {error}</div>}
+
+                {!cargando && !error && materiasPendientes.length === 0 && (
+                    <div className="empty-list-message">
+                        <SinDatos/>
+                    </div>
+                )}
+
+                {!cargando && !error && materiasPendientes.length > 0 && (
+                    <>
+                        {materiasVisibles.map((materia) => (
+                            <div className="pending-item" key={materia.id_materia}>
+                                <div className="pending-info">
+                                    <BookOpen size={24} className="pending-icon" />
+                                    <div className="pending-text">
+                                        <h4>{materia.nombre}</h4>
+                                        <p>Codigo: {materia.codigoMateria ?? "N/A"} - Pendiente de generación.</p>
+                                    </div>
+                                </div>
+                                <button
+                                    onClick={() => handleGenerarInforme(materia.id_materia)}
+                                    className="btn-action"
+                                >
+                                    Generar Informe <Send size={16} />
+                                </button>
+                            </div>
+                        ))}
+
+                        {materiasVisibles.length < materiasPendientes.length && (
+                            <div style={{ padding: "20px 15px 0", textAlign: "center" }}>
+                                <button
+                                    className="btn-action btn-ver-mas"
+                                    onClick={handleVerMas}
+                                >
+                                    Ver {materiasPendientes.length - materiasVisibles.length} restantes
+                                    <ChevronDown size={18} />
+                                </button>
+                            </div>
+                        )}
+                    </>
+                )}
+            </div>
         </div>
     );
 };
