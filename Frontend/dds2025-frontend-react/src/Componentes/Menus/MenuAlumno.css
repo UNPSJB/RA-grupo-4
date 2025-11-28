@@ -1,9 +1,3 @@
-/* =========================================
-   MENU ALUMNO - HOJA DE ESTILOS AISLADA
-   ========================================= */
-
-/* --- Variables Locales (Scope) --- */
-/* Definimos las variables solo dentro del layout del alumno para evitar conflictos */
 .menu-alumno-layout-full {
     --alumno-color-principal: #003366;      /* Azul Oscuro Institucional */
     --alumno-color-secundario: #0078D4;     /* Celeste Brillante */
@@ -24,13 +18,10 @@
     --stat-text-pending: #e76f51;
 }
 
-/* -------------------------------------------
-   1. Estructura General (Layout)
-   ------------------------------------------- */
 
 .menu-alumno-layout-full {
     background-color: var(--alumno-bg-base);
-    min-height: 100vh; /* Ocupa al menos toda la pantalla */
+    min-height: 100vh;
     font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
     color: var(--alumno-text-dark);
     display: flex;
@@ -46,7 +37,6 @@
     flex: 1;
 }
 
-/* Barra de botón volver */
 .back-button-bar {
     padding: 20px 30px 0 30px;
     max-width: 1400px;
@@ -76,9 +66,6 @@
     box-shadow: 0 4px 10px rgba(0, 51, 102, 0.3);
 }
 
-/* -------------------------------------------
-   2. Dashboard Layout (Grid Principal)
-   ------------------------------------------- */
 
 .alumno-dashboard-wrapper {
     display: flex;
@@ -86,15 +73,13 @@
     gap: 35px;
 }
 
-/* Header Grid: Bienvenida (izq) + Stats (der) */
 .alumno-header-grid {
     display: grid;
-    grid-template-columns: 2fr 1fr; /* 2 partes bienvenida, 1 parte stats */
+    grid-template-columns: 2fr 1fr; 
     gap: 30px;
     align-items: stretch;
 }
 
-/* --- Tarjeta de Bienvenida --- */
 .alumno-welcome-card {
     background-color: var(--alumno-bg-card);
     background-image: linear-gradient(to right, #ffffff 90%, var(--alumno-color-terciario) 100%);
@@ -133,7 +118,6 @@
     margin: 0;
 }
 
-/* --- Contenedor Wrapper de Stats --- */
 .alumno-stats-card {
     background-color: var(--alumno-bg-card);
     padding: 25px; 
@@ -144,10 +128,6 @@
     justify-content: center;
 }
 
-/* -------------------------------------------
-   3. Secciones de Contenido (Encuestas, Navegación)
-   ------------------------------------------- */
-
 .alumno-section-container {
     background-color: var(--alumno-bg-card);
     padding: 25px;
@@ -155,7 +135,6 @@
     box-shadow: var(--alumno-shadow);
 }
 
-/* Contenedor interno para darle espacio al componente importado */
 .alumno-content-box {
     margin-top: 15px;
 }
@@ -174,11 +153,6 @@
 .alumno-section-title svg {
     color: var(--alumno-color-secundario);
 }
-
-/* -------------------------------------------
-   4. Tarjetas de Navegación (Mis Materias, Historial)
-   ------------------------------------------- */
-
 .alumno-cards-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -197,16 +171,16 @@
     border-top: 5px solid transparent; 
 }
 
-/* Variantes de color para las tarjetas */
+/* Color tarjetas*/
 .card-variant-blue { 
-    border-top-color: #3d5a80; 
+    border-top-color: #0078D4; 
 }
 .card-variant-blue svg { color: #3d5a80; }
 
 .card-variant-yellow { 
-    border-top-color: #e09f3e; 
+    border-top-color: #9c1f1f; 
 }
-.card-variant-yellow svg { color: #e09f3e; }
+.card-variant-yellow svg { color: #9c1f1f; }
 
 .alumno-nav-card:hover {
     transform: translateY(-5px);

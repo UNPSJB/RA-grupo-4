@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import './MenuDocente.css';
 import { FileText, BarChart2, History, CheckSquare, List, Send, BookOpen, AlertCircle, GraduationCap, ChevronRight, ChevronDown } from 'lucide-react';
+import ListadoInformesACDoc from '../Docente/ListadoInformesACDoc';
 
 interface Periodo{
     ciclo_lectivo: number;
@@ -157,10 +158,12 @@ const MenuDocenteIndex: React.FC = () => {
                 <h2 className="seccion-title">
                     <AlertCircle size={24} />
                     Informes Pendientes ({periodoActual?.cuatrimestre} {periodoActual?.ciclo_lectivo})
+                
                 </h2>
                 <div className="pending-list">
                     {cargando && <div className="empty-list-message">Cargando pendientes...</div>}
                     {error && <div className="empty-list-message" style={{color: 'var(--color-alerta)'}}>Error: {error}</div>}
+
                     {!cargando && !error && materiasPendientes.length === 0 && (
                         <div className="empty-list-message">
                             ¡Felicitaciones! No tienes más informes pendientes de generar.
@@ -190,7 +193,7 @@ const MenuDocenteIndex: React.FC = () => {
                                 <div style={{padding: '20px 15px 0', textAlign: 'center'}}>
                                     <button 
                                         className="btn-action"
-                                        style={{backgroundColor: '#4caf50', display: 'inline-flex', alignItems: 'center', gap: '6px'}}
+                                        style={{backgroundColor: '#17a2b8', display: 'inline-flex', alignItems: 'center', gap: '6px'}}
                                         onClick={handleVerMas}
                                     >
                                         Ver Más ({materiasPendientes.length - materiasPendientesVisibles.length} restantes)
@@ -210,12 +213,12 @@ const MenuDocenteIndex: React.FC = () => {
                     Navegación y Acceso Rápido
                 </h2>
                 <div className="card-grid">
-                    <Link to="historial-informes" className="nav-card card-blue">
+                    <Link to="historial-informes" className="nav-card card-celeste">
                         <History size={32} />
                         <h3>Historial de Informes</h3>
                         <p>Consulta todos los informes de actividad curricular que has generado previamente.</p>
                     </Link>
-                    <Link to="estadisticas" className="nav-card card-yellow">
+                    <Link to="estadisticas" className="nav-card card-colorcito">
                         <BarChart2 size={32} />
                         <h3>Estadísticas de Catedra</h3>
                         <p>Analiza la valoración de las respuestas de los alumnos en las encuestas.</p>

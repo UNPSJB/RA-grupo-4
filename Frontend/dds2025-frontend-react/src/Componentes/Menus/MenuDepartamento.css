@@ -19,9 +19,9 @@
     --color-stat-text-done: #38a3a5; 
     --color-stat-text-pending: #e76f51; 
 }
-.card-blue { --card-color: #3d5a80; } 
-.card-yellow { --card-color: #e09f3e; } 
-.card-purple { --card-color: #70587c; } 
+.card-blue { --card-color: #e76f51; } 
+.card-yellow { --card-color: #e76f51; } 
+.card-purple { --card-color: #e76f51; } 
 
 /* --- 2. Estructura General y Botón Regresar --- */
 .dashboard-layout-full {
@@ -345,14 +345,10 @@
     background-color: none !important;
 }
 
-/* --- CORRECCIÓN FINAL PARA .btn-action-table: Mantiene OVALADO, Arregla Contraste HOVER --- */
 .btn-action-table {
-    /* Usamos el color de alerta para el fondo, ya que el botón es naranja/rojo en la UI */
-    background-color: var(--color-alerta); /* Color base naranja/rojo: #e76f51 */
-    color: white; /* Aseguramos que el texto base sea blanco */
-    border-radius: 18px; /* ¡Mantenemos la forma ovalada original! */
-    
-    /* Propiedades de diseño existentes */
+    background-color: var(--color-alerta);
+    color: white; 
+    border-radius: 18px; 
     border: none;
     padding: 6px 14px;
     font-size: 0.85rem;
@@ -362,17 +358,12 @@
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    transition: transform 0.2s, box-shadow 0.2s, background-color 0.2s; /* Añadida transición para background */
+    transition: transform 0.2s, box-shadow 0.2s, background-color 0.2s; 
 }
 
 .btn-action-table:hover {
-    /* Forzamos un color de fondo más oscuro (para el efecto visual) */
     background-color: #d1563e !important; 
-    
-    /* SOLUCIÓN CLAVE: ¡Garantiza el contraste forzando el texto a blanco! */
     color: white !important; 
-    
-    /* Animación */
     transform: translateY(-2px);
     box-shadow: 0 4px 10px rgba(0,0,0,0.15);
 }

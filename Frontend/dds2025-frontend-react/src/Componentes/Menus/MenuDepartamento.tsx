@@ -4,15 +4,13 @@ import './MenuDepartamento.css';
 import { ArrowLeft } from 'lucide-react';
 import MenuDepartamentoIndex from './MenuDepartamentoIndex';
 import GenerarInformeSinteticoDep from '../Departamento/GenerarInformeSinteticoDep';
-import ListadoInformesACDepREAL from '../Departamento/ListadoInformesACDepREAL';
+import ListadoInformesACDep from '../Departamento/ListadoInformesACDep';
 import SinDatos from '../Otros/SinDatos'; 
 import SeleccionarMateriaEstadisticasDep from '../Departamento/SeleccionarMateriaEstadisticasDep';
 import EstadisticasPorPreguntaDep from '../Departamento/EstadisticasPorPreguntaDep';
-import HistorialInformesSinteticos from '../Departamento/HistorialInformesSinteticos'; // <--- IMPORTADO
+import HistorialInformesSinteticos from '../Departamento/HistorialInformesSinteticos';
 
-/* * Layout del Departamento: 
- * Muestra el fondo de la página y el botón de regresar con lógica dinámica.
- */
+
 const DepartamentoLayout = () => {
     const location = useLocation(); 
 
@@ -37,9 +35,6 @@ const DepartamentoLayout = () => {
     );
 };
 
-/* * Router del Departamento: 
- * Define qué página se muestra dentro del Layout.
- */
 const MenuDepartamento = () => {
     return (
         <Routes>
@@ -48,11 +43,11 @@ const MenuDepartamento = () => {
                 {/* Dashboard Principal */}
                 <Route index element={<MenuDepartamentoIndex />} /> 
                 
-                {/* Gestión de Informes */}
+                {/* Gestion de Informes */}
                 <Route path="generar-informe-sintetico" element={<GenerarInformeSinteticoDep />} />
-                <Route path="historial-informes" element={<ListadoInformesACDepREAL />} />
+                <Route path="historial-informes" element={<ListadoInformesACDep />} />
                 
-                {/* --- NUEVA RUTA PARA HISTORIAL SINTÉTICO --- */}
+                {/*Historial */}
                 <Route path="historial-sinteticos" element={<HistorialInformesSinteticos />} />
 
                 {/* Estadisticas */}

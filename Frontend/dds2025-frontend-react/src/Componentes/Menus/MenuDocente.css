@@ -1,4 +1,4 @@
-/* --- 1. Variables CSS  --- */
+
 :root {
     --color-principal: #003366; 
     --color-secundario: #0078D4; 
@@ -17,11 +17,10 @@
     --color-stat-text-done: #38a3a5; 
     --color-stat-text-pending: #e76f51; 
 }
-.card-blue { --card-color: #3d5a80; } 
-.card-yellow { --card-color: #e09f3e; } 
-.card-purple { --card-color: #70587c; } 
+.card-celeste { --card-color: #17a2b8; } 
+.card-colorcito { --card-color: #17a2b8; } 
 
-/* --- 2. Estructura General y Botón Regresar --- */
+
 .dashboard-layout-full {
     background-color: var(--color-fondo-base);
     min-height: 100vh;
@@ -187,64 +186,6 @@
     color: var(--color-secundario);
 }
 
-/* --- 6. Lista de Tareas Pendientes --- */
-.pending-list {
-    display: flex;
-    flex-direction: column;
-}
-.pending-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 20px 15px;
-    border-bottom: 1px solid #eee;
-    transition: background-color 0.2s;
-}
-.pending-item:last-child { border-bottom: none; }
-.pending-item:hover { background-color: #f9fbfd; }
-.pending-info {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}
-.pending-icon { color: var(--color-secundario); }
-.pending-text h4 {
-    margin: 0 0 5px 0;
-    font-size: 16px;
-    color: #333;
-}
-.pending-text p {
-    margin: 0;
-    font-size: 13px;
-    color: #888;
-}
-.btn-action {
-    background-color: var(--color-secundario);
-    color: white;
-    border: none;
-    padding: 8px 20px;
-    border-radius: 20px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    text-decoration: none;
-    transition: transform 0.2s, box-shadow 0.2s;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-}
-.btn-action:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-}
-.empty-list-message {
-    padding: 30px;
-    text-align: center;
-    color: var(--color-texto-secundario);
-    font-size: 15px;
-    font-style: italic;
-}
-
 /* --- 7. Tarjetas de Navegación (Acceso Rápido) --- */
 .card-grid {
     display: grid;
@@ -278,7 +219,7 @@
 }
 .nav-card p {
     font-size: 0.95rem;
-    color: #666;
+    color: #17a2b8;
 }
 
 /* --- 8. Media Queries --- */

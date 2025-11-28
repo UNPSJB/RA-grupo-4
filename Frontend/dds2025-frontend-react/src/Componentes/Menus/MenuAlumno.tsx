@@ -163,10 +163,6 @@ const AlumnoDashboard = ({ estudianteId }) => {
     );
 };
 
-// ---------------------------------------------------
-// 3. Layout del Alumno (Estructura Base)
-// ---------------------------------------------------
-
 const AlumnoLayout = () => {
     const location = useLocation(); 
     // Si estamos en la raíz del alumno, el botón vuelve al Home General, sino al Dashboard de Alumno
@@ -187,11 +183,6 @@ const AlumnoLayout = () => {
         </div>
     );
 };
-
-// ---------------------------------------------------
-// 4. Router Principal del Módulo Alumno
-// ---------------------------------------------------
-
 const MenuAlumno = () => {
     const estudianteId = 1; // Aquí podrías obtener el ID real desde un Contexto o Prop
 

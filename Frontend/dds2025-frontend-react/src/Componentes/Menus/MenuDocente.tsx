@@ -1,8 +1,6 @@
 import React from 'react';
 import { Routes, Route, useLocation, Outlet, Link } from 'react-router-dom';
-import './MenuDocente.css';
 import { ArrowLeft } from 'lucide-react';
-
 import MenuDocenteIndex from './MenuDocenteIndex';
 import GenerarInformeAC from '../Docente/GenerarInformeAC';
 import ListadoInformesACDoc from '../Docente/ListadoInformesACDoc';

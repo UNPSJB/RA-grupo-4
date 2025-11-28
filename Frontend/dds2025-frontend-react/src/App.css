@@ -15,7 +15,7 @@
     --color-alumno: #28a745;
     --color-docente: #17a2b8;
     --color-departamento: #ffc107;
-    --color-secretaria: #dc3545;
+    --color-secretaria: #8e44ad;
 }
 
 body {
@@ -195,7 +195,7 @@ body {
 /* Secretaria (Rojo) */
 .carousel-card.type-secretaria .card-header {
     background: var(--color-secretaria);
-    background: linear-gradient(135deg, var(--color-secretaria) 0%, #bd2130 100%);
+    background: linear-gradient(135deg, var(--color-secretaria) 0%, #8e44ad 100%);
 }
 
 /* Interacción de Enlaces */
@@ -233,7 +233,7 @@ body {
 .slick-prev:before, .slick-next:before { color: var(--primary-color) !important; }
 
 /* --- ========================================= --- */
-/* --- 4. MENÚS SIMPLES (DOCENTE, DEPTO)         --- */
+/* --- 4. MENUS (DOCENTE, DEPTO)         --- */
 /* --- ========================================= --- */
 .menu-page-container {
     max-width: 900px;
