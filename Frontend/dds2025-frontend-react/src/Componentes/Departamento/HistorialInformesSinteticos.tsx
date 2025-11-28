@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { History, Calendar, AlertCircle } from 'lucide-react'; 
+import SinDatos from "../Otros/SinDatos";
 
 const API_BASE = "http://localhost:8000";
 
@@ -156,11 +157,7 @@ const HistorialInformesSinteticos: React.FC = () => {
               {/* ESTADO VACÍO */}
               {!loading && lista.length === 0 && (
                   <div className="empty-state">
-                      <History size={48} style={{ margin: "0 auto 15px", opacity: 0.3 }} />
-                      <p style={{ fontSize: '1.1rem', fontWeight: 500 }}>No se encontraron informes históricos generados.</p>
-                      <p style={{ fontSize: '0.9rem', marginTop: '5px' }}>
-                          Los informes se guardan automáticamente al finalizar su creación.
-                      </p>
+                        <SinDatos mensaje="No registras informes sinteticos hechos" />  
                   </div>
               )}
 
