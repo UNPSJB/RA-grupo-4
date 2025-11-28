@@ -242,4 +242,3 @@ const MenuDocenteIndex: React.FC = () => {
 };
 
 export default MenuDocenteIndex;
-

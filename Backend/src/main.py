@@ -3,11 +3,8 @@ from contextlib import asynccontextmanager
 from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-
 from src.database import engine
 from src.models import ModeloBase
-
-# Importación de todos tus routers
 from src.informesAC.router import router as informesAC_router
 from src.estudiantes.router import router as estudiantes_router
 from src.encuesta.router import router as encuesta_router
@@ -23,6 +20,8 @@ from src.departamentos.router import router as departamentos_router
 from src.secciones.router import router as secciones_router
 from src.actividades.router import router as actividades_router
 from src.periodos.router import router as periodos_router
+from src.auth import router as auth_router
+from src.users import router as users_router
 
 load_dotenv()
 
@@ -40,7 +39,7 @@ origins = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
     "http://localhost:8000",
-    "*" 
+    "http://127.0.0.1:8000",
 ]
 
 app.add_middleware(
@@ -51,7 +50,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Inclusión de rutas
 app.include_router(preguntas_router)
 app.include_router(opcion_respuestas_router)
 app.include_router(router_respuestas)
@@ -67,3 +65,6 @@ app.include_router(departamentos_router)
 app.include_router(secciones_router)
 app.include_router(actividades_router)
 app.include_router(periodos_router)
+
+app.include_router(auth_router.router)
+app.include_router(users_router.router)

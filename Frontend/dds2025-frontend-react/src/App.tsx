@@ -1,7 +1,12 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Routes, Route, Link, Outlet, Navigate } from "react-router-dom";
+import { Routes, Route, Link, Outlet, useNavigate, Navigate } from "react-router-dom";
 import { User, LogOut, Calendar, ChevronDown, Menu } from "lucide-react";
 import "./App.css";
+
+// --- IMPORTS DEL SISTEMA DE AUTENTICACIÓN ---
+import { useAuth } from "./hooks/useAuth";
+import { AuthLayout } from "./layouts/AuthLayout";
+import Login from "./features/auth/Login";
 
 // Assets
 import fotoPerfil from './assets/avatarOA.png'; 
@@ -18,17 +23,26 @@ import MostrarMiPerfil from "./Componentes/Otros/MostrarMiPerfil";
 // Menús
 import MenuAlumno from "./Componentes/Menus/MenuAlumno";
 import MenuDocente from "./Componentes/Menus/MenuDocente";
-import MenuDepartamento from "./Componentes/Menus/MenuDepartamento"; 
+import MenuDepartamento from "./Componentes/Menus/MenuDepartamento";
 import MenuSecretaria from "./Componentes/Menus/MenuSecretaria";
 
 // Menu institucional
 import MenuInstitucional from "./Componentes/Menus/Menuinstitucional";
 import Nosotros from "./Componentes/Otros/Nosotros";
 
+
+// =========================================================================
+// 1. LAYOUT PRINCIPAL (NAVBAR DINÁMICO)
+// =========================================================================
 const MainLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [mostrarMenuPerfil, setMostrarMenuPerfil] = useState(false);
   const menuPerfilRef = useRef(null);
+
+  const [mostrarMenu, setMostrarMenu] = useState(false);
+  const { currentUser, isAuthenticated, logout } = useAuth();
+  const navigate = useNavigate();
+
 
   const datosUsuario = {
     nombre: "Admin",
@@ -49,6 +63,23 @@ const MainLayout = () => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  
+  const toggleMenu = () => {
+    setMostrarMenu(!mostrarMenu);
+  };
+
+  const handleLogout = async () => {
+    await logout();
+    setMostrarMenu(false);
+    navigate("/"); // Redirige a la raíz (que ahora es el Login)
+  }
+
+  // Si no está autenticado, no debería renderizar nada (será atrapado por AuthLayout)
+  if (!isAuthenticated || !currentUser) return null; 
+  
+  // Lógica del rol (se usa en el menú o en los botones)
+  const roleName = currentUser.role_name || "Usuario";
 
   return (
     <div className="app-container">
@@ -116,9 +147,13 @@ const MainLayout = () => {
                 <Link to="/home/calendario" className="action-btn" onClick={() => setMostrarMenuPerfil(false)}>
                   <Calendar size={18} /> Mi Calendario
                 </Link>
-                <Link to="/" className="action-btn logout" onClick={() => setMostrarMenuPerfil(false)}>
-                  <LogOut size={18} /> Cerrar Sesion
-                </Link>
+
+                <div className="dropdown-divider"></div>
+                
+                {/* BOTÓN DE CERRAR SESIÓN QUE EJECUTA EL LOGOUT REAL */}
+                <div className="dropdown-item logout" onClick={handleLogout}> 
+                  Cerrar Sesión
+                </div>
               </div>
             </div>
           )}
@@ -136,31 +171,49 @@ const MainLayout = () => {
   );
 };
 
+// =========================================================================
+// 2. FUNCIÓN PRINCIPAL DE LA APLICACIÓN (RUTAS)
+// =========================================================================
 function App() {
+
+  // Usuario Mock ELIMINADO. Los datos vienen de useAuth.
+
   return (
     <Routes>
-      <Route path="/" element={<LoginPage />} />
+      {/* RUTA PÚBLICA: / (Raíz) ahora apunta al Login */}
+      <Route path="/" element={<Login />} />
+      <Route path="/login" element={<Login />} /> {/* Ruta alternativa por si acaso */}
 
-      <Route path="/home" element={<MainLayout />}>
-        <Route index element={<HomePage />} />
 
-        <Route path="alumno/*" element={<MenuAlumno />} />
-        <Route path="docente/*" element={<MenuDocente />} />
-        <Route path="departamento/*" element={<MenuDepartamento />} />
-        <Route path="secretaria/*" element={<MenuSecretaria />} />
+      {/* ---------------------------------------------------- */}
+      {/* RUTAS PROTEGIDAS: Todo lo que requiere LOGIN va aquí */}
+      {/* ---------------------------------------------------- */}
+      
+      {/* AuthLayout verifica la sesión, si falla, redirige a /login */}
+      <Route path="/home" element={<AuthLayout />}>
+        
+        {/* Usamos el MainLayout (Nav y Footer) para las sub-rutas protegidas */}
+        <Route element={<MainLayout />}> 
+            <Route index element={<HomePage />} />
 
-        {/* ✔ RUTA QUE FALTABA */}
-        <Route path="nosotros" element={<Nosotros />} />
+            {/* Rutas de Usuario (Necesitan ser dinámicas: Docente/Alumno) */}
+            <Route path="alumno/*" element={<MenuAlumno />} />
+            <Route path="docente/*" element={<MenuDocente />} />
+            <Route path="departamento/*" element={<MenuDepartamento />} />
+            <Route path="secretaria/*" element={<MenuSecretaria />} />
 
-        <Route path="error" element={<ErrorCargaDatos />} />
-        <Route path="sin-datos" element={<SinDatos />} />
-        <Route path="calendario" element={<Calendario />} />
-        <Route path="perfil" element={<MostrarMiPerfil/>} />
+        
+            <Route path="nosotros" element={<Nosotros />} />
 
-        <Route path="*" element={<Navigate to="/home" replace />} />
+            <Route path="error" element={<ErrorCargaDatos />} />
+            <Route path="sin-datos" element={<SinDatos />} />
+            <Route path="calendario" element={<Calendario />} />
+            <Route path="perfil" element={<MostrarMiPerfil/>} />
+        </Route>
       </Route>
 
-      <Route path="*" element={<Navigate to="/" replace />} />
+      {/* RUTA COMODÍN (Catch-all) */}
+      <Route path="*" element={<Login />} />
     </Routes>
   );
 }
