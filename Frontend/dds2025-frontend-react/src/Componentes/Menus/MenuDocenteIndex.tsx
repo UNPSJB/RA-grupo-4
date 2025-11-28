@@ -124,6 +124,17 @@ const MenuDocenteIndex: React.FC = () => {
     const handleGenerarInforme = (id_materia: number) => {
         navigate(`/home/docente/generar-informe/${id_materia}`);
     };
+    
+    const hoy = new Date();
+
+    const fechaCierre = periodoActual?.fecha_cierre_informesAC
+        ? new Date(periodoActual.fecha_cierre_informesAC)
+        : null;
+
+    const diasRestantes = fechaCierre
+        ? Math.ceil((fechaCierre.getTime() - hoy.getTime()) / (1000 * 60 * 60 * 24))
+        : null;
+
 
     const roleStyle = { '--color-secundario': '#17a2b8' } as React.CSSProperties;
 
@@ -136,8 +147,9 @@ const MenuDocenteIndex: React.FC = () => {
                         ¡Bienvenido, {docenteInfo?.nombre}!
                     </h1>
                     <p className="panel-subtitle">
+                        Gestión de Informes de Actividad Curricular y Estadísticas de Cátedra. <br />
                         Periodo actual: {periodoActual?.ciclo_lectivo} {" "} {periodoActual?.cuatrimestre} <br/>
-                        Gestión de Informes de Actividad Curricular y Estadísticas de Cátedra.
+                        Quedan <strong>{diasRestantes}</strong> días para el cierre de los informes de Actividad Curricular.
                     </p>
                 </div>
                 <div className="estadisticas-box">
@@ -230,3 +242,4 @@ const MenuDocenteIndex: React.FC = () => {
 };
 
 export default MenuDocenteIndex;
+
