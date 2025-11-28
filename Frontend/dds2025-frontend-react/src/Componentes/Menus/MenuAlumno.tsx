@@ -107,7 +107,7 @@ const AlumnoDashboard = ({ estudianteId }) => {
             <div className="alumno-header-grid">
                 <aside className="alumno-welcome-card">
                     <h1 className="alumno-title">
-                        <Hand size={30} className="alumno-icon-hand" /> Hola, {estudianteInfo?.nombre}
+                        <Hand size={30} className="alumno-icon-hand" />  ¡Bienvenido, {estudianteInfo?.nombre}!
                         <br />
                         
                     </h1>
