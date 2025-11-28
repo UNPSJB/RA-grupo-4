@@ -5,7 +5,7 @@ import { useAuth } from '../../hooks/useAuth';
 const Login: React.FC = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    const { isAuthenticated, isLoading, login, error } = useAuth(); 
+    const { currentUser, isAuthenticated, isLoading, login, error } = useAuth(); 
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -15,8 +15,23 @@ const Login: React.FC = () => {
     if (isLoading)
         return <div style={{ textAlign: 'center', marginTop: '50px' }}>Cargando datos del usuario...</div>
 
-    if (isAuthenticated)
+    // Redirecciones al home del rol correspondiente
+    if (isAuthenticated){
+        if (currentUser?.role_name == "alumno"){
+            return (<Navigate to="/home/alumno/" replace />)
+        }
+        if (currentUser?.role_name == "docente"){
+            return (<Navigate to="/home/docente" replace />)
+        }
+        if (currentUser?.role_name == "departamento"){
+            return (<Navigate to="/home/departamento" replace />)
+        }
+        if (currentUser?.role_name == "secretaria_academica"){
+            return (<Navigate to="/home/secretaria_academica" replace />)
+        }
+
         return (<Navigate to="/home" replace />) 
+    }
 
     return (
         <section style={{ 

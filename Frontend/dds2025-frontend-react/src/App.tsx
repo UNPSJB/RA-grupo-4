@@ -13,7 +13,6 @@ import fotoPerfil from './assets/avatarOA.png';
 import logoUnpsjb from './assets/logo_unpsjb.png';
 
 // Componentes Generales
-import LoginPage from "./Componentes/Otros/LoginPage";
 import HomePage from "./Componentes/Otros/HomePage";
 import ErrorCargaDatos from "./Componentes/Otros/ErrorCargaDatos";
 import SinDatos from "./Componentes/Otros/SinDatos";
