@@ -1,8 +1,8 @@
+from __future__ import annotations
 from sqlalchemy import ForeignKey, String
 from sqlalchemy.orm import relationship, mapped_column, Mapped
 from typing import Optional
 from src.models import ModeloBase as Base 
-
 class Role(Base):
     __tablename__ = "role"
 
@@ -20,6 +20,17 @@ class User(Base):
     role_id: Mapped[Optional[int]] = mapped_column(ForeignKey("role.id"))
     
     role: Mapped[Optional["Role"]] = relationship("Role")
+
+
+    alumno_id: Mapped[Optional[int]] = mapped_column(ForeignKey("estudiantes.id"))
+    alumno: Mapped[Optional["Estudiante"]] = relationship("Estudiante", back_populates="user")
+
+    docente_id: Mapped[Optional[int]] = mapped_column(ForeignKey("docentes.id_docente"))
+    docente: Mapped[Optional["Docentes"]] = relationship("Docentes", back_populates="user")
+
+    departamento_id: Mapped[Optional[int]] = mapped_column(ForeignKey("departamentos.id"))
+    departamento: Mapped[Optional["Departamento"]] = relationship("Departamento", back_populates="user")
+
 
     @property
     def is_admin(self):

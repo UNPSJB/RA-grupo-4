@@ -543,4 +543,4 @@ INSERT INTO materias (id_materia, nombre, id_periodo, codigoMateria, id_carrera,
 (26, 'Administracion de proyectos', 2, 'IF049', 2, 1, 2, 0, 1),
 (27, 'Sistemas Distribuidos', 2, 'IF022', 3, 9, 3, 0, 1),
 (28, 'Aspectos Legales y Profesionales', 2, 'IF016', 3, 1, 3, 0, 1),
-(29, 'Administracion de Redes y Seguridad', 2, 'IF046', 3, 4, 1, 0, 1),
+(29, 'Administracion de Redes y Seguridad', 2, 'IF046', 3, 4, 1, 0, 1);

@@ -1,7 +1,9 @@
 from re import S
 from pydantic import BaseModel, EmailStr
 from typing import Optional
-
+from src.estudiantes.schemas import Estudiante
+from src.docentes.schemas import Docente
+from src.departamentos.schemas import DepartamentoBase
 class UserBase(BaseModel): 
     username: str
     email: EmailStr
@@ -19,6 +21,13 @@ class UserCreate(BaseModel):
 class User(UserBase):
     id: int
     role_name: str
+    alumno_id: Optional[int] = None
+    alumno: Optional[Estudiante]
+    docente_id: Optional[int] = None
+    docente: Optional[Docente]
+    departamento_id: Optional[int] = None
+    departamento: Optional[DepartamentoBase]
+
     model_config = {"from_attributes": True}
 
 

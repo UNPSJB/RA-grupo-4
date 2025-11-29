@@ -20,4 +20,6 @@ class Estudiante(ModeloBase):
         "src.encuesta.models.Encuesta",
         back_populates="estudiante"
     )   
+
+    user: Mapped[Optional["User"]] = relationship("User", back_populates="alumno")
     

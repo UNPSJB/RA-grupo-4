@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 from sqlalchemy import Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from src.models import ModeloBase
@@ -18,6 +18,8 @@ class Departamento(ModeloBase):
     materias: Mapped[List["Materias"]] = relationship(
         "Materias", back_populates="departamento"
     )
+
+    user: Mapped[Optional["User"]] = relationship("User", back_populates="departamento")
 
 # 
 from src.informesSinteticos.models import InformeSintetico
