@@ -8,33 +8,10 @@ import ResponderEncuesta from '../Estudiante/ResponderEncuesta';
 import SinDatos from '../Otros/SinDatos';
 import HistorialEncuestasRealizadasEstudiante from '../Estudiante/HistorialEncuestasRealizadasEstudiante';
 import MisMaterias from '../Estudiante/MisMaterias';
-import MisRespuestas from '../Estudiante/MisRespuestas'; 
+import MostrarEncuestasAlumno from '../Estudiante/MostrarEncuesta';
+
 import './MenuAlumno.css'; 
 
-const PaginaMisRespuestas = () => {
-    const { materiaId } = useParams();
-    const id = materiaId ? parseInt(materiaId) : 0;
-
-    if (!id) return (
-        <div style={{ padding: '40px', textAlign: 'center', color: '#666' }}>
-            <p>Error: No se pudo identificar la materia.</p>
-            <NavLink to="/home/alumno/historial-encuestas" className="back-button-link">
-                Volver al historial
-            </NavLink>
-        </div>
-    );
-
-    return (
-        <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
-            <div style={{ marginBottom: '20px' }}>
-                <NavLink to="/home/alumno/historial-encuestas" className="back-button-link">
-                    <ArrowLeft size={18} /> Volver al Historial
-                </NavLink>
-            </div>
-            <MisRespuestas materiaId={id} />
-        </div>
-    );
-};
 const AlumnoDashboard = ({ estudianteId }) => {
     const navigate = useNavigate();
     
@@ -42,16 +19,13 @@ const AlumnoDashboard = ({ estudianteId }) => {
     const [estudianteInfo, setEstudianteInfo] = useState(null);
     const [loading, setLoading] = useState(true);
 
-    // Fetch de periodo actual + datos del estudiante
     useEffect(() => {
         const fetchData = async () => {
             try {
-                // 1) Periodo actual de encuestas
                 const resPeriodo = await fetch(`http://localhost:8000/periodos/actual/encuestas`);
                 const periodo = await resPeriodo.json();
                 setPeriodoActual(periodo);
 
-                // 2) Datos del estudiante
                 const resEst = await fetch(`http://localhost:8000/estudiantes/${estudianteId}`);
                 const estudiante = await resEst.json();
                 setEstudianteInfo(estudiante);
@@ -79,13 +53,11 @@ const AlumnoDashboard = ({ estudianteId }) => {
     return (
         <div className="alumno-dashboard-wrapper">
             
-            {/* 1. Cabecera del Alumno: Bienvenida y Estadisticas */}
             <div className="alumno-header-grid">
                 <aside className="alumno-welcome-card">
                     <h1 className="alumno-title">
-                        <Hand size={30} className="alumno-icon-hand" />  ¡Bienvenido, {estudianteInfo?.nombre}!
+                        <Hand size={30} className="alumno-icon-hand" />  ¡Bienvenido, {estudianteInfo?.nombre}!
                         <br />
-                        
                     </h1>
                     <p className="alumno-subtitle">
                         {periodoActual ? (
@@ -107,7 +79,6 @@ const AlumnoDashboard = ({ estudianteId }) => {
                 </div>
             </div>
 
-            {/* 2. Sección Principal: Encuestas Pendientes */}
             <div className="alumno-section-container">
                 <h2 className="alumno-section-title">
                     <FileText size={20} /> Tus encuestas pendientes
@@ -117,7 +88,6 @@ const AlumnoDashboard = ({ estudianteId }) => {
                 </div>
             </div>
 
-            {/* 3. Navegación Rápida */}
             <div className="alumno-section-container">
                 <h2 className="alumno-section-title">
                     <List size={20} /> Acceso Rápido
@@ -141,7 +111,6 @@ const AlumnoDashboard = ({ estudianteId }) => {
 
 const AlumnoLayout = () => {
     const location = useLocation(); 
-    // Si estamos en la raíz del alumno, el boton vuelve al Home General, sino al Dashboard de Alumno
     const esDashboard = location.pathname === '/home/alumno' || location.pathname === '/home/alumno/';
     const rutaDestino = esDashboard ? '/home' : '/home/alumno';
 
@@ -169,7 +138,8 @@ const MenuAlumno = () => {
                 <Route path="seleccionar" element={<SeleccionarEncuestas />} />
                 <Route path="responder-encuesta/:inscripcionId" element={<ResponderEncuesta />} />
                 <Route path="historial-encuestas" element={<HistorialEncuestasRealizadasEstudiante />} />
-                <Route path="respuestas-encuesta/:materiaId" element={<PaginaMisRespuestas />} />
+                <Route path="respuestas-encuesta/:materiaId" element={<MostrarEncuestasAlumno />} /> 
+                
                 <Route path="mis-materias" element={<MisMaterias />} />
                 <Route path="sin-datos" element={<SinDatos />} />
             </Route>
