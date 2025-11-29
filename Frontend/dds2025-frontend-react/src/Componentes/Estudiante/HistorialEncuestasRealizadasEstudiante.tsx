@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, NavLink } from 'react-router-dom';
 import { ArrowLeft, CheckCircle2, ChevronRight, ClipboardList, Calendar, GraduationCap, ChevronDown } from 'lucide-react';
-
+import { useAuth } from '../../hooks';
 // --- TIPOS DE DATOS ---
 interface EncuestaResuelta {
     id: number;
@@ -18,7 +18,9 @@ const HistorialEncuestasRealizadasEstudiante = () => {
     const [loading, setLoading] = useState(true);
     const [visibleCount, setVisibleCount] = useState(4);
     const navigate = useNavigate();
-    const estudianteId = 1;
+    
+    const { currentUser } = useAuth();
+    const estudianteId = currentUser?.alumno_id;
 
     // --- PALETA INSTITUCIONAL ---
     const theme = {

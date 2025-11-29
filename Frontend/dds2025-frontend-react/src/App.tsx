@@ -97,7 +97,8 @@ const MainLayout = () => {
           </button>
 
           <img src={logoUnpsjb} alt="Logo" className="navbar-logo" />
-          <Link to="/home" className="site-name">Sistema de Encuestas UNPSJB</Link>
+          <p className="site-name"> Sistema de Encuestas UNPSJB</p>
+          {/* <Link to="/home" className="site-name">Sistema de Encuestas UNPSJB</Link> */}
         </div>
 
         <div className="navbar-right" ref={menuPerfilRef}>

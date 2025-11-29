@@ -2,6 +2,7 @@ import React from 'react';
 import { useEffect, useState } from 'react';
 import { Routes, Route, NavLink, useNavigate, useParams, useLocation, Outlet } from 'react-router-dom';
 import { ArrowLeft, FileText, List, BookOpen, Clock, Hand } from 'lucide-react'; 
+import { useAuth } from '../../hooks';
 
 // Componentes internos de ESTUDIANTE
 import MiniEstadisticasEst from '../Estudiante/MiniEstadisticasEst';
@@ -50,7 +51,7 @@ const PaginaMisRespuestas = () => {
 // ---------------------------------------------------
 
 
-const AlumnoDashboard = ({ estudianteId }) => {
+const AlumnoDashboard =({ estudianteId })  => {
     const navigate = useNavigate();
     
     const [periodoActual, setPeriodoActual] = useState(null);
@@ -137,7 +138,7 @@ const AlumnoDashboard = ({ estudianteId }) => {
                     <FileText size={20} /> Tus encuestas pendientes
                 </h2>
                 <div className="alumno-content-box">
-                    <SeleccionarEncuestas />
+                    <SeleccionarEncuestas idAlumno={estudianteId} />
                 </div>
             </div>
 
@@ -167,7 +168,7 @@ const AlumnoLayout = () => {
     const location = useLocation(); 
     // Si estamos en la raíz del alumno, el botón vuelve al Home General, sino al Dashboard de Alumno
     const esDashboard = location.pathname === '/home/alumno' || location.pathname === '/home/alumno/';
-    const rutaDestino = esDashboard ? '/home' : '/home/alumno';
+    const rutaDestino = esDashboard ? '/home/alumno' : '/home/alumno';
 
     return (
         <div className="menu-alumno-layout-full">
@@ -184,7 +185,10 @@ const AlumnoLayout = () => {
     );
 };
 const MenuAlumno = () => {
-    const estudianteId = 1; // Aquí podrías obtener el ID real desde un Contexto o Prop
+
+    const { currentUser } = useAuth();
+
+    const estudianteId = currentUser?.alumno_id;
 
     return (
         <Routes>
@@ -195,7 +199,7 @@ const MenuAlumno = () => {
                 <Route index element={<AlumnoDashboard estudianteId={estudianteId} />} />
                 
                 {/* Sub-rutas funcionales */}
-                <Route path="seleccionar" element={<SeleccionarEncuestas />} />
+                <Route path="seleccionar" element={<SeleccionarEncuestas idAlumno={estudianteId} />} />
                 <Route path="responder-encuesta/:inscripcionId" element={<ResponderEncuesta />} />
                 <Route path="historial-encuestas" element={<HistorialEncuestasRealizadasEstudiante />} />
                 <Route path="respuestas-encuesta/:materiaId" element={<PaginaMisRespuestas />} />

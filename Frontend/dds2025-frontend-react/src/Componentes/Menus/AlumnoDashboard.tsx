@@ -2,9 +2,12 @@ import React from 'react';
 import MiniEstadisticasEst from '../Estudiante/MiniEstadisticasEst';
 import SeleccionarEncuestas from '../Estudiante/SeleccionarEncuestas';
 import { FileText, List } from 'lucide-react';
+import { useAuth } from '../../hooks';
 
 const AlumnoDashboard = () => {
-  const estudianteId = 1;
+  
+  const { currentUser } = useAuth();
+  const estudianteId = currentUser?.alumno_id;
 
   return (
     <div className="alumno-dashboard-layout">
@@ -23,7 +26,7 @@ const AlumnoDashboard = () => {
       {/* Encuestas pendientes */}
       <section className="seccion-box">
         <h2 className="seccion-title"><FileText size={20} /> Encuestas Pendientes</h2>
-        <SeleccionarEncuestas />
+        <SeleccionarEncuestas idAlumno={estudianteId} />
       </section>
 
       {/* Tarjetas de navegación */}

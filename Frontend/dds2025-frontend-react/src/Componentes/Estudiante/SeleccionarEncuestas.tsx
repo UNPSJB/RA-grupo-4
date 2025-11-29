@@ -11,12 +11,14 @@ interface EncuestaDisponible {
   nombre_materia: string;
 }
 
-const SeleccionarEncuestas: React.FC = () => {
+interface Props {
+  idAlumno: number;
+}
+
+const SeleccionarEncuestas: React.FC<Props> = ( {idAlumno }) => {
   const [encuestas, setEncuestas] = useState<EncuestaDisponible[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  const idAlumno = 1;
 
   useEffect(() => {
     const controller = new AbortController();

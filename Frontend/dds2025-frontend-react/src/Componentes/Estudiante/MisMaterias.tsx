@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { BookOpen, AlertCircle, Calendar, Hash, LayoutGrid, CheckCircle2, Clock, XCircle } from "lucide-react";
 import EstadisticasAlumno from "./EstadisticasAlumno"; 
+import { useAuth } from "../../hooks";
 
 type MateriaHistorial = {
     id: number;
@@ -13,12 +14,15 @@ type MateriaHistorial = {
     encuesta_procesada: boolean;
 };
 
+
 const MisMaterias: React.FC = () => {
     const [materias, setMaterias] = useState<MateriaHistorial[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const estudianteId = 1; 
 
+    const { currentUser } = useAuth();
+    const estudianteId = currentUser?.alumno_id;
+    
     // --- PALETA INSTITUCIONAL ---
     const theme = {
         primary: '#1e40af',       // Navy Blue
@@ -286,7 +290,6 @@ const MisMaterias: React.FC = () => {
                                     <div>
                                         <h4 style={styles.sectionTitle}>Participación General</h4>
                                         <div className="chart-container">
-                                            {/* Importante: Asegúrate de que este componente sea responsive */}
                                             <EstadisticasAlumno materiaId={materia.id} />
                                         </div>
                                     </div>

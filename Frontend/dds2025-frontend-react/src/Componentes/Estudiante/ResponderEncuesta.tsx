@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom"; 
 import { Send, ArrowRight, ArrowLeft, AlertTriangle } from "lucide-react"; 
-
+import { useAuth } from "../../hooks";
 // --- IMPORTACIONES DE COMPONENTES DE CONTROL ---
 import FaltanCamposObligatorios from "../Otros/FaltanCamposObligatorios"; 
 import TodoBien from "../Otros/TodoBien"; 
@@ -74,7 +74,9 @@ const PreguntaAbierta: React.FC<any> = ({ pregunta, respuesta, onChange }) => (
 const ResponderEncuesta: React.FC = () => {
     const { inscripcionId: inscripcionIdFromUrl } = useParams<{ inscripcionId: string }>();
     const inscripcionId = inscripcionIdFromUrl ? parseInt(inscripcionIdFromUrl, 10) : null;
-    const estudianteId = 1; 
+    
+    const { currentUser } = useAuth();
+    const estudianteId = currentUser?.alumno_id;
 
     const [encuesta, setEncuesta] = useState<any | null>(null);
     const [respuestas, setRespuestas] = useState<any[]>([]);
