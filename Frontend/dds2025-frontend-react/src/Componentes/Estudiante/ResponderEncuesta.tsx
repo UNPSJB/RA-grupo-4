@@ -82,7 +82,11 @@ const ResponderEncuesta: React.FC = () => {
     const isFirstSection = currentSectionIndex === 0;
     const isLastSection = currentSectionIndex === totalSections - 1;
     const currentSection = sections[currentSectionIndex];
-    
+    /*Pra regresar al menu*/
+    const handleGoBack = () => {
+        navigate('/home/alumno');
+    };
+
     // Calcula el progreso de la sección actual para la barra de progreso
     const currentSectionProgress = useMemo(() => {
         if (!currentSection || !currentSection.preguntas.length) return 100;
@@ -276,7 +280,7 @@ const ResponderEncuesta: React.FC = () => {
                 }
                 @keyframes fadeInContainer { from { opacity: 0; } to { opacity: 1; } }
 
-                .form-header { text-align: center; margin-bottom: 30px; }
+                .form-header {position:relative; text-align: center; margin-bottom: 30px; }
                 .form-title { color: ${styles.colorPrincipal}; margin-bottom: 5px; font-size: 2.5rem; font-weight: 700; }
                 
                 /* Barra de Progreso */
@@ -325,7 +329,7 @@ const ResponderEncuesta: React.FC = () => {
                 input[type="radio"]:checked + .opcion-descripcion { font-weight: 700; color: ${styles.colorPrincipal}; }
                 input[type="radio"]:checked + .opcion-descripcion::before { content: "✓ "; color: ${styles.colorSecundario}; }
 
-                /* Abierta (CORRECCIÓN FINAL DE DISEÑO) */
+                /* Abierta  */
                 .input-abierta { 
                     width: 100%; padding: 15px; border: 1px solid #cce4f6; 
                     background-color: ${styles.colorFondoTarjeta}; /* FONDO BLANCO */
@@ -336,8 +340,6 @@ const ResponderEncuesta: React.FC = () => {
                 }
                 .input-abierta:focus { border-color: ${styles.colorSecundario}; box-shadow: 0 0 5px ${styles.colorSecundario}80; outline: none; }
 
-
-                /* --- Tarjeta de Advertencia de Sección (SOLO al intentar avanzar) --- */
                 .section-warning-card {
                     margin-top: 30px; padding: 20px; background-color: #f8d7da; 
                     color: ${styles.colorAlerta}; border: 1px solid ${styles.colorAlerta};
@@ -355,21 +357,51 @@ const ResponderEncuesta: React.FC = () => {
                 }
                 .nav-button:disabled { background-color: #ccc; color: #666; box-shadow: none; cursor: not-allowed; }
                 
-                /* Botón Anterior (NUEVO DISEÑO) */
+                /* Botón Anterior */
                 .prev-button { background-color: ${styles.colorFondoTarjeta}; color: ${styles.colorPrincipal}; border: 1px solid #ddd; }
                 .prev-button:hover:not(:disabled) { background-color: #f0f4f8; transform: translateY(-3px); box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15); }
                 
-                /* Botón Siguiente (Color Secundario/Activo) */
+                /* Botón Siguiente */
                 .next-button { background-color: ${styles.colorSecundario}; color: white; }
                 .next-button:hover:not(:disabled) { background-color: #005bb5; transform: translateY(-3px); }
                 
                 /* Botón Enviar (Color Alerta) */
                 .send-button { background-color: ${styles.colorAlerta}; }
                 .send-button:hover:not(:disabled) { background-color: #a02834; transform: translateY(-3px); }
+             
+                /*Boton de atras*/
+                .go-back-button {
+                    position: absolute;
+                    top: 0; 
+                    right: 0;
+                    background-color: #f0f4f8;
+                    color: #0078D4;
+                    border: none;
+                    padding: 10px 15px;
+                    border-radius: 8px;
+                    cursor: pointer;
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    font-weight: 600;
+                    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+                }
+
+                .go-back-button:hover {
+                    background-color: #e8f4ff;
+                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                }
 
             `}</style>
 
             <div className="form-header">
+                <button 
+                    className="go-back-button"
+                    onClick={handleGoBack}
+                >
+                    <ArrowLeft size={20} />
+                    Regresar al incio
+                </button>
                 <HeaderInstitucional/>
                 <h1 className="form-title">{encuesta.nombre}</h1>
                 <p className="form-subtitle">Completa las {totalSections} secciones. Tu progreso se guardará al final.</p>

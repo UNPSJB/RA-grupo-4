@@ -65,14 +65,6 @@ const AlumnoDashboard = ({ estudianteId }) => {
         fetchData();
     }, [estudianteId]);
 
-    if (loading) {
-        return (
-            <div className="alumno-dashboard-wrapper">
-                <p>Cargando información...</p>
-            </div>
-        );
-    }
-
     const hoy = new Date();
 
     const fechaCierre = periodoActual?.fecha_cierre_encuestas
