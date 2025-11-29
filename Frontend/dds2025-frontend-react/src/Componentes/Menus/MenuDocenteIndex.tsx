@@ -3,10 +3,13 @@ import { Link, useNavigate } from 'react-router-dom';
 import './MenuDocente.css';
 import { FileText, BarChart2, History, CheckSquare, List, Send, BookOpen, AlertCircle, GraduationCap, ChevronRight, ChevronDown } from 'lucide-react';
 import ListadoInformesACDoc from '../Docente/ListadoInformesACDoc';
+import { useAuth } from '../../hooks';
 
 interface Periodo{
+    id: number;
     ciclo_lectivo: number;
     cuatrimestre: string;
+    fecha_cierre_informesAC: string;
 }
 interface Docente{
     id_docente: number;
@@ -25,8 +28,7 @@ interface Materia {
     informeACCompletado?: boolean;
 }
 const API_BASE = "http://localhost:8000";
-const ID_DOCENTE_ACTUAL = 1;
-const ID_PERIODO_ACTUAL = 2;
+
 
 interface StatsDocenteProps {
     total: number;
@@ -71,6 +73,9 @@ const MenuDocenteIndex: React.FC = () => {
     const ITEMS_PER_PAGE = 3;
     const [mostrarCantidad, setMostrarCantidad] = useState<number>(ITEMS_PER_PAGE);
 
+    const { currentUser } = useAuth();
+    const docenteId = currentUser?.docente_id;
+
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -81,8 +86,8 @@ const MenuDocenteIndex: React.FC = () => {
 
                 const [resMaterias, resPeriodo, resDocente] = await Promise.all([
                     fetch(`${API_BASE}/materias/listar`),
-                    fetch(`${API_BASE}/periodos/${ID_PERIODO_ACTUAL}`),
-                    fetch(`${API_BASE}/docentes/${ID_DOCENTE_ACTUAL}`)
+                    fetch(`${API_BASE}/periodos/actual/informesAC`),
+                    fetch(`${API_BASE}/docentes/${docenteId}`)
                 ]);
 
                 if (!resMaterias.ok || !resPeriodo.ok || !resDocente.ok) {
@@ -105,13 +110,13 @@ const MenuDocenteIndex: React.FC = () => {
         cargarDatos();
     }, []);
 
-    const materiasDelDocente = materias.filter(m => m.id_docente === ID_DOCENTE_ACTUAL);
+    const materiasDelDocente = materias.filter(m => m.id_docente === docenteId);
     const totalCount = materiasDelDocente.length;
 
     const completadosCount = materiasDelDocente.filter(m => m.informeACCompletado === true).length;
 
     const materiasPendientes = materiasDelDocente.filter(
-        m => m.id_periodo === ID_PERIODO_ACTUAL && m.informeACCompletado !== true
+        m => m.id_periodo === periodoActual?.id && m.informeACCompletado !== true
     );
     const pendientesCount = materiasPendientes.length;
 

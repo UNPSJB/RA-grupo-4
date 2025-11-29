@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { BarChart2, BookOpen, ArrowRight, TrendingUp, Users, CheckCircle } from 'lucide-react';
+import { useAuth } from '../../hooks';
 
 const API_BASE = "http://localhost:8000";
-const ID_DOCENTE_ACTUAL = 1;
-const ID_PERIODO_ACTUAL = 2; 
 
+interface Periodo {
+    id: number;
+}
 interface Materia {
     id_materia: number;
     nombre: string;
@@ -22,24 +24,36 @@ interface StatsSimulados {
 }
 
 const PaginaEstadisticasDoc: React.FC = () => {
+
     const [materias, setMaterias] = useState<Materia[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
+    const [periodoActual, setPeriodoActual] = useState<Periodo | null>(null);
+    
+    const { currentUser } = useAuth();
+    const docenteId = currentUser?.docente_id;
+
 
     useEffect(() => {
         const cargarMaterias = async () => {
             try {
                 setLoading(true);
-                const res = await fetch(`${API_BASE}/materias/listar`);
+
+                const resPeriodo = await fetch(`${API_BASE}/periodos/actual/informesAC`);
+                if (!resPeriodo.ok) throw new Error("No se pudo obtener el periodo actual.");
                 
+                const dataPeriodo = await resPeriodo.json();
+                setPeriodoActual(dataPeriodo);
+
+                const res = await fetch(`${API_BASE}/materias/listarInscriptos`);
                 if (!res.ok) throw new Error("Error al cargar las materias.");
                 
                 const data: Materia[] = await res.json();
                 
                 // Filtramos las materias del docente actual y periodo actual
                 const misMaterias = data.filter(m => 
-                    m.id_docente === ID_DOCENTE_ACTUAL && 
-                    m.id_periodo === ID_PERIODO_ACTUAL
+                    m.id_docente === docenteId && 
+                    m.id_periodo === dataPeriodo.id
                 );
 
                 setMaterias(misMaterias);

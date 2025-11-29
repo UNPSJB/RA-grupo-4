@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../hooks";
 
 interface Docente {
     id_docente: number;
@@ -12,12 +13,12 @@ interface Periodo{
     cuatrimestre: string;
 }
 interface Materia {
-  id_materia: number;
-  nombre: string;
-  periodo: Periodo;
-  ciclo_lectivo: number
-  cuatrimestre: string
-  codigoMateria?: string;
+    id_materia: number;
+    nombre: string;
+    periodo: Periodo;
+    ciclo_lectivo: number
+    cuatrimestre: string
+    codigoMateria?: string;
 }
 
 interface InformeAC {
@@ -33,7 +34,9 @@ interface InformeAC {
 }
 
 const HistorialInformesACDoc: React.FC = () => {
-    const idDocenteActual = 1;
+    
+    const { currentUser } = useAuth();
+    const idDocenteActual = currentUser?.docente_id;
 
     const [informes, setInformes] = useState<InformeAC[]>([]);
     const [cargando, setCargando] = useState<boolean>(true);

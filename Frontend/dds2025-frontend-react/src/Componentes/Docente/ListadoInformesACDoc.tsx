@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Send, ChevronDown, FileText } from 'lucide-react'; 
+import { useAuth } from "../../hooks";
 
 // --- INTERFACES ---
 interface Periodo {
@@ -14,6 +15,7 @@ interface Materia {
     periodo: Periodo;
     codigoMateria?: string;
     id_docente: number;
+    informeACCompletado: boolean;
 }
 
 // Interfaz para los informes que ya existen
@@ -29,10 +31,12 @@ const PRIMARY_ORANGE = "#e76f51"; // Naranja principal
 const DARK_BLUE = "#003366"; // Azul oscuro para texto principal
 
 const ListadoInformesACDoc: React.FC = () => {
-    const ID_DOCENTE_ACTUAL = 1;
-    const CICLO_LECTIVO_ACTUAL = new Date().getFullYear();
-    const CUATRIMESTRE_ACTUAL = "Segundo";
     const API_BASE = "http://localhost:8000";
+    
+    const [periodoActual, setPeriodoActual] = useState<Periodo | null>(null);
+
+    const { currentUser } = useAuth();
+    const docenteId = currentUser?.docente_id;
 
     // Estados
     const [materias, setMaterias] = useState<Materia[]>([]);
@@ -47,6 +51,20 @@ const ListadoInformesACDoc: React.FC = () => {
 
     // --- EFECTO DE CARGA DE DATOS ---
     useEffect(() => {
+        const cargarPeriodo = async () => {
+            try {
+                const resPeriodo = await fetch(`${API_BASE}/periodos/actual/informesAC`);
+                if (!resPeriodo.ok) throw new Error("No se pudo obtener el periodo actual.");
+                const dataPeriodo: Periodo = await resPeriodo.json();
+                setPeriodoActual(dataPeriodo);
+            } catch (err) {
+                console.error(err);
+            }
+        };
+        cargarPeriodo();
+    }, []);
+
+    useEffect(() => {
         const cargarDatos = async () => {
             try {
                 setCargando(true);
@@ -54,7 +72,7 @@ const ListadoInformesACDoc: React.FC = () => {
 
                 const [resMaterias, resInformes] = await Promise.all([
                     fetch(`${API_BASE}/materias/listar`),
-                    fetch(`${API_BASE}/informesAC/filtradoInformesAc?id_docente=${ID_DOCENTE_ACTUAL}`)
+                    fetch(`${API_BASE}/informesAC/filtradoInformesAc?id_docente=${docenteId}`)
                 ]);
 
                 if (!resMaterias.ok || !resInformes.ok) {
@@ -74,24 +92,23 @@ const ListadoInformesACDoc: React.FC = () => {
             }
         };
         cargarDatos();
-    }, [CICLO_LECTIVO_ACTUAL]);
+    }, []);
 
     const materiasPendientes = useMemo(() => {
         return materias.filter(materia => {
-            const correspondeDocente = materia.id_docente === ID_DOCENTE_ACTUAL;
-            const esCicloLectivoActual = Number(materia.periodo.ciclo_lectivo) === CICLO_LECTIVO_ACTUAL
-                                         && materia.periodo.cuatrimestre === CUATRIMESTRE_ACTUAL;
+            const correspondeDocente = materia.id_docente === docenteId;
+            const esCicloLectivoActual = materia.periodo.id === periodoActual?.id;
 
             if (!correspondeDocente || !esCicloLectivoActual) return false;
 
             const yaEstaHecho = informesHechos.some(inf => 
                 inf.materia.id_materia === materia.id_materia &&
-                Number(inf.ciclo_lectivo) === CICLO_LECTIVO_ACTUAL
+                Number(inf.ciclo_lectivo) === periodoActual.ciclo_lectivo
             );
 
             return !yaEstaHecho;
         });
-    }, [materias, informesHechos, ID_DOCENTE_ACTUAL, CICLO_LECTIVO_ACTUAL, CUATRIMESTRE_ACTUAL]);
+    }, [materias, informesHechos, docenteId]);
     
     const materiasVisibles = materiasPendientes.slice(0, mostrarCantidad);
     const tieneMasElementos = materiasPendientes.length > materiasVisibles.length;
@@ -120,7 +137,7 @@ const ListadoInformesACDoc: React.FC = () => {
                     <span className="title-icon">
                         <FileText size={24} color={PRIMARY_ORANGE} />
                     </span> 
-                    Informes AC Pendientes ({CUATRIMESTRE_ACTUAL} Cuatrimestre {CICLO_LECTIVO_ACTUAL})
+                    Informes AC Pendientes ({periodoActual?.cuatrimestre} Cuatrimestre {periodoActual?.ciclo_lectivo})
                 </h3>
                 
                 {/* Lista de Items */}
@@ -128,7 +145,7 @@ const ListadoInformesACDoc: React.FC = () => {
                     {materiasPendientes.length === 0 ? (
                         <div className="todo-bien-message">
                             <h4>¡Todo al día!</h4>
-                            <p>No tienes informes pendientes para el ciclo lectivo {CICLO_LECTIVO_ACTUAL}.</p>
+                            <p>No tienes informes pendientes para el ciclo lectivo {periodoActual?.ciclo_lectivo} {" "} {periodoActual?.cuatrimestre}.</p>
                         </div>
                     ) : (
                         <>
@@ -150,7 +167,7 @@ const ListadoInformesACDoc: React.FC = () => {
                                                 </div>
                                             </div>
                                         </div>
-                                      
+                                    
                                         <button 
                                             className="boton-accion-capsula"
                                             onClick={(e) => {

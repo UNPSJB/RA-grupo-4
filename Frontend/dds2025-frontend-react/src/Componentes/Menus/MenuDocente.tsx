@@ -9,11 +9,12 @@ import PaginaEstadisticasDoc from '../Docente/PaginaEstadisticasDoc';
 import SinDatos from '../Otros/SinDatos';
 import VisualizarInformeACDoc from '../Docente/VisualizarInformeACDoc';
 import EstadisticasPorPregunta from '../Docente/EstadisticasPorPregunta';
+import { useAuth } from '../../hooks';
 
 const DocenteLayout = () => {
     const location = useLocation();
     const esDashboard = location.pathname === '/home/docente' || location.pathname === '/home/docente/';
-    const rutaDestino = esDashboard ? '/home' : '/home/docente';
+    const rutaDestino = esDashboard ? '/home/docente' : '/home/docente';
 
     return (
         <div className="dashboard-layout-full">
@@ -31,6 +32,10 @@ const DocenteLayout = () => {
 };
 
 const MenuDocente = () => {
+
+    const { currentUser } = useAuth();
+    const docenteId = currentUser?.docente_id;
+
     return (
         <Routes>
             <Route path="/" element={<DocenteLayout />}>
