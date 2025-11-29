@@ -1,13 +1,11 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom"; 
 import { Send, ArrowRight, ArrowLeft, AlertTriangle } from "lucide-react"; 
-
-// --- IMPORTACIONES DE COMPONENTES DE CONTROL ---
 import FaltanCamposObligatorios from "../Otros/FaltanCamposObligatorios"; 
 import TodoBien from "../Otros/TodoBien"; 
-import logo from '../../assets/logo-unpsjb.png';
+import HeaderInstitucional from "../Otros/HeaderInstitucional";
 
-// Interfaces (Mantenidas)
+// Interfaces +
 interface OpcionRespuesta { id: number; descripcion: string; pregunta_id: number; }
 interface Pregunta { id: number; enunciado: string; tipo: "ABIERTA" | "CERRADA"; obligatoria: boolean; opciones_respuestas?: OpcionRespuesta[]; }
 interface Seccion { id: number; sigla: string; descripcion: string; preguntas: Pregunta[]; }
@@ -15,7 +13,7 @@ interface Encuesta { id_encuesta: number; nombre: string; secciones: Seccion[]; 
 interface RespuestaInput { pregunta_id: number; inscripcion_id: number; opcion_respuesta_id?: number | null; respuesta_abierta?: string | null; }
 interface ErrorItem { seccionSigla: string; preguntaId: number; enunciado: string; }
 
-// --- VARIABLES DE ESTILO ---
+// colores
 const styles = {
     colorPrincipal: '#003366', 
     colorSecundario: '#0078D4', 
@@ -29,10 +27,6 @@ const styles = {
     colorHoverSutil: '#cce4f6', 
 };
 
-
-// ----------------------------------------------------
-// --- SUBCOMPONENTES (Estilo Integrado) ---
-// ----------------------------------------------------
 
 const PreguntaCerrada: React.FC<any> = ({ pregunta, respuesta, onChange }) => (
     <div className="opciones-grid">
@@ -67,9 +61,6 @@ const PreguntaAbierta: React.FC<any> = ({ pregunta, respuesta, onChange }) => (
     />
 );
 
-// ----------------------------------------------------
-// --- COMPONENTE PRINCIPAL ---
-// ----------------------------------------------------
 
 const ResponderEncuesta: React.FC = () => {
     const { inscripcionId: inscripcionIdFromUrl } = useParams<{ inscripcionId: string }>();
@@ -86,15 +77,13 @@ const ResponderEncuesta: React.FC = () => {
     const [validationErrors, setValidationErrors] = useState<any[]>([]); 
     const [showSectionWarning, setShowSectionWarning] = useState(false); 
     const navigate = useNavigate();
-
-    // --- CÁLCULO Y LÓGICA MANTENIDA ---
     const sections = encuesta?.secciones || [];
     const totalSections = sections.length;
     const isFirstSection = currentSectionIndex === 0;
     const isLastSection = currentSectionIndex === totalSections - 1;
     const currentSection = sections[currentSectionIndex];
     
-    // Calcula el progreso de la sección actual (para la barra dinámica)
+    // Calcula el progreso de la sección actual para la barra de progreso
     const currentSectionProgress = useMemo(() => {
         if (!currentSection || !currentSection.preguntas.length) return 100;
         
@@ -112,7 +101,7 @@ const ResponderEncuesta: React.FC = () => {
         return (respondidas / totalPreguntas) * 100;
     }, [currentSection, respuestas]);
 
-    // Función para validar solo la sección actual (al intentar avanzar)
+    // Función para validar la seccion antes de avanzar
     const validarSeccionActual = (section: Seccion): ErrorItem[] => {
         const errors: ErrorItem[] = [];
         section.preguntas.forEach((preg) => {
@@ -155,8 +144,6 @@ const ResponderEncuesta: React.FC = () => {
         });
         return errors;
     };
-    
-    // --- LÓGICA DE FETCH (Mantenida) ---
     useEffect(() => {
         if (!inscripcionId) { setError("ID de inscripción inválido en la URL."); setCargandoPagina(false); return; }
 
@@ -185,7 +172,6 @@ const ResponderEncuesta: React.FC = () => {
         fetchEncuesta();
     }, [inscripcionId, estudianteId]);
     
-    // --- MANEJO DE EVENTOS (Mantenido) ---
     const manejarCambioCerrada = (preguntaId: number, opcionId: number) => {
         setRespuestas((prev) => prev.map((r) => r.pregunta_id === preguntaId ? { ...r, opcion_respuesta_id: opcionId, respuesta_abierta: null } : r ));
         setShowSectionWarning(false);
@@ -233,8 +219,6 @@ const ResponderEncuesta: React.FC = () => {
                 throw new Error(errData.detail || `Error al enviar: ${res.status}`);
             }
             setExito(true);
-            
-            // Renderizar el componente TodoBien en lugar de navegar inmediatamente
         } catch (err: any) {
             console.error("Error en enviarRespuestas:", err);
             setError(err.message || "Error desconocido al enviar.");
@@ -243,12 +227,7 @@ const ResponderEncuesta: React.FC = () => {
         }
     };
 
-    // -------------------------------------------------
-    // --- RENDERIZADO DE ESTADOS GLOBALES (DEBUG) ---
-    // -------------------------------------------------
     if (!inscripcionId) return <p className="error-msg global-message">Error: No se proporcionó un ID de inscripción válido.</p>;
-    
-    // RENDERIZADO DE CARGA CON ESTILO TEMPORAL ROBUSTO
     if (cargandoPagina) {
         return (
             <div style={{ padding: '50px', textAlign: 'center', fontSize: '1.5rem', color: styles.colorPrincipal, backgroundColor: styles.colorFondoTarjeta, borderRadius: styles.bordeRadio, boxShadow: styles.sombraTarjeta, margin: '30px auto', maxWidth: '1100px' }}>
@@ -258,8 +237,6 @@ const ResponderEncuesta: React.FC = () => {
     }
     
     if (!encuesta) return <p className="error-msg global-message">No se encontró la encuesta para esta inscripción.</p>;
-    
-    // RENDERIZADO DE ÉXITO FINAL (Muestra TodoBien)
     if (exito) {
         return (
             <div className="global-message">
@@ -268,7 +245,6 @@ const ResponderEncuesta: React.FC = () => {
         );
     }
     
-    // Renderizado de Errores
     if (error) {
          const message = error.includes("Ya has respondido") ? error : "Error al cargar la encuesta: " + error;
          const isWarning = error.includes("Ya has respondido");
@@ -394,7 +370,7 @@ const ResponderEncuesta: React.FC = () => {
             `}</style>
 
             <div className="form-header">
-             
+                <HeaderInstitucional/>
                 <h1 className="form-title">{encuesta.nombre}</h1>
                 <p className="form-subtitle">Completa las {totalSections} secciones. Tu progreso se guardará al final.</p>
             </div>
@@ -437,11 +413,11 @@ const ResponderEncuesta: React.FC = () => {
                     );
                 })}
                 
-                {/* --- ADVERTENCIA DE SECCIÓN (SOLO al intentar avanzar) --- */}
+                {/*Advertencia al avanzar*/}
                 {showSectionWarning && (
                     <div className="section-warning-card">
                         <AlertTriangle size={24} />
-                        Debe completar todos los campos obligatorios antes de pasar a la siguiente sección.
+                        Debe completar todos los campos obligatorios antes de pasar a la siguiente seccion.
                     </div>
                 )}
             </div>

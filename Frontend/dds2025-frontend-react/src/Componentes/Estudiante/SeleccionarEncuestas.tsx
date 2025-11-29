@@ -83,7 +83,7 @@ const SeleccionarEncuestas: React.FC = () => {
           background: #ffffff;
           border: 1px solid #e8f4ff;
           border-radius: 12px;
-          padding: 16px 20px;
+          padding: 16px 20px;a
           box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
           transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
