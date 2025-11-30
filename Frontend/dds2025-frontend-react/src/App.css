@@ -1,259 +1,457 @@
-/* --- Cursor de Gaviota --- */
-html, body {
-  cursor: url('./assets/gaviotaPunteroRedimensionada.png'), auto; 
+:root {
+    --primary-color: #0056b3;
+    --primary-color-rgb: 0, 86, 179;
+    --secondary-color: #f8f9fa;
+    --text-color: #333;
+    --text-color-light: #666;
+    --bg-color: #ffffff;
+    --card-bg: #ffffff;
+    --border-radius: 12px;
+
+    /* Colores de Roles */
+    --color-alumno: #0078D4;
+    --color-docente: #17a2b8;
+    --color-departamento: #ffc107;
+    --color-secretaria: #8e44ad;
 }
 
-/* --- ESTILOS GENERALES (Navbar, Footer, etc.) --- */
+body {
+    background-color: var(--bg-color) !important;
+    color: var(--text-color);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+}
+
+.page-content {
+    min-height: calc(100vh - 150px); 
+    padding: 1px 0; 
+    background-color: var(--bg-color); 
+}
+
+/*Navbar y foter estilos*/
 .navbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-color: #005f9e;
-  padding: 0 20px;
-  height: 60px;
-  color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #fff;
+    padding: 10px 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    height: 60px;
 }
 
-/* --- Navbar Left con Logo --- */
 .navbar-left {
-  display: flex;
-  align-items: center;
-  gap: 15px; /* Espacio entre logo y texto */
+    display: flex;
+    align-items: center;
+    gap: 15px;
 }
 
 .navbar-logo {
-  height: 45px; /* Ajusta según prefieras el tamaño del logo UNPSJB */
-  width: auto;
-  object-fit: contain;
+    height: 45px;
+    width: auto;
+    object-fit: contain;
 }
 
-.navbar-left .site-name {
-  font-weight: bold;
-  font-size: 1.3rem;
-  letter-spacing: 0.5px;
+.navbar-left a { text-decoration: none; display: flex; align-items: center; }
+
+.site-name { 
+    font-size: 1.3rem; 
+    color: var(--primary-color); 
+    font-weight: 600; 
 }
 
-/* --- Navbar Links --- */
-.navbar-links {
-  display: flex;
-  gap: 20px;
+.navbar-right { display: flex; align-items: center; }
+
+/* Avatar en Navbar */
+.navbar-avatar-container {
+    position: relative;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 10px;
+    border-radius: 8px;
+    transition: background 0.2s;
 }
 
-.navbar-links a,
-.navbar-right a {
-  color: white;
-  text-decoration: none;
-  padding: 8px 12px;
-  border-radius: 4px;
-  transition: background-color 0.3s;
+.navbar-avatar-container:hover {
+    background-color: rgba(0, 0, 0, 0.05);
 }
 
-.navbar-links a:hover,
-.navbar-right a:hover {
-  background-color: #007bff;
+.navbar-avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--secondary-color);
+    transition: all 0.2s ease;
 }
 
-/* --- Navbar Right con Avatar --- */
-.navbar-right {
-  display: flex;
-  align-items: center;
-  gap: 12px; /* Espacio entre avatar y "Cerrar sesión" */
+.navbar-avatar:hover {
+    transform: scale(1.08);
+    box-shadow: 0 0 10px rgba(0,0,0,0.15);
+    border-color: var(--primary-color);
 }
 
-.user-avatar {
-  width: 36px;       /* Tamaño del avatar */
-  height: 36px;
-  border-radius: 50%; /* Círculo perfecto */
-  object-fit: cover;  /* La imagen cubre el área sin deformarse */
-  border: 2px solid rgba(255, 255, 255, 0.8); /* Borde blanco semitransparente para que resalte */
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2); /* Sombra suave */
-}
-
-/* --- Resto de la página --- */
-.page-content {
-  padding: 20px;
-  min-height: calc(100vh - 100px);
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-}
-
+/* Footer */
 .footer {
-  background-color: #005f9e; 
-  color: white;
-  text-align: center;
-  padding: 10px 0;
-  height: 40px;
+    text-align: center;
+    padding: 20px;
+    margin-top: auto;
+    color: var(--text-color-light);
+    border-top: 1px solid #eee;
+    background-color: #fff;
 }
 
-/* --- ESTILOS PARA MENÚS DESPLEGABLES --- */
-.dropdown {
-  position: relative;
-  display: inline-block;
+/*Carrusel para modo admin*/
+.home-container {
+    padding: 4vh 2vw;
+    text-align: center;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 80vh;
+}
+.home-title { color: var(--primary-color); margin-bottom: 0.5rem; font-size: clamp(1.8rem, 4vw, 2.8rem); }
+.home-subtitle { color: var(--text-color-light); margin-bottom: 4vh; font-size: clamp(1rem, 2vw, 1.3rem); }
+
+.carousel-3d-container {
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 40px 0;
+}
+.slide-outer-wrapper { padding: 20px; perspective: 1500px; }
+
+.carousel-card {
+    background: var(--card-bg) !important;
+    border-radius: var(--border-radius);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    overflow: hidden;
+    height: clamp(380px, 55vh, 450px);
+    display: flex;
+    flex-direction: column;
+    opacity: 1; 
+    transform: scale(0.85);
+    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    pointer-events: none;
+    transform-origin: center center;
 }
 
-.dropdown-button {
-  background-color: transparent;
-  color: white;
-  padding: 8px 12px;
-  font-size: 16px;
-  font-family: inherit;
+.slick-center .carousel-card {
+    opacity: 1;
+    transform: scale(1.1);
+    z-index: 10;
+    box-shadow: 0 25px 50px rgba(0,0,0,0.2);
+    pointer-events: all;
+}
+
+.carousel-card .card-header { 
+    padding: 20px; 
+    color: white; 
+    min-height: 110px; 
+}
+
+.card-icon { font-size: 3.5rem; margin-bottom: 10px; line-height: 1; }
+.card-header h3 { margin: 0; font-size: 1.5rem; font-weight: 600; }
+.card-body { padding: 20px 25px; flex-grow: 1; background-color: #fff; }
+
+/*Colores especificos para cada rol*/
+/* Alumno Azul */
+.carousel-card.type-alumno .card-header {
+    background: var(--color-alumno);
+    background: linear-gradient(135deg, var(--color-alumno) 0%, #1e7e34 100%);
+}
+
+/* Docente Celeste pero algunos lo llaman Cyan */
+.carousel-card.type-docente .card-header {
+    background: var(--color-docente);
+    background: linear-gradient(135deg, var(--color-docente) 0%, #138496 100%);
+}
+
+/* Departamento Amarillo*/ 
+.carousel-card.type-departamento .card-header {
+    background: var(--color-departamento);
+    background: linear-gradient(135deg, var(--color-departamento) 0%, #d39e00 100%);
+    color: #333;
+}
+.carousel-card.type-departamento .card-icon { color: #333; }
+
+/* Secretaria Violeta  */
+.carousel-card.type-secretaria .card-header {
+    background: var(--color-secretaria);
+    background: linear-gradient(135deg, var(--color-secretaria) 0%, #8e44ad 100%);
+}
+
+/* Interacción de Enlaces */
+.carousel-card-link { 
+    text-decoration: none; 
+    display: block; 
+    cursor: pointer;
+}
+.carousel-card-link .carousel-card { 
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+}
+
+.carousel-card-link:hover .carousel-card {
+    box-shadow: 0 30px 60px rgba(0,0,0,0.25);
+    z-index: 20; 
+}
+
+.carousel-card-cta {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--text-color-light);
+    padding: 10px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    position: relative;
+    top: 40%;
+    transform: translateY(-50%);
+    display: inline-block;
+}
+.carousel-card-link:hover .carousel-card-cta {
+    color: var(--primary-color);
+    background-color: rgba(240, 240, 240, 0.7);
+}
+
+.slick-prev:before, .slick-next:before { color: var(--primary-color) !important; }
+
+/*Menues*/
+.menu-page-container {
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 30px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+    position: relative;
+    animation: fadeInUp 0.5s ease-out;
+}
+.menu-header {
+    text-align: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 4px solid var(--menu-color, var(--primary-color));
+}
+.menu-header h1 { font-size: 2.5rem; margin: 0 0 10px 0; color: var(--menu-color, var(--primary-color)); }
+.menu-header p { font-size: 1.1rem; color: var(--text-color-light); margin: 0; }
+
+.menu-link-list { display: flex; flex-direction: column; gap: 15px; }
+.menu-link {
+    display: block; padding: 18px 25px; background-color: var(--secondary-color);
+    color: var(--text-color); text-decoration: none; font-size: 1.1rem;
+    font-weight: 600; border-radius: 8px;
+    border-left: 5px solid var(--menu-color, var(--primary-color));
+    transition: all 0.2s ease-out;
+}
+.menu-link:hover {
+    background-color: #e9ecef;
+    transform: translateX(10px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.07);
+}
+
+.back-button-simple {
+    position: absolute; top: 30px; right: 30px; display: flex; align-items: center;
+    gap: 8px; padding: 10px 18px; background-color: #f8f9fa;
+    color: var(--text-color-light); border: 1px solid #ddd; border-radius: 50px;
+    font-weight: 600; font-size: 0.9rem; cursor: pointer; transition: all 0.2s ease-out;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+.back-button-simple:hover {
+    background-color: #fff; color: var(--primary-color); border-color: #bbb;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1); transform: translateY(-2px);
+}
+
+/*Tarjeta de usuario*/
+.profile-card {
+    position: absolute;
+    top: 60px;
+    right: 20px;
+    width: 320px;
+    background-color: white;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    border: 1px solid #e2e8f0;
+    overflow: hidden;
+    z-index: 1000;
+    animation: slideDown 0.2s ease-out;
+}
+
+/* Header de Perfil*/
+.profile-card .card-header {
+    background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+    padding: 20px;
+    color: white;
+    text-align: center;
+}
+
+.card-avatar-large {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    border: 3px solid white;
+    object-fit: cover;
+    margin-bottom: 10px;
+    background-color: #cbd5e1;
+}
+
+.card-user-name { font-size: 1.1rem; font-weight: 700; margin: 0; }
+.card-user-role {
+    font-size: 0.85rem; opacity: 0.9; background-color: rgba(255,255,255,0.2);
+    padding: 2px 10px; border-radius: 12px; display: inline-block; margin-top: 5px;
+}
+
+/* Cuerpo de Tarjeta de Perfil */
+.profile-card .card-body { padding: 20px; color: #334155; }
+
+.info-row {
+    display: flex; justify-content: space-between; margin-bottom: 12px;
+    font-size: 0.9rem; border-bottom: 1px solid #f1f5f9; padding-bottom: 8px;
+}
+.info-label { color: #64748b; font-weight: 500; }
+.info-value { font-weight: 600; text-align: right; }
+
+.card-actions {
+    padding: 10px 20px 20px 20px; display: flex; flex-direction: column; gap: 8px;
+}
+
+.action-btn {
+    display: flex; align-items: center; gap: 10px; padding: 10px;
+    border-radius: 8px; text-decoration: none; color: #334155;
+    font-size: 0.9rem; font-weight: 500; transition: background 0.2s;
+}
+.action-btn:hover { background-color: #f1f5f9; color: #1e40af; }
+
+.action-btn.logout { color: #ef4444; margin-top: 5px; border-top: 1px solid #f1f5f9; padding-top: 15px; }
+.action-btn.logout:hover { background-color: #fef2f2; color: #dc2626; }
+
+/*Animaciones*/
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeInDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Estilos menu de hamburgesa */
+
+/* Botón Hamburguesa en Navbar */
+.hamburger-btn {
+  background: none;
   border: none;
   cursor: pointer;
-  border-radius: 4px;
-  transition: background-color 0.3s;
-}
-
-.dropdown-button:hover {
-  background-color: #007bff;
-}
-
-.dropdown-content {
-  display: block;
-  position: absolute;
-  background-color: #f0f8ff; /* Fondo celeste claro */
-  border: 1px solid #cce5ff;
-  min-width: 220px;
-  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-  z-index: 10;
-  border-radius: 4px;
-  overflow: hidden;
-  margin-top: 5px;
-}
-
-.dropdown-content a {
-  color: #003366; /* Texto oscuro */
-  padding: 12px 16px;
-  text-decoration: none;
-  display: block;
-  text-align: left;
+  padding: 5px;
+  margin-right: 15px; 
+  display: flex;
+  align-items: center;
+  border-radius: 8px;
   transition: background-color 0.2s;
 }
 
-.dropdown-content a:hover {
-  background-color: #cce5ff; /* Fondo más oscuro al hover */
-  color: #003366;
+.hamburger-btn:hover {
+  background-color: #f1f5f9;
 }
 
-/* --- ESTILOS PARA LA PÁGINA DE BIENVENIDA --- */
-.home-container {
+.sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1040; 
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(2px);
+}
+
+.sidebar-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Panel Deslizante */
+.sidebar-menu {
+  position: fixed;
+  top: 0;
+  left: -300px; 
+  width: 280px;
+  height: 100vh;
+  background-color: #fff;
+  z-index: 1050;
+  box-shadow: 4px 0 15px rgba(0,0,0,0.1);
+  transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 40px 20px;
-  color: #333;
 }
 
-.home-logo {
-  width: 150px;
-  height: auto;
-  margin-bottom: 20px;
+.sidebar-menu.open {
+  left: 0;
 }
 
-.home-title {
-  font-size: 2.5rem;
-  font-weight: 300;
-  margin-bottom: 10px;
-  color: #0d0d0eff;
-}
-
-.home-subtitle {
-  font-size: 1.5rem;
-  font-weight: 600;
-  margin-bottom: 40px;
-  color: #333;
-}
-
-.home-image-container {
-  max-width: 800px;
-  width: 100%;
-  margin-bottom: 20px;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 10px 20px rgba(0,0,0,0.15);
-}
-
-.home-building-image {
-  width: 100%;
-  height: auto;
-  display: block;
-}
-
-.home-image-caption {
-  background-color: rgba(13, 13, 14, 0.8);
-  color: white;
-  padding: 10px;
-  margin-top: -5px;
-  font-style: italic;
-}
-
-.home-description {
-  font-size: 1.1rem;
-  color: #555;
-  max-width: 600px;
-  margin-top: 20px;
-}
-
-/* --- SISTEMA DE DISEÑO UNIFICADO --- */
-.content-card {
-  background-color: #1e1e1e;
-  color: #e1e1e1;
-  padding: 25px 30px;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-  max-width: 900px;
-  margin: 0 auto;
-}
-
-.content-title {
-  font-size: 1.8rem;
-  font-weight: 400;
-  margin-top: 0;
-  margin-bottom: 25px;
-  color: #ffffff;
-  padding-bottom: 15px;
-  border-bottom: 1px solid #444;
-}
-
-.styled-list {
-  list-style: none;
-  padding: 0;
-}
-
-.styled-list li {
+/* Header del Sidebar */
+.sidebar-header {
+  padding: 20px;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #e2e8f0;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 15px;
-  background-color: #2b2b2b;
-  border-radius: 5px;
-  margin-bottom: 10px;
-  font-size: 1.1rem;
 }
 
-.styled-button {
-  background-color: #007bff;
-  color: white;
+.sidebar-header h2 {
+  margin: 0;
+  font-size: 1.4rem;
+  color: var(--primary-color, #0056b3);
+  font-weight: 700;
+}
+
+.close-sidebar-btn {
+  background: none;
   border: none;
-  padding: 10px 20px;
-  border-radius: 5px;
   cursor: pointer;
-  font-weight: bold;
-  text-transform: uppercase;
-  font-size: 0.9rem;
-  transition: background-color 0.2s, transform 0.2s;
+  color: #64748b;
+  padding: 5px;
+  transition: color 0.2s;
+}
+.close-sidebar-btn:hover { color: #dc2626; }
+
+/* Lista de enlaces */
+.sidebar-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  overflow-y: auto;
+}
+
+.sidebar-list li {
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.sidebar-link {
+  display: block;
+  padding: 16px 24px;
   text-decoration: none;
-  display: inline-block;
+  color: #334155;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: all 0.2s;
 }
 
-.styled-button:hover {
-  background-color: #0056b3;
-  transform: scale(1.05);
-}
-
-select[disabled] {
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-  background-image: none;
+.sidebar-link:hover {
+  background-color: #f0f9ff;
+  color: var(--primary-color, #0056b3);
+  padding-left: 30px; 
 }

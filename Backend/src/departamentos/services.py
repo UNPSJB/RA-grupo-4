@@ -1,11 +1,15 @@
 from typing import List
-from sqlalchemy import delete, select, update
+from sqlalchemy import delete, select, update, func
 from sqlalchemy.orm import Session
 from src.departamentos.models import Departamento
 from src.departamentos import schemas, exceptions, models
 from src.materias.models import Materias
 from src.informesAC.models import InformesAC
-
+from src.periodos.models import Periodo
+from src.docentes.models import Docentes
+from src.inscripciones.models import Inscripciones
+from src.informesSinteticos.models import InformeSintetico
+from datetime import date
 # operaciones CRUD para Departamento
 
 
@@ -26,7 +30,7 @@ def listar_departamentos(db: Session):
 def leer_departamento(db: Session, departamento_id: int) -> schemas.Departamento:
     db_departamento = db.scalar(select(Departamento).where(Departamento.id == departamento_id))
     if db_departamento is None:
-        raise exceptions.DepartamentoNoEncontrada()
+        raise exceptions.DepartamentoNoEncontrado()
     return db_departamento
 
 
@@ -48,29 +52,148 @@ def eliminar_departamento(db: Session, departamento_id: int) -> schemas.Departam
     db.commit()
     return db_departamento
 
-def obtener_resumen_departamento(db: Session, departamento_id: int):
+def obtener_resumen_departamento(db: Session, departamento_id: int, periodo_id: int):
     """
-    Devuelve un resumen general del departamento:
-    materias, cantidad de alumnos inscriptos, comisiones teóricas y prácticas.
+    Devuelve un resumen general del departamento para un periodo específico.
+    Cada materia pertenece a un periodo y tiene solo un InformeAC.
     """
-    materias = db.query(Materias).filter(Materias.id_departamento == departamento_id).all()
+
+    # 1. Buscar materias del departamento filtradas por periodo
+    materias = (
+        db.query(Materias)
+        .filter(
+            Materias.id_departamento == departamento_id,
+            Materias.id_periodo == periodo_id
+        )
+        .all()
+    )
+
+    if not materias:
+        return []
 
     resumen = []
+
     for materia in materias:
-        # buscar el último informe asociado a la materia (si hay varios)
+        # 2. Obtener el único informeAC asociado (si existe)
         informe_ac = (
             db.query(InformesAC)
             .filter(InformesAC.id_materia == materia.id_materia)
-            .order_by(InformesAC.ciclo_lectivo.desc())
             .first()
         )
+
         resumen.append({
             "codigo": materia.codigoMateria,
             "nombre": materia.nombre,
-            "anio": materia.anio,
+            "ciclo_lectivo": materia.periodo.ciclo_lectivo,
+            "cuatrimestre": materia.periodo.cuatrimestre,
             "alumnos_inscriptos": informe_ac.cantidad_alumnos_inscriptos if informe_ac else 0,
             "comisiones_teoricas": informe_ac.cantidad_comisiones_teoricas if informe_ac else 0,
             "comisiones_practicas": informe_ac.cantidad_comisiones_practicas if informe_ac else 0,
         })
 
     return resumen
+
+
+
+def listar_informes_sinteticos_pendientes_del_departamento(db: Session, departamento_id: int):
+
+    hoy = date.today()
+
+    # Periodos cuyo cierre de informes AC ya pasó
+    periodos_cerrados = (
+        db.query(Periodo)
+        .filter(Periodo.fecha_cierre_informesAC < hoy)
+    )
+
+    # Periodos que ya tienen un informe sintetico del departamento
+    periodos_con_informe = (
+        db.query(InformeSintetico.periodo_id)
+        .filter(InformeSintetico.departamento_id == departamento_id)
+        .subquery()
+    )
+
+    # Verifica que el periodo tenga un informeAC hecho para el departamento
+    periodos_con_informesAC_del_departamento = (
+    db.query(Periodo.id)
+    .join(Materias, Materias.id_periodo == Periodo.id)
+    .join(InformesAC, InformesAC.id_materia == Materias.id_materia)
+    .filter(Materias.id_departamento == departamento_id)
+    .distinct()
+    .subquery()
+    )
+
+    # Periodos cerrados que no están en periodos_con_informe
+    periodos_pendientes = (
+        periodos_cerrados
+        .filter(Periodo.id.not_in(periodos_con_informe))
+        #.filter(Periodo.id.in_(periodos_con_informesAC_del_departamento))      #descomentar para validar que haya informesAC en el periodo
+        .order_by(Periodo.ciclo_lectivo.desc(), Periodo.cuatrimestre.desc())
+        .all()
+    )
+
+    resultados = []
+
+    for periodo in periodos_pendientes:
+        # Cantidad materias -> cantidad informesAC esperados
+        cantidad_materias = (
+            db.query(func.count(Materias.id_materia))
+            .filter(
+                Materias.id_periodo == periodo.id,
+                Materias.id_departamento == departamento_id
+            )
+            .scalar()
+        )
+
+        # Cantidad recibida -> informesAC completados
+        cantidad_recibidos = (
+            db.query(func.count(InformesAC.id_informesAC))
+            .join(Materias, InformesAC.id_materia == Materias.id_materia)
+            .filter(
+                Materias.id_periodo == periodo.id,
+                Materias.id_departamento == departamento_id,
+                Materias.informeACCompletado == True
+            )
+            .scalar()
+        )
+
+        resultados.append({
+            "id": periodo.id,
+            "ciclo_lectivo": periodo.ciclo_lectivo,
+            "cuatrimestre": periodo.cuatrimestre,
+            "fecha_cierre_informesAC": periodo.fecha_cierre_informesAC,
+            "cantidad_informes_esperados": cantidad_materias,
+            "cantidad_informes_recibidos": cantidad_recibidos
+        })
+
+    return resultados
+
+
+def estadisticas_resumen_departamento(db: Session, departamento_id: int):
+
+    # --- 1) Cantidad de docentes del departamento ---
+    cantidad_docentes = (
+        db.query(Docentes)
+        .join(Materias, Materias.id_docente == Docentes.id_docente)
+        .filter(Materias.id_departamento == departamento_id)
+        .distinct()
+        .count()
+    )
+
+    # --- 2) Cantidad de alumnos inscriptos en las materias ---
+    cantidad_alumnos = (
+        db.query(Inscripciones.estudiante_id)
+        .join(Materias, Materias.id_materia == Inscripciones.materia_id)
+        .filter(Materias.id_departamento == departamento_id)
+        .distinct()
+        .count()
+    )
+
+    # --- 3) Informes sintéticos pendientes ---
+    pendientes = listar_informes_sinteticos_pendientes_del_departamento(db, departamento_id)
+    cantidad_pendientes = len(pendientes)
+
+    return {
+        "docentes": cantidad_docentes,
+        "alumnos": cantidad_alumnos,
+        "informes_sinteticos_pendientes": cantidad_pendientes
+    }

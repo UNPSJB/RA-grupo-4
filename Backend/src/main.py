@@ -3,10 +3,8 @@ from contextlib import asynccontextmanager
 from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-
 from src.database import engine
 from src.models import ModeloBase
-
 from src.informesAC.router import router as informesAC_router
 from src.estudiantes.router import router as estudiantes_router
 from src.encuesta.router import router as encuesta_router
@@ -21,13 +19,14 @@ from src.informesSinteticos.router import router as informesSinteticos_router
 from src.departamentos.router import router as departamentos_router
 from src.secciones.router import router as secciones_router
 from src.actividades.router import router as actividades_router
-
-from fastapi.middleware.cors import CORSMiddleware
+from src.periodos.router import router as periodos_router
+from src.auth import router as auth_router
+from src.users import router as users_router
 
 load_dotenv()
 
 ENV = os.getenv("ENV")
-ROOT_PATH = os.getenv(f"ROOT_PATH_{ENV.upper()}")
+ROOT_PATH = os.getenv(f"ROOT_PATH_{ENV.upper()}") if ENV else ""
 
 @asynccontextmanager
 async def db_creation_lifespan(app: FastAPI):
@@ -39,7 +38,8 @@ app = FastAPI(root_path=ROOT_PATH, lifespan=db_creation_lifespan)
 origins = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
-    "http://localhost:8000"
+    "http://localhost:8000",
+    "http://127.0.0.1:8000",
 ]
 
 app.add_middleware(
@@ -64,3 +64,7 @@ app.include_router(informesSinteticos_router)
 app.include_router(departamentos_router)
 app.include_router(secciones_router)
 app.include_router(actividades_router)
+app.include_router(periodos_router)
+
+app.include_router(auth_router.router)
+app.include_router(users_router.router)

@@ -33,28 +33,43 @@ def listar_todos_los_informes(db: Session):
     return db.query(models.InformesAC).all()
 
 
-# --- MODIFICADO (Lógica de filtrado) ---
 def filtrar_informes(
     db: Session,
     id_docente: int | None = None,
-    id_materia: int | None = None,
+    id_materia: int | None = None,  
+    id_periodo: int | None = None,
 ):
     query = db.query(InformesAC).options(
-        joinedload(InformesAC.materia), # Eager loading
-        joinedload(InformesAC.docente)  # Eager loading
+        joinedload(InformesAC.docente),
+        joinedload(InformesAC.materia).joinedload(Materias.periodo)
     )
 
+    # --- Filtrar por docente ---
     if id_docente is not None:
         query = query.filter(InformesAC.id_docente == id_docente)
 
+    # --- Filtrar por materia (por código académico, no por ID) ---
     if id_materia is not None:
-        query = query.filter(InformesAC.id_materia == id_materia)
-        
-    # --- LÓGICA DE BANDERA (MODIFICADA) ---
-    # Filtra solo por informes cuya materia asociada esté marcada como completada
-    query = query.join(Materias).filter()#Materias.informeACCompletado == True)
-    
+        materia = db.query(Materias).get(id_materia)
+        if materia is None:
+            return []
+
+        query = query.filter(
+            InformesAC.materia.has(
+                Materias.codigoMateria == materia.codigoMateria
+            )
+        )
+
+    # --- Filtrar por periodo ---
+    if id_periodo is not None:
+        query = query.filter(
+            InformesAC.materia.has(
+                Materias.id_periodo == id_periodo
+            )
+        )
+
     return query.all()
+
 
 
 def actualizar_opinion_informe(db: Session, id_informe: int, opinion: str):
@@ -192,7 +207,7 @@ def create_informe_ac(db: Session, informe: schemas.InformeACCreate):
     )
     
     # 4. Actualizar la bandera en la materia
-    #materia_db.informeACCompletado = True
+    materia_db.informeACCompletado = True
 
     # 5. Guardar ambos cambios en una transacción
     try:
@@ -203,5 +218,5 @@ def create_informe_ac(db: Session, informe: schemas.InformeACCreate):
     except Exception as e:
         db.rollback()
         raise HTTPException(status_code=500, detail=f"Error al guardar: {e}")
-        
+
     return db_informe

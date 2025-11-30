@@ -1,6 +1,6 @@
 from sqlalchemy import Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from typing import List
+from typing import List, Optional
 from src.models import ModeloBase
 
 class Docentes(ModeloBase):
@@ -10,7 +10,7 @@ class Docentes(ModeloBase):
     nombre: Mapped[str] = mapped_column(String, unique=True, index=True)
     nroLegajo: Mapped[int] = mapped_column(Integer, index=True)
 
-    Materias: Mapped[List["Materias"]] = relationship(
+    materias: Mapped[List["Materias"]] = relationship(
         "Materias",
         back_populates="docente"
     )
@@ -18,3 +18,6 @@ class Docentes(ModeloBase):
         "InformesAC", 
         back_populates="docente"
     )
+
+    user: Mapped[Optional["User"]] = relationship("User", back_populates="docente")
+

@@ -1,7 +1,8 @@
 import React, { useEffect, useState, useCallback, useMemo } from "react";
+import SinDatos from "../Otros/SinDatos";
 import ErrorCargaDatos from "../Otros/ErrorCargaDatos";
 
-const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:8000";
+const API_BASE = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_URL) || "http://localhost:8000";
 
 // --- TIPOS COMPARTIDOS ---
 export type TipoValoracion = 'E' | 'MB' | 'B' | 'R' | 'I';
@@ -17,7 +18,7 @@ export interface ValoracionMiembro {
 }
 
 // =====================================================================
-// === COMPONENTE HIJO: TARJETA DE DOCENTE INDIVIDUAL (MEJORADO) ===
+// === COMPONENTE HIJO: TARJETA DE DOCENTE INDIVIDUAL ===
 // =====================================================================
 interface DocenteCardProps {
   docente: ValoracionMiembro;
@@ -35,7 +36,6 @@ const DocenteValoracionCard: React.FC<DocenteCardProps> = ({
   return (
     <div className="doc-card">
       <div className="doc-header">
-        {/* Usamos un SVG como ícono moderno para más flexibilidad y escalabilidad */}
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="doc-icon-svg">
           <path fillRule="evenodd" d="M7.5 6a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0ZM3.751 20.105a8.25 8.25 0 0 1 16.498 0 .75.75 0 0 1-.437.695A18.683 18.683 0 0 1 12 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 0 1-.437-.695Z" clipRule="evenodd" />
         </svg>
@@ -81,35 +81,40 @@ const DocenteValoracionCard: React.FC<DocenteCardProps> = ({
 // =====================================================================
 interface AutocompletarValoracionesProps {
   departamentoId: number | null;
+  periodoId?: number;
 }
 
-const AutocompletarValoracionesDep: React.FC<AutocompletarValoracionesProps> = ({ departamentoId }) => {
+const AutocompletarValoracionesDep: React.FC<AutocompletarValoracionesProps> = ({ departamentoId, periodoId }) => {
   const [miembros, setMiembros] = useState<ValoracionMiembro[]>([]);
   const [cargando, setCargando] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [materiaExpandida, setMateriaExpandida] = useState<string | null>(null);
 
-  const ANIO_EVALUADO = 2025;
-  const MODO_LECTURA = true; // CAMBIAR A false PARA PROBAR EDICIÓN
+  const PERIODO_ID_DEFAULT = 2; 
+  const periodoFinal = periodoId ?? PERIODO_ID_DEFAULT;
+  const MODO_LECTURA = true; 
 
   const fetchMiembros = useCallback(async () => {
-    if (!departamentoId) return;
+    if (!departamentoId) {
+        setMiembros([]);
+        return;
+    }
     setCargando(true);
     setError(null);
     try {
       const response = await fetch(
-        `${API_BASE}/informes-sinteticos/preview/valoraciones-miembros?departamento_id=${departamentoId}&anio=${ANIO_EVALUADO}`
+        `${API_BASE}/informes-sinteticos/preview/valoraciones-miembros?departamento_id=${departamentoId}&periodo_id=${periodoFinal}`
       );
       if (!response.ok) throw new Error(`Error ${response.status}`);
       const data = await response.json();
-      console.log("Valoraciones recibidas del backend:", data);
-      setMiembros(data);
+      setMiembros(Array.isArray(data) ? data : []);
     } catch (err: any) {
       setError(err.message || "Error desconocido.");
+      setMiembros([]);
     } finally {
       setCargando(false);
     }
-  }, [departamentoId]);
+  }, [departamentoId, periodoFinal]);
 
   useEffect(() => { fetchMiembros(); }, [fetchMiembros]);
 
@@ -138,10 +143,6 @@ const AutocompletarValoracionesDep: React.FC<AutocompletarValoracionesProps> = (
 
   const toggleMateria = (codigo: string) => setMateriaExpandida((prev) => (prev === codigo ? null : codigo));
 
-  // --- RENDERIZADO PADRE ---
-  if (!departamentoId) return <div style={{ padding: "30px", textAlign: "center", color: "#666" }}>🏛️ Seleccione un departamento.</div>;
-  if (error) return <ErrorCargaDatos mensajeError={error} onReintentar={fetchMiembros} />;
-
   return (
     <div className="uni-wrapper">
       <style>{`
@@ -158,16 +159,22 @@ const AutocompletarValoracionesDep: React.FC<AutocompletarValoracionesProps> = (
           --uni-shadow-hover: rgba(0, 51, 102, 0.15); /* Sombra al pasar el ratón */
 
           /* Colores para las pills de valoración */
-          --val-e: #28a745; /* Verde para Excelente */
-          --val-mb: #0056b3; /* Azul más oscuro para Muy Bien (tu primario) */
-          --val-b: #007bff; /* Azul para Bien (tu secundario) */
-          --val-r: #ffc107; /* Amarillo/Naranja para Regular */
-          --val-i: #dc3545; /* Rojo para Insuficiente */
+          --val-e: #28a745; 
+          --val-mb: #0056b3; 
+          --val-b: #007bff; 
+          --val-r: #ffc107; 
+          --val-i: #dc3545; 
         }
 
         /* TIPOGRAFÍA Y BASE */
         .uni-wrapper { font-family: "Inter", "Segoe UI", Roboto, sans-serif; padding: 20px 0; animation: fadeIn 0.6s ease-out; color: var(--uni-text-primary); }
-        h1, h2, h3, h4, h5, h6 { color: var(--uni-text-primary); }
+
+        /* Contenedor para estados vacíos y errores */
+        .uni-content-container {
+            padding: 20px 30px;
+            background-color: #ffffff;
+            border-radius: 12px;
+        }
 
         /* HEADER PRINCIPAL */
         .uni-header { display: flex; align-items: center; margin-bottom: 25px; border-bottom: 3px solid var(--uni-primary); padding-bottom: 15px; }
@@ -187,7 +194,7 @@ const AutocompletarValoracionesDep: React.FC<AutocompletarValoracionesProps> = (
         .materia-body { padding: 35px 30px; background: var(--uni-bg); border-top: 1px solid var(--uni-border); animation: slideDown 0.4s ease-out forwards; }
         .docente-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 30px; }
 
-        /* TARJETA DOCENTE (NUEVO DISEÑO INTERNO) */
+        /* TARJETA DOCENTE */
         .doc-card { 
             background: var(--uni-card-bg); border-radius: 12px; border: 1px solid var(--uni-border);
             display: flex; flex-direction: column; min-height: 340px; 
@@ -202,12 +209,11 @@ const AutocompletarValoracionesDep: React.FC<AutocompletarValoracionesProps> = (
             font-weight: 700; color: var(--uni-primary); font-size: 1.3rem; 
             display: flex; align-items: center; gap: 12px; background: #fdfdfd;
         }
-        /* Icono SVG del docente */
         .doc-icon-svg { width: 28px; height: 28px; color: var(--uni-secondary); opacity: 0.85; }
         
         .doc-body { padding: 25px; display: flex; flex-direction: column; gap: 25px; flex-grow: 1; background: #fff; }
         
-        /* SELECTOR DE VALORACIÓN (PILLS) MEJORADO */
+        /* SELECTOR DE VALORACIÓN (PILLS) */
         .val-label { font-size: 0.9rem; font-weight: 700; color: var(--uni-text-secondary); text-transform: uppercase; margin-bottom: 12px; display: block; letter-spacing: 0.8px; }
         .val-pills-container { display: flex; gap: 10px; justify-content: space-between; }
         
@@ -216,17 +222,17 @@ const AutocompletarValoracionesDep: React.FC<AutocompletarValoracionesProps> = (
             font-weight: 800; font-size: 1.05rem; color: var(--uni-text-secondary); 
             border: 2px solid var(--uni-border); background: var(--uni-bg);
             cursor: pointer; transition: all 0.25s ease-in-out;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.06); /* Sombra interior sutil */
-            user-select: none; /* Evita selección de texto */
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.06); 
+            user-select: none;
         }
         .val-pill:hover:not(:disabled) { 
             border-color: var(--uni-secondary); 
-            background: #e9f0f7; /* Ligero hover */
-            transform: translateY(-2px); /* Pequeño levantamiento */
+            background: #e9f0f7; 
+            transform: translateY(-2px); 
             box-shadow: inset 0 2px 4px rgba(0,0,0,0.06), 0 5px 10px rgba(0,0,0,0.08);
         }
         .val-pill:active:not(:disabled) { 
-            transform: translateY(0); /* Efecto de click */
+            transform: translateY(0); 
             box-shadow: inset 0 2px 8px rgba(0,0,0,0.1); 
         }
         .val-pill:disabled { cursor: not-allowed; opacity: 0.7; }
@@ -238,17 +244,17 @@ const AutocompletarValoracionesDep: React.FC<AutocompletarValoracionesProps> = (
         .val-pill.active-R { background: var(--val-r); border-color: var(--val-r); color: #343a40; box-shadow: inset 0 2px 6px rgba(0,0,0,0.2), 0 4px 12px rgba(255,193,7,0.4); }
         .val-pill.active-I { background: var(--val-i); border-color: var(--val-i); color: white; box-shadow: inset 0 2px 6px rgba(0,0,0,0.2), 0 4px 12px rgba(220,53,69,0.4); }
 
-        /* TEXTAREA MEJORADA */
+        /* TEXTAREA */
         .doc-textarea { 
             width: 100%; padding: 15px; border: 2px solid var(--uni-border); border-radius: 10px; 
             font-family: inherit; font-size: 1rem; background: #fdfdfd; color: var(--uni-text-primary);
             resize: vertical; min-height: 100px; box-sizing: border-box; transition: all 0.2s ease-in-out;
-            box-shadow: inset 0 1px 3px rgba(0,0,0,0.08); /* Sombra interior sutil */
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.08); 
         }
         .doc-textarea:not(:read-only):focus { 
             outline: none; border-color: var(--uni-secondary); 
             background: var(--uni-card-bg); 
-            box-shadow: inset 0 1px 3px rgba(0,0,0,0.08), 0 0 0 3px rgba(0,123,255,0.25); /* Focus ring */
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.08), 0 0 0 3px rgba(0,123,255,0.25); 
         }
         .doc-textarea:read-only { background: var(--uni-bg); color: var(--uni-text-secondary); border-color: #e9ecef; cursor: default; }
         .doc-textarea::placeholder { color: var(--uni-text-secondary); opacity: 0.7; }
@@ -257,61 +263,89 @@ const AutocompletarValoracionesDep: React.FC<AutocompletarValoracionesProps> = (
         /* ANIMACIONES Y UTILIDADES */
         @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        
         .skeleton { height: 80px; background: #e0e0e0; margin-bottom: 15px; border-radius: 12px; animation: pulse 1.5s infinite; }
         @keyframes pulse { 0% { opacity: 0.6; } 50% { opacity: 1; } 100% { opacity: 0.6; } }
       `}</style>
-
-      <div className="uni-header">
-        <h2 className="uni-title">Valoración de Desempeño Docente</h2>
-        {!cargando && materiasAgrupadas.length > 0 && (
-          <span className="uni-badge">{materiasAgrupadas.length} Materias</span>
-        )}
-      </div>
-
-      {cargando ? (
-        <div style={{ opacity: 0.6 }}>{[1, 2].map((i) => (<div key={i} className="skeleton"></div>))}</div>
-      ) : materiasAgrupadas.length === 0 ? (
-        <div style={{ padding: "40px", textAlign: "center", color: "#666", backgroundColor: "#fff", borderRadius: "12px", border: "2px dashed #ccc" }}>
-          <div style={{ fontSize: "2rem", marginBottom: "10px" }}>📭</div>
-          <p>No se encontraron docentes para valorar en este periodo.</p>
-        </div>
-      ) : (
-        <div>
-          {materiasAgrupadas.map((materia) => {
-            const isExpanded = materiaExpandida === materia.codigo;
+      
+      {/* Lógica de Renderizado Principal */}
+      {(() => {
+        // 1. Caso: Sin Departamento Seleccionado
+        if (!departamentoId) {
             return (
-              <div key={materia.codigo} className={`materia-card ${isExpanded ? "expanded" : ""}`}>
-                <div className="materia-header" onClick={() => toggleMateria(materia.codigo)}>
-                  <div className="materia-title">
-                    <span className="materia-code-badge">{materia.codigo}</span>
-                    {materia.nombre}
-                  </div>
-                  <div className="materia-info">
-                    <span style={{fontWeight: 'bold', color: 'rgba(255,255,255,0.9)'}}>{materia.docentes.length} docentes</span>
-                    <span className={`chevron ${isExpanded ? "rotated" : ""}`}>▼</span>
-                  </div>
+                <div className="uni-content-container">
+                    <SinDatos mensaje="Seleccione un departamento para valorar a los docentes." />
+                </div>
+            );
+        }
+
+        // 2. Caso: Error en la carga
+        if (error) {
+            return (
+                <div className="uni-content-container">
+                    <ErrorCargaDatos error={error} />
+                </div>
+            );
+        }
+
+        // 3. Renderizado Normal
+        return (
+            <>
+                <div className="uni-header">
+                    <h2 className="uni-title">Valoración de Desempeño Docente</h2>
+                    {!cargando && materiasAgrupadas.length > 0 && (
+                        <span className="uni-badge">{materiasAgrupadas.length} Materias</span>
+                    )}
                 </div>
 
-                {isExpanded && (
-                  <div className="materia-body">
-                    <div className="docente-grid">
-                      {materia.docentes.map((doc, i) => (
-                        <DocenteValoracionCard
-                          key={`${doc.id_docente}-${doc.codigo_materia}-${i}`}
-                          docente={doc}
-                          isReadOnly={MODO_LECTURA}
-                          onValoracionChange={(newVal) => handleValoracionChange(doc.id_docente, doc.codigo_materia, newVal)}
-                          onJustificacionChange={(newText) => handleJustificacionChange(doc.id_docente, doc.codigo_materia, newText)}
-                        />
-                      ))}
+                {cargando ? (
+                    <div style={{ opacity: 0.6 }}>
+                        {[1, 2].map((i) => (<div key={i} className="skeleton"></div>))}
                     </div>
-                  </div>
+                ) : materiasAgrupadas.length === 0 ? (
+                    <div className="uni-content-container">
+                        <SinDatos mensaje="No se encontraron docentes para valorar en las materias de este departamento." />
+                    </div>
+                ) : (
+                    <div>
+                        {materiasAgrupadas.map((materia) => {
+                            const isExpanded = materiaExpandida === materia.codigo;
+                            return (
+                                <div key={materia.codigo} className={`materia-card ${isExpanded ? "expanded" : ""}`}>
+                                    <div className="materia-header" onClick={() => toggleMateria(materia.codigo)}>
+                                        <div className="materia-title">
+                                            <span className="materia-code-badge">{materia.codigo}</span>
+                                            {materia.nombre}
+                                        </div>
+                                        <div className="materia-info">
+                                            <span style={{fontWeight: 'bold', color: 'rgba(255,255,255,0.9)'}}>{materia.docentes.length} docentes</span>
+                                            <span className={`chevron ${isExpanded ? "rotated" : ""}`}>▼</span>
+                                        </div>
+                                    </div>
+
+                                    {isExpanded && (
+                                        <div className="materia-body">
+                                            <div className="docente-grid">
+                                                {materia.docentes.map((doc, i) => (
+                                                    <DocenteValoracionCard
+                                                        key={`${doc.id_docente}-${doc.codigo_materia}-${i}`}
+                                                        docente={doc}
+                                                        isReadOnly={MODO_LECTURA}
+                                                        onValoracionChange={(newVal) => handleValoracionChange(doc.id_docente, doc.codigo_materia, newVal)}
+                                                        onJustificacionChange={(newText) => handleJustificacionChange(doc.id_docente, doc.codigo_materia, newText)}
+                                                    />
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            );
+                        })}
+                    </div>
                 )}
-              </div>
-            );
-          })}
-        </div>
-      )}
+            </>
+        );
+      })()}
     </div>
   );
 };

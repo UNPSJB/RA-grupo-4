@@ -2,12 +2,10 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from src.database import get_db
 from src.encuesta import schemas, services
-from src.preguntas.schemas import Pregunta as PreguntaSchema, PreguntaCreate as PreguntaCreateSchema
 from src.secciones.schemas import Seccion as SchemaSeccion
-from typing import List
+from typing import List, Dict, Any
 
 router = APIRouter(prefix="/encuestas", tags=["encuestas"])
-
 
 @router.post("/", response_model=schemas.Encuesta)
 def create_encuesta(encuesta: schemas.EncuestaCreate, db: Session = Depends(get_db)):
@@ -17,92 +15,87 @@ def create_encuesta(encuesta: schemas.EncuestaCreate, db: Session = Depends(get_
 def read_encuestas_disponibles(db: Session = Depends(get_db)):
     return services.listar_encuestas_disponibles(db)
 
+@router.get("/listado-materias-general")
+def get_todas_materias_con_encuesta(db: Session = Depends(get_db)):
+    """
+    Ruta para el panel de Departamento.
+    Devuelve todas las materias que tienen encuestas para poder ver sus estadísticas.
+    Se coloca aquí para evitar conflicto con la ruta /{id_encuesta}.
+    """
+    materias = services.obtener_todas_materias_con_encuesta(db)
+    
+    # Formateamos la respuesta
+    resultado = []
+    for mat in materias:
+        resultado.append({
+            "id": mat.id_materia,
+            "nombre": mat.nombre,
+            "ciclo_lectivo": mat.periodo.ciclo_lectivo,
+            "cuatrimestre": mat.periodo.cuatrimestre, 
+            "cant_inscriptos": len(mat.inscripciones) if mat.inscripciones else 0
+        })
+    return resultado
 
 @router.get("/", response_model=list[schemas.Encuesta])
 def read_encuestas(db: Session = Depends(get_db)):
     return services.listar_encuestas(db)
 
-
 @router.get("/{id_encuesta}", response_model=schemas.Encuesta)
 def read_encuesta(id_encuesta: int, db: Session = Depends(get_db)):
-    try:
-        encuesta = services.leer_encuesta(db, id_encuesta)
-        if not encuesta:
-            raise HTTPException(status_code=404, detail="Encuesta no encontrada")
-        return encuesta
-    except Exception as e:
-        import traceback
-        print("ERROR en read_encuesta")
-        traceback.print_exc()  
-        raise HTTPException(status_code=500, detail=str(e))
-
-
+    return services.leer_encuesta(db, id_encuesta)
 
 @router.put("/{id_encuesta}", response_model=schemas.Encuesta)
-def update_encuesta(
-    id_encuesta: int, encuesta: schemas.EncuestaUpdate, db: Session = Depends(get_db)
-):
-    encuesta_actualizada = services.modificar_encuesta(db, id_encuesta, encuesta)
-    if not encuesta_actualizada:
-        raise HTTPException(status_code=404, detail="Encuesta no encontrada")
-    return encuesta_actualizada
-
+def update_encuesta(id_encuesta: int, encuesta: schemas.EncuestaUpdate, db: Session = Depends(get_db)):
+    return services.modificar_encuesta(db, id_encuesta, encuesta)
 
 @router.delete("/{id_encuesta}", response_model=schemas.EncuestaDelete)
 def delete_encuesta(id_encuesta: int, db: Session = Depends(get_db)):
-    encuesta_eliminada = services.eliminar_encuesta(db, id_encuesta)
-    if not encuesta_eliminada:
-        raise HTTPException(status_code=404, detail="Encuesta no encontrada")
-    return encuesta_eliminada
-
-
+    return services.eliminar_encuesta(db, id_encuesta)
 
 @router.post("/{id_encuesta}/secciones", response_model=SchemaSeccion)
 def agrega_seccion_a_encuesta(id_encuesta: int, seccion: SchemaSeccion, db: Session = Depends(get_db)):
     return services.agregar_seccion_a_encuesta(db, id_encuesta, seccion)
 
-
-@router.get(
-    "/estudiantes/{estudiante_id}/encuestas_habilitadas",
-    response_model=List[schemas.EncuestaDisponible],
-    tags=["estudiantes"] 
-)
-def seleccionar_encuestas_disponibles(
-    estudiante_id: int,
-    db: Session = Depends(get_db)
-):
-    """
-    Obtiene las encuestas habilitadas para un estudiante basado en sus inscripciones a materias.
-    """
+@router.get("/estudiantes/{estudiante_id}/encuestas_habilitadas", response_model=List[schemas.EncuestaDisponible], tags=["estudiantes"])
+def seleccionar_encuestas_disponibles(estudiante_id: int, db: Session = Depends(get_db)):
     return services.get_encuestas_disponibles_por_estudiante(db, estudiante_id)
 
-@router.get("/estudiantes/{id_estudiante}", tags=["encuestas"])
-def obtener_encuestas_disponibles(id_estudiante: int):
+@router.get("/estudiantes/{estudiante_id}/historial")
+def get_historial_estudiante(estudiante_id: int, db: Session = Depends(get_db)):
+    return services.obtener_historial_materias_estudiante(db, estudiante_id)
+
+@router.get("/estudiantes/{estudiante_id}/respuestas")
+def get_historial_respuestas_filtrado(estudiante_id: int, db: Session = Depends(get_db)):
     """
-    Endpoint de prueba para devolver encuestas disponibles a un estudiante.
-    Luego se reemplazará con la lógica real que use Inscripciones y Materias.
+    Ruta específica para el historial de encuestas completadas.
+    Filtra las materias y devuelve SOLO las que ya tienen 'encuesta_procesada' = True.
     """
-    encuestas = [
-        {"id": 1, "nombre": "Encuesta de Programación I", "materia": "Programación I", "habilitada": True},
-        {"id": 2, "nombre": "Encuesta de Matemática I", "materia": "Matemática I", "habilitada": False},
-        {"id": 3, "nombre": "Encuesta de Base de Datos", "materia": "Base de Datos", "habilitada": True},
-    ]
+    todas_las_materias = services.obtener_historial_materias_estudiante(db, estudiante_id)
+    
+    historial_filtrado = []
 
-    # Solo devuelve las encuestas habilitadas
-    disponibles = [e for e in encuestas if e["habilitada"]]
-    return disponibles
+    for materia in todas_las_materias:
+        if materia["encuesta_procesada"] is True:
+            historial_filtrado.append({
+                "id": materia["id"],
+                "materia_id": materia["id"],
+                "materia_nombre": materia["nombre"],
+                "encuesta_nombre": materia["encuesta_nombre"],
+                "ciclo_lectivo": materia["ciclo_lectivo"],
+                "cuatrimestre": materia["cuatrimestre"],
+                "fecha_finalizacion": "Completada" 
+            })
+            
+    return historial_filtrado
 
+@router.get("/estudiantes/{estudiante_id}/respuestas/materia/{materia_id}", response_model=schemas.HistorialDetalle)
+def get_mis_respuestas(estudiante_id: int, materia_id: int, db: Session = Depends(get_db)):
+    return services.obtener_respuestas_alumno(db, estudiante_id, materia_id)
 
+@router.get("/estadisticas/materia/{materia_id}", response_model=schemas.MateriaEstadisticas)
+def get_estadisticas_docente(materia_id: int, db: Session = Depends(get_db)):
+    return services.obtener_estadisticas_docente(db, materia_id)
 
-@router.get("/admin/debug-listado", tags=["debug"])
-def debug_encuestas_admin(db: Session = Depends(get_db)):
-    encuestas = services.listar_encuestas(db)
-    return [
-        {
-            "id_encuesta": e.id_encuesta,
-            "nombre": e.nombre,
-            "disponible": e.disponible,
-            "tipo_disponible": type(e.disponible).__name__
-        }
-        for e in encuestas
-    ]
+@router.get("/estadisticas/materia/{materia_id}/publica", response_model=schemas.MateriaEstadisticas)
+def get_estadisticas_alumno(materia_id: int, db: Session = Depends(get_db)):
+    return services.obtener_estadisticas_alumno(db, materia_id)

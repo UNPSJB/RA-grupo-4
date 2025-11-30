@@ -5,16 +5,16 @@ import HeaderInstitucional from "../Otros/HeaderInstitucional";
 import SinDatos from "../Otros/SinDatos";
 
 //Para ver datos hardcodeados
-const USE_DEBUG_DATA = true;
+const USE_DEBUG_DATA =true;
 
 const MOCK_INFORME_DATA: InformeSinteticoDetalle = {
   id: 999,
-  descripcion: "[MODO PRUEBA] Informe Anual de Departamento",
-  anio: 2025,
-  periodo: "Anual",
-  sede: "Puerto Madryn",
+  descripcion: "Informe del Departamento de informatica",
+  ciclo_lectivo: 2025,
+  periodo: "Segundo Cuatrimestre",
+  sede: "Trelew",
   integrantes: "Lic. Ana Turing, Dr. Alan Kay",
-  departamento_nombre: "Departamento de Informática Experimental",
+  departamento_nombre: "Departamento de Informática ",
   comentarios: "Este es un comentario de prueba para verificar cómo se visualizan los textos largos en el documento final. Se espera que ocupe varias líneas y mantenga un formato legible.",
   resumen_general: [
     { codigo: "INF101", nombre: "Algoritmos I", alumnos_inscriptos: 150, comisiones_teoricas: 2, comisiones_practicas: 6 },
@@ -64,7 +64,7 @@ interface ValoracionMiembroItem {
 interface InformeSinteticoDetalle {
   id: number;
   descripcion: string;
-  anio: number;
+  ciclo_lectivo: number;
   periodo: string;
   sede: string;
   integrantes: string | null;
@@ -84,7 +84,7 @@ const PrevisualizarInformeSinteticoSec: React.FC = () => {
   const fetchInformeDetalle = useCallback(async () => {
     // Si estamos en modo debug, usamos los datos falsos y salimos
     if (USE_DEBUG_DATA) {
-      console.log("⚡ MODO DEBUG ACTIVADO: Usando datos mock");
+      console.log(" MODO DEBUG ACTIVADO: Usando datos mock");
       setTimeout(() => {
         setInforme(MOCK_INFORME_DATA);
         setCargando(false);
@@ -259,18 +259,18 @@ const PrevisualizarInformeSinteticoSec: React.FC = () => {
           }
         `}</style>
 
-        {USE_DEBUG_DATA && (
+        {/* {USE_DEBUG_DATA && (
           <div style={{background: '#fff3cd', color: '#856404', padding: '10px', textAlign: 'center', marginBottom: '20px', border: '1px solid #ffeeba', borderRadius: '4px'}}>
             ⚠️ <strong>MODO PREVISUALIZACIÓN:</strong> Se están mostrando datos de prueba hardcodeados.
           </div>
-        )}
+        )} */}
 
         {/* --- ENCABEZADO DEL DOCUMENTO --- */}
         <div className="doc-header">
           <h1 className="doc-title">Informe Sintetico de Departamento</h1>
           <div className="doc-meta">
             {informe.departamento_nombre && <div><strong>Departamento:</strong> {informe.departamento_nombre}</div>}
-            <div><strong>Sede:</strong> {informe.sede} | <strong>Período:</strong> {informe.periodo} - {informe.anio}</div>
+            <div><strong>Sede:</strong> {informe.sede} | <strong>Período:</strong> {informe.periodo} - {informe.ciclo_lectivo}</div>
             <div><strong>ID Documento:</strong> #{informe.id}</div>
           </div>
         </div>

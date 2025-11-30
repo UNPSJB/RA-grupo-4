@@ -1,161 +1,219 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Routes, Route, Link } from "react-router-dom";
+import { Routes, Route, Link, Outlet, useNavigate, Navigate } from "react-router-dom";
+import { User, LogOut, Calendar, ChevronDown, Menu } from "lucide-react";
 import "./App.css";
 
-// --- IMPORTACIONES DE IMÁGENES ---
-import logoUnpsjb from "./assets/logo_unpsjb.png";
-import userAvatar from "./assets/avatarOA.png";
+// --- IMPORTS DEL SISTEMA DE AUTENTICACIÓN ---
+import { useAuth } from "./hooks/useAuth";
+import { AuthLayout } from "./layouts/AuthLayout";
+import Login from "./features/auth/Login";
 
-// Componentes de autenticación y generales
-import LoginPage from "./Componentes/Otros/LoginPage";
+// Assets
+import fotoPerfil from './assets/avatarOA.png'; 
+import logoUnpsjb from './assets/logo_unpsjb.png';
+
+// Componentes Generales
 import HomePage from "./Componentes/Otros/HomePage";
 import ErrorCargaDatos from "./Componentes/Otros/ErrorCargaDatos";
 import SinDatos from "./Componentes/Otros/SinDatos";
+import Calendario from "./Componentes/Otros/Calendario";
+import MostrarMiPerfil from "./Componentes/Otros/MostrarMiPerfil";
 
-// Componentes de Alumno
-import SeleccionarEncuestas from "./Componentes/Estudiante/SeleccionarEncuestas";
-import ResponderEncuesta from "./Componentes/Estudiante/ResponderEncuesta";
+// Menús
+import MenuAlumno from "./Componentes/Menus/MenuAlumno";
+import MenuDocente from "./Componentes/Menus/MenuDocente";
+import MenuDepartamento from "./Componentes/Menus/MenuDepartamento";
+import MenuSecretaria from "./Componentes/Menus/MenuSecretaria";
 
-// Componentes de Docente
-import ListadoInformesACDoc from "./Componentes/Docente/ListadoInformesACDoc";
-import HistorialInformesACDoc from "./Componentes/Docente/HistorialInformesACDoc";
-import PaginaEstadisticasDoc from "./Componentes/Docente/PaginaEstadisticasDoc";
-import EstadisticasPreguntasPage from "./Componentes/Departamento/EstadisticasPorPregunta";
-import GenerarInformeACDoc from "./Componentes/Docente/GenerarInformeAC";
-import VisualizarInformeACDoc from "./Componentes/Docente/VisualizarInformeACDoc";
+// Menu institucional
+import MenuInstitucional from "./Componentes/Menus/Menuinstitucional";
+import Nosotros from "./Componentes/Otros/Nosotros";
 
-// Componentes de Departamento
-import ListadoInformesACDepREAL from "./Componentes/ListadoInformesACDepREAL";
-import GenerarInformeSinteticoDep from "./Componentes/Departamento/GenerarInformeSinteticoDep";
-// Componentes de Secretaría
-import SeleccionarInformeSinteticoSEC from "./Componentes/Secretaria/SeleccionarInformeSinteticoSEC";
-import PrevisualizarInformeSinteticoSec from "./Componentes/Secretaria/PrevizualisarInformeSinteticoSec";
 
-// --- Componente auxiliar para el menú desplegable ---
-const DropdownMenu: React.FC<{ title: string; children: React.ReactNode }> = ({ title, children }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+// =========================================================================
+// 1. LAYOUT PRINCIPAL (NAVBAR DINÁMICO)
+// =========================================================================
+const MainLayout = () => {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [mostrarMenuPerfil, setMostrarMenuPerfil] = useState(false);
+  const menuPerfilRef = useRef(null);
 
-  const toggleDropdown = () => setIsOpen(!isOpen);
-  const closeDropdown = () => setIsOpen(false);
+  const [mostrarMenu, setMostrarMenu] = useState(false);
+  const { currentUser, isAuthenticated, logout } = useAuth();
+  const navigate = useNavigate();
 
+
+  const datosUsuario = {
+    nombre: "Admin",
+    email: "admin@unpsjb.edu.ar",
+    rol: "Administrador",
+    legajo: "0000",
+    carrera: "Licenciatura en Sistemas",
+    sede: "Sede Trelew"
+  };
+
+  // Cerrar menu perfil al hacer clic fuera
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        closeDropdown();
+    const handleClickOutside = (event) => {
+      if (menuPerfilRef.current && !menuPerfilRef.current.contains(event.target)) {
+        setMostrarMenuPerfil(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  
+  const toggleMenu = () => {
+    setMostrarMenu(!mostrarMenu);
+  };
+
+  const handleLogout = async () => {
+    await logout();
+    setMostrarMenu(false);
+    navigate("/"); // Redirige a la raíz (que ahora es el Login)
+  }
+
+  // Si no está autenticado, no debería renderizar nada (será atrapado por AuthLayout)
+  if (!isAuthenticated || !currentUser) return null; 
+  
+  // Lógica del rol (se usa en el menú o en los botones)
+  const roleName = currentUser.role_name || "Usuario";
+
   return (
-    <div className="dropdown" ref={dropdownRef}>
-      <button onClick={toggleDropdown} className="dropdown-button">
-        {title}
-      </button>
-      {isOpen && (
-        <div className="dropdown-content">
-          {React.Children.map(children, (child) =>
-            React.isValidElement(child)
-              ? React.cloneElement(child, { onClick: closeDropdown } as React.Attributes)
-              : child
+    <div className="app-container">
+
+      {/* Menu de hamburgesa, lo vi en tiktok */}
+      <MenuInstitucional 
+        isOpen={sidebarOpen} 
+        onClose={() => setSidebarOpen(false)} 
+      />
+
+      {/*navbar */}
+      <nav className="navbar">
+        <div className="navbar-left">
+          <button className="hamburger-btn" onClick={() => setSidebarOpen(true)}>
+            <Menu size={28} color="#0056b3" />
+          </button>
+
+          <img src={logoUnpsjb} alt="Logo" className="navbar-logo" />
+          <p className="site-name"> Sistema de Encuestas UNPSJB</p>
+          {/* <Link to="/home" className="site-name">Sistema de Encuestas UNPSJB</Link> */}
+        </div>
+
+        <div className="navbar-right" ref={menuPerfilRef}>
+          <div className="navbar-avatar-container" onClick={() => setMostrarMenuPerfil(!mostrarMenuPerfil)}>
+            <div style={{textAlign: 'right', marginRight: '5px', display: 'flex', flexDirection: 'column'}}>
+              <span style={{fontSize: '0.85rem', fontWeight: 'bold', color: '#1e293b'}}>Hola, {datosUsuario.nombre.split(" ")[0]}</span>
+              <span style={{fontSize: '0.7rem', color: '#64748b'}}>{datosUsuario.rol}</span>
+            </div>
+            <img 
+              src={fotoPerfil} 
+              alt="Perfil" 
+              className="navbar-avatar" 
+              style={{width: '40px', height: '40px', borderRadius: '50%', border: '2px solid #e2e8f0'}}
+            />
+            <ChevronDown size={16} color="#64748b" />
+          </div>
+
+          {mostrarMenuPerfil && (
+            <div className="profile-card">
+              <div className="card-header">
+                <img src={fotoPerfil} alt="User" className="card-avatar-large" />
+                <h3 className="card-user-name">{datosUsuario.nombre}</h3>
+                <span className="card-user-role">{datosUsuario.rol}</span>
+                <div style={{fontSize: '0.8rem', marginTop: '5px', opacity: 0.8}}>{datosUsuario.email}</div>
+              </div>
+
+              <div className="card-body">
+                <div className="info-row">
+                  <span className="info-label">Legajo</span>
+                  <span className="info-value">{datosUsuario.legajo}</span>
+                </div>
+                <div className="info-row">
+                  <span className="info-label">Sede</span>
+                  <span className="info-value">{datosUsuario.sede}</span>
+                </div>
+                <div className="info-row" style={{borderBottom: 'none', marginBottom: 0}}>
+                  <span className="info-label">Carrera</span>
+                  <span className="info-value" style={{maxWidth: '150px'}}>{datosUsuario.carrera}</span>
+                </div>
+              </div>
+
+              <div className="card-actions">
+                <Link to="/home/perfil" className="action-btn" onClick={() => setMostrarMenuPerfil(false)}>
+                  <User size={18} /> Mi Perfil Completo
+                </Link>
+                <Link to="/home/calendario" className="action-btn" onClick={() => setMostrarMenuPerfil(false)}>
+                  <Calendar size={18} /> Mi Calendario
+                </Link>
+
+                <div className="dropdown-divider"></div>
+                
+                {/* BOTÓN DE CERRAR SESIÓN QUE EJECUTA EL LOGOUT REAL */}
+                <div className="dropdown-item logout" onClick={handleLogout}> 
+                  Cerrar Sesión
+                </div>
+              </div>
+            </div>
           )}
         </div>
-      )}
+      </nav>
+
+      <div className="page-content">
+        <Outlet />
+      </div>
+
+      <footer className="footer">
+        © 2025 HP TEAM — Sistema de encuestas UNPSJB - Todos los derechos reservados
+      </footer>
     </div>
   );
 };
 
+// =========================================================================
+// 2. FUNCIÓN PRINCIPAL DE LA APLICACIÓN (RUTAS)
+// =========================================================================
 function App() {
+
+  // Usuario Mock ELIMINADO. Los datos vienen de useAuth.
+
   return (
     <Routes>
-      {/* Página de login */}
-      <Route path="/" element={<LoginPage />} />
+      {/* RUTA PÚBLICA: / (Raíz) ahora apunta al Login */}
+      <Route path="/" element={<Login />} />
+      <Route path="/login" element={<Login />} /> {/* Ruta alternativa por si acaso */}
 
-      {/* Estructura principal */}
-      <Route
-        path="/home/*"
-        element={
-          <>
-            <nav className="navbar">
-              <div className="navbar-left">
-                {/* --- LOGO UNPSJB --- */}
-                <img src={logoUnpsjb} alt="Logo UNPSJB" className="navbar-logo" />
-                <span className="site-name">Sistema de encuestas UNPSJB</span>
-              </div>
 
-              <div className="navbar-links">
-                <DropdownMenu title="Funcionalidades Alumno">
-                  <Link to="/home/seleccionar">Seleccionar Encuestas</Link>
-                </DropdownMenu>
+      {/* ---------------------------------------------------- */}
+      {/* RUTAS PROTEGIDAS: Todo lo que requiere LOGIN va aquí */}
+      {/* ---------------------------------------------------- */}
+      
+      {/* AuthLayout verifica la sesión, si falla, redirige a /login */}
+      <Route path="/home" element={<AuthLayout />}>
+        
+        {/* Usamos el MainLayout (Nav y Footer) para las sub-rutas protegidas */}
+        <Route element={<MainLayout />}> 
+            <Route index element={<HomePage />} />
 
-                <DropdownMenu title="Funcionalidades Docente">
-                  <Link to="/home/informes-doc">Informes Pendientes</Link>
-                  <Link to="/home/historial-informes">Historial de Informes</Link>
-                  <Link to="/home/estadisticas-docente">Ver Estadísticas Materias</Link>
-                  <Link to="/home/estadisticas-preguntas">Ver Estadísticas de preguntas</Link>
-                  {/* <Link to="/home/generar-informe">Generar AC par debug</Link> */}
-                </DropdownMenu>
+            {/* Rutas de Usuario (Necesitan ser dinámicas: Docente/Alumno) */}
+            <Route path="alumno/*" element={<MenuAlumno />} />
+            <Route path="docente/*" element={<MenuDocente />} />
+            <Route path="departamento/*" element={<MenuDepartamento />} />
+            <Route path="secretaria/*" element={<MenuSecretaria />} />
 
-                <DropdownMenu title="Funcionalidades Departamento">
-                  <Link to="/home/listado-informes-ac">Gestión Informes A.C.</Link>
-                  <Link to="/home/generar-sintetico">Generar informe Sintetico</Link>
-                </DropdownMenu>
+        
+            <Route path="nosotros" element={<Nosotros />} />
 
-                <DropdownMenu title="Funcionalidades Secretaría">
-                  <Link to="/home/informes-sinteticos">Listado informes sinteticos</Link>
-                  <Link to="/home/ver-sinteticos">ver sinteticos</Link>
-                  {/* borrar si no queremos ver datos hardcodeados */}
-                </DropdownMenu>
-              </div>
+            <Route path="error" element={<ErrorCargaDatos />} />
+            <Route path="sin-datos" element={<SinDatos />} />
+            <Route path="calendario" element={<Calendario />} />
+            <Route path="perfil" element={<MostrarMiPerfil/>} />
+        </Route>
+      </Route>
 
-              <div className="navbar-right">
-                {/* --- AVATAR DE USUARIO --- */}
-                <img src={userAvatar} alt="Avatar Usuario" className="user-avatar" />
-                <Link to="/">Cerrar sesión</Link>
-              </div>
-            </nav>
-
-            <div className="page-content">
-              <Routes>
-                <Route index element={<HomePage />} />
-
-                {/* Rutas de Alumno */}
-                <Route path="seleccionar" element={<SeleccionarEncuestas />} />
-                <Route path="responder-encuesta/:inscripcionId" element={<ResponderEncuesta />} />
-
-                {/* Rutas de Docente */}
-                <Route path="informes-doc" element={<ListadoInformesACDoc />} />
-                <Route path="historial-informes" element={<HistorialInformesACDoc />} />
-                <Route path="estadisticas-docente" element={<PaginaEstadisticasDoc />} />
-                <Route path="estadisticas-preguntas" element={<EstadisticasPreguntasPage />} />
-                <Route path="generar-informe" element={<GenerarInformeACDoc />} />
-                <Route path="generar-informe/:id_materia" element={<GenerarInformeACDoc />} />
-                <Route path="visualizar-informe/:id_informe" element={<VisualizarInformeACDoc />} />
-
-                {/* Rutas de Departamento */}
-                <Route path="listado-informes-ac" element={<ListadoInformesACDepREAL />} />
-                <Route path="generar-sintetico" element={<GenerarInformeSinteticoDep />} />
-
-                {/* Rutas de Secretaría */}
-                <Route path="informes-sinteticos" element={<SeleccionarInformeSinteticoSEC />} />
-                <Route path="ver-sinteticos" element={<PrevisualizarInformeSinteticoSec />} />
-                {/* Usar la ruta de arriba para ver datos hardcodeados, sino borrarla */}
-                <Route path="informe-sintetico/ver/:id" element={<PrevisualizarInformeSinteticoSec />} />
-
-                {/* Rutas de Error/Info */}
-                <Route path="error" element={<ErrorCargaDatos />} />
-                <Route path="sin-datos" element={<SinDatos />} />
-              </Routes>
-            </div>
-
-            <footer className="footer">
-              © 2025 HP TEAM — Sistema de encuestas UNPSJB
-            </footer>
-          </>
-        }
-      />
+      {/* RUTA COMODÍN (Catch-all) */}
+      <Route path="*" element={<Login />} />
     </Routes>
   );
 }

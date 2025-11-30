@@ -1,206 +1,288 @@
-/* --- ========================================= --- */
-/* --- ESTILOS MENÚ ALUMNO "WOW" (MODERNO)       --- */
-/* --- ========================================= --- */
+.menu-alumno-layout-full {
+    --alumno-color-principal: #003366;      /* Reutilizar estos colores*/
+    --alumno-color-secundario: #0078D4;     /* Este igual */
+    --alumno-color-terciario: #e8f4ff;      /* Fondo sutil */
+    --alumno-color-alerta: #e76f51;         /* Alertas */
+    --alumno-bg-base: #ffffff;              /* Fondo General */
+    --alumno-bg-card: #ffffff;              /* Fondo Tarjetas */
+    --alumno-text-dark: #222;
+    --alumno-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+    --alumno-radius: 12px;
+    --alumno-transition: 0.3s ease;
 
-.menu-alumno-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 40px 20px;
-  perspective: 1500px;
-  position: relative; /* Contenedor relativo para el botón */
-}
-
-/* Cabecera con gradiente de texto */
-.menu-alumno-header {
-  text-align: center;
-  margin-bottom: 50px;
-  animation: fadeInDown 0.8s ease-out;
-}
-.menu-alumno-header h1 {
-  font-size: 3rem;
-  margin: 0;
-  font-weight: 700;
-  background: linear-gradient(135deg, var(--primary-color), var(--color-docente));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  text-fill-color: transparent;
-}
-.menu-alumno-header p {
-  font-size: 1.2rem;
-  color: var(--text-color-light);
-  margin-top: 10px;
+    /* Colores para Mini estadisticsa */
+    --stat-bg-total: var(--alumno-color-principal);
+    --stat-bg-done: #e8f4ff;
+    --stat-bg-pending: #fff0e8;
+    --stat-text-done: #38a3a5;
+    --stat-text-pending: #e76f51;
 }
 
-/* Grid de tarjetas responsivo */
-.menu-alumno-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 35px;
+
+.menu-alumno-layout-full {
+    background-color: var(--alumno-bg-base);
+    min-height: 100vh;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    color: var(--alumno-text-dark);
+    display: flex;
+    flex-direction: column;
 }
 
-/* --- LA TARJETA WOW (Contenedor) --- */
-.menu-card-wow {
-  position: relative;
-  display: block;
-  text-decoration: none;
-  color: var(--text-color);
-  border-radius: 16px;
-  overflow: hidden;
-  background-color: var(--card-bg);
-  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.1);
-  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275),
-              box-shadow 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  animation: fadeInUp 0.6s ease-out backwards;
-}
-.menu-card-wow:nth-child(2) { animation-delay: 0.1s; }
-.menu-card-wow:nth-child(3) { animation-delay: 0.2s; }
-.menu-card-wow:nth-child(4) { animation-delay: 0.3s; }
-
-.menu-card-wow:hover {
-  transform: translateY(-12px) scale(1.03) rotateX(3deg);
-  box-shadow: 0 25px 45px -10px rgba(var(--primary-color-rgb, 0, 86, 179), 0.3);
-  z-index: 10;
+.menu-alumno-content {
+    padding: 30px;
+    max-width: 1400px;
+    margin: 0 auto;
+    width: 100%;
+    box-sizing: border-box;
+    flex: 1;
 }
 
-/* --- BORDE ANIMADO (AZUL/CELESTE) --- */
-.animated-border-glow {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 2;
-  border-radius: 16px;
-  background: linear-gradient(
-    135deg, 
-    var(--color-docente),
-    var(--primary-color),
-    var(--color-docente),
-    var(--primary-color)
-  );
-  background-size: 400% 400%;
-  animation: moveGradient 4s ease infinite;
-  opacity: 0;
-  transition: opacity 0.4s ease-out;
-  -webkit-mask: 
-    linear-gradient(#fff 0 0) content-box, 
-    linear-gradient(#fff 0 0);
-  mask: 
-    linear-gradient(#fff 0 0) content-box, 
-    linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  padding: 3px;
-}
-.menu-card-wow:hover .animated-border-glow {
-  opacity: 1;
+.back-button-bar {
+    padding: 20px 30px 0 30px;
+    max-width: 1400px;
+    margin: 0 auto;
+    width: 100%;
+    box-sizing: border-box;
 }
 
-/* --- CONTENIDO INTERNO (Soluciona el tamaño) --- */
-.card-content {
-  position: relative;
-  z-index: 3;
-  background: var(--card-bg);
-  border-radius: 13px;
-  padding: 30px;
-  height: 100%;
-  min-height: 340px;
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-}
-.icon-wrapper {
-  color: var(--card-color);
-  margin-bottom: 20px;
-  transition: transform 0.3s ease;
-}
-.menu-card-wow:hover .icon-wrapper {
-  transform: scale(1.15) rotate(5deg);
-}
-.card-content h3 {
-  margin: 0 0 10px 0;
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: #222;
-}
-.card-content p {
-  color: var(--text-color-light);
-  font-size: 1rem;
-  line-height: 1.5;
-  margin-bottom: 25px;
-  flex-grow: 1; /* Empuja el botón CTA hacia abajo */
-}
-
-/* --- BOTÓN CTA (Arreglado) --- */
-.card-cta {
-  display: inline-block;
-  padding: 12px 30px;
-  color: white;
-  background-color: var(--card-color);
-  border-radius: 30px;
-  font-weight: 600;
-  font-size: 1rem;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 15px -5px var(--card-color);
-}
-.menu-card-wow:hover .card-cta {
-  transform: scale(1.05);
-  box-shadow: 0 8px 25px -8px var(--card-color);
-}
-
-/* --- BOTÓN REGRESAR (Personalizado para este menú) --- */
-.back-button {
-  position: absolute;
-  top: 40px;
-  right: 30px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 18px;
-  background-color: #f8f9fa;
-  color: var(--text-color-light);
-  border: 1px solid #ddd;
-  border-radius: 50px;
-  font-weight: 600;
-  font-size: 0.9rem;
-  cursor: pointer;
-  transition: all 0.2s ease-out;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-}
-.back-button:hover {
-  background-color: #fff;
-  color: var(--primary-color);
-  border-color: #bbb;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-  transform: translateY(-2px);
-}
-@media (max-width: 768px) {
-  .back-button {
-    position: relative;
-    top: 0;
-    right: 0;
-    margin: 0 auto 30px;
+.back-button-link {
     display: inline-flex;
-  }
-  .menu-alumno-header {
-    margin-bottom: 30px;
-  }
+    align-items: center;
+    gap: 8px;
+    padding: 8px 15px;
+    background-color: var(--alumno-bg-card);
+    border: 1px solid var(--alumno-color-terciario);
+    border-radius: 8px;
+    text-decoration: none;
+    color: var(--alumno-color-principal);
+    font-weight: 600;
+    transition: all 0.2s ease-in-out;
+    cursor: pointer;
 }
 
-/* --- Keyframes (Asegúrate de tenerlos) --- */
-@keyframes moveGradient {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+.back-button-link:hover {
+    background-color: var(--alumno-color-principal);
+    color: #fff;
+    box-shadow: 0 4px 10px rgba(0, 51, 102, 0.3);
 }
-@keyframes fadeInDown {
-  from { opacity: 0; transform: translateY(-30px); }
-  to { opacity: 1; transform: translateY(0); }
+
+
+.alumno-dashboard-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 35px;
 }
-@keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(30px); }
-  to { opacity: 1; transform: translateY(0); }
+
+.alumno-header-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr; 
+    gap: 30px;
+    align-items: stretch;
+}
+
+.alumno-welcome-card {
+    background-color: var(--alumno-bg-card);
+    background-image: linear-gradient(to right, #ffffff 90%, var(--alumno-color-terciario) 100%);
+    padding: 30px;
+    border-radius: var(--alumno-radius);
+    box-shadow: var(--alumno-shadow);
+    border-left: 6px solid var(--alumno-color-secundario);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.alumno-title {
+    font-size: 2rem;
+    color: var(--alumno-color-principal);
+    margin: 0 0 8px 0;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+}
+
+.alumno-icon-hand {
+    color: var(--alumno-color-secundario);
+    margin-right: 15px;
+    animation: wave-hand 2.5s ease-in-out infinite;
+}
+
+@keyframes wave-hand {
+    0%, 100% { transform: rotate(0deg); }
+    50% { transform: rotate(15deg); }
+}
+
+.alumno-subtitle {
+    font-size: 1.1rem;
+    color: #555;
+    margin: 0;
+}
+
+.alumno-stats-card {
+    background-color: var(--alumno-bg-card);
+    padding: 25px; 
+    border-radius: var(--alumno-radius);
+    box-shadow: var(--alumno-shadow);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.alumno-section-container {
+    background-color: var(--alumno-bg-card);
+    padding: 25px;
+    border-radius: var(--alumno-radius);
+    box-shadow: var(--alumno-shadow);
+}
+
+.alumno-content-box {
+    margin-top: 15px;
+}
+
+.alumno-section-title {
+    font-size: 1.6rem;
+    color: var(--alumno-color-principal);
+    margin: 0 0 25px 0;
+    border-left: 5px solid var(--alumno-color-secundario);
+    padding-left: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.alumno-section-title svg {
+    color: var(--alumno-color-secundario);
+}
+.alumno-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
+}
+
+.alumno-nav-card {
+    position: relative;
+    overflow: hidden;
+    padding: 30px;
+    background-color: var(--alumno-bg-card);
+    border-radius: var(--alumno-radius);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    cursor: pointer;
+    transition: all var(--alumno-transition);
+    border-top: 5px solid transparent; 
+}
+
+/* Tarjetas*/
+.card-variant-blue { 
+    border-top-color: #0078D4; 
+}
+.card-variant-blue svg { color: #0078D4; }
+
+.card-variant-yellow { 
+    border-top-color: #0078D4; 
+}
+.card-variant-yellow svg { color: #0078D4; }
+
+.alumno-nav-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.alumno-nav-card h3 {
+    font-size: 1.4rem;
+    color: var(--alumno-color-principal);
+    margin: 15px 0 8px 0;
+}
+
+.alumno-nav-card p {
+    font-size: 0.95rem;
+    color: #666;
+    margin: 0;
+}
+.mini-stats-est-container {
+    width: 100%;
+}
+
+.mini-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); 
+    gap: 10px;
+}
+
+.mini-stat-box {
+    border-radius: 8px;
+    padding: 15px 5px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    min-height: 80px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.mini-stat-box:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.mini-stat-number {
+    font-size: 1.8rem;
+    font-weight: 700;
+    line-height: 1.1;
+    margin-bottom: 5px;
+}
+
+.mini-stat-label {
+    font-size: 0.75rem;
+    color: #555;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.mini-stat-box.stat-total {
+    background-color: var(--stat-bg-total);
+}
+.mini-stat-box.stat-total .mini-stat-number {
+    color: #fff;
+}
+.mini-stat-box.stat-total .mini-stat-label {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.mini-stat-box.stat-done {
+    background-color: var(--stat-bg-done);
+}
+.mini-stat-box.stat-done .mini-stat-number {
+    color: var(--stat-text-done);
+}
+.mini-stat-box.stat-done .mini-stat-label {
+    color: var(--alumno-color-principal);
+}
+
+.mini-stat-box.stat-pending {
+    background-color: var(--stat-bg-pending);
+    border: 1px solid rgba(231, 111, 81, 0.3);
+}
+.mini-stat-box.stat-pending .mini-stat-number {
+    color: var(--stat-text-pending);
+}
+.mini-stat-box.stat-pending .mini-stat-label {
+    color: var(--stat-text-pending);
+}
+
+@media (max-width: 992px) {
+    .alumno-header-grid {
+        grid-template-columns: 1fr; 
+        gap: 20px;
+    }
+
+    .alumno-stats-card {
+        padding: 20px;
+    }
+    
+    .mini-stats-grid {
+        gap: 20px;
+    }
 }

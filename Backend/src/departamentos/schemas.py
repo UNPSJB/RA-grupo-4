@@ -12,6 +12,8 @@ class DepartamentoBase(BaseModel):
     nombre: str
     id: int
 
+    model_config = {"from_attributes": True}
+    
 class DepartamentoCreate(DepartamentoBase):
     pass
 

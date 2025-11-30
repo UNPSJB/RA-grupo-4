@@ -7,9 +7,7 @@ class Estudiante(ModeloBase):
     __tablename__ = "estudiantes"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
-    nombre: Mapped[str] = mapped_column(String, unique=False, index=True) 
-    usuario: Mapped[str] = mapped_column(String, unique=True, index=True, nullable=False)
-    contraseña: Mapped[str] = mapped_column(String, nullable=False)
+    nombre: Mapped[str] = mapped_column(String, unique=False, index=True)
 
     inscripciones: Mapped[Optional[List["Inscripciones"]]] = relationship(
         "Inscripciones", 
@@ -20,4 +18,6 @@ class Estudiante(ModeloBase):
         "src.encuesta.models.Encuesta",
         back_populates="estudiante"
     )   
+
+    user: Mapped[Optional["User"]] = relationship("User", back_populates="alumno")
     

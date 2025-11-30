@@ -1,35 +1,54 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Routes, Route, useLocation, Outlet, Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
-import '../../App.css'; // Usa el App.css general
+import MenuDocenteIndex from './MenuDocenteIndex';
+import GenerarInformeAC from '../Docente/GenerarInformeAC';
+import ListadoInformesACDoc from '../Docente/ListadoInformesACDoc';
+import HistorialInformesACDoc from '../Docente/HistorialInformesACDoc';
+import PaginaEstadisticasDoc from '../Docente/PaginaEstadisticasDoc';
+import SinDatos from '../Otros/SinDatos';
+import VisualizarInformeACDoc from '../Docente/VisualizarInformeACDoc';
+import EstadisticasPorPregunta from '../Docente/EstadisticasPorPregunta';
+import { useAuth } from '../../hooks';
 
-const MenuDocente = () => {
-    const navigate = useNavigate();
-    
-    // Lista de enlaces que SÍ existen en tu App.tsx
-    const links = [
-        { ruta: "/home/informes-doc", texto: "Informes Pendientes" },
-        { ruta: "/home/historial-informes", texto: "Historial de Informes" },
-        { ruta: "/home/estadisticas-docente", texto: "Ver Estadísticas Materias" },
-    ];
+const DocenteLayout = () => {
+    const location = useLocation();
+    const esDashboard = location.pathname === '/home/docente' || location.pathname === '/home/docente/';
+    const rutaDestino = esDashboard ? '/home/docente' : '/home/docente';
 
     return (
-        <div className="menu-page-container">
-            <button onClick={() => navigate(-1)} className="back-button-simple">
-                <ArrowLeft size={18} /> Regresar
-            </button>
-            <header className="menu-header" style={{ '--menu-color': 'var(--color-docente)' }}>
-                <h1>Portal del Docente</h1>
-                <p>Gestione sus informes y estadísticas.</p>
-            </header>
-            <div className="menu-link-list">
-                {links.map((link, index) => (
-                    <Link key={index} to={link.ruta} className="menu-link">
-                        {link.texto}
-                    </Link>
-                ))}
+        <div className="dashboard-layout-full">
+            <div className="back-button-bar">
+                <Link to={rutaDestino} className="back-button-link">
+                    <ArrowLeft size={18} />
+                    Regresar al Inicio
+                </Link>
+            </div>
+            <div className="dashboard-content">
+                <Outlet />
             </div>
         </div>
+    );
+};
+
+const MenuDocente = () => {
+
+    const { currentUser } = useAuth();
+    const docenteId = currentUser?.docente_id;
+
+    return (
+        <Routes>
+            <Route path="/" element={<DocenteLayout />}>
+                <Route index element={<MenuDocenteIndex />} />
+                <Route path="generar-informe/:idMateria" element={<GenerarInformeAC />} />
+                <Route path="informes-pendientes" element={<ListadoInformesACDoc />} />
+                <Route path="historial-informes" element={<HistorialInformesACDoc />} />
+                <Route path="estadisticas" element={<PaginaEstadisticasDoc />} />
+                <Route path="estadisticas/materia/:materiaId" element={<EstadisticasPorPregunta />} />
+                <Route path="mi-perfil" element={<SinDatos />} />
+                <Route path="visualizar-informe/:id_informe" element={<VisualizarInformeACDoc />} />
+            </Route>
+        </Routes>
     );
 };
 
