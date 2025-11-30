@@ -456,7 +456,7 @@ const GenerarInformeACDoc: React.FC = () => {
                     </h2>
                     <h2 style={styles.title}>Informe de Actividad Curricular</h2>
 
-                    {/* SECCIÓN 1: DATOS GENERALES */}
+                    {/* SECCION 1: DATOS GENERALES */}
                     <CompletarDatosGeneralesDoc
                         materias={materias}
                         docentes={docentes}
@@ -465,39 +465,39 @@ const GenerarInformeACDoc: React.FC = () => {
                         loading={loading}
                     />
                     
-                    <hr style={styles.separator} /> {/* SEPARADOR */}
+                    <hr style={styles.separator} /> {/* Separador */}
 
-                    {/* SECCIÓN 2: NECESIDADES */}
+                    {/* Necesidades */}
                     <CompletarNecesidadesDoc equipamiento={equipamiento} bibliografia={bibliografia} onNecesidadesChange={handleNecesidadesChange} />
                     
-                    <hr style={styles.separator} /> {/* SEPARADOR */}
+                    <hr style={styles.separator} /> {/* Separador */}
 
-                    {/* SECCIÓN 3: PORCENTAJES DE COMISIONES */}
+                    {/* Porcentaje de comisiones*/}
                     <CompletarPorcentajesDoc formData={formData} handleChange={handleFormChange} />
                     
-                    <hr style={styles.separator} /> {/* SEPARADOR */}
+                    <hr style={styles.separator} /> {/* Separador */}
 
-                    {/* SECCIÓN 4: CONTENIDO ABORDADO */}
+                    {/* Contenido abordao*/}
                     <CompletarContenidoAbordadoDoc formData={formData} handleChange={handleFormChange} />
                     
-                    <hr style={styles.separator} /> {/* SEPARADOR */}
+                    <hr style={styles.separator} /> {/* Separador */}
 
-                    {/* SECCIÓN 5: RESUMEN DE VALORES DE ENCUESTA */}
+                    {/* Resumen de valores de la encuesta */}
                     <ResumenSecciones idMateria={Number(formData.id_materia)} handleChange={handleResumenChange} />
                     
-                    <hr style={styles.separator} /> {/* SEPARADOR */}
+                    <hr style={styles.separator} /> {/* Separador */}
 
-                    {/* SECCIÓN 6: PROCESO DE ENSEÑANZA/APRENDIZAJE */}
+                    {/* Procveso de enseñansa/aprendizaje*/}
                     <CompletarProcesoAprendizajeDoc formData={formData} handleChange={handleFormChange} />
                     
-                    <hr style={styles.separator} /> {/* SEPARADOR */}
+                    <hr style={styles.separator} /> {/* Separador */}
 
-                    {/* SECCIÓN 7: ACTIVIDADES DEL DOCENTE */}
+                    {/*Actividades del docente*/}
                     <ConsignarActividadesDoc actividades={actividades} onActividadesChange={handleActividadesChange} />
                     
-                    <hr style={styles.separator} /> {/* SEPARADOR */}
+                    <hr style={styles.separator} /> {/* Separador */}
 
-                    {/* SECCIÓN 8: VALORACIÓN DE AUXILIARES */}
+                    {/*Valoracion auxiliares */}
                     <CompletarValoracionAuxiliaresDoc valoraciones={valoracionesAuxiliares} onValoracionesChange={handleValoracionesChange} />
 
                     <div style={styles.buttonContainer}>

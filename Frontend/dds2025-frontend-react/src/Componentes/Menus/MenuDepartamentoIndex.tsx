@@ -89,7 +89,7 @@ const MenuDepartamentoIndex: React.FC = () => {
                 <div className="card-grid">
                     <Link to="historial-informes" className="nav-card card-blue">
                         <History size={32} />
-                        <h3>Historial de Informes</h3>
+                        <h3>Historial de informes de Actividad Curricular</h3>
                         <p>Consulta informacion de los informes de Actividad Curricular.</p>
                     </Link>
                     <Link to="estadisticas" className="nav-card card-yellow">
@@ -97,14 +97,10 @@ const MenuDepartamentoIndex: React.FC = () => {
                         <h3>Estadísticas Globales de materias</h3>
                         <p>Analiza métricas de todas las materias y carreras.</p>
                     </Link>
-                    <Link 
-                        to="historial-sinteticos" 
-                        className="nav-card"
-                        style={{ borderTop: '4px solid #e76f51' }} // Violeta
-                    >
-                        <FileBarChart size={32} style={{ color: '#e76f51', marginBottom: '15px' }} />
-                        <h3 style={{ color: '#333' }}>Historial Sintéticos</h3>
-                        <p style={{ color: '#666' }}>Repositorio de informes sintéticos y cortes históricos generados.</p>
+                    <Link to="historial-sinteticos" className="nav-card card-yellow">
+                        <BarChart2 size={32} />
+                        <h3>Historial de informes Sintéticos</h3>
+                        <p>Repositorio de informes sintéticos y cortes historicos generados.</p>
                     </Link>
                 </div>
             </div>
