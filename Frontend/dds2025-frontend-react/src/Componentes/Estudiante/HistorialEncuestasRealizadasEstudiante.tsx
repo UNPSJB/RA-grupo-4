@@ -35,6 +35,10 @@ const HistorialEncuestasRealizadasEstudiante: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
     const navigate = useNavigate();
     
+    const handleGoBack = () => {
+        navigate('/home/alumno');
+    };
+
     const { currentUser } = useAuth();
     const estudianteId = currentUser?.alumno_id;
 
@@ -80,6 +84,7 @@ const HistorialEncuestasRealizadasEstudiante: React.FC = () => {
     const handleCardClick = (materiaId: number) => {
         navigate(`/home/alumno/respuestas-encuesta/${materiaId}`);
     };
+
 
 
     if (loading) return <p style={{ color: "#003366", padding: "20px" }}>Cargando historial...</p>;
@@ -283,7 +288,7 @@ const HistorialEncuestasRealizadasEstudiante: React.FC = () => {
                         >
                             <div className="encuesta-info-historial">
                                 <CheckCircle2 size={24} className="icono-materia-historial" />
-                                <span className="materia-title-historial">{item.materia_nombre}</span>
+                                <span className="materia-title-historial">{"hola "}{item.materia_nombre}</span>
                             </div>
                             
                             <div className="encuesta-meta-historial">
