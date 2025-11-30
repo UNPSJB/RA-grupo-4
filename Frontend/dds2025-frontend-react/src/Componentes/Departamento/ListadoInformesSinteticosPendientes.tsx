@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { Send, FileText } from "lucide-react"; 
 
 import TodoBien from "../Otros/TodoBien";
+import SinDatos from "../Otros/SinDatos";
 
 
 interface PendienteSintetico {
@@ -20,7 +21,7 @@ interface Props {
 const InformesSinteticosPendientes: React.FC<Props> = ({ departamentoId }) => {
     const [pendientes, setPendientes] = useState<PendienteSintetico[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
-    const [showAll, setShowAll] = useState<boolean>(false); // Nuevo estado para "Ver Más"
+    const [showAll, setShowAll] = useState<boolean>(false); 
 
     useEffect(() => {
         const fetchPendientes = async () => {
@@ -38,7 +39,6 @@ const InformesSinteticosPendientes: React.FC<Props> = ({ departamentoId }) => {
                 setPendientes(data);
             } catch (err) {
                 console.error("Error al obtener pendientes", err);
-                // Aquí podrías manejar un estado de error, pero lo simplificamos
             } finally {
                 setLoading(false);
             }
@@ -58,9 +58,7 @@ const InformesSinteticosPendientes: React.FC<Props> = ({ departamentoId }) => {
 
             {pendientes.length === 0 ? (
                 <div className="empty-list-message">
-                    <TodoBien
-                        mensaje="No tienes informes sintéticos pendientes de generar."
-                    />
+                    <SinDatos/>
                 </div>
             ) : (
                 <>

@@ -223,11 +223,6 @@ const SecretariaLayout = () => {
 
     return (
         <div className="menu-secretaria-layout-full">
-            <div className="sec-back-bar">
-                <NavLink to={rutaDestino} className="sec-back-link">
-                    <ArrowLeft size={18} /> {esDashboard ? "Inicio General" : "Volver al Panel"}
-                </NavLink>
-            </div>
             <main className="menu-secretaria-content">
                 <Outlet />
             </main>

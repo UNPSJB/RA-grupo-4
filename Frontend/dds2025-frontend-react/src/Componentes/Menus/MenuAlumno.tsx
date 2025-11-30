@@ -154,11 +154,6 @@ const AlumnoLayout = () => {
 
     return (
         <div className="menu-alumno-layout-full">
-            <div className="back-button-bar">
-                <NavLink to={rutaDestino} className="back-button-link">
-                    <ArrowLeft size={18} /> {esDashboard ? "Inicio General" : "Volver al Panel"}
-                </NavLink>
-            </div>
             <main className="menu-alumno-content">
     
                 <Outlet />

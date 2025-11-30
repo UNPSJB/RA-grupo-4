@@ -18,12 +18,6 @@ const DocenteLayout = () => {
 
     return (
         <div className="dashboard-layout-full">
-            <div className="back-button-bar">
-                <Link to={rutaDestino} className="back-button-link">
-                    <ArrowLeft size={18} />
-                    Regresar al Inicio
-                </Link>
-            </div>
             <div className="dashboard-content">
                 <Outlet />
             </div>
