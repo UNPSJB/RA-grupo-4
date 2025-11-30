@@ -9,10 +9,7 @@ interface Props {
 }
 
 const styles = {
-  container: {
-    maxWidth: '800px', margin: '0 auto', padding: '28px', backgroundColor: '#ffffff',
-    borderRadius: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.08)', fontFamily: '"Roboto", "Segoe UI", sans-serif',
-  },
+
   instructions: {
     color: '#000', fontSize: '15px', lineHeight: '1.5', marginBottom: '24px',
     padding: '14px', backgroundColor: '#f9f9f9', borderRadius: '8px', border: '1px solid #ddd',

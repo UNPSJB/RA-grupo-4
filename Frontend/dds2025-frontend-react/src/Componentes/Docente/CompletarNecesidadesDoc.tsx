@@ -1,15 +1,6 @@
 import React, { useState } from 'react';
 
 const styles: { [key: string]: React.CSSProperties } = {
-  container: {
-    maxWidth: '800px',
-    margin: '0 auto',
-    padding: '28px',
-    backgroundColor: '#ffffff',
-    borderRadius: '12px',
-    boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
-    fontFamily: '"Roboto", "Segoe UI", sans-serif',
-  },
   fieldset: {
     border: '2px solid #003366',
     borderRadius: '8px',

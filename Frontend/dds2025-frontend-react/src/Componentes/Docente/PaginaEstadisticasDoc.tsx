@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { BarChart2, BookOpen, ArrowRight, TrendingUp, Users, CheckCircle } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { BarChart2, BookOpen, ArrowRight, TrendingUp, Users, CheckCircle, ArrowLeft } from 'lucide-react';
 
 const API_BASE = "http://localhost:8000";
 const ID_DOCENTE_ACTUAL = 1;
@@ -29,10 +29,15 @@ interface StatsSimulados {
 }
 
 const PaginaEstadisticasDoc: React.FC = () => {
+    const navigate = useNavigate();
     const [materias, setMaterias] = useState<Materia[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
-
+    
+    const handleGoBack = () => {
+        navigate('/home/docente');
+    };
+    
     useEffect(() => {
         const cargarMaterias = async () => {
             try {
@@ -49,8 +54,8 @@ const PaginaEstadisticasDoc: React.FC = () => {
                 );
 
                 setMaterias(misMaterias);
-            } catch (err: any) {
-                setError(err.message || "Error desconocido");
+            } catch (err) {
+                setError(err instanceof Error ? err.message : "Error desconocido");
             } finally {
                 setLoading(false);
             }
@@ -69,6 +74,19 @@ const PaginaEstadisticasDoc: React.FC = () => {
             Cargando listado de materias...
         </div>
     );
+    
+    if (error) return (
+        <div className="dashboard-main-view">
+            <style>{`
+                .dashboard-main-view { max-width: 1200px; margin: 0 auto; padding: 30px 20px; font-family: 'Inter', sans-serif; }
+                .error-message-full { padding: 40px; text-align: center; color: #dc3545; background-color: #fde8e8; border-radius: 12px; margin-top: 50px; font-size: 1.2rem; }
+            `}</style>
+            <div className="error-message-full">
+                Error al cargar datos: {error}
+            </div>
+        </div>
+    );
+
 
     return (
         <div className="dashboard-main-view">
@@ -138,6 +156,7 @@ const PaginaEstadisticasDoc: React.FC = () => {
                     background-color: #f8f9fa;
                     padding: 25px;
                     border-radius: 12px;
+                    position: relative;
                 }
 
                 .seccion-title {
@@ -305,6 +324,27 @@ const PaginaEstadisticasDoc: React.FC = () => {
                     }
                 }
 
+                .go-back-button {
+                    position: absolute;
+                    top: 25px; 
+                    right: 25px;
+                    background-color: #f0f4f8;
+                    color: #0078D4;
+                    border: none;
+                    padding: 10px 15px;
+                    border-radius: 8px;
+                    cursor: pointer;
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    font-weight: 600;
+                    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+                }
+
+                .go-back-button:hover {
+                    background-color: #e8f4ff;
+                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                }
             `}</style>
             
             <div className="dashboard-header-container">
@@ -320,6 +360,13 @@ const PaginaEstadisticasDoc: React.FC = () => {
             </div>
 
             <div className="seccion-box">
+                    <button 
+                        className="go-back-button"
+                        onClick={handleGoBack}
+                    >
+                        <ArrowLeft size={20} />
+                        Regresar al incio
+                    </button>
                 <h2 className="seccion-title">
                     <BookOpen size={24} />
                     Materias Disponibles
