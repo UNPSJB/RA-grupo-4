@@ -156,7 +156,7 @@ const HistorialInformesSinteticos: React.FC = () => {
               {/* ESTADO VACÍO */}
               {!loading && lista.length === 0 && (
                   <div className="empty-state">
-                    <SinDatos/>
+                        <SinDatos mensaje="No registras informes sinteticos hechos" />  
                   </div>
               )}
 
