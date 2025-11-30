@@ -27,7 +27,7 @@ const Login: React.FC = () => {
             return (<Navigate to="/home/departamento" replace />)
         }
         if (currentUser?.role_name == "secretaria_academica"){
-            return (<Navigate to="/home/secretaria_academica" replace />)
+            return (<Navigate to="/home/secretaria" replace />)
         }
 
         return (<Navigate to="/home" replace />) 

@@ -5,13 +5,15 @@ import './MenuDepartamento.css';
 import { FileText, BarChart2, History, Settings, CheckSquare, List, Send, FileBarChart, AlertCircle, Building } from 'lucide-react';
 import InformesSinteticosPendientes from '../Departamento/ListadoInformesSinteticosPendientes';
 import MiniEstadisticasDep from '../Departamento/MiniEstadisticasDep';
+import { useAuth } from '../../hooks';
 
 const API_BASE = "http://localhost:8000";
-const ID_DEPARTAMENTO_ACTUAL = 1;
-const ID_PERIODO_ACTUAL = 2;
 
 const MenuDepartamentoIndex: React.FC = () => {
     
+    const { currentUser } = useAuth();
+    const departamentoId = currentUser?.departamento_id;
+
     const roleStyle = { '--color-secundario': '#e56849ff' } as React.CSSProperties;
 
     const [periodoActual, setPeriodoActual] = useState<any>(null);
@@ -21,13 +23,13 @@ const MenuDepartamentoIndex: React.FC = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const resPeriodo = await fetch(`http://localhost:8000/periodos/${ID_PERIODO_ACTUAL}`);
+                const resPeriodo = await fetch(`${API_BASE}/periodos/actual/informesAC`);
                 const periodo = await resPeriodo.json();
                 setPeriodoActual(periodo);
 
-                const resEst = await fetch(`http://localhost:8000/departamentos/${ID_DEPARTAMENTO_ACTUAL}`);
-                const estudiante = await resEst.json();
-                setDepartamentoInfo(estudiante);
+                const resDep = await fetch(`http://localhost:8000/departamentos/${departamentoId}`);
+                const departamento = await resDep.json();
+                setDepartamentoInfo(departamento);
             } catch (error) {
                 console.error("Error cargando datos del dashboard:", error);
             } finally {
@@ -66,7 +68,7 @@ const MenuDepartamentoIndex: React.FC = () => {
                         <List size={20} />
                         Resumen General
                     </h2>
-                    <MiniEstadisticasDep departamentoId={ID_DEPARTAMENTO_ACTUAL} />
+                    <MiniEstadisticasDep departamentoId={departamentoId} />
                 </div>
             </div>
 
@@ -77,7 +79,7 @@ const MenuDepartamentoIndex: React.FC = () => {
                     Informes Sinteticos Pendientes
                 </h2>
 
-                <InformesSinteticosPendientes departamentoId={ID_DEPARTAMENTO_ACTUAL} />
+                <InformesSinteticosPendientes departamentoId={departamentoId} />
             </div>
             
             <div className="seccion-box">
@@ -100,7 +102,7 @@ const MenuDepartamentoIndex: React.FC = () => {
                     <Link 
                         to="historial-sinteticos" 
                         className="nav-card"
-                        style={{ borderTop: '4px solid #e76f51' }} // Violeta
+                        style={{ borderTop: '4px solid #e76f51' }}
                     >
                         <FileBarChart size={32} style={{ color: '#e76f51', marginBottom: '15px' }} />
                         <h3 style={{ color: '#333' }}>Historial Sintéticos</h3>

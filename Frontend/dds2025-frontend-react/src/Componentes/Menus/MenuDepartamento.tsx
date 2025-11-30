@@ -9,14 +9,14 @@ import SinDatos from '../Otros/SinDatos';
 import SeleccionarMateriaEstadisticasDep from '../Departamento/SeleccionarMateriaEstadisticasDep';
 import EstadisticasPorPreguntaDep from '../Departamento/EstadisticasPorPreguntaDep';
 import HistorialInformesSinteticos from '../Departamento/HistorialInformesSinteticos';
-
+import { useAuth } from '../../hooks';
 
 const DepartamentoLayout = () => {
     const location = useLocation(); 
 
     const esDashboard = location.pathname === '/home/departamento' || location.pathname === '/home/departamento/';
 
-    const rutaDestino = esDashboard ? '/home' : '/home/departamento';
+    const rutaDestino = esDashboard ? '/home/departamento' : '/home/departamento';
 
     return (
         <div className="dashboard-layout-full"> 
@@ -36,6 +36,10 @@ const DepartamentoLayout = () => {
 };
 
 const MenuDepartamento = () => {
+
+    const { currentUser } = useAuth();
+    const departamentoId = currentUser?.departamento_id;
+    
     return (
         <Routes>
             <Route path="/" element={<DepartamentoLayout />}>

@@ -39,7 +39,7 @@ interface Periodo {
     fecha_cierre_informesAC: string;
 }
 
-const SecretariaDashboard = ({ secretariaId }) => {
+const SecretariaDashboard = () => {
     const navigate = useNavigate();
 
     const [periodoEncuestas, setPeriodoEncuestas] = useState<Periodo | null>(null);
@@ -240,12 +240,11 @@ const SecretariaLayout = () => {
 // ---------------------------------------------------
 
 const MenuSecretaria = () => {
-    const secretariaId = 1; // ID simulado o por contexto
 
     return (
         <Routes>
             <Route path="/" element={<SecretariaLayout />}>
-                <Route index element={<SecretariaDashboard secretariaId={secretariaId} />} />
+                <Route index element={<SecretariaDashboard />} />
                 
                 {/* Rutas Hijas */}
                 <Route path="listar-informes" element={<ListarInformesSinteticos />} /> 

@@ -77,6 +77,7 @@ def main():
         "admin": "123456789",
         "alumno": "123456789",
         "docente": "123456789",
+        "departamento": "123456789",
         "secretaria_academica": "123456789",
     }
 

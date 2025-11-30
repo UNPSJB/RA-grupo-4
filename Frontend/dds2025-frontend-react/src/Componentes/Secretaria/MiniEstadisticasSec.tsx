@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { List } from 'lucide-react'; // Importamos el ícono de lista
 
-const MiniEstadisticasEst = ({ estudianteId }) => {
+const MiniEstadisticasEst = () => {
     const [stats, setStats] = useState({
         total: 0,
         respondidas: 0,
@@ -40,7 +40,7 @@ const MiniEstadisticasEst = ({ estudianteId }) => {
         };
 
         fetchStats();
-    }, [estudianteId]);
+    }, []);
 
     // LÓGICA DE CÁLCULO DE PORCENTAJES
     const totalBase = stats.totalDepartamentos > 0 ? stats.totalDepartamentos : 1; 
@@ -160,4 +160,4 @@ const MiniEstadisticasEst = ({ estudianteId }) => {
     );
 };
 
-export default MiniEstadisticasEst;
+export default MiniEstadisticasSec;
