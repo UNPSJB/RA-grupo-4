@@ -5,6 +5,7 @@ import Nosotros from '../Otros/Nosotros';
 
 const MenuInstitucional = ({ isOpen, onClose }) => {
   const menuItems = [
+    { label: "Inicio", url: "/home/alumno", external: false},
     { label: "Mapas", url: "https://www.unp.edu.ar/index.php/22-universidad/14-mapas-de-las-sedes", external: true },
     { label: "Manual y gráfica", url: "https://www.unp.edu.ar/index.php/22-universidad/11-manual-institucional", external: true },
     { label: "Estatuto", url: "https://www.unp.edu.ar/consejo/documentos/ordenanzas/ordenanza120.pdf", external: true },
@@ -15,6 +16,7 @@ const MenuInstitucional = ({ isOpen, onClose }) => {
     { label: "Página web 50 años UNPSJB", url: "https://debunp.unp.edu.ar/50aniversario/", external: true},
     { label: "Museo del Petróleo", url: "https://www.unp.edu.ar/index.php/museo-del-petroleo", external: true },
     { label: "Nosotros", url: "/home/nosotros", external: false }
+
   ];
 
   return (

@@ -27,7 +27,6 @@ const SinDatos: React.FC<SinDatosProps> = ({
           padding: 40px 20px;
           background-color: #f8fafc;
           border-radius: 12px;
-          border: 2px dashed #e0e0e0;
           text-align: center;
           font-family: "Segoe UI", "Roboto", sans-serif;
           animation: fadeIn 0.8s ease-out;

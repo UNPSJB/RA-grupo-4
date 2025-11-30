@@ -1,16 +1,16 @@
 .menu-alumno-layout-full {
-    --alumno-color-principal: #003366;      /* Azul Oscuro Institucional */
-    --alumno-color-secundario: #0078D4;     /* Celeste Brillante */
+    --alumno-color-principal: #003366;      /* Reutilizar estos colores*/
+    --alumno-color-secundario: #0078D4;     /* Este igual */
     --alumno-color-terciario: #e8f4ff;      /* Fondo sutil */
-    --alumno-color-alerta: #e76f51;         /* Naranja Alerta */
-    --alumno-bg-base: #f0f4f8;              /* Fondo General */
+    --alumno-color-alerta: #e76f51;         /* Alertas */
+    --alumno-bg-base: #ffffff;              /* Fondo General */
     --alumno-bg-card: #ffffff;              /* Fondo Tarjetas */
     --alumno-text-dark: #222;
     --alumno-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
     --alumno-radius: 12px;
     --alumno-transition: 0.3s ease;
 
-    /* Colores para Mini Stats */
+    /* Colores para Mini estadisticsa */
     --stat-bg-total: var(--alumno-color-principal);
     --stat-bg-done: #e8f4ff;
     --stat-bg-pending: #fff0e8;
@@ -171,16 +171,16 @@
     border-top: 5px solid transparent; 
 }
 
-/* Color tarjetas*/
+/* Tarjetas*/
 .card-variant-blue { 
     border-top-color: #0078D4; 
 }
-.card-variant-blue svg { color: #3d5a80; }
+.card-variant-blue svg { color: #0078D4; }
 
 .card-variant-yellow { 
-    border-top-color: #9c1f1f; 
+    border-top-color: #0078D4; 
 }
-.card-variant-yellow svg { color: #9c1f1f; }
+.card-variant-yellow svg { color: #0078D4; }
 
 .alumno-nav-card:hover {
     transform: translateY(-5px);
@@ -198,19 +198,13 @@
     color: #666;
     margin: 0;
 }
-
-/* -------------------------------------------
-   5. MINI ESTADÍSTICAS (Estilos Internos del Componente)
-   ------------------------------------------- */
-/* Estos estilos aplican a los elementos dentro de MiniEstadisticasEst.jsx */
-
 .mini-stats-est-container {
     width: 100%;
 }
 
 .mini-stats-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr); /* 3 columnas exactas */
+    grid-template-columns: repeat(3, 1fr); 
     gap: 10px;
 }
 
@@ -247,8 +241,6 @@
     letter-spacing: 0.5px;
 }
 
-/* Variantes de Mini Stats */
-/* 1. Total */
 .mini-stat-box.stat-total {
     background-color: var(--stat-bg-total);
 }
@@ -259,7 +251,6 @@
     color: rgba(255, 255, 255, 0.8);
 }
 
-/* 2. Respondidas */
 .mini-stat-box.stat-done {
     background-color: var(--stat-bg-done);
 }
@@ -270,7 +261,6 @@
     color: var(--alumno-color-principal);
 }
 
-/* 3. Pendientes */
 .mini-stat-box.stat-pending {
     background-color: var(--stat-bg-pending);
     border: 1px solid rgba(231, 111, 81, 0.3);
@@ -282,15 +272,9 @@
     color: var(--stat-text-pending);
 }
 
-
-/* -------------------------------------------
-   6. Media Queries (Responsividad)
-   ------------------------------------------- */
-
-/* Tablets y pantallas medianas */
 @media (max-width: 992px) {
     .alumno-header-grid {
-        grid-template-columns: 1fr; /* Apila bienvenida arriba, stats abajo */
+        grid-template-columns: 1fr; 
         gap: 20px;
     }
 
@@ -299,44 +283,6 @@
     }
     
     .mini-stats-grid {
-        /* Hacemos las stats más grandes si hay espacio al apilarse */
         gap: 20px;
-    }
-}
-
-/* Móviles */
-@media (max-width: 600px) {
-    .menu-alumno-content {
-        padding: 15px;
-    }
-    
-    .back-button-bar {
-        padding: 15px 15px 0 15px;
-    }
-
-    .alumno-title {
-        font-size: 1.5rem;
-    }
-
-    .alumno-cards-grid {
-        grid-template-columns: 1fr; /* Una tarjeta debajo de otra */
-    }
-
-    /* En móviles muy estrechos, apilamos las mini stats verticalmente o en 2 columnas */
-    .mini-stats-grid {
-        grid-template-columns: 1fr; 
-    }
-    
-    .mini-stat-box {
-        flex-direction: row; /* Número a la izq, texto a la der para ahorrar espacio vertical */
-        justify-content: space-between;
-        padding: 15px 20px;
-        align-items: center;
-        min-height: auto;
-    }
-    
-    .mini-stat-label {
-        margin-left: 10px;
-        text-align: right;
     }
 }

@@ -5,9 +5,9 @@ import { useAuth } from "../../hooks";
 // --- IMPORTACIONES DE COMPONENTES DE CONTROL ---
 import FaltanCamposObligatorios from "../Otros/FaltanCamposObligatorios"; 
 import TodoBien from "../Otros/TodoBien"; 
-import logo from '../../assets/logo-unpsjb.png';
+import HeaderInstitucional from "../Otros/HeaderInstitucional";
 
-// Interfaces (Mantenidas)
+// Interfaces +
 interface OpcionRespuesta { id: number; descripcion: string; pregunta_id: number; }
 interface Pregunta { id: number; enunciado: string; tipo: "ABIERTA" | "CERRADA"; obligatoria: boolean; opciones_respuestas?: OpcionRespuesta[]; }
 interface Seccion { id: number; sigla: string; descripcion: string; preguntas: Pregunta[]; }
@@ -15,7 +15,7 @@ interface Encuesta { id_encuesta: number; nombre: string; secciones: Seccion[]; 
 interface RespuestaInput { pregunta_id: number; inscripcion_id: number; opcion_respuesta_id?: number | null; respuesta_abierta?: string | null; }
 interface ErrorItem { seccionSigla: string; preguntaId: number; enunciado: string; }
 
-// --- VARIABLES DE ESTILO ---
+// colores
 const styles = {
     colorPrincipal: '#003366', 
     colorSecundario: '#0078D4', 
@@ -29,10 +29,6 @@ const styles = {
     colorHoverSutil: '#cce4f6', 
 };
 
-
-// ----------------------------------------------------
-// --- SUBCOMPONENTES (Estilo Integrado) ---
-// ----------------------------------------------------
 
 const PreguntaCerrada: React.FC<any> = ({ pregunta, respuesta, onChange }) => (
     <div className="opciones-grid">
@@ -67,9 +63,6 @@ const PreguntaAbierta: React.FC<any> = ({ pregunta, respuesta, onChange }) => (
     />
 );
 
-// ----------------------------------------------------
-// --- COMPONENTE PRINCIPAL ---
-// ----------------------------------------------------
 
 const ResponderEncuesta: React.FC = () => {
     const { inscripcionId: inscripcionIdFromUrl } = useParams<{ inscripcionId: string }>();
@@ -88,15 +81,17 @@ const ResponderEncuesta: React.FC = () => {
     const [validationErrors, setValidationErrors] = useState<any[]>([]); 
     const [showSectionWarning, setShowSectionWarning] = useState(false); 
     const navigate = useNavigate();
-
-    // --- CÁLCULO Y LÓGICA MANTENIDA ---
     const sections = encuesta?.secciones || [];
     const totalSections = sections.length;
     const isFirstSection = currentSectionIndex === 0;
     const isLastSection = currentSectionIndex === totalSections - 1;
     const currentSection = sections[currentSectionIndex];
-    
-    // Calcula el progreso de la sección actual (para la barra dinámica)
+    /*Pra regresar al menu*/
+    const handleGoBack = () => {
+        navigate('/home/alumno');
+    };
+
+    // Calcula el progreso de la sección actual para la barra de progreso
     const currentSectionProgress = useMemo(() => {
         if (!currentSection || !currentSection.preguntas.length) return 100;
         
@@ -114,7 +109,7 @@ const ResponderEncuesta: React.FC = () => {
         return (respondidas / totalPreguntas) * 100;
     }, [currentSection, respuestas]);
 
-    // Función para validar solo la sección actual (al intentar avanzar)
+    // Función para validar la seccion antes de avanzar
     const validarSeccionActual = (section: Seccion): ErrorItem[] => {
         const errors: ErrorItem[] = [];
         section.preguntas.forEach((preg) => {
@@ -157,8 +152,6 @@ const ResponderEncuesta: React.FC = () => {
         });
         return errors;
     };
-    
-    // --- LÓGICA DE FETCH (Mantenida) ---
     useEffect(() => {
         if (!inscripcionId) { setError("ID de inscripción inválido en la URL."); setCargandoPagina(false); return; }
 
@@ -187,7 +180,6 @@ const ResponderEncuesta: React.FC = () => {
         fetchEncuesta();
     }, [inscripcionId, estudianteId]);
     
-    // --- MANEJO DE EVENTOS (Mantenido) ---
     const manejarCambioCerrada = (preguntaId: number, opcionId: number) => {
         setRespuestas((prev) => prev.map((r) => r.pregunta_id === preguntaId ? { ...r, opcion_respuesta_id: opcionId, respuesta_abierta: null } : r ));
         setShowSectionWarning(false);
@@ -235,8 +227,6 @@ const ResponderEncuesta: React.FC = () => {
                 throw new Error(errData.detail || `Error al enviar: ${res.status}`);
             }
             setExito(true);
-            
-            // Renderizar el componente TodoBien en lugar de navegar inmediatamente
         } catch (err: any) {
             console.error("Error en enviarRespuestas:", err);
             setError(err.message || "Error desconocido al enviar.");
@@ -245,12 +235,7 @@ const ResponderEncuesta: React.FC = () => {
         }
     };
 
-    // -------------------------------------------------
-    // --- RENDERIZADO DE ESTADOS GLOBALES (DEBUG) ---
-    // -------------------------------------------------
     if (!inscripcionId) return <p className="error-msg global-message">Error: No se proporcionó un ID de inscripción válido.</p>;
-    
-    // RENDERIZADO DE CARGA CON ESTILO TEMPORAL ROBUSTO
     if (cargandoPagina) {
         return (
             <div style={{ padding: '50px', textAlign: 'center', fontSize: '1.5rem', color: styles.colorPrincipal, backgroundColor: styles.colorFondoTarjeta, borderRadius: styles.bordeRadio, boxShadow: styles.sombraTarjeta, margin: '30px auto', maxWidth: '1100px' }}>
@@ -260,8 +245,6 @@ const ResponderEncuesta: React.FC = () => {
     }
     
     if (!encuesta) return <p className="error-msg global-message">No se encontró la encuesta para esta inscripción.</p>;
-    
-    // RENDERIZADO DE ÉXITO FINAL (Muestra TodoBien)
     if (exito) {
         return (
             <div className="global-message">
@@ -270,7 +253,6 @@ const ResponderEncuesta: React.FC = () => {
         );
     }
     
-    // Renderizado de Errores
     if (error) {
          const message = error.includes("Ya has respondido") ? error : "Error al cargar la encuesta: " + error;
          const isWarning = error.includes("Ya has respondido");
@@ -302,7 +284,7 @@ const ResponderEncuesta: React.FC = () => {
                 }
                 @keyframes fadeInContainer { from { opacity: 0; } to { opacity: 1; } }
 
-                .form-header { text-align: center; margin-bottom: 30px; }
+                .form-header {position:relative; text-align: center; margin-bottom: 30px; }
                 .form-title { color: ${styles.colorPrincipal}; margin-bottom: 5px; font-size: 2.5rem; font-weight: 700; }
                 
                 /* Barra de Progreso */
@@ -351,7 +333,7 @@ const ResponderEncuesta: React.FC = () => {
                 input[type="radio"]:checked + .opcion-descripcion { font-weight: 700; color: ${styles.colorPrincipal}; }
                 input[type="radio"]:checked + .opcion-descripcion::before { content: "✓ "; color: ${styles.colorSecundario}; }
 
-                /* Abierta (CORRECCIÓN FINAL DE DISEÑO) */
+                /* Abierta  */
                 .input-abierta { 
                     width: 100%; padding: 15px; border: 1px solid #cce4f6; 
                     background-color: ${styles.colorFondoTarjeta}; /* FONDO BLANCO */
@@ -362,8 +344,6 @@ const ResponderEncuesta: React.FC = () => {
                 }
                 .input-abierta:focus { border-color: ${styles.colorSecundario}; box-shadow: 0 0 5px ${styles.colorSecundario}80; outline: none; }
 
-
-                /* --- Tarjeta de Advertencia de Sección (SOLO al intentar avanzar) --- */
                 .section-warning-card {
                     margin-top: 30px; padding: 20px; background-color: #f8d7da; 
                     color: ${styles.colorAlerta}; border: 1px solid ${styles.colorAlerta};
@@ -381,22 +361,52 @@ const ResponderEncuesta: React.FC = () => {
                 }
                 .nav-button:disabled { background-color: #ccc; color: #666; box-shadow: none; cursor: not-allowed; }
                 
-                /* Botón Anterior (NUEVO DISEÑO) */
+                /* Botón Anterior */
                 .prev-button { background-color: ${styles.colorFondoTarjeta}; color: ${styles.colorPrincipal}; border: 1px solid #ddd; }
                 .prev-button:hover:not(:disabled) { background-color: #f0f4f8; transform: translateY(-3px); box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15); }
                 
-                /* Botón Siguiente (Color Secundario/Activo) */
+                /* Botón Siguiente */
                 .next-button { background-color: ${styles.colorSecundario}; color: white; }
                 .next-button:hover:not(:disabled) { background-color: #005bb5; transform: translateY(-3px); }
                 
                 /* Botón Enviar (Color Alerta) */
                 .send-button { background-color: ${styles.colorAlerta}; }
                 .send-button:hover:not(:disabled) { background-color: #a02834; transform: translateY(-3px); }
+             
+                /*Boton de atras*/
+                .go-back-button {
+                    position: absolute;
+                    top: 0; 
+                    right: 0;
+                    background-color: #f0f4f8;
+                    color: #0078D4;
+                    border: none;
+                    padding: 10px 15px;
+                    border-radius: 8px;
+                    cursor: pointer;
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    font-weight: 600;
+                    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+                }
+
+                .go-back-button:hover {
+                    background-color: #e8f4ff;
+                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                }
 
             `}</style>
 
             <div className="form-header">
-             
+                <button 
+                    className="go-back-button"
+                    onClick={handleGoBack}
+                >
+                    <ArrowLeft size={20} />
+                    Regresar al incio
+                </button>
+                <HeaderInstitucional/>
                 <h1 className="form-title">{encuesta.nombre}</h1>
                 <p className="form-subtitle">Completa las {totalSections} secciones. Tu progreso se guardará al final.</p>
             </div>
@@ -439,11 +449,11 @@ const ResponderEncuesta: React.FC = () => {
                     );
                 })}
                 
-                {/* --- ADVERTENCIA DE SECCIÓN (SOLO al intentar avanzar) --- */}
+                {/*Advertencia al avanzar*/}
                 {showSectionWarning && (
                     <div className="section-warning-card">
                         <AlertTriangle size={24} />
-                        Debe completar todos los campos obligatorios antes de pasar a la siguiente sección.
+                        Debe completar todos los campos obligatorios antes de pasar a la siguiente seccion.
                     </div>
                 )}
             </div>

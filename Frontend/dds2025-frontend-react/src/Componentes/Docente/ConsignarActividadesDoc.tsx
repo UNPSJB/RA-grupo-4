@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 
-// --- ESTILOS COMPLETOS ---
 const styles: { [key: string]: React.CSSProperties } = {
   fieldset: {
     border: '2px solid #003366',
@@ -179,7 +178,7 @@ const ConsignarActividadesDoc: React.FC<Props> = ({ actividades, onActividadesCh
 
         {/* Formulario de agregar SOLO si NO está disabled */}
         {!disabled && (
-            <div className="no-print" style={{ backgroundColor: '#f0f8ff', padding: '15px', borderRadius: '8px', marginBottom: '20px' }}>
+            <div className="no-print" style={{ backgroundColor: '#fff', padding: '15px', borderRadius: '8px', marginBottom: '20px' }}>
                 <h4 style={{ marginTop: 0, color: '#003366' }}>Agregar Nueva Actividad</h4>
                 <div style={styles.formGridTable}>
                   <div>

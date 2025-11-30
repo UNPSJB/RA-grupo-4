@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { AlertCircle, ChevronLeft, ChevronRight } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { AlertCircle, CheckCircle, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 type OpcionRespuesta = { id: number; descripcion: string; };
@@ -14,12 +14,23 @@ type PreguntaDetalle = {
 type SeccionDetalle = { id: number; enunciado: string; preguntas: PreguntaDetalle[]; };
 type HistorialDetalleData = { materia_nombre: string; encuesta_nombre: string; secciones: SeccionDetalle[]; };
 
+const ETIQUETAS_FIJAS = [
+    "A",   
+    "B",  
+    "C",   
+    "D",  
+    "E-T", 
+    "E-P",  
+    "G"     
+];
+
+
 const MisRespuestas: React.FC<{ materiaId: number }> = ({ materiaId }) => {
     const [data, setData] = useState<HistorialDetalleData | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     
-    const [indiceSeccionActual, setIndiceSeccionActual] = useState(0);
+    const [indiceSeccionActual, setIndiceSeccionActual] = useState(0); 
 
     const estudianteId = 1; 
     const navigate = useNavigate();
@@ -34,133 +45,194 @@ const MisRespuestas: React.FC<{ materiaId: number }> = ({ materiaId }) => {
             .then(d => { 
                 setData(d); 
                 setLoading(false); 
-                setIndiceSeccionActual(0); 
+                setIndiceSeccionActual(0);
             })
             .catch(err => { setError(err.message); setLoading(false); });
     }, [materiaId]);
 
-    // Navegación entre secciones
-    const irSiguiente = () => {
+    const seleccionarSeccion = useCallback((index: number) => {
+        setIndiceSeccionActual(index);
+        window.scrollTo(0, 0);
+    }, []);
+
+    const irSiguiente = useCallback(() => {
         if (data && indiceSeccionActual < data.secciones.length - 1) {
-            setIndiceSeccionActual(prev => prev + 1);
-            window.scrollTo(0, 0); 
+            seleccionarSeccion(indiceSeccionActual + 1);
         }
-    };
+    }, [data, indiceSeccionActual, seleccionarSeccion]);
 
-    const irAnterior = () => {
+    const irAnterior = useCallback(() => {
         if (indiceSeccionActual > 0) {
-            setIndiceSeccionActual(prev => prev - 1);
-            window.scrollTo(0, 0);
+            seleccionarSeccion(indiceSeccionActual - 1);
         }
-    };
-
-    const finalizarRevision = () => {
-        navigate('/home/alumno/historial-encuestas');
-    };
-
-    if (loading) return <div style={{ padding: 40, textAlign: 'center', color: '#666' }}>Cargando encuesta...</div>;
-    if (error) return <div style={{ padding: 20, color: '#dc3545', textAlign: 'center' }}><AlertCircle style={{display:'inline'}}/> {error}</div>;
-    if (!data || data.secciones.length === 0) return <div style={{ padding: 40, textAlign: 'center' }}>No hay datos disponibles.</div>;
-
-    const seccionActual = data.secciones[indiceSeccionActual];
-    const totalSecciones = data.secciones.length;
-    const progreso = ((indiceSeccionActual + 1) / totalSecciones) * 100;
+    }, [indiceSeccionActual, seleccionarSeccion]);
     
-    // Título de la sección
-    const tituloSeccion = seccionActual.enunciado || `Sección ${indiceSeccionActual + 1}`;
+    const estilos = {
+        contenedorPrincipal: {
+            maxWidth: '100%', 
+            backgroundColor: '#fff', 
+            borderRadius: '12px', 
+            overflow: 'hidden',
+        },
+        header: {
+            padding: '20px 30px 10px 30px', 
+            textAlign: 'center', 
+            borderBottom: '1px solid #eee', 
+            backgroundColor: '#fff',
+        },
+        tituloEncuesta: { 
+            color: '#0056b3', 
+            margin: '0 0 5px 0', 
+            fontSize: '1.6rem',
+            fontWeight: '700'
+        },
+        subtituloMateria: { 
+            color: '#666', 
+            fontSize: '1rem', 
+            margin: 0,
+            fontWeight: 600,
+        },
+        tabsBar: {
+            display: 'flex',
+            justifyContent: 'center' as 'center',
+            flexWrap: 'wrap' as 'wrap',
+            borderBottom: '2px solid #ddd',
+            padding: '10px 30px 0',
+        },
+        tab: {
+            padding: '8px 15px', 
+            margin: '0 5px 10px',
+            cursor: 'pointer',
+            fontWeight: 500,
+            fontSize: '0.9rem',
+            color: '#666',
+            borderRadius: '4px',
+            transition: 'all 0.2s ease',
+        },
+        tabActivo: {
+            backgroundColor: '#0056b3',
+            color: '#fff',
+            fontWeight: 600,
+            boxShadow: '0 2px 4px rgba(0, 86, 179, 0.3)',
+        },
+        preguntaBox: {
+            padding: '20px', 
+            border: '1px solid #e0e0e0', 
+            borderRadius: '8px', 
+            backgroundColor: '#fafafa',
+            marginBottom: '20px',
+        },
+        enunciadoPregunta: { 
+            fontWeight: 700, 
+            marginBottom: '15px', 
+            color: '#333', 
+            fontSize: '1rem',
+            lineHeight: 1.5 
+        },
+        opcionSeleccionada: { 
+            backgroundColor: '#e6ffed', 
+            border: '1px solid #b7e3c9', 
+            color: '#155724', 
+            fontWeight: 600,
+        },
+        opcionNoSeleccionada: { 
+            backgroundColor: '#fff', 
+            border: '1px solid #eee', 
+            color: '#495057',
+        },
+        respuestaTexto: {
+            width: '100%', padding: '12px', borderRadius: '6px', border: '1px solid #ccc', 
+            backgroundColor: '#fff', color: '#333', resize: 'none', minHeight: '80px',
+            fontSize: '0.95rem', fontFamily: 'inherit', readOnly: true 
+        },
+    };
+
+    if (loading) return <div style={{ padding: 40, textAlign: 'center', color: '#666' }}>Cargando historial de respuestas...</div>;
+    if (error) return <div style={{ padding: 20, color: '#dc3545', textAlign: 'center' }}><AlertCircle style={{display:'inline'}}/> {error}</div>;
+    if (!data || data.secciones.length === 0) return <div style={{ padding: 40, textAlign: 'center' }}>No hay respuestas registradas para esta materia.</div>;
+
+    const totalSecciones = data.secciones.length;
+    const seccionActual = data.secciones[indiceSeccionActual];
 
     return (
-        <div style={{ maxWidth: '900px', margin: '0 auto', backgroundColor: '#fff', borderRadius: '8px', boxShadow: '0 4px 12px rgba(0,0,0,0.08)', overflow: 'hidden' }}>
+        <div style={estilos.contenedorPrincipal}>
             
-            {/* HEADER DE LA ENCUESTA */}
-            <div style={{ padding: '30px 30px 10px 30px', textAlign: 'center', borderBottom: '1px solid #eee' }}>
-                <h2 style={{ color: '#0056b3', margin: '0 0 10px 0', fontSize: '1.6rem' }}>{data.encuesta_nombre}</h2>
-                <p style={{ color: '#666', fontSize: '1rem', margin: 0 }}>Materia: <strong>{data.materia_nombre}</strong></p>
+            <div style={estilos.header}>
+                <h2 style={estilos.tituloEncuesta}>{data.encuesta_nombre}</h2>
+                <p style={estilos.subtituloMateria}>Materia: {data.materia_nombre}</p> 
             </div>
 
-            {/* BARRA DE PROGRESO */}
-            <div style={{ padding: '20px 30px', backgroundColor: '#f8f9fa', borderBottom: '1px solid #eee' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', fontSize: '0.85rem', color: '#555', fontWeight: 600 }}>
-                    <span>Sección {indiceSeccionActual + 1} de {totalSecciones}</span>
-                    <span>{Math.round(progreso)}% Completado</span>
-                </div>
-                <div style={{ width: '100%', height: '6px', backgroundColor: '#e9ecef', borderRadius: '3px', overflow: 'hidden' }}>
-                    <div style={{ width: `${progreso}%`, height: '100%', backgroundColor: '#0056b3', transition: 'width 0.3s ease' }}></div>
-                </div>
+            {/* Barra Tabs*/}
+            <div style={estilos.tabsBar}>
+                {data.secciones.map((seccion, index) => (
+                    <div 
+                        key={seccion.id} 
+                        style={{ ...estilos.tab, ...(indiceSeccionActual === index ? estilos.tabActivo : {}) }}
+                        onClick={() => seleccionarSeccion(index)}
+                        title={seccion.enunciado || `Sección ${index + 1}`} 
+                    >
+                    
+                        {ETIQUETAS_FIJAS[index] || (index + 1)} 
+                    </div>
+                ))}
             </div>
 
-            {/* CONTENIDO DE LA SECCIÓN */}
             <div style={{ padding: '30px' }}>
                 
-                {/* Título de la Sección Actual */}
-                <div style={{ 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    marginBottom: '30px', 
-                    padding: '15px', 
-                    backgroundColor: '#f0f7ff', 
-                    borderLeft: '5px solid #0056b3',
-                    borderRadius: '0 4px 4px 0'
+                <h4 style={{ 
+                    marginTop: 0, 
+                    color: '#0056b3', 
+                    borderBottom: '1px dotted #ccc', 
+                    paddingBottom: '10px', 
+                    marginBottom: '25px' 
                 }}>
-                    <h3 style={{ margin: 0, color: '#003366', fontSize: '1.2rem', fontWeight: 'bold' }}>
-                        {tituloSeccion}
-                    </h3>
-                </div>
+                    {indiceSeccionActual + 1}. {seccionActual.enunciado || `Sección ${indiceSeccionActual + 1}`}
+                </h4>
 
                 {/* Lista de Preguntas */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '30px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                     {seccionActual.preguntas.map((pregunta, index) => (
-                        <div key={pregunta.id} style={{ 
-                            padding: '20px', 
-                            border: '1px solid #e0e0e0', 
-                            borderRadius: '8px', 
-                            backgroundColor: '#fff',
-                            boxShadow: '0 2px 4px rgba(0,0,0,0.02)' 
-                        }}>
-                            <p style={{ fontWeight: 600, marginBottom: '15px', color: '#333', fontSize: '1rem' }}>
+                        <div key={pregunta.id} style={estilos.preguntaBox}>
+                            <p style={estilos.enunciadoPregunta}>
                                 {index + 1}. {pregunta.enunciado}
                             </p>
 
-                            {/* RENDERIZADO DE OPCIONES  */}
                             {(pregunta.opciones && pregunta.opciones.length > 0) ? (
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                     {pregunta.opciones.map((opcion) => {
                                         const isSelected = opcion.id === pregunta.respuesta_seleccionada_id;
+                                        
+                                        const opcionStyle = {
+                                            display: 'flex', alignItems: 'center', gap: '12px', 
+                                            padding: '12px 18px', borderRadius: '8px', 
+                                            cursor: 'default', 
+                                            ...estilos.opcionNoSeleccionada,
+                                            ...(isSelected ? estilos.opcionSeleccionada : {}),
+                                        };
+                                        
                                         return (
-                                            <label key={opcion.id} style={{ 
-                                                display: 'flex', alignItems: 'center', gap: '12px', 
-                                                padding: '10px 15px', borderRadius: '6px', 
-                                                backgroundColor: isSelected ? '#e8f0fe' : '#fff',
-                                                border: isSelected ? '1px solid #1967d2' : '1px solid #ddd',
-                                                cursor: 'default', 
-                                                transition: 'background-color 0.2s'
-                                            }}>
+                                            <div key={opcion.id} style={opcionStyle}>
                                                 <div style={{
                                                     width: '18px', height: '18px', borderRadius: '50%', 
-                                                    border: `2px solid ${isSelected ? '#1967d2' : '#757575'}`,
+                                                    border: `2px solid ${isSelected ? '#155724' : '#757575'}`,
                                                     display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-                                                    backgroundColor: '#fff'
+                                                    backgroundColor: isSelected ? estilos.opcionSeleccionada.backgroundColor : 'transparent',
                                                 }}>
-                                                    {isSelected && <div style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: '#1967d2' }}></div>}
+                                                    {isSelected && <CheckCircle size={14} color="#155724" fill={estilos.opcionSeleccionada.backgroundColor} />} 
                                                 </div>
-                                                <span style={{ color: isSelected ? '#155724' : '#495057', fontWeight: isSelected ? 600 : 400 }}>
+                                                <span style={{ marginLeft: '4px', color: isSelected ? '#155724' : '#495057', fontWeight: isSelected ? 700 : 400 }}>
                                                     {opcion.descripcion}
                                                 </span>
-                                            </label>
+                                            </div>
                                         );
                                     })}
                                 </div>
                             ) : (
-                                /* RENDERIZADO DE TEXTO (Si fue pregunta abierta) */
                                 <div style={{ marginTop: '5px' }}>
                                     <textarea 
                                         readOnly
                                         value={pregunta.respuesta_texto || ''}
-                                        style={{ 
-                                            width: '100%', padding: '12px', borderRadius: '6px', border: '1px solid #ccc', 
-                                            backgroundColor: '#f8f9fa', color: '#333', resize: 'none', minHeight: '80px',
-                                            fontSize: '0.95rem', fontFamily: 'inherit'
-                                        }}
+                                        style={estilos.respuestaTexto}
                                         placeholder="No se registró respuesta de texto."
                                     />
                                 </div>
@@ -168,63 +240,54 @@ const MisRespuestas: React.FC<{ materiaId: number }> = ({ materiaId }) => {
                         </div>
                     ))}
                 </div>
-            </div>
 
-            {/* FOOTER DE NAVEGACIÓN */}
-            <div style={{ 
-                padding: '20px 30px', 
-                backgroundColor: '#fff', 
-                borderTop: '1px solid #eee', 
-                display: 'flex', 
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                position: 'sticky',
-                bottom: 0,
-                zIndex: 10
-            }}>
-                <button 
-                    onClick={irAnterior}
-                    disabled={indiceSeccionActual === 0}
-                    style={{ 
-                        display: 'flex', alignItems: 'center', gap: '5px',
-                        padding: '10px 20px', borderRadius: '4px', border: '1px solid #ccc',
-                        backgroundColor: indiceSeccionActual === 0 ? '#f1f1f1' : '#fff',
-                        color: indiceSeccionActual === 0 ? '#999' : '#333',
-                        cursor: indiceSeccionActual === 0 ? 'not-allowed' : 'pointer',
-                        fontWeight: 600
-                    }}
-                >
-                    <ChevronLeft size={18} /> Anterior
-                </button>
-
-                {indiceSeccionActual < totalSecciones - 1 ? (
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '30px', paddingBottom: '20px' }}>
+                    
                     <button 
-                        onClick={irSiguiente}
+                        onClick={irAnterior}
+                        disabled={indiceSeccionActual === 0}
                         style={{ 
                             display: 'flex', alignItems: 'center', gap: '5px',
-                            padding: '10px 25px', borderRadius: '4px', border: 'none',
-                            backgroundColor: '#0056b3', color: '#fff',
-                            cursor: 'pointer', fontWeight: 600, fontSize: '1rem',
-                            boxShadow: '0 2px 5px rgba(0,0,0,0.2)'
+                            padding: '10px 20px', borderRadius: '6px', border: '1px solid #ccc',
+                            backgroundColor: indiceSeccionActual === 0 ? '#f1f1f1' : '#fff',
+                            color: indiceSeccionActual === 0 ? '#999' : '#333',
+                            cursor: indiceSeccionActual === 0 ? 'not-allowed' : 'pointer',
+                            fontWeight: 600, transition: 'background-color 0.2s'
                         }}
                     >
-                        Siguiente <ChevronRight size={18} />
+                        <ChevronLeft size={18} /> Anterior
                     </button>
-                ) : (
-                    <button 
-                        onClick={finalizarRevision}
-                        style={{ 
-                            display: 'flex', alignItems: 'center', gap: '5px',
-                            padding: '10px 25px', borderRadius: '4px', border: 'none',
-                            backgroundColor: '#28a745', color: '#fff',
-                            cursor: 'pointer', fontWeight: 600, fontSize: '1rem',
-                            boxShadow: '0 2px 5px rgba(0,0,0,0.2)'
-                        }}
-                    >
-                        Finalizar Revisión
-                    </button>
-                )}
+                    {indiceSeccionActual < totalSecciones - 1 && (
+                        <button 
+                            onClick={irSiguiente}
+                            style={{ 
+                                display: 'flex', alignItems: 'center', gap: '5px',
+                                padding: '10px 25px', borderRadius: '6px', border: 'none',
+                                backgroundColor: '#0056b3', color: '#fff',
+                                cursor: 'pointer', fontWeight: 600, fontSize: '1rem',
+                                boxShadow: '0 2px 5px rgba(0,0,0,0.2)', transition: 'background-color 0.2s'
+                            }}
+                        >
+                            Siguiente Sección <ChevronRight size={18} />
+                        </button>
+                    )}
+                    {indiceSeccionActual === totalSecciones - 1 && (
+                        <button 
+                            onClick={() => navigate('/home/alumno/historial-encuestas')}
+                            style={{ 
+                                display: 'flex', alignItems: 'center', gap: '5px',
+                                padding: '10px 25px', borderRadius: '6px', border: 'none',
+                                backgroundColor: '#28a745', color: '#fff',
+                                cursor: 'pointer', fontWeight: 600, fontSize: '1rem',
+                                boxShadow: '0 2px 5px rgba(0,0,0,0.2)', transition: 'background-color 0.2s'
+                            }}
+                        >
+                            Finalizar Revisión
+                        </button>
+                    )}
+                </div>
             </div>
+            
         </div>
     );
 };

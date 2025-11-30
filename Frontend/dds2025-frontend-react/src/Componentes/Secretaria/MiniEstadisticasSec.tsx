@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { List } from 'lucide-react'; // Importamos el ícono de lista
 
-const MiniEstadisticasEst = () => {
+const MiniEstadisticasSec = () => {
     const [stats, setStats] = useState({
         total: 0,
         respondidas: 0,

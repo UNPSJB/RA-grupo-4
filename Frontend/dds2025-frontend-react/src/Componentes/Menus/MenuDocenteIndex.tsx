@@ -170,60 +170,9 @@ const MenuDocenteIndex: React.FC = () => {
                     />
                 </div>
             </div>
-
             <div className="seccion-box">
-                <h2 className="seccion-title">
-                    <AlertCircle size={24} />
-                    Informes Pendientes ({periodoActual?.cuatrimestre} {periodoActual?.ciclo_lectivo})
-                
-                </h2>
-                <div className="pending-list">
-                    {cargando && <div className="empty-list-message">Cargando pendientes...</div>}
-                    {error && <div className="empty-list-message" style={{color: 'var(--color-alerta)'}}>Error: {error}</div>}
-
-                    {!cargando && !error && materiasPendientes.length === 0 && (
-                        <div className="empty-list-message">
-                            ¡Felicitaciones! No tienes más informes pendientes de generar.
-                        </div>
-                    )}
-                    {!cargando && !error && materiasPendientes.length > 0 && (
-                        <>
-                            {materiasPendientesVisibles.map((materia) => (
-                                <div className="pending-item" key={materia.id_materia}>
-                                    <div className="pending-info">
-                                        <BookOpen size={24} className="pending-icon" />
-                                        <div className="pending-text">
-                                            <h4>{materia.nombre}</h4>
-                                            <p>Código: {materia.codigoMateria ?? 'N/A'} - Pendiente de generación.</p>
-                                        </div>
-                                    </div>
-                                    <button
-                                        onClick={() => handleGenerarInforme(materia.id_materia)}
-                                        className="btn-action"
-                                    >
-                                        Generar Informe <Send size={16} />
-                                    </button>
-                                </div>
-                            ))}
-
-                            {materiasPendientesVisibles.length < materiasPendientes.length && (
-                                <div style={{padding: '20px 15px 0', textAlign: 'center'}}>
-                                    <button 
-                                        className="btn-action"
-                                        style={{backgroundColor: '#17a2b8', display: 'inline-flex', alignItems: 'center', gap: '6px'}}
-                                        onClick={handleVerMas}
-                                    >
-                                        Ver Más ({materiasPendientes.length - materiasPendientesVisibles.length} restantes)
-                                        <ChevronDown size={18} />
-                                    </button>
-                                </div>
-                            )}
-
-                        </>
-                    )}
-                </div>
+                <ListadoInformesACDoc />
             </div>
-
             <div className="seccion-box">
                 <h2 className="seccion-title">
                     <CheckSquare size={24} />
