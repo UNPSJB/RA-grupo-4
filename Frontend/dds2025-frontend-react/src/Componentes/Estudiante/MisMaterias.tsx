@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { BookOpen, AlertCircle, Calendar, Hash, LayoutGrid, CheckCircle2, Clock, XCircle } from "lucide-react";
-import EstadisticasAlumno from "./EstadisticasAlumno"; 
+import { BookOpen, AlertCircle, Calendar, Hash, LayoutGrid, CheckCircle2, Clock, XCircle, ArrowLeft } from "lucide-react";
+import { useNavigate } from 'react-router-dom';
+import EstadisticasAlumno from "./EstadisticasAlumno";
+import SinDatos from "../Otros/SinDatos";
+import ErrorCargaDatos from "../Otros/ErrorCargaDatos";
 
 type MateriaHistorial = {
     id: number;
@@ -17,38 +20,44 @@ const MisMaterias: React.FC = () => {
     const [materias, setMaterias] = useState<MateriaHistorial[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const estudianteId = 1; 
+    const estudianteId = 1;
+    const navigate = useNavigate();
 
-    // --- PALETA INSTITUCIONAL ---
     const theme = {
-        primary: '#1e40af',       // Navy Blue
-        primaryHover: '#1e3a8a',
-        primarySoft: '#eff6ff',   // Fondo muy claro azul
-        textMain: '#0f172a',      // Slate Dark
-        textSecondary: '#64748b', // Slate
+        primary: '#1e40af',   
+        primaryHover: '#3658b6ff',
+        primarySoft: '#eff6ff', 
+        textMain: '#1e40af',     
+        textSecondary: '#64748b', 
         border: '#e2e8f0',
         white: '#ffffff',
-        bgPage: '#f8fafc',        // Fondo página
-        successBg: '#dcfce7',     // Fondo verde claro
-        successText: '#166534',   // Texto verde oscuro
-        warningBg: '#fef3c7',     // Fondo amarillo/naranja claro
-        warningText: '#920e0eff',   // Texto naranja oscuro
-        neutralBg: '#f1f5f9',     // Fondo gris
-        neutralText: '#475569'    // Texto gris
+        bgPage: '#f8fafc',    
+        successBg: '#dcfce7',    
+        successText: '#166534',
+        warningBg: '#fef3c7',   
+        warningText: '#920e0eff',   
+        neutralBg: '#f1f5f9',     
+        neutralText: '#475569',
+        botonRegresar:'#0078D4'
+    };
+    const handleGoBack = () => {
+        navigate('/home/alumno');
     };
 
     useEffect(() => {
         setLoading(true);
         fetch(`http://localhost:8000/encuestas/estudiantes/${estudianteId}/historial`)
             .then(res => {
-                if (!res.ok) throw new Error("No se pudo conectar con el servidor");
+                if (!res.ok) throw new Error("No se pudo conectar con el servidor o la URL es incorrecta.");
                 return res.json();
             })
             .then(data => { setMaterias(data); setLoading(false); })
-            .catch(err => { setError(err.message); setLoading(false); });
-    }, []);
-
-    // --- CSS INYECTADO ---
+            .catch(err => { 
+                console.error("Error fetching materias:", err);
+                setError(err.message || "Error inesperado al cargar las materias."); 
+                setLoading(false);
+            });
+    }, [estudianteId]);
     const cssInyectado = `
         .fade-in { animation: fadeIn 0.5s ease-out; }
         
@@ -68,20 +77,39 @@ const MisMaterias: React.FC = () => {
             border-color: ${theme.primary}40;
         }
 
-        /* Estilo para el gráfico contenedor para asegurar que no rompa el diseño */
         .chart-container {
             background: #ffffff;
             border-radius: 8px;
             padding: 10px 0;
         }
+        
+        .go-back-button:hover {
+                    background-color: #e8f4ff;
+                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                }
 
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
+        @media (max-width: 768px) {
+            .header-wrapper {
+                flex-direction: column;
+                align-items: flex-start !important;
+            }
+            .go-back-button {
+                width: 100%;
+                justify-content: center;
+                margin-top: 10px;
+            }
+            .main-container {
+                padding: 20px !important;
+            }
+            .header-title {
+                font-size: 1.5rem !important;
+            }
+        }
     `;
-
-    // --- ESTILOS EN LÍNEA ---
     const styles = {
         pageWrapper: {
             padding: '40px 20px',
@@ -95,20 +123,27 @@ const MisMaterias: React.FC = () => {
         mainContainer: {
             backgroundColor: theme.white,
             width: '100%',
-            maxWidth: '1100px', // Un poco más ancho para el grid
+            maxWidth: '1100px', 
             borderRadius: '20px',
             boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 10px 15px -3px rgba(0, 0, 0, 0.05)',
             overflow: 'hidden',
             border: `1px solid ${theme.border}`,
             padding: '30px',
         },
-        header: {
+        headerWrapper: { 
             marginBottom: '30px',
+            display: 'flex',
+            justifyContent: 'space-between', 
+            alignItems: 'center',
+            gap: '20px',
+            paddingBottom: '20px',
+            borderBottom: `1px solid ${theme.border}`,
+        },
+        headerTitleContainer: {
             display: 'flex',
             alignItems: 'center',
             gap: '16px',
-            paddingBottom: '20px',
-            borderBottom: `1px solid ${theme.border}`,
+            flexShrink: 1,
         },
         headerIcon: {
             backgroundColor: theme.primary,
@@ -122,16 +157,37 @@ const MisMaterias: React.FC = () => {
         headerTitle: {
             margin: 0,
             fontSize: '1.8rem',
-            fontWeight: 800,
+            fontWeight: 750,
             color: theme.textMain,
             letterSpacing: '-0.5px',
+        },
+        headerDescription: {
+            margin: 0,
+            marginTop: '5px',
+            fontSize: '0.9rem',
+            color: theme.textSecondary,
+            maxWidth: '600px',
+        },
+        goBackButton: {
+            backgroundColor: theme.primarySoft,
+            color: theme.botonRegresar,
+            border: 'none',
+            padding: '10px 18px',
+            borderRadius: '8px',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            fontWeight: 600,
+            fontSize: '0.9rem',
+            transition: 'background-color 0.2s ease, box-shadow 0.2s ease',
+            flexShrink: 0,
         },
         grid: {
             display: "grid",
             gridTemplateColumns: "repeat(auto-fill, minmax(340px, 1fr))",
             gap: "24px",
         },
-        // Tarjeta Individual
         cardHeader: {
             padding: "16px 20px",
             backgroundColor: theme.primarySoft,
@@ -197,11 +253,8 @@ const MisMaterias: React.FC = () => {
             gap: '6px',
         },
         loadingState: { padding: '80px', textAlign: 'center' as const, color: theme.textSecondary },
-        errorState: { padding: '40px', color: '#ef4444', textAlign: 'center' as const, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '10px' },
-        emptyState: { padding: '60px', textAlign: 'center' as const, backgroundColor: theme.primarySoft, borderRadius: '12px', color: theme.textSecondary }
     };
 
-    // Helper para renderizar el badge
     const renderBadge = (materia: MateriaHistorial) => {
         if (materia.encuesta_procesada) {
             return (
@@ -226,16 +279,16 @@ const MisMaterias: React.FC = () => {
 
     if (loading) return (
         <div style={styles.pageWrapper}>
-             <div style={styles.mainContainer}>
-                <div style={styles.loadingState}>Cargando tus materias...</div>
+             <div style={styles.mainContainer} className="main-container">
+                 <div style={styles.loadingState}>Cargando tus materias...</div>
              </div>
         </div>
     );
 
     if (error) return (
         <div style={styles.pageWrapper}>
-             <div style={styles.mainContainer}>
-                <div style={styles.errorState}><AlertCircle /> {error}</div>
+             <div style={styles.mainContainer} className="main-container">
+                 <ErrorCargaDatos mensaje={error} theme={theme} />
              </div>
         </div>
     );
@@ -244,25 +297,34 @@ const MisMaterias: React.FC = () => {
         <div style={styles.pageWrapper}>
             <style>{cssInyectado}</style>
 
-            <div style={styles.mainContainer} className="fade-in">
+            <div style={styles.mainContainer} className="fade-in main-container">
                 
-                {/* Header Principal */}
-                <div style={styles.header}>
-                    <div style={styles.headerIcon}>
-                        <LayoutGrid size={32} />
+                <div style={styles.headerWrapper} className="header-wrapper">
+                    <div style={styles.headerTitleContainer}>
+                        <div>
+                            <h2 style={styles.headerTitle}>Resumen Academico</h2>
+                            <p style={styles.headerDescription}>
+                            Consulta el listado de tus materias, el estado de las encuestas docentes y el nivel de participación de tus compañeros en cada curso.
+                            </p>
+
+                        </div>
                     </div>
-                    <div>
-                        <h2 style={styles.headerTitle}>Mis Materias</h2>
-                        <span style={{color: theme.textSecondary}}>Resumen de cursada y participación</span>
-                    </div>
+                    
+                    <button 
+                        style={styles.goBackButton} 
+                        className="go-back-button"
+                        onClick={handleGoBack}
+                    >
+                        <ArrowLeft size={20} />
+                        Regresar al incio
+                    </button>
                 </div>
 
-                {/* Contenido */}
                 {materias.length === 0 ? (
-                    <div style={styles.emptyState}>
-                        <BookOpen size={40} style={{ marginBottom: 10, opacity: 0.5 }} />
-                        <p>No estás inscripto en materias actualmente.</p>
-                    </div>
+                    <SinDatos
+                        mensaje="No estás inscripto en materias actualmente."
+                        titulo="Sin Materias Activas"
+                    />
                 ) : (
                     <div style={styles.grid}>
                         {materias.map((materia) => (
@@ -280,13 +342,11 @@ const MisMaterias: React.FC = () => {
                                         </div>
                                     </div>
                                 </div>
-
-                                {/* Cuerpo de la Tarjeta */}
+                                {/*tarjeta */}
                                 <div style={styles.cardBody}>
                                     <div>
                                         <h4 style={styles.sectionTitle}>Participación General</h4>
                                         <div className="chart-container">
-                                            {/* Importante: Asegúrate de que este componente sea responsive */}
                                             <EstadisticasAlumno materiaId={materia.id} />
                                         </div>
                                     </div>

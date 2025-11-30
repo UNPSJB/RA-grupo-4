@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { History, Calendar, AlertCircle } from 'lucide-react'; 
 import SinDatos from "../Otros/SinDatos";
-
 const API_BASE = "http://localhost:8000";
 
 interface HistorialItem {

@@ -83,7 +83,7 @@ const SeleccionarEncuestas: React.FC = () => {
           background: #ffffff;
           border: 1px solid #e8f4ff;
           border-radius: 12px;
-          padding: 16px 20px;
+          padding: 16px 20px;a
           box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
           transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
@@ -127,7 +127,7 @@ const SeleccionarEncuestas: React.FC = () => {
           align-items: center;
           gap: 8px;
           background-color: #0078D4;
-          color: white; /* Aseguramos que el texto base sea blanco */
+          color: white; 
           padding: 10px 16px;
           border-radius: 8px;
           font-weight: 600;
@@ -135,11 +135,10 @@ const SeleccionarEncuestas: React.FC = () => {
           transition: background-color 0.2s ease, transform 0.1s ease;
         }
 
-        /* CORRECCIÓN CLAVE: Aseguramos el color blanco en el hover */
         .boton-primario:hover {
           background-color: #005bb5;
           transform: translateY(-1px);
-          color: white; /* <-- CORRECCIÓN: Fuerza el color del texto a blanco */
+          color: white; 
         }
 
         @media (max-width: 768px) {

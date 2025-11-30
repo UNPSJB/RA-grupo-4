@@ -9,7 +9,7 @@ import CompletarContenidoAbordadoDoc from './CompletarContenidoAbordadoDoc';
 import CompletarProcesoAprendizajeDoc from './CompletarProcesoAprendizajeDoc';
 import ConsignarActividadesDoc from './ConsignarActividadesDoc';
 import CompletarValoracionAuxiliaresDoc, { ValoracionAuxiliarData } from './CompletarValoracionAuxiliaresDoc';
-import ResumenSecciones from '../Departamento/ConsignarResumenValoresEncuesta';
+import ResumenSecciones from './ConsignarResumenValoresEncuesta';
 
 const BASE_URL = 'http://localhost:8000';
 
@@ -226,7 +226,6 @@ const GenerarInformeACDoc: React.FC = () => {
         };
     }, [informeGenerado, navigate]);
 
-    // ---  LÓGICA DE AUTOCOMPLETADO ARREGLADA  ---
     useEffect(() => {
         const fetchData = async () => {
             if (!idMateria) { 
@@ -239,7 +238,7 @@ const GenerarInformeACDoc: React.FC = () => {
                 setLoading(true);
                 setError(null);
 
-                // 1. Traemos TODAS las materias y docentes 
+                // 1. Traemos las materias y docentes 
                 const materiasRes = await fetch(`${BASE_URL}/materias/listar`);
                 const docentesRes = await fetch(`${BASE_URL}/docentes/listar`);
 
@@ -299,7 +298,6 @@ const GenerarInformeACDoc: React.FC = () => {
         fetchData();
     }, [idMateria]); // Se dispara cuando el idMateria de la URL cambia
 
-    // --- HANDLERS ---
     const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
         setFormData(prev => ({
@@ -317,7 +315,6 @@ const GenerarInformeACDoc: React.FC = () => {
     };
     const handleValoracionesChange = (nuevas: ValoracionAuxiliarData[]) => setValoracionesAuxiliares(nuevas);
 
-    // --- SUBMIT (Sin cambios) ---
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError(null);
@@ -393,7 +390,6 @@ const GenerarInformeACDoc: React.FC = () => {
         }
     };
 
-    // --- RENDERIZADO ---
     if (loading && materias.length === 0) {
         return (
             <div style={styles.page}>
@@ -404,8 +400,6 @@ const GenerarInformeACDoc: React.FC = () => {
             </div>
         );
     }
-
-    // Este error SÍ es importante y se mostrará si la materia no se encuentra
     if (error && materias.length === 0) {
         return (
             <div style={styles.page}>

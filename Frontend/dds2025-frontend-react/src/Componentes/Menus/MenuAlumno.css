@@ -1,16 +1,16 @@
 .menu-alumno-layout-full {
-    --alumno-color-principal: #003366;      /* Azul Oscuro Institucional */
-    --alumno-color-secundario: #0078D4;     /* Celeste Brillante */
+    --alumno-color-principal: #003366;      /* Reutilizar estos colores*/
+    --alumno-color-secundario: #0078D4;     /* Este igual */
     --alumno-color-terciario: #e8f4ff;      /* Fondo sutil */
-    --alumno-color-alerta: #e76f51;         /* Naranja Alerta */
-    --alumno-bg-base: #f0f4f8;              /* Fondo General */
+    --alumno-color-alerta: #e76f51;         /* Alertas */
+    --alumno-bg-base: #ffffff;              /* Fondo General */
     --alumno-bg-card: #ffffff;              /* Fondo Tarjetas */
     --alumno-text-dark: #222;
     --alumno-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
     --alumno-radius: 12px;
     --alumno-transition: 0.3s ease;
 
-    /* Colores para Mini Stats */
+    /* Colores para Mini estadisticsa */
     --stat-bg-total: var(--alumno-color-principal);
     --stat-bg-done: #e8f4ff;
     --stat-bg-pending: #fff0e8;
@@ -171,7 +171,7 @@
     border-top: 5px solid transparent; 
 }
 
-/* Color tarjetas*/
+/* Tarjetas*/
 .card-variant-blue { 
     border-top-color: #0078D4; 
 }
@@ -198,19 +198,13 @@
     color: #666;
     margin: 0;
 }
-
-/* -------------------------------------------
-   5. MINI ESTADÍSTICAS (Estilos Internos del Componente)
-   ------------------------------------------- */
-/* Estos estilos aplican a los elementos dentro de MiniEstadisticasEst.jsx */
-
 .mini-stats-est-container {
     width: 100%;
 }
 
 .mini-stats-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr); /* 3 columnas exactas */
+    grid-template-columns: repeat(3, 1fr); 
     gap: 10px;
 }
 
