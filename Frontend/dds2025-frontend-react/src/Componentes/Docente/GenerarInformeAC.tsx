@@ -13,7 +13,6 @@ import ResumenSecciones from './ConsignarResumenValoresEncuesta';
 
 const BASE_URL = 'http://localhost:8000';
 
-// (Estilos...
 const styles: { [key: string]: React.CSSProperties } = {
     page: {
         backgroundColor: '#f4f7f6',
@@ -23,7 +22,7 @@ const styles: { [key: string]: React.CSSProperties } = {
         position: 'relative',
     },
     container: {
-        maxWidth: '950px',
+        maxWidth: '1100px',
         margin: '0 auto',
         padding: '30px',
         backgroundColor: '#ffffff',
@@ -131,10 +130,14 @@ const styles: { [key: string]: React.CSSProperties } = {
         cursor: 'pointer',
         alignSelf: 'flex-end',
         transition: '0.2s',
+    },
+    separator: {
+        border: 'none',
+        borderTop: '1px solid #e0e0e0', 
+        margin: '40px 0', 
     }
 };
 
-// --- INTERFACES ---
 interface MateriaParaAutocompletar {
     id_materia: number;
     nombre: string;
@@ -197,7 +200,6 @@ const GenerarInformeACDoc: React.FC = () => {
         resumen_reflexion: '',
     });
 
-    // (Estados de equipamiento, bibliografia, etc...
     const [equipamiento, setEquipamiento] = useState<string[]>([]);
     const [bibliografia, setBibliografia] = useState<string[]>([]);
     const [valoracionesAuxiliares, setValoracionesAuxiliares] = useState<ValoracionAuxiliarData[]>([
@@ -210,7 +212,6 @@ const GenerarInformeACDoc: React.FC = () => {
     const [informeGenerado, setInformeGenerado] = useState<any>(null);
     const [segundosRestantes, setSegundosRestantes] = useState(5);
 
-    // --- EFECTO PARA REDIRECCIÓN ---
     useEffect(() => {
         let timerRedirect: NodeJS.Timeout;
         let timerCount: NodeJS.Timeout;
@@ -237,8 +238,6 @@ const GenerarInformeACDoc: React.FC = () => {
             try {
                 setLoading(true);
                 setError(null);
-
-                // 1. Traemos las materias y docentes 
                 const materiasRes = await fetch(`${BASE_URL}/materias/listar`);
                 const docentesRes = await fetch(`${BASE_URL}/docentes/listar`);
 
@@ -251,18 +250,12 @@ const GenerarInformeACDoc: React.FC = () => {
                 setMaterias(materiasData); 
                 setDocentes(docentesData); 
 
-                // 2. Encontramos la materia seleccionada en la lista
                 const selectedMateria = materiasData.find((m: MateriaParaAutocompletar) => String(m.id_materia) === idMateria);
 
                 if (!selectedMateria) {
                     throw new Error(`Materia con ID ${idMateria} no encontrada.`);
                 }
-
-                // 3. Encontramos al docente de esa materia en la lista
                 const selectedDocente = docentesData.find((d: Docente) => d.id_docente === selectedMateria.id_docente);
-
-                // 4. Buscamos la sede. Si no tienes /sedes/:id, tendrás que ajustar esto.
-                // Por ahora, asumimos que existe para autocompletar.
                 let sedeNombre = '';
                 try {
                     const sedeRes = await fetch(`${BASE_URL}/sedes/${selectedMateria.id_sede}`);
@@ -296,7 +289,7 @@ const GenerarInformeACDoc: React.FC = () => {
             }
         };
         fetchData();
-    }, [idMateria]); // Se dispara cuando el idMateria de la URL cambia
+    }, [idMateria]); 
 
     const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
@@ -417,40 +410,40 @@ const GenerarInformeACDoc: React.FC = () => {
             {informeGenerado && (
                 <div style={styles.floatingSuccess}>
                    <style>{`
-                     @keyframes slideDownFade { 
-                       from { opacity: 0; transform: translate(-50%, -20px); } 
-                       to { opacity: 1; transform: translate(-50%, 0); } 
-                     }
-                     @keyframes checkmark { 0% { stroke-dashoffset: 50; } 100% { stroke-dashoffset: 0; } }
-                     @keyframes pulseGray { 0% { color: #999; } 50% { color: #555; } 100% { color: #999; } }
-                   `}</style>
-                   
+                    @keyframes slideDownFade { 
+                        from { opacity: 0; transform: translate(-50%, -20px); } 
+                        to { opacity: 1; transform: translate(-50%, 0); } 
+                    }
+                    @keyframes checkmark { 0% { stroke-dashoffset: 50; } 100% { stroke-dashoffset: 0; } }
+                    @keyframes pulseGray { 0% { color: #999; } 50% { color: #555; } 100% { color: #999; } }
+                    `}</style>
+                    
                    <div style={styles.successHeader}>
-                     <div style={{ width: '35px', height: '35px', backgroundColor: '#e8f5e9', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                       <svg viewBox="0 0 52 52" width="25" height="25">
-                         <circle cx="26" cy="26" r="25" fill="none" stroke="#4CAF50" strokeWidth="2" />
-                         <path fill="none" stroke="#4CAF50" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"
-                               strokeDasharray="50" strokeDashoffset="0" d="M14.1 27.2l7.1 7.2 16.7-16.8"
-                               style={{ animation: 'checkmark 0.8s ease-in-out forwards' }} />
-                       </svg>
-                     </div>
-                     <h3 style={styles.successTitle}>¡Informe Creado!</h3>
-                     <button onClick={() => navigate(-1)} style={styles.closeButton} title="Cerrar y volver ya">×</button>
+                       <div style={{ width: '35px', height: '35px', backgroundColor: '#e8f5e9', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                        <svg viewBox="0 0 52 52" width="25" height="25">
+                           <circle cx="26" cy="26" r="25" fill="none" stroke="#4CAF50" strokeWidth="2" />
+                           <path fill="none" stroke="#4CAF50" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"
+                                 strokeDasharray="50" strokeDashoffset="0" d="M14.1 27.2l7.1 7.2 16.7-16.8"
+                                 style={{ animation: 'checkmark 0.8s ease-in-out forwards' }} />
+                        </svg>
+                       </div>
+                       <h3 style={styles.successTitle}>¡Informe Creado!</h3>
+                       <button onClick={() => navigate(-1)} style={styles.closeButton} title="Cerrar y volver ya">×</button>
                    </div>
 
                    <p style={styles.successText}>
-                     El informe se ha guardado correctamente en el sistema.
+                       El informe se ha guardado correctamente en el sistema.
                    </p>
-                   
+                    
                    <div style={styles.redirectText}>
-                     <span>⏳</span> 
-                     <span style={{ animation: 'pulseGray 2s infinite' }}>
-                       Volviendo automáticamente en <b>{segundosRestantes}s</b>...
-                     </span>
+                       <span>⏳</span> 
+                       <span style={{ animation: 'pulseGray 2s infinite' }}>
+                           Volviendo automáticamente en <b>{segundosRestantes}s</b>...
+                       </span>
                    </div>
 
                    <button onClick={() => navigate(-1)} style={styles.volverButtonSmall}>
-                     Volver ahora
+                       Volver ahora
                    </button>
                 </div>
             )}
@@ -463,6 +456,7 @@ const GenerarInformeACDoc: React.FC = () => {
                     </h2>
                     <h2 style={styles.title}>Informe de Actividad Curricular</h2>
 
+                    {/* SECCION 1: DATOS GENERALES */}
                     <CompletarDatosGeneralesDoc
                         materias={materias}
                         docentes={docentes}
@@ -470,12 +464,40 @@ const GenerarInformeACDoc: React.FC = () => {
                         handleChange={handleFormChange}
                         loading={loading}
                     />
+                    
+                    <hr style={styles.separator} /> {/* Separador */}
+
+                    {/* Necesidades */}
                     <CompletarNecesidadesDoc equipamiento={equipamiento} bibliografia={bibliografia} onNecesidadesChange={handleNecesidadesChange} />
+                    
+                    <hr style={styles.separator} /> {/* Separador */}
+
+                    {/* Porcentaje de comisiones*/}
                     <CompletarPorcentajesDoc formData={formData} handleChange={handleFormChange} />
+                    
+                    <hr style={styles.separator} /> {/* Separador */}
+
+                    {/* Contenido abordao*/}
                     <CompletarContenidoAbordadoDoc formData={formData} handleChange={handleFormChange} />
+                    
+                    <hr style={styles.separator} /> {/* Separador */}
+
+                    {/* Resumen de valores de la encuesta */}
                     <ResumenSecciones idMateria={Number(formData.id_materia)} handleChange={handleResumenChange} />
+                    
+                    <hr style={styles.separator} /> {/* Separador */}
+
+                    {/* Procveso de enseñansa/aprendizaje*/}
                     <CompletarProcesoAprendizajeDoc formData={formData} handleChange={handleFormChange} />
+                    
+                    <hr style={styles.separator} /> {/* Separador */}
+
+                    {/*Actividades del docente*/}
                     <ConsignarActividadesDoc actividades={actividades} onActividadesChange={handleActividadesChange} />
+                    
+                    <hr style={styles.separator} /> {/* Separador */}
+
+                    {/*Valoracion auxiliares */}
                     <CompletarValoracionAuxiliaresDoc valoraciones={valoracionesAuxiliares} onValoracionesChange={handleValoracionesChange} />
 
                     <div style={styles.buttonContainer}>

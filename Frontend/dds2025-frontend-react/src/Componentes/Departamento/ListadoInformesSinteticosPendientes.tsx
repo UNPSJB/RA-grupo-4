@@ -109,17 +109,7 @@ const InformesSinteticosPendientes: React.FC<Props> = ({ departamentoId }) => {
                     color: #e76f51; /* Naranja principal */
                     padding: 20px;
                 }
-                
-             
-
-                .lista-informes-capsula {
-                    list-style: none;
-                    padding: 0;
-                    margin: 0;
-                    display: flex;
-                    flex-direction: column;
-                    gap: 16px;
-                }
+               
 
                 /* Estilo de la Cápsula/Tarjeta */
                 .tarjeta-informe-capsula {

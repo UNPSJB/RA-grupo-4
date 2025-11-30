@@ -24,7 +24,7 @@ interface Props {
 
 const styles = {
     container: {
-        maxWidth: '800px',
+        maxWidth: '900px',
         margin: '0 auto',
         padding: '28px',
         backgroundColor: '#ffffff',
