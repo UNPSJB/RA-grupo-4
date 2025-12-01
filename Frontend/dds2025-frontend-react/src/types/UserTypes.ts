@@ -29,5 +29,6 @@ interface Docente {
 
 interface Departamento {
     id: number;
+    dni: number;
     nombre: string;
 }

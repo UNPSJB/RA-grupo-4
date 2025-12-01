@@ -288,7 +288,7 @@ const HistorialEncuestasRealizadasEstudiante: React.FC = () => {
                         >
                             <div className="encuesta-info-historial">
                                 <CheckCircle2 size={24} className="icono-materia-historial" />
-                                <span className="materia-title-historial">{"hola "}{item.materia_nombre}</span>
+                                <span className="materia-title-historial">{item.materia_nombre}</span>
                             </div>
                             
                             <div className="encuesta-meta-historial">

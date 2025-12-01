@@ -8,6 +8,7 @@ class Estudiante(ModeloBase):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     nombre: Mapped[str] = mapped_column(String, unique=False, index=True)
+    dni: Mapped[int] = mapped_column(Integer, index=True)
 
     inscripciones: Mapped[Optional[List["Inscripciones"]]] = relationship(
         "Inscripciones", 

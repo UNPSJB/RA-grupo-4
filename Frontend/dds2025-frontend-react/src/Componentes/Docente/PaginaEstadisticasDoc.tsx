@@ -56,7 +56,7 @@ const PaginaEstadisticasDoc: React.FC = () => {
                 const dataPeriodo = await resPeriodo.json();
                 setPeriodoActual(dataPeriodo);
 
-                const res = await fetch(`${API_BASE}/materias/listarInscriptos`);
+                const res = await fetch(`${API_BASE}/materias/listar`);
                 if (!res.ok) throw new Error("Error al cargar las materias.");
                 
                 const data: Materia[] = await res.json();
@@ -77,10 +77,15 @@ const PaginaEstadisticasDoc: React.FC = () => {
         cargarMaterias();
     }, []);
 
-    const getDatosSimulados = (materia: Materia): StatsSimulados => ({
-        inscriptos: materia.inscriptos || Math.floor(Math.random() * 50) + 20,
-        procesadas: materia.procesadas || Math.floor(Math.random() * 20) + 10,
-    });
+    const getDatosSimulados = (materia: Materia): StatsSimulados => {
+        const inscriptos = materia.inscriptos || Math.floor(Math.random() * 50) + 20;
+        const procesadas = Math.min(
+            materia.procesadas || Math.floor(Math.random() * 20) + 10,
+            inscriptos
+        );
+
+        return { inscriptos, procesadas };
+    };
 
     if (loading) return (
         <div className="loading-message">
