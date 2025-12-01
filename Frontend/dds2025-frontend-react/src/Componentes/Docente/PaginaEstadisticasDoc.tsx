@@ -383,7 +383,7 @@ const PaginaEstadisticasDoc: React.FC = () => {
                         onClick={handleGoBack}
                     >
                         <ArrowLeft size={20} />
-                        Regresar al incio
+                        Regresar al inicio
                     </button>
                 <h2 className="seccion-title">
                     <BookOpen size={24} />

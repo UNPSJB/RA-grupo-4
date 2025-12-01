@@ -12,8 +12,8 @@ const Login: React.FC = () => {
         login({username, password});
     };
 
-    if (isLoading)
-        return <div style={{ textAlign: 'center', marginTop: '50px' }}>Cargando datos del usuario...</div>
+    // if (isLoading)
+    //     return <div style={{ textAlign: 'center', marginTop: '50px' }}>Cargando datos del usuario...</div>
 
     // Redirecciones al home del rol correspondiente
     if (isAuthenticated){

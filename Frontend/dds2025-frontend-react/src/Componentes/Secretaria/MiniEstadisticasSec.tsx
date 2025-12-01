@@ -22,12 +22,12 @@ const MiniEstadisticasSec = () => {
 
                 // DATOS DE EJEMPLO (MOCK): 5 en todos los campos
                 const dataSimulada = {
-                    total: 5, 
+                    total: 9, 
                     respondidas: 5, 
                     pendientes: 5, 
                     totalDepartamentos: 5, // Izquierda: Total Departamentos (BASE/DENOMINADOR)
-                    isRecibidos: 0,         // Centro: I.S. Recibidos
-                    isPendientes: 5         // Derecha: I.S. Pendientes
+                    isRecibidos: 2,         // Centro: I.S. Recibidos
+                    isPendientes: 7         // Derecha: I.S. Pendientes
                 };
 
                 setStats(dataSimulada);
@@ -43,7 +43,7 @@ const MiniEstadisticasSec = () => {
     }, []);
 
     // LÓGICA DE CÁLCULO DE PORCENTAJES
-    const totalBase = stats.totalDepartamentos > 0 ? stats.totalDepartamentos : 1; 
+    const totalBase = stats.totalDepartamentos > 0 ? stats.total : 1; 
     const porcentajeRecibidos = ((stats.isRecibidos / totalBase) * 100).toFixed(0);
     const porcentajePendientes = ((stats.isPendientes / totalBase) * 100).toFixed(0);
 
