@@ -18,7 +18,7 @@ import ErrorCargaDatos from "./Componentes/Otros/ErrorCargaDatos";
 import SinDatos from "./Componentes/Otros/SinDatos";
 import Calendario from "./Componentes/Otros/Calendario";
 import MostrarMiPerfil from "./Componentes/Otros/MostrarMiPerfil";
-
+import TarjetaDelPerfil from "./Componentes/Otros/TarjetasPerfiles";
 // Menús
 import MenuAlumno from "./Componentes/Menus/MenuAlumno";
 import MenuDocente from "./Componentes/Menus/MenuDocente";
@@ -42,15 +42,23 @@ const MainLayout = () => {
   const { currentUser, isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
 
+  const getHomePath = () => {
+      const rol = currentUser?.role_name;
 
-  const datosUsuario = {
-    nombre: "Admin",
-    email: "admin@unpsjb.edu.ar",
-    rol: "Administrador",
-    legajo: "0000",
-    carrera: "Licenciatura en Sistemas",
-    sede: "Sede Trelew"
+      switch (rol) {
+          case "alumno":
+              return "/home/alumno";
+          case "docente":
+              return "/home/docente";
+          case "departamento":
+              return "/home/departamento";
+          case "secretaria_academica":
+              return "/home/secretaria";
+          default:
+              return "/home";
+      }
   };
+
 
   // Cerrar menu perfil al hacer clic fuera
   useEffect(() => {
@@ -77,8 +85,38 @@ const MainLayout = () => {
   // Si no está autenticado, no debería renderizar nada (será atrapado por AuthLayout)
   if (!isAuthenticated || !currentUser) return null; 
   
-  // Lógica del rol (se usa en el menú o en los botones)
-  const roleName = currentUser.role_name || "Usuario";
+  // Obtiene nombre y rol visibles para el navbar según el tipo de usuario
+  const getInfoNavbar = () => {
+      const rol = currentUser.role_name;
+
+      switch (rol) {
+          case "alumno":
+              return {
+                  nombre: currentUser.alumno?.nombre || currentUser.username,
+                  rolVisible: "Alumno"
+              };
+
+          case "docente":
+              return {
+                  nombre: currentUser.docente?.nombre || currentUser.username,
+                  rolVisible: "Docente"
+              };
+
+          case "departamento":
+              return {
+                  nombre: currentUser.departamento?.nombre || currentUser.username,
+                  rolVisible: "Departamento"
+              };
+
+          default:
+              return {
+                  nombre: currentUser.username,
+                  rolVisible: currentUser.role_name
+              };
+      }
+  };
+
+  const navbarInfo = getInfoNavbar();
 
   return (
     <div className="app-container">
@@ -97,15 +135,19 @@ const MainLayout = () => {
           </button>
 
           <img src={logoUnpsjb} alt="Logo" className="navbar-logo" />
-          <p className="site-name"> Sistema de Encuestas UNPSJB</p>
-          {/* <Link to="/home" className="site-name">Sistema de Encuestas UNPSJB</Link> */}
+          <Link to={getHomePath()}  className="site-name">Sistema de Encuestas UNPSJB</Link>
         </div>
 
         <div className="navbar-right" ref={menuPerfilRef}>
           <div className="navbar-avatar-container" onClick={() => setMostrarMenuPerfil(!mostrarMenuPerfil)}>
             <div style={{textAlign: 'right', marginRight: '5px', display: 'flex', flexDirection: 'column'}}>
-              <span style={{fontSize: '0.85rem', fontWeight: 'bold', color: '#1e293b'}}>Hola, {datosUsuario.nombre.split(" ")[0]}</span>
-              <span style={{fontSize: '0.7rem', color: '#64748b'}}>{datosUsuario.rol}</span>
+              <span style={{fontSize: '0.85rem', fontWeight: 'bold', color: '#1e293b'}}>
+                  Hola, {navbarInfo.nombre.split(" ")[0]}
+              </span>
+              
+              <span style={{fontSize: '0.7rem', color: '#64748b'}}>
+                  {navbarInfo.rolVisible}
+              </span>
             </div>
             <img 
               src={fotoPerfil} 
@@ -117,45 +159,11 @@ const MainLayout = () => {
           </div>
 
           {mostrarMenuPerfil && (
-            <div className="profile-card">
-              <div className="card-header">
-                <img src={fotoPerfil} alt="User" className="card-avatar-large" />
-                <h3 className="card-user-name">{datosUsuario.nombre}</h3>
-                <span className="card-user-role">{datosUsuario.rol}</span>
-                <div style={{fontSize: '0.8rem', marginTop: '5px', opacity: 0.8}}>{datosUsuario.email}</div>
-              </div>
-
-              <div className="card-body">
-                <div className="info-row">
-                  <span className="info-label">Legajo</span>
-                  <span className="info-value">{datosUsuario.legajo}</span>
-                </div>
-                <div className="info-row">
-                  <span className="info-label">Sede</span>
-                  <span className="info-value">{datosUsuario.sede}</span>
-                </div>
-                <div className="info-row" style={{borderBottom: 'none', marginBottom: 0}}>
-                  <span className="info-label">Carrera</span>
-                  <span className="info-value" style={{maxWidth: '150px'}}>{datosUsuario.carrera}</span>
-                </div>
-              </div>
-
-              <div className="card-actions">
-                <Link to="/home/perfil" className="action-btn" onClick={() => setMostrarMenuPerfil(false)}>
-                  <User size={18} /> Mi Perfil Completo
-                </Link>
-                <Link to="/home/calendario" className="action-btn" onClick={() => setMostrarMenuPerfil(false)}>
-                  <Calendar size={18} /> Mi Calendario
-                </Link>
-
-                <div className="dropdown-divider"></div>
-                
-                {/* BOTÓN DE CERRAR SESIÓN QUE EJECUTA EL LOGOUT REAL */}
-                <div className="dropdown-item logout" onClick={handleLogout}> 
-                  Cerrar Sesión
-                </div>
-              </div>
-            </div>
+            <TarjetaDelPerfil
+                usuario={currentUser}
+                onLogout={handleLogout}
+                onClose={() => setMostrarMenuPerfil(false)}
+            />
           )}
         </div>
       </nav>

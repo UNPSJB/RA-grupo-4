@@ -175,10 +175,10 @@ const HistorialInformesSinteticos: React.FC = () => {
                                   <tr key={item.id}>
                                       <td>
                                           <div className="report-title">
-                                              Informe Sintético (ID: {item.id})
+                                              Informe Sintético del departamento de  {item.nombre_departamento}
                                           </div>
                                           <div className="report-subtitle">
-                                              {item.nombre_departamento}
+                                              {item.anio_lectivo} (ID: {item.id})
                                           </div>
                                       </td>
                                       

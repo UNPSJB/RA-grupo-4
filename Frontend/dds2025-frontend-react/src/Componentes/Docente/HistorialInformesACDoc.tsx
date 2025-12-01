@@ -328,7 +328,7 @@ const HistorialInformesACDoc: React.FC = () => {
                     onClick={handleGoBack}
                 >
                     <ArrowLeft size={20} />
-                    Regresar al incio
+                    Regresar al inicio
                 </button>
             </div>
 

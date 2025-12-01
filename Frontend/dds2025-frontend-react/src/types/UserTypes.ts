@@ -18,6 +18,7 @@ export interface User {
 
 interface Alumno {
     id: number;
+    dni: number;
     nombre: string; 
 }
 
@@ -29,6 +30,5 @@ interface Docente {
 
 interface Departamento {
     id: number;
-    dni: number;
     nombre: string;
 }

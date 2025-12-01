@@ -2,10 +2,31 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { X, ExternalLink } from 'lucide-react';
 import Nosotros from '../Otros/Nosotros';
+import { useAuth } from '../../hooks';
 
 const MenuInstitucional = ({ isOpen, onClose }) => {
+
+  const { currentUser, isAuthenticated, logout } = useAuth();
+  const getHomePath = () => {
+      const rol = currentUser?.role_name;
+
+      switch (rol) {
+          case "alumno":
+              return "/home/alumno";
+          case "docente":
+              return "/home/docente";
+          case "departamento":
+              return "/home/departamento";
+          case "secretaria_academica":
+              return "/home/secretaria";
+          default:
+              return "/home";
+      }
+  };
+
+
   const menuItems = [
-    { label: "Inicio", url: "/home", external: false},
+    { label: "Inicio", url: getHomePath(), external: false},
     { label: "Mapas", url: "https://www.unp.edu.ar/index.php/22-universidad/14-mapas-de-las-sedes", external: true },
     { label: "Manual y gráfica", url: "https://www.unp.edu.ar/index.php/22-universidad/11-manual-institucional", external: true },
     { label: "Estatuto", url: "https://www.unp.edu.ar/consejo/documentos/ordenanzas/ordenanza120.pdf", external: true },
