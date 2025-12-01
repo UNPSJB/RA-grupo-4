@@ -100,5 +100,4 @@ const Login: React.FC = () => {
         </section>
     );
 };
-
 export default Login; 
