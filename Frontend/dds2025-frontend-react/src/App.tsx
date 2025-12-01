@@ -42,15 +42,23 @@ const MainLayout = () => {
   const { currentUser, isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
 
+  const getHomePath = () => {
+      const rol = currentUser?.role_name;
 
-  const datosUsuario = {
-    nombre: "Admin",
-    email: "admin@unpsjb.edu.ar",
-    rol: "Administrador",
-    legajo: "0000",
-    carrera: "Licenciatura en Sistemas",
-    sede: "Sede Trelew"
+      switch (rol) {
+          case "alumno":
+              return "/home/alumno";
+          case "docente":
+              return "/home/docente";
+          case "departamento":
+              return "/home/departamento";
+          case "secretaria_academica":
+              return "/home/secretaria";
+          default:
+              return "/home";
+      }
   };
+
 
   // Cerrar menu perfil al hacer clic fuera
   useEffect(() => {
@@ -127,7 +135,7 @@ const MainLayout = () => {
           </button>
 
           <img src={logoUnpsjb} alt="Logo" className="navbar-logo" />
-          <Link to="/home" className="site-name">Sistema de Encuestas UNPSJB</Link>
+          <Link to={getHomePath()}  className="site-name">Sistema de Encuestas UNPSJB</Link>
         </div>
 
         <div className="navbar-right" ref={menuPerfilRef}>
