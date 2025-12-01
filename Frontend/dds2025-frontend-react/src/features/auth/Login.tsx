@@ -32,9 +32,6 @@ const Login: React.FC = () => {
         login({ username, password });
     };
 
-    if (isLoading)
-        return <div className="loading-message">Cargando datos del usuario...</div>;
-
     if (isAuthenticated) {
         if (currentUser?.role_name === "alumno") return <Navigate to="/home/alumno/" replace />;
         if (currentUser?.role_name === "docente") return <Navigate to="/home/docente" replace />;
@@ -58,9 +55,12 @@ const Login: React.FC = () => {
                     </div>
 
                     <form onSubmit={handleSubmit} className="form">
-                        <p id="heading" className="login-title">Inicio Secion</p>
-
-                        {error ? <p className="error-message">{error}</p> : null}
+                        <p id="heading" className="login-title">Iniciar sesion</p>
+                        {error && (
+                            <div className="login-error">
+                                {error}
+                            </div>
+                        )}
 
                         <div className="field">
                             <UserIcon />
