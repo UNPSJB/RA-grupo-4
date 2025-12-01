@@ -1,0 +1,237 @@
+/* Login.css – Versión Mejorada, Suave y Profesional para la UNPSJB */
+
+/* Fondo General */
+.login-container {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+
+    background-color: #ffffff;
+    padding: 20px;
+    font-family: 'Inter', sans-serif;
+
+    backdrop-filter: blur(6px); /* ← blur suave */
+}
+
+/* --- Animación de entrada más elegante --- */
+@keyframes fadeSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(18px) scale(0.97);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Burbuja Azul (Izquierda) */
+.bubble-blue {
+    position: absolute;
+    top: 70%;
+    left: 0;
+    width: 1450px;
+    height: 1450px;
+    background-color: #2fd2eb;
+    border-radius: 50%;
+    transform: translate(-65%, -50%);
+    opacity: 0.75;
+    z-index: 0;
+}
+
+/* Burbuja Roja */
+.bubble-red {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 800px;
+    height: 800px;
+    background-color: #b60909;
+    border-radius: 50%;
+    transform: translate(25%, 35%);
+    opacity: 0.6;
+    z-index: 0;
+}
+
+/* Burbuja Verde */
+.bubble-green {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 750px;
+    height: 750px;
+    background-color: #2fb350;
+    border-radius: 50%;
+    transform: translate(30%, -30%);
+    opacity: 1;
+    z-index: 0;
+}
+
+/* --- TARJETA PRINCIPAL --- */
+.card {
+    background: linear-gradient(145deg, #e9f2ff 0%, #d7e8ff 100%);
+    border-radius: 28px;
+    padding: 4px; 
+    border: 1px solid rgba(0,0,0,0.4); /* ← borde negro elegante */
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+    transition: 0.25s ease-in-out;
+    z-index: 10;
+}
+
+.card:hover {
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px); /* ← elevación suave */
+    background: linear-gradient(145deg, #f1f7ff 0%, #e0edff 100%);
+}
+
+/* Capa interior */
+.card2 {
+    border-radius: 25px;
+    background: #ffffff;
+}
+
+/* Formulario */
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    padding: 45px 55px 25px 55px;
+    background-color: #ffffff;
+    border-radius: 23px;
+    width: 360px;
+    animation: fadeSlideIn 0.55s ease-out;
+}
+
+/* Título */
+.login-title {
+    text-align: center;
+    color: #1a4a8c;
+    font-size: 1.65em;
+    margin-bottom: 20px;
+    font-weight: 700;
+}
+
+/* --- CAMPOS --- */
+.field {
+    display: flex;
+    align-items: center;
+    gap: 0.8em;
+    border-radius: 14px;
+    padding: 0.85em;
+    border: 1px solid #d1d1d1;
+    background: #f9f9f9;
+
+    transition: all 0.25s ease-in-out;
+}
+
+.field:hover {
+    background: #ffffff;
+    border-color: #b9d7ff; /* ← hover suave */
+}
+
+.field:focus-within {
+    border: 1px solid #007bff;
+    box-shadow: 0 0 4px rgba(0, 123, 255, 0.20);
+    background-color: #ffffff;
+}
+
+.input-icon {
+    width: 1.2em;
+    height: 1.2em;
+    color: #4e4e4e;
+}
+
+.input-field {
+    border: none;
+    outline: none;
+    width: 100%;
+    background: transparent;
+    font-size: 1em;
+    color: #333;
+}
+
+/* Botonera */
+.form-buttons {
+    margin-top: 2.3em;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* BOTÓN SUBMIT (moderno y suave) */
+.submit-button {
+    padding: 0.85em;
+    border-radius: 10px;
+    border: none;
+    background-color: #1a4a8c;
+    color: #fff;
+    font-size: 1.05em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.25s ease-in-out;
+}
+
+.submit-button:hover {
+    background-color: #245fb5;
+    box-shadow: 0 4px 12px rgba(26, 74, 140, 0.25);
+}
+
+/* Enlaces */
+.auth-links {
+    display: flex;
+    justify-content: space-between;
+}
+
+.auth-links a {
+    font-size: 0.9em;
+    padding: 5px 8px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: 0.25s ease-in-out;
+}
+
+/* Olvidé contraseña */
+.button2 {
+    background-color: transparent;
+    border: 1px solid #d6d6d6;
+    color: #1a4a8c;
+}
+
+.button2:hover {
+    background-color: #eef4ff;
+    border-color: #b9d7ff;
+}
+
+/* Crear cuenta */
+.button3 {
+    background-color: #f1f1f1;
+    color: #333;
+}
+
+.button3:hover {
+    background-color: #e6e6e6;
+    color: #000;
+}
+
+.header-institucional {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 15px;
+}
+
+.logo-unpsjb {
+    width: 140px;
+    height: auto;
+}
+
+.sistema-encuestas {
+    font-size: 1.15em;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 5px;
+}
