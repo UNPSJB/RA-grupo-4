@@ -1,103 +1,103 @@
 import React, { useState } from 'react';
-import { Link, Navigate } from 'react-router-dom'; 
-import { useAuth } from '../../hooks/useAuth'; 
+import { Link, Navigate } from 'react-router-dom';
+import { useAuth } from '../../hooks/useAuth';
+import './Login.css';
+import logo from '../../assets/logo_unpsjb.png';
+
+const UserIcon = () => (
+    <svg className="input-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+        viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+        strokeLinecap="round" strokeLinejoin="round">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+        <circle cx="12" cy="7" r="4"></circle>
+    </svg>
+);
+
+const LockIcon = () => (
+    <svg className="input-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+        viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+        strokeLinecap="round" strokeLinejoin="round">
+        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+    </svg>
+);
 
 const Login: React.FC = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    const { currentUser, isAuthenticated, isLoading, login, error } = useAuth(); 
+    const { currentUser, isAuthenticated, isLoading, login, error } = useAuth();
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        login({username, password});
+        login({ username, password });
     };
 
-    if (isLoading)
-        return <div style={{ textAlign: 'center', marginTop: '50px' }}>Cargando datos del usuario...</div>
-
-    // Redirecciones al home del rol correspondiente
-    if (isAuthenticated){
-        if (currentUser?.role_name == "alumno"){
-            return (<Navigate to="/home/alumno/" replace />)
-        }
-        if (currentUser?.role_name == "docente"){
-            return (<Navigate to="/home/docente" replace />)
-        }
-        if (currentUser?.role_name == "departamento"){
-            return (<Navigate to="/home/departamento" replace />)
-        }
-        if (currentUser?.role_name == "secretaria_academica"){
-            return (<Navigate to="/home/secretaria" replace />)
-        }
-
-        return (<Navigate to="/home" replace />) 
+    if (isAuthenticated) {
+        if (currentUser?.role_name === "alumno") return <Navigate to="/home/alumno/" replace />;
+        if (currentUser?.role_name === "docente") return <Navigate to="/home/docente" replace />;
+        if (currentUser?.role_name === "departamento") return <Navigate to="/home/departamento" replace />;
+        if (currentUser?.role_name === "secretaria_academica") return <Navigate to="/home/secretaria" replace />;
+        return <Navigate to="/home" replace />;
     }
 
     return (
-        <section style={{ 
-            display: 'flex', 
-            justifyContent: 'center', 
-            alignItems: 'center', 
-            minHeight: '80vh' 
-        }}>
-            <div style={{ 
-                border: '1px solid #ccc', 
-                padding: '30px', 
-                borderRadius: '8px', 
-                boxShadow: '0 4px 8px rgba(0,0,0,0.1)'
-            }}>
-                <h3 style={{ textAlign: 'center', marginBottom: '20px' }}>Iniciar Sesión</h3>
-                
-                {/* Muestra el error si existe */}
-                {error ? <p style={{ color: 'red', fontSize: '.9em', textAlign: 'center' }}>{error}</p> : null}
+        <section className="login-container">
 
-                <form onSubmit={handleSubmit} style={{ 
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: '15px'
-                }}>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-                        <label htmlFor="username">Nombre de usuario</label>
-                        <input
-                            id="username"
-                            type="text"
-                            value={username}
-                            onChange={(e) => setUsername(e.target.value)}
-                            required
-                            style={{ padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
-                        />
-                    </div>
-                    
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-                        <label htmlFor="password">Contraseña</label>
-                        <input
-                            id="password"
-                            type="password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            required
-                            style={{ padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
-                        />
-                    </div>
-                    
-                    <button type="submit" style={{ 
-                        marginTop: 15, 
-                        padding: '10px', 
-                        backgroundColor: '#007bff', 
-                        color: 'white', 
-                        border: 'none', 
-                        borderRadius: '4px', 
-                        cursor: 'pointer' 
-                    }}>
-                        Iniciar Sesión
-                    </button>
+            <div className="bubble-blue"></div>
+            <div className="bubble-red"></div>
+            <div className="bubble-green"></div>
 
-                    <p className="auth-links" style={{ textAlign: 'center', fontSize: '.9em', marginTop: '10px' }}>
-                        <Link to="/crear-cuenta">Crear una cuenta nueva</Link> | <Link to="/recuperar-contraseña">Olvidé mi contraseña</Link>
-                    </p>
-                </form>
+            <div className="card">
+                <div className="card2">
+
+                    <div className="header-institucional">
+                        <img src={logo} alt="UNPSJB Logo" className="logo-unpsjb" />
+                    </div>
+
+                    <form onSubmit={handleSubmit} className="form">
+                        <p id="heading" className="login-title">Iniciar sesion</p>
+                        {error && (
+                            <div className="login-error">
+                                {error}
+                            </div>
+                        )}
+
+                        <div className="field">
+                            <UserIcon />
+                            <input
+                                id="username"
+                                type="text"
+                                value={username}
+                                onChange={(e) => setUsername(e.target.value)}
+                                required
+                                className="input-field"
+                                placeholder="Nombre de usuario"
+                            />
+                        </div>
+
+                        <div className="field">
+                            <LockIcon />
+                            <input
+                                id="password"
+                                type="password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                required
+                                className="input-field"
+                                placeholder="Contraseña"
+                            />
+                        </div>
+
+                        <div className="form-buttons">
+                            <button type="submit" className="submit-button button1">
+                                INGRESAR
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </section>
     );
 };
-export default Login; 
+
+export default Login;
