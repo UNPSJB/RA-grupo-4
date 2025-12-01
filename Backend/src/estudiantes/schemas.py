@@ -19,6 +19,7 @@ class EstudianteBase(BaseModel):
 
 class Estudiante(EstudianteBase):
     id: int
+    dni: int
     
     model_config = {"from_attributes": True}
 
