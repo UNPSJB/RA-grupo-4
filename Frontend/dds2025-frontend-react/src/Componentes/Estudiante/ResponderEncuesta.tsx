@@ -2,7 +2,6 @@ import React, { useEffect, useState, useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom"; 
 import { Send, ArrowRight, ArrowLeft, AlertTriangle } from "lucide-react"; 
 import { useAuth } from "../../hooks";
-// --- IMPORTACIONES DE COMPONENTES DE CONTROL ---
 import FaltanCamposObligatorios from "../Otros/FaltanCamposObligatorios"; 
 import TodoBien from "../Otros/TodoBien"; 
 import HeaderInstitucional from "../Otros/HeaderInstitucional";
@@ -404,7 +403,7 @@ const ResponderEncuesta: React.FC = () => {
                     onClick={handleGoBack}
                 >
                     <ArrowLeft size={20} />
-                    Regresar al incio
+                    Regresar al inicio
                 </button>
                 <HeaderInstitucional/>
                 <h1 className="form-title">{encuesta.nombre}</h1>

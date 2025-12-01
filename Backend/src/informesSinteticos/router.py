@@ -168,7 +168,6 @@ def obtener_necesidades_por_departamento(departamento_id: int, db: Session = Dep
 def obtener_informesAC_asociados_a_informeSintetico(departamento_id: int, periodo_id: int, db: Session = Depends(get_db)):
     return services.get_informesAC_asociados_a_informeSintetico(db, departamento_id, periodo_id)
 
-
 @router.get("/departamento/{departamento_id}/periodo/{periodo_id}/informesAC/porcentajes")
 def obtener_porcentajes_informesAC(departamento_id: int, periodo_id: int, db: Session = Depends(get_db)):
     return services.get_porcentajes_informeSintetico(db, departamento_id, periodo_id)
