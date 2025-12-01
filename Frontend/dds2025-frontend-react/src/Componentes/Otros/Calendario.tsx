@@ -1,31 +1,25 @@
 import React, { useState } from "react";
-import logoUnpsjb from "../../assets/logo_unpsjb.png"; // ajusta la ruta según tu proyecto
+import logoUnpsjb from "../../assets/logo_unpsjb.png"; 
+import { Send, ArrowRight, ArrowLeft, AlertTriangle } from "lucide-react"; 
+import { useNavigate, useParams } from "react-router-dom"; 
+import { useAuth } from "../../hooks";
 
-// --- 1. DEFINICIÓN DE MARCAS DE FECHA ---
 interface MarcaFecha {
   date: Date;
   title: string;
-  type: 'inicio' | 'cierre' | 'personal'; // Nuevo tipo 'personal' añadido
+  type: 'inicio' | 'cierre' | 'personal'; 
 }
 
-// Fechas relevantes solicitadas para el año 2025
 const fechasRelevantes: MarcaFecha[] = [
-  // NOTA: Los meses en JavaScript (Date) van de 0 (Enero) a 11 (Diciembre)
   { date: new Date(2025, 7, 1), title: 'Inicio de Segundo Cuatrimestre', type: 'inicio' }, // Agosto (7) - Día 1
   { date: new Date(2025, 11, 1), title: 'Fin de Segundo Cuatrimestre', type: 'cierre' },  // Diciembre (11) - Día 1
   { date: new Date(2025, 10, 28), title: 'Día de pesca HP TEAM', type: 'personal' }, // Noviembre (10) - Día 28
-  // --- NUEVA MARCA AÑADIDA: Sprint 4 Review (Noviembre es el mes 10, Día 25) ---
   { date: new Date(2025, 10, 25), title: 'Sprint 4 Review', type: 'personal' } // Noviembre (10) - Día 25
 ];
-// ----------------------------------------
-
 const Calendario = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
-  // Mantenemos selectedDate para la funcionalidad original (resaltar día)
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date()); 
-  
-  // Usaremos CSS/clases para la simplicidad del tooltip.
-
+  const navigate = useNavigate();
   const daysOfWeek = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
   const monthNames = [
     "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
@@ -36,7 +30,7 @@ const Calendario = () => {
     setCurrentDate(
       new Date(currentDate.getFullYear(), currentDate.getMonth() + increment, 1)
     );
-    setSelectedDate(null); // Limpiar selección al cambiar de mes
+    setSelectedDate(null); 
   };
 
   const daysInMonth = new Date(
@@ -54,7 +48,6 @@ const Calendario = () => {
   const blanks = Array(firstDay).fill(null);
   const days = Array.from({ length: daysInMonth }, (_, i) => i + 1);
 
-  // --- LÓGICA DE BUSQUEDA DE MARCAS ---
   const getDayMark = (date: Date): MarcaFecha | undefined => {
     return fechasRelevantes.find(mark => 
         mark.date.toDateString() === date.toDateString()
@@ -64,6 +57,29 @@ const Calendario = () => {
   const handleSelectDate = (date: Date | null) => {
       setSelectedDate(date);
   };
+  
+  const { currentUser, isAuthenticated, isLoading, login, error}=useAuth();
+
+   const getHomePath = () => {
+      const rol = currentUser?.role_name;
+
+      switch (rol) {
+          case "alumno":
+              return "/home/alumno";
+          case "docente":
+              return "/home/docente";
+          case "departamento":
+              return "/home/departamento";
+          case "secretaria_academica":
+              return "/home/secretaria";
+          default:
+              return "/home";
+      }
+  };
+
+   const handleGoBack = () => {
+        navigate(getHomePath());
+    };
 
   return (
     <div className="calendario-container">
@@ -221,9 +237,37 @@ const Calendario = () => {
           from { opacity: 0; transform: translateY(30px); }
           to { opacity: 1; transform: translateY(0); }
         }
+
+        /*Boton de atras*/
+                .go-back-button {
+                    background-color: #f0f4f8;
+                    color: #0078D4;
+                    border: none;
+                    padding: 10px 15px;
+                    border-radius: 8px;
+                    cursor: pointer;
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    font-weight: 600;
+                    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+                }
+
+                .go-back-button:hover {
+                    background-color: #e8f4ff;
+                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                }
+
       `}</style>
 
       {/* Header con logo al lado del mes */}
+      <button 
+                  className="go-back-button"
+                  onClick={handleGoBack}
+                >
+                  <ArrowLeft size={20} />
+                  Regresar al inicio
+          </button>
       <div className="calendario-header">
         <button onClick={() => changeMonth(-1)}>←</button>
         <h2>
@@ -266,14 +310,12 @@ const Calendario = () => {
                       selectedDate &&
                       selectedDate.toDateString() === thisDate.toDateString();
                       
-                    // --- OBTENER MARCA ---
                     const mark = thisDate ? getDayMark(thisDate) : undefined;
 
                     return (
                       <td
                         key={i}
                         onClick={() => day && handleSelectDate(thisDate)}
-                        // Aplicamos la clase day-with-mark que ahora contiene el color amarillo
                         className={`
                           ${isSelected ? "bg-selected" : ""}
                           ${isToday && !isSelected ? "bg-today" : ""}
@@ -283,10 +325,8 @@ const Calendario = () => {
                         {day ? (
                           <>
                             <span className="day-number">{day}</span>
-                            {/* Eliminamos el punto de color, solo queda el Tooltip flotante */}
                             {mark && (
                                 <>
-                                    {/* Tooltip flotante que aparece en hover */}
                                     <span className="event-tooltip">
                                         {mark.title}
                                     </span>
@@ -306,7 +346,6 @@ const Calendario = () => {
         </tbody>
       </table>
 
-      {/* Eliminamos la sección selected-date & Event Detail, solo mostramos la fecha seleccionada */}
       <div className="selected-date">
         <h3>Fecha seleccionada</h3>
         <p>

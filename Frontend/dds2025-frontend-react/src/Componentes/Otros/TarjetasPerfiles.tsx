@@ -1,9 +1,13 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { User, Calendar } from "lucide-react";
+import { User, Calendar, LogOut } from "lucide-react";
 import fotoPerfil from "../../assets/avatarOA.png";
 import { User as UserType } from "../../types/UserTypes";
 import "../../App.css";
+
+
+
+
 
 interface Props {
     usuario: UserType;
@@ -100,8 +104,9 @@ const TarjetaDelPerfil: React.FC<Props> = ({ usuario, onLogout, onClose }) => {
 
                 <div className="dropdown-divider"></div>
 
-                <div className="dropdown-item logout" onClick={onLogout}>
-                    Cerrar Sesión
+                <div className="dropdown-item logout" style={logoutStyle}  onClick={onLogout}>
+                    <LogOut size={18} style={{ marginRight: 8 }} />
+                    <span>Cerrar Sesión</span>
                 </div>
             </div>
         </div>
@@ -109,3 +114,20 @@ const TarjetaDelPerfil: React.FC<Props> = ({ usuario, onLogout, onClose }) => {
 };
 
 export default TarjetaDelPerfil;
+
+
+
+
+const logoutStyle: React.CSSProperties = {
+    display: "flex",
+    alignItems: "center",
+    gap: "8px",
+    background: "none",
+    border: "none",
+    color: "#e63946",
+    width: "100%",
+    textAlign: "left",
+    cursor: "pointer",
+    padding: "10px",
+    fontWeight: 500,
+};

@@ -32,12 +32,25 @@ const Login: React.FC = () => {
         login({ username, password });
     };
 
-    if (isAuthenticated) {
-        if (currentUser?.role_name === "alumno") return <Navigate to="/home/alumno/" replace />;
-        if (currentUser?.role_name === "docente") return <Navigate to="/home/docente" replace />;
-        if (currentUser?.role_name === "departamento") return <Navigate to="/home/departamento" replace />;
-        if (currentUser?.role_name === "secretaria_academica") return <Navigate to="/home/secretaria" replace />;
-        return <Navigate to="/home" replace />;
+    // if (isLoading)
+    //     return <div style={{ textAlign: 'center', marginTop: '50px' }}>Cargando datos del usuario...</div>
+
+    // Redirecciones al home del rol correspondiente
+    if (isAuthenticated){
+        if (currentUser?.role_name == "alumno"){
+            return (<Navigate to="/home/alumno/" replace />)
+        }
+        if (currentUser?.role_name == "docente"){
+            return (<Navigate to="/home/docente" replace />)
+        }
+        if (currentUser?.role_name == "departamento"){
+            return (<Navigate to="/home/departamento" replace />)
+        }
+        if (currentUser?.role_name == "secretaria_academica"){
+            return (<Navigate to="/home/secretaria" replace />)
+        }
+
+        return (<Navigate to="/home" replace />) 
     }
 
     return (
