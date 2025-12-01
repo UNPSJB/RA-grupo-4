@@ -137,7 +137,6 @@ const ListadoInformesACDoc: React.FC = () => {
     return (
         <div className="seccion-box">
             <style>{`
-    
                 .pending-list {
                     list-style: none;
                     padding: 0;
